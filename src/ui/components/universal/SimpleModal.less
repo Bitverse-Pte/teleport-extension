@@ -1,0 +1,45 @@
+.simple-modal-mask {
+    .simple-modal {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 155px 24px;
+        max-width: 302px;
+        background: #FFFFFF;
+        border-radius: 16px;
+        .simple-modal-header {
+            padding: 19px 16px;
+            margin-bottom: 0;
+            .title {
+                font-weight: 600;
+                font-size: 16px;
+                color: #364361;
+            }
+            .closeButton {
+                margin-left: 56px;
+                padding: 3.75px;
+            }
+        }
+        .content {
+            padding: 0 16px;
+            margin-bottom: 37px;
+            width: 100%;
+            .addChain-showchain-detail-item {
+                padding: 12px 0;
+            }
+        }
+    }
+}
+
+.overlay {
+    height: 100%;
+    width: 100%;
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    background-color: rgb(0,0,0); /* Black fallback color */
+    background-color: rgba(0,0,0, 0.9); /* Black w/opacity */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+  }

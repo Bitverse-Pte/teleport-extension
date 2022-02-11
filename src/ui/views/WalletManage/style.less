@@ -1,0 +1,324 @@
+@import '../../style/mixin';
+
+.wallet-manage-button-container {
+  height: 96px;
+  flex: 0 0 96px;
+}
+
+.tab-container {
+  height: 36px;
+  flex: 0 0 36px;
+  margin-bottom: 16px;
+}
+
+.wallet-manage-button-container {
+  justify-content: space-between;
+  align-items: flex-start;
+
+  ._edit {
+    .wallet-manage-button-wrap {
+      background: #F8FAFC;
+    }
+
+  }
+
+  ._import {
+    .wallet-manage-button-wrap {
+      background: #F0F9FF;
+    }
+    .wallet-manage-button-item-title{
+      color: #1484F5;
+    }
+  }
+
+  ._add {
+    .wallet-manage-button-wrap {
+      background: #F0FFF0;
+    }
+    .wallet-manage-button-item-title{
+      color: #42B856;
+    }
+  }
+
+  .wallet-manage-button-item {
+    align-items: center;
+    &:first-child{
+      margin-left: 12px;
+    }
+    &:last-child{
+      margin-right: 12px;
+    }
+    .wallet-manage-button-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .wallet-manage-img {
+        width: 17px;
+        height: 17px;
+      }
+    }
+
+    .wallet-manage-button-item-title {
+      font-size: 14px;
+      font-family: MontserratBold;
+    }
+  }
+}
+
+.wallet-manage {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+
+  p {
+    margin: 0;
+    line-height: 1;
+  }
+
+  
+
+  .content {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding-bottom: 16px;
+    .wallet-manage-button-container {
+      justify-content: space-between;
+      align-items: center;
+      background: #EFF7FF;
+      border-radius: 12px;
+      box-sizing: border-box;
+      padding: 0 16px;
+      height: 65px;
+      margin-bottom: 12px;
+
+      .wallet-manage-button-container-left {
+        align-items: center;
+
+        .wallet-manage-button-container-left-count {
+          font-weight: 600;
+          font-size: 20px;
+          line-height: 28px;
+        }
+
+        .wallet-manage-button-container-left-wallet {
+          font-weight: 500;
+          font-size: 16px;
+          line-height: 28px;
+          height: 28px;
+          line-height: 32px;
+        }
+
+      }
+
+      .wallet-manage-button-container-right {
+        align-items: center;
+        justify-content: flex-end;
+
+        .wallet-manage-button {
+          width: 85px;
+          align-items: center;
+          border: none;
+          height: 34px !important;
+        }
+
+        .import-button {
+          align-items: center;
+
+          .reverse-enter {
+            margin-right: 3px;
+          }
+        }
+
+        .green {
+          background: #42B856;
+          margin-left: 12px;
+        }
+      }
+    }
+
+    .account-container {
+      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
+
+      .list {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+
+        .item {
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          height: 64px;
+          flex: 0 0 64px;
+          padding: 0 @pagePaddingLeft;
+          box-sizing: border-box;
+          cursor: pointer;
+
+          &:hover {
+            background: #FAFCFE;
+          }
+
+          .circle {
+            width: 32px;
+            flex: 0 0 32px;
+            height: 32px;
+            margin-right: 14px;
+            border-radius: 50%;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #ffffff;
+            font-family: MontserratBold;
+          }
+
+          .right {
+            flex: 1;
+            justify-content: space-between;
+            align-items: center;
+
+            .name {
+              font-family: MontserratBold;
+              font-size: 14px;
+            }
+
+            .name-account {
+              .name-account-name {
+                font-family: MontserratBold;
+                font-size: 14px;
+              }
+
+              .name-account-address {
+                font-size: 12px;
+                color: #A3B4CC;
+              }
+            }
+
+            .normal-container {
+              justify-content: flex-end;
+              align-items: center;
+
+              .account-count {
+                text-align: right;
+                font-size: 14px;
+                color: #798CAD;
+              }
+
+              .svg-icon {
+                margin-left: 24px;
+                fill: #A3B4CC;
+              }
+            }
+
+            .icons-container {
+              width: 104px;
+              flex: 0 0 104px;
+              justify-content: space-between;
+              align-items: center;
+            }
+
+          }
+        }
+      }
+
+      .no-data {
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+
+        .home-no-assets {
+          width: 90px;
+          height: 83px;
+          margin-bottom: 12px;
+        }
+
+        .no-assets-title {
+          font-size: 12px;
+          line-height: 17px;
+          color: #9EA2A9;
+        }
+      }
+
+    }
+
+
+
+  }
+
+}
+
+.adm-popover-inner-content {
+  padding: 0 !important;
+}
+
+.adm-popover-arrow {
+  display: none;
+}
+
+.menu-node {
+  height: 99px;
+  width: 140px;
+  box-sizing: border-box;
+
+  .menu-item {
+    height: 33px;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 14px;
+    box-sizing: border-box;
+
+    .item {
+      font-style: normal;
+      font-weight: normal;
+      font-size: 11px;
+      font-size: 11px;
+      color: #9EA2A9;
+    }
+
+    &:hover {
+      background: #FAFCFE;
+
+      .item {
+        font-weight: 500;
+        color: @baseTextColor;
+      }
+    }
+
+    .icon {
+      margin-right: 10px;
+    }
+
+  }
+}
+
+.wallet-header-container{
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+  flex:0 0 64px;
+  .wallet-header-title{
+    font-size:18px;
+    font-family: MontserratBold;
+  }
+  .wallet-header-done{
+    width: 72px;
+    height: 30px;
+    font-size: 14px;
+    font-family: MontserratBold;
+    line-height: 30px;
+    background: #1484F5;
+    color: #ffffff;
+    border-radius: 8px;
+    text-align: center;
+  }
+}

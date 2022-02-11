@@ -1,0 +1,46 @@
+{
+  "manifest_version": 2,
+  "name": "__MSG_appName__",
+  "short_name": "__MSG_appName__",
+  "version": "0.0.1",
+  "default_locale": "en",
+  "description": "__MSG_appDescription__",
+  "icons": {
+    "16": "images/icons/16.png",
+    "32": "images/icons/32.png",
+    "48": "images/icons/48.png",
+    "64": "images/icons/64.png",
+    "128": "images/icons/128.png",
+    "512": "images/icons/512.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "images/icons/16.png",
+      "32": "images/icons/32.png",
+      "48": "images/icons/48.png",
+      "128": "images/icons/128.png"
+    },
+    "default_title": "TeleportWallet",
+    "default_popup": "popup.html"
+  },
+  "author": "https://teleport.network/",
+  "background": {
+    "persistent": true,
+    "scripts": ["webextension-polyfill.js", "vendors.js", "background.js"]
+  },
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "js": ["webextension-polyfill.js", "content-script.js"],
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["*://connect.trezor.io/*/popup.html"],
+      "js": ["vendor/trezor/trezor-content-script.js"]
+    }
+  ],
+  "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
+  "permissions": ["storage", "activeTab", "notifications"],
+  "web_accessible_resources": ["user-media-permission.html"]
+}

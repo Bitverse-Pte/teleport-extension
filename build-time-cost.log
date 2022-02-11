@@ -1,0 +1,4 @@
+background: paths.rootResolve('src/background/index.ts'),    real    1m49.097s
+'content-script': paths.rootResolve('src/content-script/index.ts'), real    1m9.279s
+pageProvider: paths.rootResolve('src/content-script/pageProvider/index.ts'), 1m9.450s
+ui: paths.rootResolve('src/ui/index.tsx'), 2m56.262s

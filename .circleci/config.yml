@@ -1,0 +1,60 @@
+# This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
+version: 2.1
+
+# Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
+# See: https://circleci.com/docs/2.0/orb-intro/
+orbs:
+  node: circleci/node@5.0
+
+jobs:
+  build:
+    executor:
+      name: node/default
+      tag: '14.18'
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          command: yarn lint:fix
+          name: Run YARN lint 
+      - run:
+          command: yarn build:pro
+          name: Run YARN build
+# jobs:
+#   lint:
+#     docker:
+
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+workflows:
+  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
+    # Inside the workflow, you define the jobs you want to run.
+    jobs:
+      # - lint: 
+      #     version: '14.18'
+      #     yarn-run: lint:fix
+      #     # If you are using yarn, change the line below from "npm" to "yarn"
+      #     pkg-manager: yarn
+      # - node/run: 
+      #     # requires: lint
+      #     version: '14.18'
+      #     # yarn-run: build:pro
+      #     # If you are using yarn, change the line below from "npm" to "yarn"
+      #     # pkg-manager: yarn
+      #     command: |
+      #       yarn lint:fix;
+      #       yarn build:pro
+      #     # steps:
+      #     # - run:
+      #     #     command: |
+      #     #       yarn lint:fix;
+      #     #       yarn build:pro
+      - build
+      - node/test:
+          # This is the node version to use for the `cimg/node` tag
+          # Relevant tags can be found on the CircleCI Developer Hub
+          # https://circleci.com/developer/images/image/cimg/node
+          version: '14.18'
+          # If you are using yarn, change the line below from "npm" to "yarn"
+          pkg-manager: yarn

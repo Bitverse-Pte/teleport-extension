@@ -1,0 +1,108 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~antd/dist/antd.less';
+@import './mixin.less';
+@import './overwrite';
+
+@font-face {
+  font-family: MontserratMedium;
+  src: url('../../assets/font/Montserrat-Medium.ttf');
+}
+@font-face {
+  font-family: Montserrat;
+  src: url('../../assets/font/Montserrat-Regular.ttf');
+}
+@font-face {
+  font-family: MontserratBold;
+  src: url('../../assets/font/Montserrat-Bold.ttf');
+}
+
+html,
+body {
+  font-family: 'PingFang HK', 'Roboto', sans-serif;
+  color: @baseTextColor;
+}
+//TODO (Jayce) test code, should
+body {
+  box-sizing: border-box;
+  border: 1px solid #3598db;
+  font-family: Montserrat;
+}
+
+
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+}
+
+h1 {
+  font-size: 20px;
+  line-height: 23px;
+  font-weight: 500;
+}
+
+button:focus {
+  outline: none;
+}
+
+.subtitle {
+  color: #818a99;
+  font-size: 14px;
+  line-height: 14px;
+}
+
+.font-roboto-mono {
+  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.create-new-header {
+  position: relative;
+  background: linear-gradient(111.24deg, #8babff 9.66%, #8094ff 85.59%);
+  padding: 32px 20px;
+  .teleportwallet-logo {
+    width: 84px;
+    height: 24px;
+    margin-left: 12px;
+  }
+  .mask {
+    position: absolute;
+    user-select: none;
+    z-index: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.uploader {
+  border-color: transparent;
+  border-width: 1px;
+  transition: border 0.2s;
+  &:hover {
+    border-color: #b0bdff;
+  }
+}
+
+/* Inserting this collapsed row between two flex items will make 
+ * the flex item that comes after it break to a new row */
+.break {
+  flex-basis: 100%;
+  height: 0;
+}
+
+
+// .flex-center-message {
+  .ant-message-notice-content .ant-message-custom-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    span::first-letter {
+      text-transform: capitalize;
+    }
+  }
+// }

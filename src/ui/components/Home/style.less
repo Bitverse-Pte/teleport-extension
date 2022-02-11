@@ -1,0 +1,74 @@
+@import '../../style/mixin';
+
+.header {
+  width: 100%;
+  height: @baseHeaderHeight;
+  flex: 0 0 @baseHeaderHeight;
+  position: relative;
+  justify-content: center;
+  align-content: center;
+
+  .back {
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+  .title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: @baseHeaderHeight;
+  }
+
+  .right {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+}
+
+.home .headerOfMenu {
+  height: 64px;
+  width: 100%;
+  position: relative;
+  // flex:0 0 64px;
+  padding: 0 24px;
+  .logo-container {
+    // background: #42B856;
+    border-radius: 100%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      height: 28px;
+      border-radius: 100%;
+    }
+  }
+  .network-select-bar {
+    width: 137px;
+    height: 20px;
+    padding: 12px 4px;
+    border-radius: 12px;
+    span.network-nickname {
+      font-size: 12px;
+    }
+  }
+  .expand-menu-btn {
+    padding: 2.5px;
+    .expand-menu-btn-icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .expand-list {
+    width: 12px;
+    height: 12px;
+  }
+}

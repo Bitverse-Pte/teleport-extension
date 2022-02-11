@@ -1,0 +1,199 @@
+.row {
+    display: flex;
+    padding: 24px 0;
+    justify-content: center;
+    align-items: center;
+    .field-name {
+        margin-right: auto;
+        font-size: 14px;
+        font-weight: 400;
+        color: #798CAD;
+        // line-height: 20px;
+        // letter-spacing: 0em;
+        text-align: left;
+    }
+    .field-name::after {
+        content: ":";
+    }
+    .field-value {
+        display: flex;
+        font-size: 14px;
+        font-family: MontserratBold;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 14px;
+        letter-spacing: 0em;
+        text-align: right;
+        color: #364361;
+        text-align: right;
+    }
+}
+.value-display {
+    margin: 0 auto;
+}
+.value {
+    display: flex;
+    justify-content: center;
+}
+
+svg.blue {
+    color: #0F83FF;
+}
+.some-padding {
+    margin: 0 4px;
+}
+
+
+.activity-detail {
+    font-family: Montserrat;
+    background-size: 360px 240px;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(24px);
+
+    .txdetail-status {
+        font-size: 12px;
+        font-style: normal;
+        font-family: MontserratBold;
+        line-height: 17px;
+        letter-spacing: 0em;
+        text-align: left;
+    
+        border-radius: 100px;
+        padding: 4px 8px;
+    }
+    .txdetail-status.default {
+        background: #FFFFFF;
+        color: rgb(121, 140, 173);
+    }
+    .txdetail-status.error {
+        background: #FFFFFF;
+        /* Red/02-normal */
+        color: rgb(224, 86, 81);
+    }
+    .txdetail-status.pending {
+        background: #FFFFFF;
+        /* Orange/02-normal */
+        color: rgb(255, 160, 20);
+    }
+
+    .txdetail-direction-logo {
+        margin-bottom: 32px;
+    }
+    .txdetail-values {
+        margin-bottom: 20px;
+    }
+
+    .txdetail-value-display {
+        margin: 0 auto;
+    }
+    .txdetail-value {
+        display: flex;
+        justify-content: center;
+        font-size: 30px;
+        font-style: normal;
+        font-family: MontserratBold;
+        font-weight: 600;
+        line-height: 28px;
+        letter-spacing: 0em;
+        text-align: center;
+        margin-bottom: 6px;
+        span.unit {
+            font-size: 16px;
+            margin-left: 2px;
+            font-family: MontserratBold;
+            font-weight: 600;
+        }
+    }
+
+    .from-and-to {
+        padding: 12px 0 0;
+        .address-card {
+            width: 148px;
+        }
+        .to-icon {
+            height: 24px;
+            width: 24px;
+            fill: white;
+            background: #1484F5;
+            display: block;
+            border-radius: 12px;
+            padding: 6px;
+            margin: auto -4px;
+            // on top of other elements
+            z-index: 999;
+          }
+    }
+
+    .row.pending-tx-actions {
+        button {
+        }
+        button.editGasBtn {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: 6px 14px;
+
+            position: static;
+            width: 144px;
+            height: 36px;
+            left: 0px;
+            top: 0px;
+
+            /* Blue/02-normal */
+
+            background: #1484F5;
+            color: #FFFFFF;
+            fill: #FFFFFF;
+            border-radius: 12px;
+
+            /* Inside auto layout */
+
+            flex: none;
+            order: 0;
+            flex-grow: 1;
+            margin: 0px 24px;
+            // from figma
+        }
+        button.cancelBtn {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: 6px 14px;
+
+            position: static;
+            width: 144px;
+            height: 36px;
+            left: 168px;
+            top: 0px;
+
+            /* Red/07-bg */
+            background: #FFF3F0;
+            // Red/02-normal
+            color: #E05651;
+            fill: #E05651;
+            border-radius: 12px;
+
+            /* Inside auto layout */
+
+            flex: none;
+            order: 1;
+            flex-grow: 1;
+            margin: 0px 24px;
+            // from figma
+        }
+    }
+}
+
+.activity-detail.default {
+    background-image: radial-gradient(110.92% 131.87% at 50% -31.87%, rgba(106,181,255,0.38) 0%, #FFFFFF 100%);
+}
+
+.activity-detail.error {
+    background-image: radial-gradient(119.33% 141.88% at 50% -41.88%, rgba(255,106,106,0.38) 0%, #FFFFFF 100%)
+}
+
+.activity-detail.pending {
+    background-image: radial-gradient(119.33% 141.88% at 50% -41.88%, rgba(255, 204, 106, 0.38) 0%, #FFFFFF 100%);
+}

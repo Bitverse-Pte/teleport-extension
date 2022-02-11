@@ -1,0 +1,37 @@
+{
+  "ETH": [
+    {
+      "symbol": "eth",
+      "decimal": 18,
+      "name": "ETH",
+      "amount": 0,
+      "denom": "wei",
+      "isNative": true,
+      "contractAddress": "",
+      "display": true,
+      "icon": ""
+    },
+    {
+      "symbol": "usdt",
+      "decimal": 18,
+      "name": "USDT",
+      "amount": 0,
+      "denom": "",
+      "isNative": false,
+      "contractAddress": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "display": true,
+      "icon": ""
+    },
+    {
+      "symbol": "uni",
+      "decimal": 18,
+      "name": "UNI",
+      "amount": 0,
+      "denom": "",
+      "isNative": false,
+      "contractAddress": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+      "display": false,
+      "icon": ""
+    }
+  ]
+}

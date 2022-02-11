@@ -1,0 +1,8 @@
+build/*
+dist/*
+*.config.js
+_raw/*
+webpack.config.js
+jest.config.js
+__tests__/*
+node_modules/*

@@ -1,0 +1,460 @@
+@import '../../style/mixin';
+
+.home {
+  height: 100%;
+  box-sizing: border-box;
+  font-family: Montserrat;
+  position: relative;
+
+  p,
+  span {
+    margin: 0;
+    line-height: 1;
+  }
+
+  .home-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 248px;
+    background: url(../../../assets/homeBg.png) no-repeat 0 0;
+    background-size: 100% 100%;
+    z-index: -1;
+  }
+
+  .home-content {
+    box-sizing: border-box;
+    padding-top: 2px;
+
+    .home-wallet-name {
+      margin-bottom: 8px;
+      width: 100%;
+      padding-left: @pagePaddingLeft;
+      box-sizing: border-box;
+      font-size: 12px;
+      height: 12px;
+    }
+
+    .home-preview-container {
+      height: 156px;
+      align-items: center;
+      box-sizing: border-box;
+      padding: 12px 16px 0 16px;
+      background: rgba(255, 255, 255, 0.6);
+      box-shadow: 0px 4px 16px rgba(94, 139, 255, 0.1);
+      border-radius: 16px 16px 0px 0px;
+      margin-bottom: 68px;
+
+      .home-preview-top-container {
+        justify-content: space-between;
+        width: 100%;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .home-preview-top-left {
+          align-items: center;
+
+          .home-preview-top-account-name {
+            font-family: MontserratBold;
+            font-size: 14px;
+            margin-left: 4px;
+
+            max-width: 224px;
+            height: 14px;
+            text-overflow: ellipsis;
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+        }
+
+        .chevron-down {
+          fill: @baseTextColor;
+        }
+
+
+      }
+
+      .home-preview-address-container {
+        width: 100%;
+        height: 22px;
+        flex: 0 0 22px;
+        background: #FFFFFF;
+        border-radius: 14px;
+        padding: 0 12px;
+        box-sizing: border-box;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .home-preview-address {
+          font-size: 12px;
+          color: #5E6C8A;
+        }
+
+        .home-preview-icon-container {
+          align-items: center;
+          justify-content: flex-end;
+
+          .explorer,
+          .copy {
+            fill: @themeColor;
+          }
+
+          .explorer {
+            margin-right: 10px;
+          }
+        }
+      }
+
+      div.home-preview-balance {
+        align-items: flex-end;
+        margin-bottom: 8px;
+
+        span.home-preview-balance-amount {
+          font-family: MontserratBold;
+          font-size: 30px;
+        }
+
+        span.home-preview-balance-symbol {
+          font-family: MontserratBold;
+          font-size: 16px;
+          margin-left: 3px;
+          position: relative;
+          top: -2px;
+        }
+      }
+
+      div.home-preview-dollar {
+        color: #5E6C8A;
+        font-size: 12px;
+      }
+
+      div.home-preview-button-container {
+        justify-content: center;
+
+        div.home-preview-button-item {
+          align-items: center;
+
+          &:first-child {
+            margin-right: 100px;
+          }
+
+          div.home-preview-send-img {
+            margin-bottom: 8px;
+            width: 48px;
+            height: 48px;
+            background: #FFFFFF;
+            box-shadow: 0px 4px 8px rgba(94, 139, 255, 0.2);
+            border-radius: 24px;
+            justify-content: center;
+            align-items: center;
+
+            .home-preview-send-img-item {
+              width: 15px;
+              height: 15px;
+            }
+
+            .home-preview-send-img-item {
+              width: 15px;
+              height: 17px;
+            }
+          }
+
+          span.home-preview-send-title {
+            font-size: 12px;
+            font-family: MontserratBold;
+          }
+        }
+      }
+    }
+  }
+
+  .preview-container {
+    height: 194px;
+    border-radius: 16px;
+    flex: 0 0 194px;
+    position: relative;
+    margin-bottom: 27px;
+
+    .summary {
+      width: 100%;
+      height: 148px;
+      background: #003769;
+      border-radius: 16px;
+      box-sizing: border-box;
+      padding: 0 10px;
+
+      .preview-header {
+        justify-content: space-between;
+        align-items: center;
+        color: #ffffff;
+        font-style: normal;
+        height: 40px;
+
+        .left {
+          align-items: center;
+
+          .wallet-icon-container {
+            align-items: center;
+            justify-content: flex-end;
+            width: 36px;
+            height: 18px;
+            background: #FFA800;
+            border-radius: 9px;
+            box-sizing: border-box;
+            padding-right: 1px;
+
+            .wallet-icon-char {
+              font-weight: 500;
+              font-family: PingFang HK;
+              font-size: 12px;
+              line-height: 18px;
+              color: #ffffff;
+              margin-right: 4px;
+            }
+          }
+
+          .name {
+            margin: 0 6px;
+            font-weight: 600;
+            font-size: 14px;
+          }
+
+          .address {
+            font-size: 12px;
+            margin-right: 8px;
+          }
+
+          .chevron-down {
+            fill: #ffffff;
+          }
+        }
+
+        .right {
+          .explorer {
+            cursor: pointer;
+            margin-right: 12px;
+            fill: #ffffff;
+          }
+
+          .copy {
+            cursor: pointer;
+            fill: #ffffff;
+          }
+        }
+      }
+    }
+
+
+    .preview-content {
+      width: 290px;
+      height: 154px;
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      background: #EFF7FF;
+      border-radius: 16px;
+      padding: 18px 12px;
+
+      .balance-container {
+        align-items: flex-end;
+
+        .balance {
+          font-size: 36px;
+          font-weight: 600;
+          line-height: 50px;
+        }
+
+        .token {
+          margin-left: 10px;
+          font-size: 24px;
+          font-weight: 600;
+        }
+      }
+
+      .price {
+        font-size: 12px;
+        color: #9EA2A9;
+        margin-bottom: 18px;
+      }
+
+      .btn-container {
+        width: 100%;
+        justify-content: space-between;
+
+        .btn {
+          width: 127px;
+          font-family: Montserrat;
+        }
+      }
+    }
+  }
+
+  .tab-container {
+    margin-bottom: 16px;
+  }
+
+}
+
+.assets-container {
+  flex: 1;
+  height: 0;
+
+  .search-container {
+    height: 24px;
+    flex: 0 0 24px;
+    align-items: center;
+    margin-bottom: 6px;
+
+    .wrap {
+      width: 232px;
+
+    }
+
+    .home-search-icon-container {
+      align-items: center;
+
+      .edit-icon {
+        margin-left: 13px;
+        flex: 0 0 18px;
+      }
+
+      .home-search-add-icon {
+        width: 24px;
+        height: 24px;
+        margin-left: 22px;
+      }
+    }
+
+    .edit-icon {
+      margin-left: 13px;
+      flex: 0 0 18px;
+    }
+
+    .done {
+      width: 62px;
+      flex: 0 0 62px;
+      height: 24px;
+      background: #1484F5;
+      border-radius: 12px;
+      margin-left: 6px;
+      font-family: MontserratBold;
+      font-size: 12px;
+      text-align: center;
+      line-height: 24px;
+      color: #ffffff;
+    }
+
+    .edit-icon {
+      fill: @baseTextColor;
+    }
+    .add-assets-button{
+      
+    }
+  }
+
+  .token-list {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+    padding-bottom: 20px;
+    height: 0;
+
+    .token-item {
+      width: 100%;
+      padding: 0 @pagePaddingLeft;
+      height: 64px;
+      flex: 0 0 64px;
+      justify-content: space-between;
+      align-items: center;
+
+      &:hover {
+        background: #FAFCFE;
+      }
+
+      .left {
+        align-items: center;
+
+        .token-icon {
+          margin-right: 14px;
+        }
+
+        .balance-container {
+          .balance {
+            font-size: 14px;
+            line-height: 20px;
+            font-family: MontserratBold;
+          }
+
+          .estimate {
+            font-size: 12px;
+            line-height: 17px;
+            color: #9EA2A9;
+          }
+        }
+      }
+
+      .right-icon {
+        color: @baseTextColor;
+      }
+    }
+  }
+}
+
+.home-no-assets-container {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+
+  .home-no-assets {
+    width: 90px;
+    height: 83px;
+    margin-bottom: 12px;
+  }
+
+  .no-assets-title {
+    font-size: 12px;
+    line-height: 17px;
+    color: #9EA2A9;
+  }
+}
+.account-switch-drawer{
+  div.account-switch-header {
+    justify-content: flex-end;
+    align-items: center;
+    height: 60px;
+    flex:0 0 60px;
+  }
+  
+  div.account-switch-accounts {
+    height: 24px;
+    flex:0 0 24px;
+    margin-bottom: 24px;
+    justify-content: space-between;
+    align-items: center;
+    span.account-switch-accounts-title {
+      font-family: MontserratBold;
+      font-size: 24px;
+    }
+  
+    div.account-switch-accounts-manage-wallet-container {
+      align-items: center;
+      justify-content: flex-end;
+      span.account-switch-accounts-manage-wallet {
+        font-family: MontserratBold;
+        font-size: 12px;
+        color: @themeColor;
+        line-height: 1;
+      }
+      .account-switch-link{
+        margin-left: 8px;
+        fill: @themeColor;
+      }
+      
+    }
+  }
+}

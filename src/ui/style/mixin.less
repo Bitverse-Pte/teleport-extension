@@ -1,0 +1,92 @@
+@import './index';
+
+@baseTextColor: #364361;
+@themeColor: #1484F5;
+;
+
+@baseHeaderHeight: 64px;
+
+@pagePaddingLeft: 24px;
+@pagePaddingRight: @pagePaddingLeft;
+
+
+.flexR {
+  display: flex;
+  display: -webkit-flex;
+  display: -moz-flex;
+  flex-direction: row;
+}
+
+.flexCol {
+  display: flex;
+  display: -webkit-flex;
+  display: -moz-flex;
+  flex-direction: column;
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+.bold {
+  font-family: MontserratBold;
+}
+
+.disNone {
+  display: none;
+}
+
+.svg-icon {
+  width: 16px;
+  height: 16px;
+  color: #ffffff;
+}
+
+.notice {
+  width: 100%;
+  background: rgba(255, 168, 0, 0.04);
+  border: 1px dashed #FFA800;
+  box-sizing: border-box;
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  position: relative;
+
+  .notice-badge {
+    position: absolute;
+    width: 57px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    background: #FFA014;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #FFFFFF;
+    top: -11px;
+    left: 16px;
+    font-family: MontserratBold;
+  }
+
+  .item {
+    font-size: 12px;
+    line-height: 1;
+    color: #FFA014;
+    list-style-type: disc;
+    margin-left: 8px;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+  }
+
+  .bold {
+    font-family: MontserratBold;
+  }
+}
+
+.content-wrap-padding {
+  width: calc(100% - 2 * @pagePaddingLeft);
+  margin-left: @pagePaddingLeft;
+}

@@ -1,0 +1,122 @@
+@import '../../style/mixin';
+
+.token-manage {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    .tab-container {
+        height: 36px;
+        flex: 0 0 36px;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+    }
+
+    .token-list {
+        width: 100%;
+        flex: 1;
+        height: 0;
+
+        .input-container {
+            height: 24px;
+            flex: 0 0 24px;
+            position: relative;
+            margin-bottom: 6px;
+
+            .svg-icon {
+                font-size: 30px;
+                position: absolute;
+                left: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 14px;
+                height: 20px;
+                z-index: 10;
+            }
+
+            .search {
+                fill: #A3B4CC;;
+            }
+
+            .input {
+                width: 100%;
+                height: 24px;
+                background: #FAFCFE;
+                border-radius: 12px;
+                border: none;
+                text-indent: 20px;
+            }
+        }
+
+        .tokens {
+            width: 100%;
+            flex: 1;
+            overflow-y: auto;
+
+            .token-item {
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+                height: 64px;
+                flex: 0 0 64px;
+                padding: 0 @pagePaddingLeft;
+
+                &:hover {
+                    background: #FAFCFE;
+                }
+
+                .left {
+                    align-items: center;
+
+                    .token-icon {
+                        margin-right: 14px;
+                    }
+
+                    .token-info {
+                        justify-content: center;
+                        margin-bottom: 4px;
+                        .balance{
+                            font-size: 16px;
+                            font-family: MontserratBold;
+                        }
+                        .address{
+                            color:#A3B4CC;
+                            font-size: 12px;
+                        }
+                    }
+                }
+
+                .token-manage-show-icon {
+                    width: 12px;
+                    height: 12px;
+                }
+            }
+        }
+    }
+
+    .token-custom {
+        flex: 1;
+        justify-content: space-between;
+        box-sizing: border-box;
+        padding-bottom: 20px;
+
+        .token-custom-top {
+            flex: 1;
+            width: 100%;
+
+            .token-custom-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+                font-family: MontserratBold;
+
+            }
+            .token-custom-address{
+                margin-top: 24px;
+            }
+        }
+        .token-manage-button{
+            margin-bottom: 24px;
+        }
+    }
+
+}

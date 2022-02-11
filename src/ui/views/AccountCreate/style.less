@@ -1,0 +1,63 @@
+@import '../../style/mixin';
+
+.account-create {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    //padding: 0 @pagePaddingLeft;
+    p{
+        margin-bottom: 0;
+        line-height: 1;
+    }
+    .content {
+        flex: 1;
+        box-sizing: border-box;
+        overflow-y: auto;
+
+        .account-create-title {
+            font-family: MontserratBold;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .account-create-name-input{
+            margin-bottom: 24px;
+        }
+
+        .password-container {
+            .account-create-notice {
+                font-size: 12px;
+                line-height: 18px;
+                color: #798CAD;
+                margin-bottom: 12px;
+            }
+            .custom-password-input{
+                margin-bottom: 12px;
+            }
+        }
+    }
+
+    .button {
+        margin-bottom: 40px;
+    }
+
+}
+
+.policy {
+    margin-top: 12px;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 17px;
+
+    .policy-title {
+        margin-left: 8px;
+    }
+
+    .policy-link {
+        color: @themeColor;
+        &:hover{
+            text-decoration: underline;
+        }
+    }
+}

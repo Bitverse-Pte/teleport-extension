@@ -1,0 +1,217 @@
+@import '../../style/mixin';
+
+.custom-input-container {
+    width: 100%;
+    position: relative;
+
+    ::-webkit-input-placeholder {
+        color: #A3B4CC;
+        font-size: 12px;
+    }
+
+    .search-icon {
+        fill: #A3B4CC;
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .custom-search-input {
+        background: #FAFCFE;
+        border-radius: 12px;
+        height: 24px;
+        text-indent: 30px;
+        outline: none;
+        border: none;
+        width: 100%;
+    }
+}
+
+.token-icon {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 16px;
+    display: block;
+}
+
+.token-icon-default {
+    font-weight: 600;
+    font-size: 20px;
+    color: #000000;
+    background: #ffffff;
+    text-align: center;
+    line-height: 32px !important;
+}
+
+.custom-button {
+    font-family: PingFang HK;
+    height: 36px !important;
+    border-radius: 8px !important;
+    line-height: 1 !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+}
+
+.custom-button-default {
+    color: #0F83FF !important;
+    border-color: #0F83FF !important;
+}
+
+.ant-btn-primary[disabled] {
+    color: #ffffff !important;
+    border: none;
+    opacity: .4;
+}
+
+.theme {
+    background: #0F83FF !important;
+}
+
+::-webkit-input-placeholder {
+    color: #A3B4CC;
+    font-size: 14px;
+    font-family: Montserrat;
+}
+
+.custom-input {
+    height: 36px !important;
+    background: #F8FAFC !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    border: 1px solid #F8FAFC !important;
+    caret-color: @themeColor;
+    font-family: Montserrat;
+
+    &:hover {
+        .custom-input-active;
+    }
+}
+
+.ant-input {
+    background: #F8FAFC !important;
+    caret-color: @themeColor;
+    font-family: Montserrat;
+
+    &:hover {
+        background: #ffffff !important;
+    }
+}
+
+.custom-input-active {
+    border: 1px solid @themeColor  !important;
+    background: #ffffff !important;
+}
+
+.ant-input-password-icon {
+    width: 22px;
+    height: 16px;
+}
+
+.password-check-pass-container {
+    width: 100%;
+    margin: 8px 0 20px 0;
+
+    .password-check-pass-top {
+        margin-bottom: 8px;
+        align-items: center;
+
+        .password-check-pass-item {
+            width: 120px;
+            align-items: center;
+
+            &:first-child {
+                margin-right: 22px;
+            }
+
+            .password-check-pass-icon {
+                width: 12px;
+                height: 12px;
+                margin-right: 4px;
+            }
+
+            .password-check-pass-title {
+                font-weight: 600;
+                font-size: 10px;
+                line-height: 14px;
+                color: #5E6C8A;
+                margin-bottom: 0;
+            }
+
+            .password-check-pass-title-active {
+                color: #A3B4CC;
+            }
+        }
+    }
+}
+
+.widgets-wallet-name-container {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.widgets-tab-container {
+    width: 100%;
+    height: 36px;
+    background: #F8FAFC;
+    border-radius: 8px;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 2px;
+    margin-bottom: 24px;
+
+    .tab-item {
+        width: 147px;
+        height: 32px;
+        line-height: 32px;
+        text-align: center;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #A3B4CC;
+        font-family: MontserratBold;
+    }
+
+    .tab-item-active {
+        color: @baseTextColor;
+        background: #FFFFFF;
+    }
+}
+
+div.tip-button-button-item {
+    align-items: center;
+
+    &:first-child {
+        margin-right: 100px;
+    }
+
+    div.tip-button-send-img {
+        margin-bottom: 8px;
+        width: 48px;
+        height: 48px;
+        background: #FFFFFF;
+        box-shadow: 0px 4px 8px rgba(94, 139, 255, 0.2);
+        border-radius: 24px;
+        justify-content: center;
+        align-items: center;
+
+        .tip-button-send-img-item {
+            width: 15px;
+            height: 15px;
+        }
+
+        .tip-button-send-img-item {
+            width: 15px;
+            height: 17px;
+        }
+    }
+
+    span.tip-button-send-title {
+        font-size: 12px;
+        font-family: MontserratBold;
+    }
+}

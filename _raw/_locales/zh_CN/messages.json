@@ -1,0 +1,667 @@
+{
+  "appName": {
+    "message": "BitOS",
+    "description": "The name of the application"
+  },
+  "appDescription": {
+    "message": "专为 DeFi 设计的插件钱包",
+    "description": "The description of the application"
+  },
+  "Send": {
+    "message": "转账"
+  },
+  "Swap": {
+    "message": "兑换"
+  },
+  "History": {
+    "message": "交易历史"
+  },
+  "Set__Unlock__Password": {
+    "message": "设置解锁密码"
+  },
+  "Set__Current__Address": {
+    "message": "选择当前地址",
+    "description": "Switch modal title in dashboard"
+  },
+  "Manage__addresses": {
+    "message": "管理地址"
+  },
+  "View__Mnemonic": {
+    "message": "查看助记词"
+  },
+  "Created__by__Mnemonic": {
+    "message": "由助记词生成"
+  },
+  "Imported__by__Private__Key": {
+    "message": "通过私钥导入"
+  },
+  "Hardware__Wallet": {
+    "message": "硬件钱包"
+  },
+  "Watch__Mode": {
+    "message": "观察模式"
+  },
+  "Copied": {
+    "message": "已复制到剪贴板"
+  },
+  "connected": {
+    "message": "已连接"
+  },
+  "Not__connected__to__current__website": {
+    "message": "当前网站未连接"
+  },
+  "Please__input__openapi__host": {
+    "message": "请填写 OpenAPI host"
+  },
+  "Please__check__your__host": {
+    "message": "请检查 host"
+  },
+  "Save": {
+    "message": "保存"
+  },
+  "AddressManagement": {
+    "message": "地址管理"
+  },
+  "ChainManagement": {
+    "message": "链管理"
+  },
+  "Chain__Management": {
+    "message": "链管理"
+  },
+  "Connected__websites": {
+    "message": "已连接网站"
+  },
+  "Backend__Service__URL": {
+    "message": "后端服务 URL"
+  },
+  "Settings": {
+    "message": "设置"
+  },
+  "Lock": {
+    "message": "锁定钱包"
+  },
+  "Mnemonic": {
+    "message": "助记词"
+  },
+  "Private__Key": {
+    "message": "私钥"
+  },
+  "removed": {
+    "message": "已删除"
+  },
+  "Keep__at__least__one__address__visible": {
+    "message": "请保证至少一个地址可见"
+  },
+  "Show__address": {
+    "message": "显示地址"
+  },
+  "Hide__address": {
+    "message": "隐藏地址"
+  },
+  "Delete__address": {
+    "message": "删除地址"
+  },
+  "NoAddress": {
+    "message": "无地址"
+  },
+  "Add__addresses": {
+    "message": "添加地址"
+  },
+  "Address__Management": {
+    "message": "地址管理"
+  },
+  "Add__Address": {
+    "message": "添加地址"
+  },
+  "incorrect__password": {
+    "message": "密码错误"
+  },
+  "Password": {
+    "message": "密码"
+  },
+  "Wallet__Name": {
+    "message": "钱包名"
+  },
+  "Please__input__Password": {
+    "message": "请输入密码"
+  },
+  "Unlock": {
+    "message": "解锁"
+  },
+  "Get__Started": {
+    "message": "开始使用"
+  },
+  "Welcome__Create": {
+    "message": "创建"
+  },
+  "Welcome__Import": {
+    "message": "导入"
+  },
+  "Successfully__created": {
+    "message": "创建成功"
+  },
+  "Not__a__valid__address": {
+    "message": "地址格式不正确"
+  },
+  "Enter__an__address__without__providing__private__key": {
+    "message": "无需提供私钥，直接添加地址"
+  },
+  "Please__input__address": {
+    "message": "请输入地址"
+  },
+  "Address": {
+    "message": "地址"
+  },
+  "Successfully__imported": {
+    "message": "导入成功"
+  },
+  "AddressCount": {
+    "message": "{{count}} 个地址"
+  },
+  "Not__a__valid__private__key": {
+    "message": "私钥格式不正确"
+  },
+  "Enter__Your__Private__Key": {
+    "message": "请输入私钥"
+  },
+  "Please__input__Private__key": {
+    "message": "请输入私钥"
+  },
+  "Import__via__Private__Key": {
+    "message": "通过私钥导入地址"
+  },
+  "Import__via__Keystore": {
+    "message": "通过 Keystore 导入地址"
+  },
+  "Import__via__Mnemonic": {
+    "message": "通过助记词导入地址"
+  },
+  "Not__a__valid__mnemonic": {
+    "message": "助记词不正确"
+  },
+  "Enter__Your__Mnemonic": {
+    "message": "输入助记词"
+  },
+  "Please__input__Mnemonics": {
+    "message": "请输入助记词"
+  },
+  "Mnemonics__words": {
+    "message": "助记词"
+  },
+  "Select__the__keystore__file__you__want__to__import__and__enter__the__corresponding__password": {
+    "message": "选择需要导入的 keystore 文件并输入对应密码"
+  },
+  "Click__to__upload__again": {
+    "message": "点击再次上传"
+  },
+  "Import__Your__Keystore": {
+    "message": "导入 Keystore"
+  },
+  "passwordMinimumLengthAlert": {
+    "message": "密码不能少于 {{length}} 个字符"
+  },
+  "passwordMaximumLengthAlert": {
+    "message": "密码不能超过 {{length}} 个字符"
+  },
+  "Please__confirm__Password": {
+    "message": "请确认密码"
+  },
+  "Two__inputs__do__not__match": {
+    "message": "两次输入不匹配"
+  },
+  "Repeat__Password": {
+    "message": "重复密码"
+  },
+  "backupMnemonicTip": {
+    "message": "点击继续之前，请确保你已妥善备份好你的助记词；不要向任何人透露你的助记词。"
+  },
+  "backupMnemonicAlert": {
+    "message": "请确保已保存好助记词，一旦遗失无法找回"
+  },
+  "Back__Up__Your__Mnemonic": {
+    "message": "备份你的助记词"
+  },
+  "Verify__Mnemonic": {
+    "message": "验证助记词"
+  },
+  "Please__select__the__mnemonic__words__in__order": {
+    "message": "请按顺序点选助记词"
+  },
+  "Verification__failed": {
+    "message": "验证失败"
+  },
+  "You__need__to__make__use__your__last__account__before__you__can__add__a__new__one": {
+    "message": "创建新账号前请先使用已有账号"
+  },
+  "Select__Addresses": {
+    "message": "选择地址"
+  },
+  "Select__the__addresses__you__want__to__import": {
+    "message": "选择想要导入的地址"
+  },
+  "Load__More": {
+    "message": "加载更多..."
+  },
+  "Please__add__your__address__via__one__of__the__following__methods": {
+    "message": "请通过以下方法添加你的地址"
+  },
+  "No__Address": {
+    "message": "无可用地址"
+  },
+  "hardwareImportTip": {
+    "message": "如果你正在使用带有摄像头的硬件钱包，请选择观察模式添加地址"
+  },
+  "Connect__Hardware__Wallet": {
+    "message": "连接硬件钱包"
+  },
+  "Select__the__hardware__wallet__you__are__using": {
+    "message": "请选择你正在使用的硬件钱包品牌"
+  },
+  "Select__Connect__Method": {
+    "message": "选择连接方式"
+  },
+  "Ledger__Blue__is__not__supported__by__Chrome__91__and__above__versions": {
+    "message": "Chrome 91 及以上版本不支持 Ledger Blue"
+  },
+  "Connect__through__Ledger__Live__app": {
+    "message": "通过 Ledger Live app 连接"
+  },
+  "Connect__hardware__wallet__directly": {
+    "message": "直接连接硬件钱包"
+  },
+  "dontRemind": {
+    "message": "不再提醒"
+  },
+  "You__will__be__visiting": {
+    "message": "即将访问"
+  },
+  "Asset__data__loading": {
+    "message": "资产数据加载中"
+  },
+  "The__network__is__disconnected__and__no__data__is__obtained": {
+    "message": "网络异常，无法获取数据"
+  },
+  "No__assets": {
+    "message": "尚无资产"
+  },
+  "No__data": {
+    "message": "无数据"
+  },
+  "Connected__Sites": {
+    "message": "已连接网站"
+  },
+  "disableChainAlert": {
+    "message": "禁用一条链后，使用该链连接的网站都将被删除"
+  },
+  "Disable": {
+    "message": "禁用"
+  },
+  "Cancel": {
+    "message": "取消"
+  },
+  "At__least__one__enabled__chain__is__required": {
+    "message": "请启用至少一条链"
+  },
+  "Chain__ID": {
+    "message": "链 ID"
+  },
+  "Enable__Chains": {
+    "message": "启用链"
+  },
+  "createAddress": {
+    "message": "创建"
+  },
+  "Import": {
+    "message": "导入"
+  },
+  "Imported": {
+    "message": "已导入"
+  },
+  "Select__a__JSON__file": {
+    "message": "选择 JSON 文件"
+  },
+  "Current__account": {
+    "message": "当前地址"
+  },
+  "enableChainContent": {
+    "message": "添加该链后，你将可以在该链上产生交易"
+  },
+  "switchChainDesc": {
+    "message": "将会切换钱包连接到 {{name}} 网络"
+  },
+  "doYouAllowSiteToAddNetwork" : {
+    "message": "是否允许该站点添加网络?"
+  },
+  "doYouAllowSiteToSwitchNetwork" : {
+    "message": "是否允许该站点切换网络?"
+  },
+  "Change": {
+    "message": "切换",
+    "description": "Switch chain confirm button text"
+  },
+  "Switch__a__Chain": {
+    "message": "切换链"
+  },
+  "Enable": {
+    "message": "启用"
+  },
+  "Enable__a__Chain": {
+    "message": "启用链"
+  },
+  "The__requested__chain__is__not__supported__by__BitOS__yet": {
+    "message": "BitOS 尚不支持该链"
+  },
+  "OK": {
+    "message": "确定"
+  },
+  "Website__Wants__to__Connect": {
+    "message": "网站请求连接"
+  },
+  "On__this__site__use__chain": {
+    "message": "在该网站使用该链"
+  },
+  "Connect": {
+    "message": "连接",
+    "description": "Website connect confirm button text"
+  },
+  "ledgerWebUSBSignAlertPart1": {
+    "message": "如果因为 Chrome 问题而无法继续"
+  },
+  "ledgerWebUSBSignAlertPart2": {
+    "message": "请删除该地址后，重新添加以重试该操作"
+  },
+  "Please__proceed__in__your__hardware__wallet": {
+    "message": "请在硬件钱包中继续操作"
+  },
+  "Security__checks__have__not__been__executed": {
+    "message": "安全检查尚未执行"
+  },
+  "Checking": {
+    "message": "检查中..."
+  },
+  "No__risk__found": {
+    "message": "未发现风险"
+  },
+  "Check": {
+    "message": "检查",
+    "description": "Security check action button text"
+  },
+  "processAnyway": {
+    "message": "我确认想要继续操作"
+  },
+  "Forbidden": {
+    "message": "Forbidden"
+  },
+  "Danger": {
+    "message": "Danger"
+  },
+  "Warning": {
+    "message": "Warning"
+  },
+  "Enter__passward__to__continue__your__transaction": {
+    "message": "输入密码以继续交易"
+  },
+  "Confirm": {
+    "message": "确认"
+  },
+  "Please__enter__the__password": {
+    "message": "请输入密码"
+  },
+  "Transaction__detail": {
+    "message": "交易详情"
+  },
+  "Sign__Text": {
+    "message": "签名文本"
+  },
+  "view__Raw": {
+    "message": "查看原始数据"
+  },
+  "Sign": {
+    "message": "签名"
+  },
+  "Continue": {
+    "message": "继续"
+  },
+  "Preexecution__failed": {
+    "message": "预执行失败"
+  },
+  "Error": {
+    "message": "Error"
+  },
+  "Sign__Typed__Message": {
+    "message": "Sign Typed Message"
+  },
+  "Cannot__sign__using__a__watch__mode__address__at__this__moment": {
+    "message": "暂时无法使用观察模式地址进行签名"
+  },
+  "Sign__via__phone__scanning__coming__soon": {
+    "message": "即将上线手机扫码签名功能"
+  },
+  "signTransactionWithChain": {
+    "message": "签名 {{name}} 上的交易"
+  },
+  "Approve": {
+    "message": "授权",
+    "description": "Approve token tx title"
+  },
+  "unlimited": {
+    "message": "无限"
+  },
+  "UnknownProtocol": {
+    "message": "未知协议"
+  },
+  "token__balance__change": {
+    "message": "预估 Token 余额变化"
+  },
+  "Total__value__change": {
+    "message": "净值变化"
+  },
+  "balanceChangeNotSupport": {
+    "message": "{{name}} 暂不支持该功能"
+  },
+  "No__Changes": {
+    "message": "无变化"
+  },
+  "cancelApprovalTitle": {
+    "message": "取消授权 {{symbol}} 给"
+  },
+  "Cancel__Pending__Transaction": {
+    "message": "取消 pending 中交易"
+  },
+  "One__pending__transaction__will__be__canceled": {
+    "message": "一笔 pending 中的交易将被取消"
+  },
+  "Deploy__a__Contract": {
+    "message": "部署合约"
+  },
+  "You__are__deploying__a__smart__contract": {
+    "message": "正在部署一个智能合约"
+  },
+  "sendTokenTo": {
+    "message": "转账 {{amount}} 个 {{symbol}} 给"
+  },
+  "Protocol": {
+    "message": "协议"
+  },
+  "Unknown__Protocol": {
+    "message": "未知协议"
+  },
+  "Action": {
+    "message": "操作"
+  },
+  "Unknown__Action": {
+    "message": "未知操作"
+  },
+  "Contract": {
+    "message": "合约"
+  },
+  "gasCostTitle": {
+    "message": "预估 Gas 费用"
+  },
+  "gasPriceTitle": {
+    "message": "Gas 价格 (Gwei)"
+  },
+  "txn__ahead": {
+    "message": "笔交易在前"
+  },
+  "Select__Gas__Setting": {
+    "message": "选择 Gas 价格"
+  },
+  "Standard": {
+    "message": "一般"
+  },
+  "Fast": {
+    "message": "高速"
+  },
+  "Instant": {
+    "message": "极速"
+  },
+  "Custom": {
+    "message": "自定义"
+  },
+  "Enter__Password": {
+    "message": "输入密码"
+  },
+  "View": {
+    "message": "查看"
+  },
+  "Languages": {
+    "message": "语言"
+  },
+  "Switching__languages": {
+    "message": "切换语言"
+  },
+  "This__password__will__be__used__to__unlock__your__wallet": {
+    "message": "此密码将被用于解锁您的钱包"
+  },
+  "Pin__Website": {
+    "message": "置顶此网站"
+  },
+  "UnPin__Website": {
+    "message": "解除置顶"
+  },
+  "Select__HD__Path": {
+    "message": "请选择 HD Path"
+  },
+  "Next": {
+    "message": "下一步"
+  },
+  "Back": {
+    "message": "返回"
+  },
+  "View__private__key": {
+    "message": "查看私钥"
+  },
+  "Wrong__mnemonic__word": {
+    "message": "错误的助记词"
+  },
+  "otherWalletConflictAlert": {
+    "message": "为避免冲突，请禁用其他浏览器钱包"
+  },
+  "GasLimitMinimumValueAlert": {
+    "message": "Gas 限制不可小于 21000"
+  },
+  "GasLimitEmptyAlert": {
+    "message": "请输入 Gas 限制"
+  },
+  "RecommendGasLimitTip": {
+    "message": "预估 {{est}}，当前 {{current}}x，建议 "
+  },
+  "Advanced__Options": {
+    "message": "高级选项"
+  },
+  "GasLimit": {
+    "message": "Gas 限制"
+  },
+  "MnemonicDisableTip": {
+    "message": "钱包中已有一个助记词，不可再导入"
+  },
+  "Token__Approval": {
+    "message": "Token 授权"
+  },
+  "Amount": {
+    "message": "数量"
+  },
+  "Edit": {
+    "message": "编辑"
+  },
+  "Approve__to": {
+    "message": "授权给"
+  },
+  "Send__Token": {
+    "message": "转账"
+  },
+  "To__address": {
+    "message": "接收地址"
+  },
+  "Transaction__submitted": {
+    "message": "⏳ 交易已提交"
+  },
+  "Transaction__completed": {
+    "message": "🎉 交易已完成"
+  },
+  "Transaction__failed": {
+    "message": "❌ 交易失败"
+  },
+  "Transaction__push__failed": {
+    "message": "❌ 交易提交失败"
+  },
+  "click__to__view__more__information": {
+    "message": "点击查看更多信息"
+  },
+  "you__need__to__unlock__wallet__first": {
+    "message": "请先解锁钱包"
+  },
+  "mnemonic__phrase__is__invalid": {
+    "message": "错误的助记词"
+  },
+  "Cannot__unlock__without__a__previous__vault": {
+    "message": "请先初始化钱包"
+  },
+  "duplicateAccount": {
+    "message": "此地址已经存在"
+  },
+  "the__private__key__is__invalid": {
+    "message": "错误的私钥"
+  },
+  "the__input__file__is__invalid": {
+    "message": "错误的文件格式"
+  },
+  "sendSpecifiedTokens": {
+    "message": "发送 {{$1}}",
+    "description": "Symbol of the specified token"
+  },
+  "fromAddress": {
+    "message": "从：{{$1}}",
+    "description": "{{$1}} is the address to include in the From label. It is typically shortened first using shortenAddress"
+  },
+  "toAddress": {
+    "message": "至：{{$1}}",
+    "description": "{{$1}} is the address to include in the To label. It is typically shortened first using shortenAddress"
+  },
+  "token": {
+    "message": "代币"
+  },
+  "signatureRequest": {
+    "message": "请求签名"
+  },
+  "signatureRequest1": {
+    "message": "信息"
+  },
+  "approve": {
+    "message": "批准消费限额"
+  },
+  "approveSpendLimit": {
+    "message": "批准 {{$1}} 消费限额",
+    "description": "The token symbol that is being approved"
+  },
+  "approved": {
+    "message": "已批准"
+  },
+  "receive": {
+    "message": "接收"
+  },
+  "Gas__price__too__low": {
+    "message": "Gas 价格过低"
+  }
+}

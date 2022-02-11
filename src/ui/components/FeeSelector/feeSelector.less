@@ -1,0 +1,79 @@
+.fee {
+  overflow: hidden;
+  .fee-box {
+    margin: 72px 0 50px;
+    height: 350px;
+    overflow: auto;
+    padding: 0 24px 24px;
+  }
+  ul {
+    list-style: none;
+    li:last-of-type {
+      .fee-selector-item-tail {
+        height: 100%;
+      }
+    }
+  }
+  .fee-selector {
+    box-sizing: border-box;
+    color: #000000d9;
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    font-feature-settings: "tnum";
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .custom-box {
+    background-color: #F8FAFC;
+    color: #364361;
+    font-size: 14px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px;
+    margin-top: 24px;
+    font-weight: 700;
+    font-family: MontserratBold;
+  }
+  .gas-fee-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 24px;
+    .gas-fee-btn {
+      border-radius: 8px;
+      font-weight: 700;
+      font-family: MontserratBold;
+    }
+  }
+}
+
+.drawer-header-container{
+  height: 64px;
+  flex:0 0 64px;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  padding: 24px;
+  top: 0;
+  left: 0;
+  .drawer-header-title{
+    font-size:18px;
+    font-family: MontserratBold;
+  }
+  .drawer-header-close-icon{
+    fill:#798CAD;
+  }
+}
+.drawer-header-type2 {
+  flex-direction: row-reverse!important;
+  .drawer-header-title {
+    width: 100%;
+    text-align: center;
+  }
+}

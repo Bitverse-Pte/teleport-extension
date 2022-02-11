@@ -1,0 +1,162 @@
+@import '../../style/mixin';
+
+.backup {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 @pagePaddingLeft;
+
+  p {
+    margin: 0;
+    line-height: 1;
+  }
+
+  .content {
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+
+    .mnemonic-container {
+      width: 100%;
+      position: relative;
+      box-sizing: border-box;
+      padding: 16px 14px;
+      background: #EFF7FF;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      .flexR;
+      align-items: center;
+      justify-content: center;
+
+      .phrase-container {
+        display: grid;
+        grid-template-columns: repeat(3, 86px);
+        grid-template-rows: repeat(4, 29px);
+        grid-row-gap: 10px;
+        grid-column-gap: 8px;
+
+        .phrase {
+          width: 86px;
+          height: 29px;
+          border-radius: 4px;
+          line-height: 29px;
+          text-align: center;
+          background: #fff;
+          font-size: 14px;
+          color: #364361;
+          font-family: MontserratBold;
+        }
+      }
+
+      .model {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        position: absolute;
+        background:url(../../../assets/Mask.png) no-repeat 0 0;
+        z-index: 1;
+        color: #fff;
+        .flexCol;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        padding: 21px 14px;
+        border-radius: 16px;
+
+        .circle-container {
+          height: 52px;
+          width: 52px;
+          border: 2px solid #fff;
+          justify-content: center;
+          align-items: center;
+          border-radius: 50%;
+          box-sizing: border-box;
+          font-family: MontserratBold;
+
+          .second {
+            font-size: 20px;
+          }
+
+          .sub-second {
+            font-size: 16px;
+            font-weight: 500;
+            position: relative;
+            top: 1px;
+          }
+        }
+
+        .mnemonic-check-button-disabled {
+          opacity: 0.5;
+          color: #A3B4CC !important;
+          
+        }
+        .mnemonic-check-button {
+          color: @themeColor;
+          background: #FFFFFF;
+          width: 240px;
+          height: 36px;
+          text-align: center;
+          line-height: 36px;
+          background: #FFFFFF;
+          border: 1px solid #1484F5;
+          box-sizing: border-box;
+          border-radius: 8px;
+          margin-top: 24px;
+          font-family: MontserratBold;
+          font-size: 14px;
+        }
+      }
+
+    }
+
+    .notice-section {
+
+      .notice {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+
+      .notice-container {
+
+        .notice-item {
+          font-size: 12px;
+          margin-bottom: 8px;
+        }
+      }
+    }
+
+    .mnemonic-backup-attention {
+      width: 100%;
+
+      .mnemonic-backup-attention-title {
+        font-family: MontserratBold;
+        font-size: 18px;
+        line-height: 20px;
+        margin-bottom: 12px;
+        color: #FFA014;
+      }
+
+      .mnemonic-backup-attention-content {
+        font-family: Montserrat;
+        font-size: 14px;
+        line-height: 20px;
+        color: #5E6C8A;
+        margin-bottom: 12px;
+      }
+    }
+
+  }
+
+  .button-container {
+    width: 100%;
+    margin-bottom: 40px;
+
+    .btn {
+      margin-bottom: 10px;
+    }
+  }
+
+}

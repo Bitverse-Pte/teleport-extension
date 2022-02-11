@@ -1,0 +1,106 @@
+@import '../../style/mixin';
+
+.header {
+  height: @baseHeaderHeight;
+  flex: 0 0 @baseHeaderHeight;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+
+  .back-icon {
+    position: absolute;
+    left: -3px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    fill: #798CAD;
+    width: 20px;
+    height: 24px;
+  }
+
+  .title {
+    font-size: 18px;
+    font-family: MontserratBold;
+    line-height: @baseHeaderHeight;
+    color: #364361;
+  }
+
+  .widgets-wallet-name-container {
+    font-size:18px;
+    line-height: 1;
+  }
+
+  .right {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+
+    .edit-btn {
+      width: 72px;
+      height: 30px;
+      font-size: 14px;
+      font-family: MontserratBold;
+      line-height: 30px;
+      background: #1484F5;
+      color: #ffffff;
+      align-items: center;
+    }
+
+    .done {
+      border-radius: 8px;
+      justify-content: center;
+    }
+
+    .edit {
+      justify-content: flex-end;
+    }
+  }
+
+}
+
+.headerOfMenu {
+  height: 64px;
+  width: 100%;
+  position: relative;
+  flex: 0 0 64px;
+
+  img {
+    height: 26px;
+  }
+
+  .closeIcon {
+    height: 18px;
+    width: 18px;
+    margin-right: 0;
+  }
+
+  .closeWindowBtn {
+    margin-left: auto;
+  }
+
+  .title {
+    font-family: MontserratBold;
+    font-size: 18px;
+    font-weight: 700;
+    color: #364361;
+    text-align: left;
+  }
+  .nologo-title {
+    margin-left: 20px;
+    font-family: MontserratBold;
+    font-style: normal;
+    font-size: 18px;
+    line-height: 100%;
+    display: flex;
+    align-items: flex-end;
+    color: #364361;
+    text-align: left;
+  }
+  .header-logo {
+    margin-right: 16px;
+    height: 40px;
+  }
+}
