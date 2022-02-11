@@ -239,11 +239,6 @@ export class WalletController extends BaseController {
   changeAccount = (account: BaseAccount) =>
     preferenceService.setCurrentAccount(account);
 
-  getPreferenceStore = () => {
-    const cloned = { ...preferenceService.store };
-    return cloned;
-  };
-
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 
   _setCurrentAccount = async (account: BaseAccount) => {
