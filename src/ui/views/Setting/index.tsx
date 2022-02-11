@@ -86,7 +86,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   return (
     <div className="setting flexCol">
       <LogoHeader handleCloseClick={props.handleCloseClick} />
-      <div className="setting-button-container content-wrap-padding flex">
+      <div className="setting-button-container content-wrap-padding flexR">
         <TipButton
           title="Manage Wallet"
           type={TipButtonEnum.WALLET_MANAGE}
@@ -99,7 +99,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
         />
       </div>
       {SettingFeat.map((setting: ISettingFeat) => (
-        <div className="setting-item flex cursor" key={setting.title}>
+        <div className="setting-item flexR cursor" key={setting.title}>
           <span className="title">{setting.title}</span>
           <span
             className="tag"

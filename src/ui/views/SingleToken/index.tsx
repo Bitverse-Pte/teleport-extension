@@ -79,7 +79,7 @@ const SingleToken = () => {
   }, [token, prices]);
 
   const title = (
-    <div className="title-container flex">
+    <div className="title-container flexR">
       <WalletName cls="wallet-name" width={50}>
         {account?.hdWalletName}
       </WalletName>
@@ -104,7 +104,7 @@ const SingleToken = () => {
           {/* <img src={teleportLogo} className="logo" /> */}
         </div>
         <div className="bottom flexCol">
-          <div className="balance-container flex">
+          <div className="balance-container flexR">
             <span className="balance">
               {denom2SymbolRatio(
                 updatedToken?.amount || 0,
@@ -124,7 +124,7 @@ const SingleToken = () => {
           </span>
         </div>
       </div>
-      <div className="send-container content-wrap-padding flex">
+      <div className="send-container content-wrap-padding flexR">
         <TipButton
           title="Send"
           type={TipButtonEnum.SEND}
