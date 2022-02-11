@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "BitOS",
+    "message": "Teleport",
     "description": "The name of the application"
   },
   "appDescription": {
-    "message": "专为 DeFi 设计的插件钱包",
+    "message": "The most powerful wallet for Teleport",
     "description": "The description of the application"
   },
   "Send": {
