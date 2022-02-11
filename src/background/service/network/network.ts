@@ -647,6 +647,11 @@ class NetworkPreferenceService extends EventEmitter {
       chain: opts.chainId,
       networkVersion: opts.chainId,
     });
+
+    /**
+     * After provider was changed, we must check it is 1559 implemented.
+     */
+    this.update1559ImplForCurrentProvider();
   }
 
   private _configureProvider({
