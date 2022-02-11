@@ -7,6 +7,7 @@ import knownMethodReducer from './knownMethod.reducer';
 import preferenceReducer from './preference.reducer';
 import appStateReducer from './appState.reducer';
 import gasReducer from './gas.reducer';
+import sendReducer from './send.reducer';
 
 const rootReducer = combineReducers({
   activeTab: (s) => (s === undefined ? null : s),
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   preference: preferenceReducer,
   appState: appStateReducer,
   gas: gasReducer,
+  send: sendReducer,
 });
 
 export default rootReducer;

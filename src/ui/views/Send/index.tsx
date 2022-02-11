@@ -1,4 +1,10 @@
-import React, { useState, createContext, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  createContext,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +28,10 @@ import { CustomButton, TokenIcon, WalletName } from 'ui/components/Widgets';
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import './style.less';
 import BigNumber from 'bignumber.js';
+import { utils } from 'ethers';
+import { useDispatch, useSelector } from 'react-redux';
+import { getCurrentChainId } from 'ui/selectors/selectors';
+import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -32,6 +42,7 @@ const { Option } = Select;
 
 const Send = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const wallet = useWallet();
   const [selected, setSelected] = useState<BaseAccount | undefined>();
   const { t } = useTranslation();
@@ -46,6 +57,24 @@ const Send = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [selectedToken, setSelectedToken] = useState<Token>();
   const [recentAddressList, setRecentAddressList] = useState<string[]>();
+
+  const chainId = useSelector(getCurrentChainId);
+
+  const cleanup = useCallback(() => {
+    dispatch(resetSendState());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (chainId !== undefined) {
+      dispatch(initializeSendState());
+    }
+  }, [chainId, dispatch, cleanup]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetSendState());
+    };
+  }, [dispatch, cleanup]);
 
   useAsyncEffect(async () => {
     const current: BaseAccount | undefined = await wallet.getCurrentAccount();
@@ -277,10 +306,7 @@ const Send = () => {
             !selectedToken ||
             (selectedToken.amount &&
               new BigNumber(
-                denom2SymbolRatio(
-                  selectedToken?.amount || 0,
-                  selectedToken?.decimal || 0
-                )
+                utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
               ).lessThan(amount))
           }
           onClick={next}
