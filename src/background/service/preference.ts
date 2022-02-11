@@ -1,11 +1,8 @@
 import cloneDeep from 'lodash/cloneDeep';
-import { createPersistStore } from 'background/utils';
-import { sessionService, i18n, permissionService } from './index';
-import { EVENTS } from 'constants/index';
+import { sessionService, i18n } from './index';
 import { browser } from 'webextension-polyfill-ts';
 import { BaseAccount } from 'types/extend';
-import eventBus from 'eventBus';
-import permission from './permission';
+import { ObservableStorage } from 'background/utils/obsStorage';
 
 export interface PreferenceStore {
   currentAccount: BaseAccount | undefined | null;
@@ -17,8 +14,21 @@ export interface PreferenceStore {
 const SUPPORT_LOCALES = ['en', 'zh_CN'];
 
 class PreferenceService {
-  store!: PreferenceStore;
+  store: ObservableStorage<PreferenceStore>;
   popupOpen = false;
+
+  constructor() {
+    this.store = new ObservableStorage<PreferenceStore>('preference', {
+      currentAccount: undefined,
+      locale: 'en',
+      isDefaultWallet: false,
+      currentCurrency: 'ETH',
+    });
+  }
+
+  get storeState() {
+    return this.store.getState();
+  }
 
   init = async () => {
     let defaultLang = 'en';
@@ -26,46 +36,34 @@ class PreferenceService {
     if (acceptLangs.length > 0) {
       defaultLang = acceptLangs[0];
     }
-    this.store = await createPersistStore<PreferenceStore>({
-      name: 'preference',
-      template: {
-        currentAccount: undefined,
-        locale: defaultLang,
-        isDefaultWallet: false,
-        currentCurrency: 'ETH',
-      },
-    });
-    if (!this.store.locale) {
-      this.store.locale = defaultLang;
-    }
-    i18n.changeLanguage(this.store.locale);
-    if (
-      this.store.isDefaultWallet === undefined ||
-      this.store.isDefaultWallet === null
-    ) {
-      this.store.isDefaultWallet = true;
-    }
 
-    // push to UI
-    eventBus.addEventListener(
-      'fetchPreferenceStore',
-      this.pushStoreToUI.bind(this)
-    );
+    if (!this.storeState.locale) {
+      // this.storeState.locale = defaultLang;
+      this.store.updateState({
+        locale: defaultLang,
+      });
+    }
+    i18n.changeLanguage(this.storeState.locale);
+    if (
+      this.storeState.isDefaultWallet === undefined ||
+      this.storeState.isDefaultWallet === null
+    ) {
+      // this.storeState.isDefaultWallet = true;
+      this.store.updateState({
+        isDefaultWallet: true,
+      });
+    }
   };
 
-  pushStoreToUI() {
-    eventBus.emit(EVENTS.broadcastToUI, {
-      method: 'onPreferenceUpdate',
-      params: { ...this.store },
+  setIsDefaultWallet = (isDefaultWallet: boolean) => {
+    // this.storeState.isDefaultWallet = val;
+    this.store.updateState({
+      isDefaultWallet,
     });
-  }
-
-  setIsDefaultWallet = (val: boolean) => {
-    this.store.isDefaultWallet = val;
   };
 
   getIsDefaultWallet = () => {
-    return this.store.isDefaultWallet;
+    return this.storeState.isDefaultWallet;
   };
 
   getAcceptLanguages = async () => {
@@ -77,11 +75,14 @@ class PreferenceService {
   };
 
   getCurrentAccount = (): BaseAccount | undefined | null => {
-    return cloneDeep(this.store.currentAccount);
+    return cloneDeep(this.storeState.currentAccount);
   };
 
   setCurrentAccount = (account: BaseAccount) => {
-    this.store.currentAccount = account;
+    // this.storeState.currentAccount = account;
+    this.store.updateState({
+      currentAccount: account,
+    });
     if (account) {
       sessionService.broadcastEvent('accountsChanged', [account.address]);
     }
@@ -101,24 +102,30 @@ class PreferenceService {
     /**
      * Disabled for the 1st version
      * @todo: refine Chinese and other locale
-     * in order to use `this.store.locale`
+     * in order to use `this.storeState.locale`
      */
-    // return this.store.locale;
+    // return this.storeState.locale;
 
     return 'en';
   };
 
   setLocale = (locale: string) => {
-    this.store.locale = locale;
+    // this.storeState.locale = locale;
+    this.store.updateState({
+      locale,
+    });
     i18n.changeLanguage(locale);
   };
 
   getCurrentCurrency = () => {
-    return this.store.currentCurrency;
+    return this.storeState.currentCurrency;
   };
 
-  setCurrentCurrency = (currency: string) => {
-    this.store.currentCurrency = currency;
+  setCurrentCurrency = (currentCurrency: string) => {
+    // this.storeState.currentCurrency = currentCurrency;
+    this.store.updateState({
+      currentCurrency,
+    });
   };
 }
 

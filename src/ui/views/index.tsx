@@ -10,7 +10,7 @@ import SortHat from 'ui/views/SortHat';
 // const AsyncMainRoute = lazy(() => import('./MainRoute'));
 import { WalletProvider } from 'ui/utils';
 import { NetworkStoreProvider } from '../context/NetworkProvider';
-import { BackgroundDataToStoreProvider } from '../context/BackgroundDataToStoreProvider';
+import { BackgroundDataSyncMiddleware } from '../context/BackgroundDataToStoreProvider';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { message } from 'antd';
 
@@ -58,12 +58,9 @@ const ProvidersInjector = ({
 }) => {
   return (
     <Provider store={store}>
+      <BackgroundDataSyncMiddleware />
       <WalletProvider wallet={wallet}>
-        <NetworkStoreProvider>
-          <BackgroundDataToStoreProvider>
-            {children}
-          </BackgroundDataToStoreProvider>
-        </NetworkStoreProvider>
+        <NetworkStoreProvider>{children}</NetworkStoreProvider>
       </WalletProvider>
     </Provider>
   );
