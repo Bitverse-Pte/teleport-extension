@@ -1,19 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
-import clsx from 'clsx';
 import Jazzicon from 'react-jazzicon';
 import { message, Drawer } from 'antd';
 import {
   useWallet,
-  useWalletRequest,
   useAsyncEffect,
   transferAddress2Display,
   denom2SymbolRatio,
   getTotalPricesByAmountAndPrice,
 } from 'ui/utils';
 import AccountSwitch from 'ui/components/AccountSwitch';
-import Setting, { LogoHeader } from 'ui/views/Setting';
+import Setting from 'ui/views/Setting';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { HomeHeader } from 'ui/components/Home/Header';
 import {
@@ -21,7 +19,6 @@ import {
   BaseAccount,
   DisplayWalletManage,
   HdAccountStruct,
-  HomeTabType,
 } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Token } from 'types/token';
@@ -36,7 +33,7 @@ import {
 import { Provider } from 'types/network';
 import { TransactionsList } from 'ui/components/TransactionList';
 import './style.less';
-import { Tabs, TipButtonEnum, WALLET_THEME_COLOR } from 'constants/wallet';
+import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
 
