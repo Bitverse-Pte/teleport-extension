@@ -77,9 +77,9 @@ const switchChainValidation = ({
     throw ethErrors.provider.custom({
       code: 4902, // To-be-standardized "unrecognized chain ID" error
       message: `Unrecognized chain ID "${chainParams.chainId}". Try adding the chain using ${MESSAGE_TYPE.ADD_ETHEREUM_CHAIN} first.`,
-    })
+    });
   }
-}
+};
 
 class ProviderController extends BaseController {
   ethRpc = async (req) => {
@@ -404,7 +404,7 @@ class ProviderController extends BaseController {
         throw ethErrors.provider.custom({
           code: 4902, // To-be-standardized "unrecognized chain ID" error
           message: `Unrecognized chain ID "${chainParams.chainId}". Try adding the chain using ${MESSAGE_TYPE.ADD_ETHEREUM_CHAIN} first.`,
-        })
+        });
       }
       networkPreferenceService.setProviderConfig(matchedProvider);
 
