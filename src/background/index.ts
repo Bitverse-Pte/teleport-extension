@@ -14,6 +14,7 @@ import {
   TokenService,
   knownMethodService,
   networkPreferenceService,
+  latestBlockDataHub,
 } from './service';
 import { providerController, walletController } from './controller';
 import i18n from './service/i18n';
@@ -69,6 +70,7 @@ async function restoreAppState() {
     preference: preferenceService.store,
     networkStore: networkPreferenceService.networkStore,
     customNetworksStore: networkPreferenceService.customNetworksStore,
+    latestBlockData: latestBlockDataHub.store,
   });
 
   appStoreLoaded = true;
