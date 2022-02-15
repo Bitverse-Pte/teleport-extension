@@ -241,41 +241,6 @@ class NetworkPreferenceService extends EventEmitter {
     });
   }
 
-  async update1559ImplForCurrentProvider() {
-    // current provider's chainId
-    const { chainId } = this.getProviderConfig();
-
-    // first we query the cache and see
-    if (this.isChainEnable1559(chainId)) {
-      // hit cache, just set and end
-      // this.store.networkController.networkDetails.EIPS['1559'] = true;
-      this.markCurrentNetworkEIPStatus('1559', true);
-      return;
-    }
-
-    const { rpcUrl } = this.networkStore.getState().provider;
-    const isNowEIP1559Impled = await this.checkNetworkIs1559Impled(rpcUrl);
-    // we only cache enabled networks
-    if (isNowEIP1559Impled) this.cacheChainEnable1559(chainId);
-
-    // we re-check to avoid race condition
-    const { chainId: chainIdNow } = this.getProviderConfig();
-    if (chainIdNow !== chainId) {
-      // if not match, that means provider was changed when we fetching the block
-      // in this case that we will rerun the query
-      console.debug('another chainId detected, rerunning');
-      return this.update1559ImplForCurrentProvider();
-    }
-    const { EIPS } = this.networkStore.getState().networkDetails;
-    /**
-     * Avoid unnecessary update, only update if value updated
-     */
-    if (isNowEIP1559Impled !== EIPS[1559]) {
-      // if it changed, then update
-      this.markCurrentNetworkEIPStatus('1559', isNowEIP1559Impled);
-    }
-  }
-
   /**
    * These are moved from metamask's network.js
    *
@@ -647,11 +612,6 @@ class NetworkPreferenceService extends EventEmitter {
       chain: opts.chainId,
       networkVersion: opts.chainId,
     });
-
-    /**
-     * After provider was changed, we must check it is 1559 implemented.
-     */
-    this.update1559ImplForCurrentProvider();
   }
 
   private _configureProvider({
