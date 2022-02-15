@@ -13,6 +13,7 @@ import { PreferenceStore } from 'background/service/preference';
 import { Network, NetworkController } from 'types/network';
 import { updateNetworkController } from 'ui/reducer/network.reducer';
 import { setCustomNetworks } from 'ui/reducer/customNetwork.reducer';
+import { setCurrentGasLimit } from 'ui/reducer/block.reducer';
 
 /**
  * BackgroundDataSyncMiddleware
@@ -53,6 +54,12 @@ export function BackgroundDataSyncMiddleware() {
         )
       );
     };
+    const onCurrentBlockStore = (s: {
+      currentBlockGasLimit: string;
+      isBaseFeePerGasExist: boolean;
+    }) => {
+      dispatch(setCurrentGasLimit(s.currentBlockGasLimit));
+    };
     eventBus.addEventListener(
       'dataSyncService.transactionHistory',
       onTxServiceBackgroundMessage
@@ -71,6 +78,10 @@ export function BackgroundDataSyncMiddleware() {
       'dataSyncService.customNetworksStore',
       onCustomNetworksStore
     );
+    eventBus.addEventListener(
+      'dataSyncService.latestBlockData',
+      onCurrentBlockStore
+    );
 
     fetchStorageDataFromBackground('transactionHistory');
     fetchStorageDataFromBackground('tokenStore');
@@ -78,6 +89,7 @@ export function BackgroundDataSyncMiddleware() {
     fetchStorageDataFromBackground('preference');
     fetchStorageDataFromBackground('networkStore');
     fetchStorageDataFromBackground('customNetworksStore');
+    fetchStorageDataFromBackground('latestBlockData');
 
     return () => {
       eventBus.removeEventListener(
@@ -103,6 +115,10 @@ export function BackgroundDataSyncMiddleware() {
       eventBus.removeEventListener(
         'dataSyncService.customNetworksStore',
         onCustomNetworksStore
+      );
+      eventBus.removeEventListener(
+        'dataSyncService.latestBlockData',
+        onCurrentBlockStore
       );
     };
   }, []);
