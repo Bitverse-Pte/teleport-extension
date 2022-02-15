@@ -72,14 +72,6 @@ export function NetworkStoreProvider({
 
   const customProviders = useSelector((state) => state.customNetworks);
 
-  useInterval(() => {
-    fetch1559ImplFromBackground();
-  }, 1000 * 60);
-
-  const fetch1559ImplFromBackground = useCallback(async () => {
-    await wallet._update1559ImplForCurrentProvider();
-  }, [wallet]);
-
   const getCustomProvider = useCallback(
     (matchedIdx: number) => {
       return customProviders[matchedIdx];
