@@ -20,7 +20,11 @@ import { useWallet, useAsyncEffect, denom2SymbolRatio } from 'ui/utils';
 import { transferAddress2Display } from 'ui/utils';
 import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
 import AccountSelect from 'ui/components/AccountSelect';
-import { ETH, Transaction } from 'constants/transaction';
+import {
+  ETH,
+  Transaction,
+  TransactionEnvelopeTypes,
+} from 'constants/transaction';
 import { BaseAccount } from 'types/extend';
 import { Token } from 'types/token';
 import { generateTokenTransferData } from 'ui/context/send.utils';
@@ -59,6 +63,7 @@ const Send = () => {
   const [recentAddressList, setRecentAddressList] = useState<string[]>();
 
   const chainId = useSelector(getCurrentChainId);
+  const isSupport1559 = useSelector((state) => state.send.eip1559support);
 
   const cleanup = useCallback(() => {
     dispatch(resetSendState());
@@ -116,12 +121,14 @@ const Send = () => {
         fromDenomination: EthDenomination.ETH,
       }).toString()
     );
+    const type = isSupport1559
+      ? TransactionEnvelopeTypes.FEE_MARKET
+      : TransactionEnvelopeTypes.LEGACY;
     const params: Record<string, any> = {
       from: fromAccount?.address,
       value: '0x0',
       isSend: true,
-      type: '0x2',
-      gas: '0x11359',
+      type: type,
     };
     if (selectedToken?.isNative) {
       params.to = toAddress;
@@ -134,11 +141,17 @@ const Send = () => {
         amount: userInputAmount,
       });
     }
+    if (isSupport1559) {
+      delete params.gasPrice;
+    } else {
+      delete params.maxFeePerGas;
+      delete params.maxPriorityFeePerGas;
+    }
     params.txParam = {
       from: fromAccount?.address,
       to: toAddress,
       value: userInputAmount,
-      type: '0x2',
+      type: type,
       symbol: selectedToken?.symbol,
     };
     wallet.sendRequest({
