@@ -9,7 +9,7 @@ import DefaulutIcon from 'assets/tokens/default.svg';
 import { BigNumber } from 'ethers';
 import { PresetNetworkId } from 'constants/defaultNetwork';
 
-export function categoryToIconSVG(category: string): string | undefined {
+export function categoryToIconSVG(category?: string): string | undefined {
   switch (category) {
     case 'ETH':
       return EthIconB;
