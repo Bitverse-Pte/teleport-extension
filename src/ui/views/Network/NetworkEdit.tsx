@@ -53,12 +53,20 @@ const NetworkEdit = () => {
   }, [isEdit, formattedIdx, networkContext]);
 
   const [form] = Form.useForm();
+  const customNetworks = useSelector((s) => s.customNetworks);
 
   const checkRpcUrlAndSetChainId = useCallback(
     async (value: string) => {
       console.info(`RPC URL is ${value}`);
       try {
         if (!value) return setErrorMessage('rpcUrl');
+
+        const isExistedRpc =
+          customNetworks.filter((p) => p.rpcUrl === value).length > 0;
+        if (isExistedRpc && !isEdit) {
+          throw new Error(t('same_rpc_url'));
+        }
+
         checkIsTrimmed(value);
         checkIsLegitURL(value);
         type JsonRpcResult = {
@@ -104,7 +112,7 @@ const NetworkEdit = () => {
         setErrorMessage('rpcUrl', uiErrorMsg);
       }
     },
-    [form]
+    [form, customNetworks]
   );
 
   const editNetwork = useCallback(
@@ -148,8 +156,6 @@ const NetworkEdit = () => {
     },
     [history, networkContext, isEdit, formattedIdx]
   );
-
-  const customNetworks = useSelector((s) => s.customNetworks);
 
   const checkNetworkNickname = useCallback(
     (_: unknown, value: string) => {
