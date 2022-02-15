@@ -12,6 +12,8 @@ import DefaulutIcon from 'assets/tokens/default.svg';
 import { isString } from 'util';
 import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber } from 'ethers';
+import { defaultNetworks } from 'constants/defaultNetwork';
+import { useSelector } from 'react-redux';
 
 const Icon = (src: string) => <img className="category-icon" src={src} />;
 
@@ -147,15 +149,37 @@ const NetworkEdit = () => {
     [history, networkContext, isEdit, formattedIdx]
   );
 
-  const checkNetworkNickname = (_: unknown, value: string) => {
-    const maxCharsInNickname = 20;
-    checkIsTrimmed(value);
-    if (value.length > maxCharsInNickname) {
-      throw new Error(
-        `The length of ${'nickname'} is no longer than ${maxCharsInNickname} chars.`
-      );
-    }
-  };
+  const customNetworks = useSelector((s) => s.customNetworks);
+
+  const checkNetworkNickname = useCallback(
+    (_: unknown, value: string) => {
+      const maxCharsInNickname = 20;
+      checkIsTrimmed(value);
+      if (value.length > maxCharsInNickname) {
+        throw new Error(
+          `The length of ${'nickname'} is no longer than ${maxCharsInNickname} chars.`
+        );
+      }
+
+      const sameNameWithDefaultNet =
+        Object.values(defaultNetworks).filter(
+          (p) => Boolean(p) && p.nickname === value
+        ).length > 0;
+      if (sameNameWithDefaultNet) {
+        throw new Error(
+          'Same name with our preset provider, please rename your provider name.'
+        );
+      }
+      const sameNameWithCustomNetwork =
+        customNetworks.filter((p) => p.nickname === value).length > 0;
+      if (sameNameWithCustomNetwork && !isEdit) {
+        throw new Error(
+          'Same name with existed provider, please rename your provider name.'
+        );
+      }
+    },
+    [customNetworks]
+  );
 
   const setErrorMessage = useCallback(
     (fieldName: string, message?: string) => {
