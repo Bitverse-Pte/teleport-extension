@@ -49,8 +49,6 @@ import {
 import { ComposedStore, ObservableStore } from '@metamask/obs-store';
 import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
-import eventBus from 'eventBus';
-import { EVENTS } from 'constants/index';
 
 let defaultProviderConfigOpts = defaultNetworks['mainnet'] as Provider;
 if (process.env.IN_TEST === 'true') {
@@ -148,72 +146,6 @@ class NetworkPreferenceService extends EventEmitter {
       );
     });
     this.on(NETWORK_EVENTS.NETWORK_DID_CHANGE, this.lookupNetwork);
-
-    // this keeps syncing data from the UI
-    this._registerListener();
-  }
-
-  private _registerListener() {
-    this._store.subscribe((newState) => {
-      this._uiNetworkPortPostMsg({
-        type: 'update_all',
-        data: {
-          ctrler: newState.networkController,
-          customNetworks: Object.values(newState.customNetworks),
-        },
-      });
-    });
-
-    eventBus.addEventListener('fetchNetworkServiceData', (params) => {
-      if (params.type === 'fetch_all') {
-        this._handleNCPortMsg(params);
-      }
-    });
-  }
-
-  private _uiNetworkPortPostMsg(msg: NetworkBg2UIMessage): void {
-    // I typed msg for better coding experince
-    eventBus.emit(EVENTS.broadcastToUI, {
-      method: 'syncNetworkServiceData',
-      params: msg,
-    });
-  }
-
-  // private _syncNCStateToUI(data: NetworkController) {
-  //   this._uiNetworkPortPostMsg({ type: 'update', data })
-  // }
-
-  // private _syncCustomNetworkToUI(data: Network[]) {
-  //   this._uiNetworkPortPostMsg({ type: 'update_custom_network', data })
-  // }
-
-  sendAllDataToUI() {
-    const ctrler = this.networkStore.getState();
-    const customNetworks = this.getCustomNetworks();
-    return this._uiNetworkPortPostMsg({
-      type: 'update_all',
-      data: {
-        ctrler,
-        customNetworks,
-      },
-    });
-  }
-
-  private _handleNCPortMsg(message: { type: string; data: any }): void {
-    switch (message.type) {
-      // case 'fetch': return this._syncNCStateToUI(ctrler)
-      // case 'fetch_custom_network': return this._syncCustomNetworkToUI(customNetworks)
-      case 'fetch_all': {
-        return this.sendAllDataToUI();
-      }
-      default: {
-        console.warn(
-          `Unknown type '${message.type}', data: ${JSON.stringify(
-            message.data
-          )}`
-        );
-      }
-    }
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
@@ -303,40 +235,17 @@ class NetworkPreferenceService extends EventEmitter {
 
   async markCurrentNetworkEIPStatus(name: string, isEnabled: boolean) {
     const { networkDetails } = this.networkStore.getState();
+    if (networkDetails.EIPS[name] === isEnabled) {
+      /**
+       * avoid useless data push of `ObservableStore`
+       * only change the state if they are not equal
+       */
+      return;
+    }
     networkDetails.EIPS[name] = isEnabled;
     this.networkStore.updateState({
       networkDetails,
     });
-  }
-
-  async update1559ImplForCurrentProvider() {
-    // current provider's chainId
-    const { chainId } = this.getProviderConfig();
-
-    // first we query the cache and see
-    if (this.isChainEnable1559(chainId)) {
-      // hit cache, just set and end
-      // this.store.networkController.networkDetails.EIPS['1559'] = true;
-      this.markCurrentNetworkEIPStatus('1559', true);
-      return;
-    }
-
-    const { rpcUrl } = this.networkStore.getState().provider;
-    const is1559Impled = await this.checkNetworkIs1559Impled(rpcUrl);
-    // we only cache enabled networks
-    if (is1559Impled) this.cacheChainEnable1559(chainId);
-
-    // we re-check to avoid race condition
-    const { chainId: chainIdNow } = this.getProviderConfig();
-    if (chainIdNow !== chainId) {
-      // if not match, that means provider was changed when we fetching the block
-      // in this case that we will rerun the query
-      console.debug('another chainId detected, rerunning');
-      return this.update1559ImplForCurrentProvider();
-    } else {
-      // otherwise, just set
-      this.markCurrentNetworkEIPStatus('1559', is1559Impled);
-    }
   }
 
   /**

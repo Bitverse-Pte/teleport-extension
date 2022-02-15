@@ -1,17 +1,8 @@
-import { EVENTS } from 'constants/index';
 import { defaultNetworks } from 'constants/defaultNetwork';
-import eventBus from 'eventBus';
-import {
-  CoinType,
-  NetworkBg2UIMessage,
-  NetworkController,
-  Provider,
-} from 'types/network';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { CoinType, NetworkController, Provider } from 'types/network';
+import React, { useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { useInterval } from 'react-use';
-import { setCustomNetworks } from '../reducer/customNetwork.reducer';
-import { updateNetworkController } from '../reducer/network.reducer';
 import { useWallet } from '../utils';
 
 /**
@@ -77,74 +68,9 @@ export function NetworkStoreProvider({
 }) {
   const wallet = useWallet();
 
-  const dispatch = useDispatch();
-
   const currentNetworkController = useSelector((state) => state.network);
-  const setCurrentNetworkController = (newCtler: NetworkController) => {
-    dispatch(updateNetworkController(newCtler));
-  };
 
   const customProviders = useSelector((state) => state.customNetworks);
-  const setCustomProviders = (ps: Provider[]) => {
-    dispatch(setCustomNetworks(ps));
-  };
-
-  useInterval(() => {
-    fetch1559ImplFromBackground();
-  }, 1000 * 60);
-
-  const fetch1559ImplFromBackground = useCallback(async () => {
-    await wallet._update1559ImplForCurrentProvider();
-  }, [wallet]);
-
-  // const fetchNetworkFromBackground = () => port?.postMessage({ type: 'fetch' })
-  // const fetchCustomProvidersFromBackground = () => port?.postMessage({ type: 'fetch_custom_network' })
-  const fetchThemFromBackground = () =>
-    eventBus.emit(EVENTS.broadcastToBackground, {
-      method: 'fetchNetworkServiceData',
-      data: {
-        type: 'fetch_all',
-      },
-    });
-
-  useEffect(() => {
-    // only for the beginning of this hook
-    const onBackgroundMessage = (message: NetworkBg2UIMessage) => {
-      switch (message.type) {
-        case 'update': {
-          setCurrentNetworkController(message.data);
-          break;
-        }
-        case 'update_all': {
-          setCurrentNetworkController(message.data.ctrler);
-          setCustomProviders(
-            message.data.customNetworks.map((v) => ({
-              ...v,
-              type: 'rpc',
-            }))
-          );
-          break;
-        }
-        case 'update_custom_network': {
-          setCustomProviders(
-            message.data.map((v) => ({
-              ...v,
-              type: 'rpc',
-            }))
-          );
-          break;
-        }
-      }
-    };
-    eventBus.addEventListener('syncNetworkServiceData', onBackgroundMessage);
-    fetchThemFromBackground();
-    return () => {
-      eventBus.removeEventListener(
-        'syncNetworkServiceData',
-        onBackgroundMessage
-      );
-    };
-  }, []);
 
   const getCustomProvider = useCallback(
     (matchedIdx: number) => {

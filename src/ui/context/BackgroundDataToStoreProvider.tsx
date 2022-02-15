@@ -1,47 +1,31 @@
-import { ITokenStore, Token } from 'types/token';
+import { ITokenStore } from 'types/token';
 import { EVENTS } from 'constants/index';
 import eventBus from 'eventBus';
-import { Transaction, TransactionHistoryStore } from 'constants/transaction';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setTokens, setTokenServiceState } from '../reducer/token.reducer';
+import { TransactionHistoryStore } from 'constants/transaction';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setTokenServiceState } from '../reducer/token.reducer';
 import { setTransactions } from '../reducer/transactions.reducer';
-import { useWallet } from '../utils';
 import { KnownMethodDict } from 'background/service/knownMethod';
-import { useInterval } from 'react-use';
 import { updateKnownMethods } from 'ui/reducer/knownMethod.reducer';
 import { updatePreferences } from 'ui/reducer/preference.reducer';
-
-type TxStore = Record<string, Transaction>;
+import { PreferenceStore } from 'background/service/preference';
+import { Network, NetworkController } from 'types/network';
+import { updateNetworkController } from 'ui/reducer/network.reducer';
+import { setCustomNetworks } from 'ui/reducer/customNetwork.reducer';
+import { setCurrentGasLimit } from 'ui/reducer/block.reducer';
 
 /**
- * BackgroundDataToStoreProvider
- * @param childrens  children elements into be injected
- * @returns
+ * BackgroundDataSyncMiddleware
+ * to manage the data sync between these two parts
  */
-export function BackgroundDataToStoreProvider({
-  children,
-}: {
-  children: JSX.Element;
-}) {
+export function BackgroundDataSyncMiddleware() {
   const dispatch = useDispatch();
-  const walletBg = useWallet();
 
   const fetchStorageDataFromBackground = (storageName: string) =>
     eventBus.emit(EVENTS.broadcastToBackground, {
       method: `dataSyncService.fetch.${storageName}`,
     });
-
-  const fetchPreferenceStore = useCallback(async () => {
-    const s = await walletBg.getPreferenceStore();
-    dispatch(updatePreferences(s));
-  }, [walletBg]);
-
-  useInterval(() => {
-    // fetch PreferenceStore every second since it's not stream based store
-    fetchPreferenceStore();
-    // I do not want to exceed eventBus, so 3 sec delay
-  }, 1000 * 3);
 
   useEffect(() => {
     // only for the beginning of this hook
@@ -53,6 +37,28 @@ export function BackgroundDataToStoreProvider({
     };
     const onKnownMethodsUpdate = (s: KnownMethodDict) => {
       dispatch(updateKnownMethods(s));
+    };
+    const onPreferenceUpdate = (s: PreferenceStore) => {
+      dispatch(updatePreferences(s));
+    };
+    const onNetworkStore = (s: NetworkController) => {
+      dispatch(updateNetworkController(s));
+    };
+    const onCustomNetworksStore = (s: Record<number, Network>) => {
+      dispatch(
+        setCustomNetworks(
+          Object.values(s).map((v) => ({
+            ...v,
+            type: 'rpc',
+          }))
+        )
+      );
+    };
+    const onCurrentBlockStore = (s: {
+      currentBlockGasLimit: string;
+      isBaseFeePerGasExist: boolean;
+    }) => {
+      dispatch(setCurrentGasLimit(s.currentBlockGasLimit));
     };
     eventBus.addEventListener(
       'dataSyncService.transactionHistory',
@@ -66,11 +72,25 @@ export function BackgroundDataToStoreProvider({
       'dataSyncService.knownMethod',
       onKnownMethodsUpdate
     );
-    // not in dataSyncService
-    // eventBus.addEventListener('onPreferenceUpdate', onPreferenceUpdate)
+    eventBus.addEventListener('dataSyncService.preference', onPreferenceUpdate);
+    eventBus.addEventListener('dataSyncService.networkStore', onNetworkStore);
+    eventBus.addEventListener(
+      'dataSyncService.customNetworksStore',
+      onCustomNetworksStore
+    );
+    eventBus.addEventListener(
+      'dataSyncService.latestBlockData',
+      onCurrentBlockStore
+    );
+
     fetchStorageDataFromBackground('transactionHistory');
     fetchStorageDataFromBackground('tokenStore');
     fetchStorageDataFromBackground('knownMethod');
+    fetchStorageDataFromBackground('preference');
+    fetchStorageDataFromBackground('networkStore');
+    fetchStorageDataFromBackground('customNetworksStore');
+    fetchStorageDataFromBackground('latestBlockData');
+
     return () => {
       eventBus.removeEventListener(
         'dataSyncService.transactionHistory',
@@ -84,10 +104,24 @@ export function BackgroundDataToStoreProvider({
         'dataSyncService.knownMethod',
         onTxServiceBackgroundMessage
       );
-      // not in dataSyncService
-      // eventBus.removeEventListener('onPreferenceUpdate', onPreferenceUpdate)
+      eventBus.removeEventListener(
+        'dataSyncService.preference',
+        onPreferenceUpdate
+      );
+      eventBus.removeEventListener(
+        'dataSyncService.networkStore',
+        onNetworkStore
+      );
+      eventBus.removeEventListener(
+        'dataSyncService.customNetworksStore',
+        onCustomNetworksStore
+      );
+      eventBus.removeEventListener(
+        'dataSyncService.latestBlockData',
+        onCurrentBlockStore
+      );
     };
   }, []);
 
-  return children;
+  return null;
 }

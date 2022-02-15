@@ -232,17 +232,8 @@ export class WalletController extends BaseController {
   getSameChainsByCoinType = (coinType: CoinType) =>
     networkPreferenceService.getSameChainsByCoinType(coinType);
 
-  _update1559ImplForCurrentProvider = () => {
-    return networkPreferenceService.update1559ImplForCurrentProvider();
-  };
-
   changeAccount = (account: BaseAccount) =>
     preferenceService.setCurrentAccount(account);
-
-  getPreferenceStore = () => {
-    const cloned = { ...preferenceService.store };
-    return cloned;
-  };
 
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 

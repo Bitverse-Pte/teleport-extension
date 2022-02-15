@@ -13,6 +13,8 @@ import {
   txHistoryService,
   TokenService,
   knownMethodService,
+  networkPreferenceService,
+  latestBlockDataHub,
 } from './service';
 import { providerController, walletController } from './controller';
 import i18n from './service/i18n';
@@ -61,10 +63,14 @@ async function restoreAppState() {
     TokenService.init(),
   ]);
 
-  const dataSync = new DataSyncService({
+  new DataSyncService({
     tokenStore: TokenService.store,
     transactionHistory: txHistoryService.store,
     knownMethod: knownMethodService.store,
+    preference: preferenceService.store,
+    networkStore: networkPreferenceService.networkStore,
+    customNetworksStore: networkPreferenceService.customNetworksStore,
+    latestBlockData: latestBlockDataHub.store,
   });
 
   appStoreLoaded = true;
