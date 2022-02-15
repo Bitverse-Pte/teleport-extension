@@ -235,6 +235,13 @@ class NetworkPreferenceService extends EventEmitter {
 
   async markCurrentNetworkEIPStatus(name: string, isEnabled: boolean) {
     const { networkDetails } = this.networkStore.getState();
+    if (networkDetails.EIPS[name] === isEnabled) {
+      /**
+       * avoid useless data push of `ObservableStore`
+       * only change the state if they are not equal
+       */
+      return;
+    }
     networkDetails.EIPS[name] = isEnabled;
     this.networkStore.updateState({
       networkDetails,
