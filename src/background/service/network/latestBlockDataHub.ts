@@ -61,6 +61,12 @@ export class LatestBlockDataHubService {
     this.currentBlockNumber = blockNumber;
     const p = new ethers.providers.JsonRpcProvider(this.rpcUrl);
     const currentBlock = await p.getBlock(blockNumber);
+    /**
+     * not update if block are null
+     */
+    if (!currentBlock) {
+      return;
+    }
     const currentBlockGasLimit = currentBlock.gasLimit.toHexString();
     // even it's 0, it's a BigNumber '0', so just use boolean
     // null / undefined will be false
@@ -77,6 +83,11 @@ export class LatestBlockDataHubService {
   private async handleProviderChange(
     state: ReturnType<NetworkProviderStore['getState']>
   ) {
+    const isRpcChanged = this.rpcUrl === state.provider.rpcUrl;
+    if (!isRpcChanged) {
+      // skip
+      return;
+    }
     console.debug(
       'LatestBlockDataHubService::handleProviderChange: changing rpcUrl to: ',
       state.provider.rpcUrl
