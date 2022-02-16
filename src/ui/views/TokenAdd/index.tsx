@@ -13,6 +13,7 @@ import { ErrorCode } from 'constants/code';
 import Header from 'ui/components/Header';
 
 import './style.less';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const TokenAdd = () => {
   const { state } = useLocation<{
@@ -39,7 +40,7 @@ const TokenAdd = () => {
         err.code &&
         err.code === ErrorCode.CUSTOM_ERC20_TOKEN_DUPLICATED
       ) {
-        message.error('current token was exist already');
+        ClickToCloseMessage.error('current token was exist already');
       }
     },
   });

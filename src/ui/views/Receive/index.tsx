@@ -7,6 +7,7 @@ import QrCodeView from 'ui/components/QrCode';
 import { useWallet, useAsyncEffect } from 'ui/utils';
 import { BaseAccount } from 'types/extend';
 import './style.less';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const SendToken = () => {
   const wallet = useWallet();
@@ -41,7 +42,7 @@ const SendToken = () => {
         <div className="copy-box">
           <CopyToClipboard
             text={fromAccount?.address}
-            onCopy={() => message.success('Copied')}
+            onCopy={() => ClickToCloseMessage.success('Copied')}
           >
             <Button type="primary" block className="copy-btn">
               Copy

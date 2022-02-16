@@ -6,9 +6,10 @@ import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import IconArrowRight from 'assets/to.png';
 import './index.less';
+import { ClickToCloseMessage } from '../universal/ClickToCloseMessage';
 
 const onCopy = () => {
-  message.success('Copied');
+  ClickToCloseMessage.success('Copied');
 };
 
 function Address({ checksummedAddress, name }) {
