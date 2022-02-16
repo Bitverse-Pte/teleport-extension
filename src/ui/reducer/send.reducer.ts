@@ -354,8 +354,9 @@ export const initializeSendState = createAsyncThunk(
     const isNonStandardEthChain = getIsNonStandardEthChain(state);
     const chainId = getCurrentChainId(state);
     const eip1559support = isEIP1559Network(state);
+    console.log('===========[eip1559support]=============', eip1559support);
     const {
-      send: { draftTransaction, asset, recipient, amount },
+      send: { draftTransaction, asset, amount },
       preference,
     } = state;
 

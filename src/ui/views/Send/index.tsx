@@ -63,6 +63,9 @@ const Send = () => {
   const [recentAddressList, setRecentAddressList] = useState<string[]>();
 
   const chainId = useSelector(getCurrentChainId);
+  const draftTransaction = useSelector(
+    (state) => state.send.draftTransaction.txParams
+  );
   const isSupport1559 = useSelector((state) => state.send.eip1559support);
 
   const cleanup = useCallback(() => {
@@ -146,6 +149,7 @@ const Send = () => {
     } else {
       delete params.maxFeePerGas;
       delete params.maxPriorityFeePerGas;
+      params.gas = draftTransaction.gas;
     }
     params.txParam = {
       from: fromAccount?.address,
