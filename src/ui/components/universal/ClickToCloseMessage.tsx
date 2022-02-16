@@ -28,13 +28,13 @@ const createCTCMessage =
     } else {
       msgKey = content.key;
     }
-
+    const _poorOldOnClick = content.onClick;
     content.onClick = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (content.onClick) {
+      if (_poorOldOnClick) {
         /**
          * continute if onClick existed
          */
-        content.onClick(e);
+        _poorOldOnClick(e);
       }
       message.destroy(msgKey);
     };
