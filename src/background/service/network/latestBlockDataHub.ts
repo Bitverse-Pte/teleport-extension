@@ -1,6 +1,7 @@
 import { ObservableStore } from '@metamask/obs-store';
 import { PollingBlockTracker } from 'eth-block-tracker';
 import { ethers } from 'ethers';
+import eventBus from 'eventBus';
 
 type BlockData = {
   /**
@@ -29,6 +30,7 @@ export class LatestBlockDataHubService {
   store: ObservableStore<BlockData>;
   private _blockTracker: PollingBlockTracker;
   private rpcUrl: string;
+  private isUiOpened = false;
 
   constructor(opts: LatestBlockDataHubConstructorParams) {
     this.store = new ObservableStore({
@@ -45,9 +47,23 @@ export class LatestBlockDataHubService {
     // bind function for easier listener syntax
     this.updateForBlock = this.updateForBlock.bind(this);
     this.handleProviderChange = this.handleProviderChange.bind(this);
+    this.handleUIStatus = this.handleUIStatus.bind(this);
     this.rpcUrl = opts.networkProviderStore.getState().provider.rpcUrl;
     // keep `rpcUrl` updated
     opts.networkProviderStore.subscribe(this.handleProviderChange);
+
+    eventBus.addEventListener('UI_STATUS', this.handleUIStatus);
+  }
+
+  private handleUIStatus(_isUiOpened: boolean) {
+    console.debug('LatestBlockDataHubService::UI_STATUS:', _isUiOpened);
+    this.isUiOpened = _isUiOpened;
+    if (!_isUiOpened) {
+      this.stop();
+    } else {
+      // start if UI are back
+      this.start();
+    }
   }
 
   /**
@@ -58,6 +74,12 @@ export class LatestBlockDataHubService {
    * @fires 'block' The updated state, if all account updates are successful
    */
   private async updateForBlock(blockNumber: string) {
+    /**
+     * not update when UI close
+     */
+    if (!this.isUiOpened) {
+      return;
+    }
     this.currentBlockNumber = blockNumber;
     const p = new ethers.providers.JsonRpcProvider(this.rpcUrl);
     const currentBlock = await p.getBlock(blockNumber);
