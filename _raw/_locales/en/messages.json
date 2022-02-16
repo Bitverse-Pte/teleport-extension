@@ -35,6 +35,9 @@
   "Bad_RPC_URL": {
     "message": " 🤔 That didn't seems to be a valid RPC URL, please double check and try again."
   },
+  "same_rpc_url": {
+    "message": "Provider with same rpcUrl existed, please double check and try again."
+  },
   "rpc_url_404": {
     "message": " 🤔 Server responded, but rejected, please double check the URL and try again."
   },
