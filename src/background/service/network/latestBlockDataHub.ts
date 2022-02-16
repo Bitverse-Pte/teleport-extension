@@ -83,7 +83,7 @@ export class LatestBlockDataHubService {
   private async handleProviderChange(
     state: ReturnType<NetworkProviderStore['getState']>
   ) {
-    const isRpcChanged = this.rpcUrl === state.provider.rpcUrl;
+    const isRpcChanged = this.rpcUrl !== state.provider.rpcUrl;
     if (!isRpcChanged) {
       // skip
       return;
