@@ -12,6 +12,9 @@ import {
   TransactionStatuses,
   TransactionTypes,
 } from 'constants/transaction';
+import { TOKEN_TRANSFER_FUNCTION_SIGNATURE } from 'ui/context/send.constants';
+import { multiplyCurrencies } from './conversion';
+import { conversionGreaterThan, conversionLessThan } from 'utils/conversion';
 
 const hstInterface = new ethers.utils.Interface(abi);
 
@@ -251,4 +254,83 @@ export function getTransactionTypeTitle(
       throw new Error(`Unrecognized transaction type: ${type}`);
     }
   }
+}
+
+export function generateERC20TransferData({
+  toAddress = '0x0',
+  amount = '0x0',
+  sendToken,
+}) {
+  if (!sendToken) {
+    return undefined;
+  }
+  return (
+    TOKEN_TRANSFER_FUNCTION_SIGNATURE +
+    Array.prototype.map
+      .call(
+        abi.rawEncode(
+          ['address', 'uint256'],
+          [toAddress, addHexPrefix(amount)]
+        ),
+        (x) => `00${x.toString(16)}`.slice(-2)
+      )
+      .join('')
+  );
+}
+
+export const readAddressAsContract = async (ethQuery, address) => {
+  let contractCode;
+  try {
+    contractCode = await ethQuery.getCode(address);
+  } catch (e) {
+    contractCode = null;
+  }
+
+  const isContractAddress =
+    contractCode && contractCode !== '0x' && contractCode !== '0x0';
+  return { contractCode, isContractAddress };
+};
+
+function addGasBuffer(
+  initialGasLimitHex,
+  blockGasLimitHex,
+  bufferMultiplier = 1.5
+) {
+  const upperGasLimit = multiplyCurrencies(blockGasLimitHex, 0.9, {
+    toNumericBase: 'hex',
+    multiplicandBase: 16,
+    multiplierBase: 10,
+    numberOfDecimals: '0',
+  });
+  const bufferedGasLimit = multiplyCurrencies(
+    initialGasLimitHex,
+    bufferMultiplier,
+    {
+      toNumericBase: 'hex',
+      multiplicandBase: 16,
+      multiplierBase: 10,
+      numberOfDecimals: '0',
+    }
+  );
+
+  // if initialGasLimit is above blockGasLimit, dont modify it
+  if (
+    conversionGreaterThan(
+      { value: initialGasLimitHex, fromNumericBase: 'hex' },
+      { value: upperGasLimit, fromNumericBase: 'hex' }
+    )
+  ) {
+    return initialGasLimitHex;
+  }
+  // if bufferedGasLimit is below blockGasLimit, use bufferedGasLimit
+  if (
+    conversionLessThan(
+      { value: bufferedGasLimit, fromNumericBase: 'hex' },
+      { value: upperGasLimit, fromNumericBase: 'hex' }
+    )
+  ) {
+    return bufferedGasLimit;
+  }
+  // otherwise use blockGasLimit
+  return upperGasLimit;
 }

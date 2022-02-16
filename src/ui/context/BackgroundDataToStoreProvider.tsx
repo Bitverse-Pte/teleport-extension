@@ -13,7 +13,10 @@ import { PreferenceStore } from 'background/service/preference';
 import { Network, NetworkController } from 'types/network';
 import { updateNetworkController } from 'ui/reducer/network.reducer';
 import { setCustomNetworks } from 'ui/reducer/customNetwork.reducer';
-import { setCurrentGasLimit } from 'ui/reducer/block.reducer';
+import {
+  setCurrentGasLimit,
+  setGasFeeEstimates,
+} from 'ui/reducer/block.reducer';
 
 /**
  * BackgroundDataSyncMiddleware
@@ -56,9 +59,11 @@ export function BackgroundDataSyncMiddleware() {
     };
     const onCurrentBlockStore = (s: {
       currentBlockGasLimit: string;
+      gasFeeEstimates: any;
       isBaseFeePerGasExist: boolean;
     }) => {
       dispatch(setCurrentGasLimit(s.currentBlockGasLimit));
+      dispatch(setGasFeeEstimates(s.gasFeeEstimates));
     };
     eventBus.addEventListener(
       'dataSyncService.transactionHistory',

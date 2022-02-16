@@ -1,3 +1,9 @@
+import {
+  EthGasPriceEstimate,
+  GasFeeController,
+  GasFeeEstimates,
+  LegacyGasPriceEstimate,
+} from '@metamask/controllers';
 import { ObservableStore } from '@metamask/obs-store';
 import { PollingBlockTracker } from 'eth-block-tracker';
 import { ethers } from 'ethers';
@@ -7,6 +13,14 @@ type BlockData = {
    * The Current GasLimit
    */
   currentBlockGasLimit: string;
+  /**
+   * The Current gasFeeEstimates
+   */
+  gasFeeEstimates:
+    | EthGasPriceEstimate
+    | GasFeeEstimates
+    | LegacyGasPriceEstimate
+    | Record<string, never>;
   /**
    * Indicate a EVM chain is implemented EIP1559 or not
    */
@@ -21,18 +35,22 @@ type NetworkProviderStore = ObservableStore<{
 
 interface LatestBlockDataHubConstructorParams {
   blockTracker: PollingBlockTracker;
+  gasFeeTracker: GasFeeController;
   networkProviderStore: NetworkProviderStore;
 }
 
 export class LatestBlockDataHubService {
   currentBlockNumber: string | null;
+  gasFeeEstimates: any | null;
   store: ObservableStore<BlockData>;
   private _blockTracker: PollingBlockTracker;
+  private _gasFeeTracker: GasFeeController;
   private rpcUrl: string;
 
   constructor(opts: LatestBlockDataHubConstructorParams) {
     this.store = new ObservableStore({
       currentBlockGasLimit: '',
+      gasFeeEstimates: {},
       isBaseFeePerGasExist: false,
     });
 
@@ -42,6 +60,7 @@ export class LatestBlockDataHubService {
     this._blockTracker.once('latest', (blockNumber) => {
       this.currentBlockNumber = blockNumber;
     });
+    this._gasFeeTracker = opts.gasFeeTracker;
     // bind function for easier listener syntax
     this.updateForBlock = this.updateForBlock.bind(this);
     this.handleProviderChange = this.handleProviderChange.bind(this);
@@ -71,8 +90,12 @@ export class LatestBlockDataHubService {
     // even it's 0, it's a BigNumber '0', so just use boolean
     // null / undefined will be false
     const isBaseFeePerGasExist = Boolean(currentBlock.baseFeePerGas);
+
+    const gasFeeState = await this._gasFeeTracker.fetchGasFeeEstimates();
+    const gasFeeEstimates = gasFeeState.gasFeeEstimates;
     this.store.updateState({
       currentBlockGasLimit,
+      gasFeeEstimates,
       isBaseFeePerGasExist,
     });
     console.debug(

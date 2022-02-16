@@ -3,6 +3,7 @@ import type { RootState } from '.';
 
 interface CurrentBlockSliceState {
   gasLimit: string;
+  gasFeeEstimates: any;
 }
 
 export const currentBlockSlice = createSlice<
@@ -12,20 +13,29 @@ export const currentBlockSlice = createSlice<
       state: CurrentBlockSliceState,
       action: PayloadAction<string>
     ) => any;
+    setGasFeeEstimates: (
+      state: CurrentBlockSliceState,
+      action: PayloadAction<string>
+    ) => any;
   }
 >({
   name: 'currentBlock',
   initialState: {
     gasLimit: '',
+    gasFeeEstimates: {},
   },
   reducers: {
     setCurrentGasLimit(state, action) {
       state.gasLimit = action.payload;
     },
+    setGasFeeEstimates(state, action) {
+      state.gasFeeEstimates = action.payload;
+    },
   },
 });
 
-export const { setCurrentGasLimit } = currentBlockSlice.actions;
+export const { setCurrentGasLimit, setGasFeeEstimates } =
+  currentBlockSlice.actions;
 
 /**
  * use this with `useSelector` and receive always-fresh Gas Limit
