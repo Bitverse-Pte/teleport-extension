@@ -27,6 +27,7 @@ import './style.less';
 import { NoContent } from 'ui/components/universal/NoContent';
 import tokenHide from '../../../assets/tokenHide.svg';
 import tokenShow from '../../../assets/tokenShow.svg';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const TokenManage = () => {
   const history = useHistory();
@@ -95,7 +96,7 @@ const TokenManage = () => {
     },
     onError(err) {
       console.error(err);
-      message.error('no token found');
+      ClickToCloseMessage.error('no token found');
     },
   });
 

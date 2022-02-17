@@ -5,7 +5,7 @@ import './style.less';
 import { useHistory, useParams } from 'react-router';
 import axios, { AxiosError } from 'axios';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
-import { Button, Form, Input, message, Select } from 'antd';
+import { Button, Form, Input, Select } from 'antd';
 import Header from 'ui/components/Header';
 import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import DefaulutIcon from 'assets/tokens/default.svg';
@@ -14,6 +14,7 @@ import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { useSelector } from 'react-redux';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const Icon = (src: string) => <img className="category-icon" src={src} />;
 
@@ -149,7 +150,7 @@ const NetworkEdit = () => {
         );
       }
 
-      message.success({
+      ClickToCloseMessage.success({
         content: t('Custom Provider Saved!'),
       });
       history.goBack();

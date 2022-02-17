@@ -25,6 +25,7 @@ import { IdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 import { WalletHeader } from '../WalletManage';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -93,7 +94,7 @@ const AccountManage: React.FC = () => {
         queryAccounts();
       },
       onError: (e) => {
-        message.error('add account failed');
+        ClickToCloseMessage.error('add account failed');
       },
     }
   );
@@ -102,17 +103,17 @@ const AccountManage: React.FC = () => {
 
   const onRenameConfirm = async (accountName) => {
     if (!accountName) {
-      message.error('invalid account name');
+      ClickToCloseMessage.error('invalid account name');
       return;
     }
     if (accountName.length > 20) {
-      message.error('the length of name should less than 20');
+      ClickToCloseMessage.error('the length of name should less than 20');
       return;
     }
     const renamed = await wallet
       .renameDisplayAccount(hdWalletId, accountName, currentAccountIndex)
       .catch((e) => {
-        message.error('this name is exist already');
+        ClickToCloseMessage.error('this name is exist already');
       });
     if (renamed) {
       setRenamePopupVisible(false);
@@ -199,7 +200,9 @@ const AccountManage: React.FC = () => {
                     cls="base-text-color right"
                     onClick={(e) => {
                       if (i === 0) {
-                        message.warn('can not delete the last account');
+                        ClickToCloseMessage.warning(
+                          'can not delete the last account'
+                        );
                         return;
                       }
                       e.stopPropagation();
@@ -263,7 +266,7 @@ const AccountManage: React.FC = () => {
                           </span>
                           <CopyToClipboard
                             text={item.address}
-                            onCopy={() => message.success('Copied')}
+                            onCopy={() => ClickToCloseMessage.success('Copied')}
                           >
                             <IconComponent
                               name="copy"
@@ -494,7 +497,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
 
   const handleConfirmBtnClick = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      message.error('wrong password');
+      ClickToCloseMessage.error('wrong password');
     });
     if (checksumPassed) {
       if (props.onConfirm && props.onConfirm instanceof Function) {
