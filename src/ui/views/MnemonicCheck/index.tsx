@@ -9,6 +9,7 @@ import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
 import { AccountHeader } from '../AccountRecover';
 import { Tabs } from 'constants/wallet';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const BackupCheck = () => {
   const { state } = useLocation<{
@@ -48,7 +49,7 @@ const BackupCheck = () => {
 
   const checksumPsd = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      message.error('wrong password');
+      ClickToCloseMessage.error('wrong password');
       console.error(e.code);
     });
     if (checksumPassed) {
@@ -152,7 +153,7 @@ const BackupCheck = () => {
         </CustomButton>
         <CopyToClipboard
           text={state.accountType === Tabs.FIRST ? mnemonic : privateKey}
-          onCopy={() => message.success('Copied')}
+          onCopy={() => ClickToCloseMessage.success('Copied')}
         >
           <CustomButton
             type="primary"

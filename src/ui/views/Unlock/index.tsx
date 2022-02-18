@@ -7,6 +7,7 @@ import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
 import './style.less';
 import { LogoHeader } from '../Setting';
 import defenseImg from '../../../assets/defense.png';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const Unlock = () => {
   const wallet = useWallet();
@@ -18,7 +19,7 @@ const Unlock = () => {
       resolveApproval();
     },
     onError(err) {
-      message.error('wrong password');
+      ClickToCloseMessage.error('wrong password');
     },
   });
 

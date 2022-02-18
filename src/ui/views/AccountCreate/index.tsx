@@ -14,6 +14,7 @@ import {
   PasswordCheckPassed,
 } from 'ui/components/Widgets';
 import { AccountHeader } from '../AccountRecover';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const AccountCreate = () => {
   const { t } = useTranslation();
@@ -38,7 +39,7 @@ const AccountCreate = () => {
     },
     onError(err) {
       console.error(err);
-      message.error(t('Not a valid mnemonic'));
+      ClickToCloseMessage.error(t('Not a valid mnemonic'));
     },
   });
 
@@ -59,20 +60,20 @@ const AccountCreate = () => {
 
   const submit = () => {
     if (!name) {
-      message.error('name is necessary');
+      ClickToCloseMessage.error('name is necessary');
       return;
     }
     if (name.length > 20) {
-      message.error('the length of name should less than 20');
+      ClickToCloseMessage.error('the length of name should less than 20');
       return;
     }
     if (policyShow) {
       if (!psd.trim() || psd.trim().length < MIN_PASSWORD_LENGTH) {
-        message.error('password need more than 8 words');
+        ClickToCloseMessage.error('password need more than 8 words');
         return;
       }
       if (psd.trim() !== confirmPsd.trim()) {
-        message.error('two password is different');
+        ClickToCloseMessage.error('two password is different');
         return;
       }
     }

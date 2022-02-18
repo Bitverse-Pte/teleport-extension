@@ -17,6 +17,7 @@ import TokenService from './token/TokenService';
 import platform from './extension';
 import txHistoryService from './transactions/history';
 import knownMethodService from './knownMethod';
+import { LatestBlockDataHubService } from './network/latestBlockDataHub';
 
 const controllerMessenger = new ControllerMessenger();
 
@@ -83,6 +84,19 @@ const txController = new TransactionController({
     gasFeeController.fetchGasFeeEstimates.bind(gasFeeController),
 });
 
+const latestBlockDataHub = new LatestBlockDataHubService({
+  blockTracker: networkController.getProviderAndBlockTracker().blockTracker,
+  gasFeeTracker: gasFeeController,
+  networkProviderStore: networkController.networkStore,
+});
+
+latestBlockDataHub.store.subscribe(({ isBaseFeePerGasExist }) => {
+  networkPreferenceService.markCurrentNetworkEIPStatus(
+    '1559',
+    isBaseFeePerGasExist
+  );
+});
+
 export {
   txController,
   gasFeeController,
@@ -98,6 +112,7 @@ export {
   knownMethodService,
   TokenService,
   txHistoryService,
+  latestBlockDataHub,
 };
 
 async function newUnapprovedTransaction(txParams, req) {

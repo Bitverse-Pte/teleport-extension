@@ -19,6 +19,7 @@ import reversEnter from 'assets/reverseEnter.svg';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import importImg from 'assets/importImg.svg';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 export interface WalletHeaderProps {
   title: string;
@@ -104,11 +105,11 @@ const WalletManage: React.FC = () => {
 
   const onRenameConfirm = async (walletName) => {
     if (!walletName) {
-      message.error('invalid wallet name');
+      ClickToCloseMessage.error('invalid wallet name');
       return;
     }
     if (walletName.length > 20) {
-      message.error('the length of name should less than 20');
+      ClickToCloseMessage.error('the length of name should less than 20');
       return;
     }
     const renamed: boolean = await wallet
@@ -116,7 +117,7 @@ const WalletManage: React.FC = () => {
       .catch((e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          message.error('wallet name is already exist');
+          ClickToCloseMessage.error('wallet name is already exist');
         }
       });
     if (renamed) {
@@ -127,7 +128,7 @@ const WalletManage: React.FC = () => {
 
   const handleDeleteBtnClick = (e, hdWalletId) => {
     if (hdWalletAccounts.length + simpleWalletAccounts.length === 1) {
-      message.warn('can not delete the last wallet');
+      ClickToCloseMessage.warning('can not delete the last wallet');
       return;
     }
     e.stopPropagation();
@@ -246,7 +247,7 @@ const WalletManage: React.FC = () => {
                       <ChainIcons coinType={w?.coinType} />
                       <CopyToClipboard
                         text={w.address}
-                        onCopy={() => message.success('Copied')}
+                        onCopy={() => ClickToCloseMessage.success('Copied')}
                       >
                         <IconComponent
                           name="copy"

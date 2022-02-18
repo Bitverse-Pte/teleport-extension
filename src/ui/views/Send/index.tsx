@@ -1,4 +1,10 @@
-import React, { useState, createContext, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  createContext,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +20,11 @@ import { useWallet, useAsyncEffect, denom2SymbolRatio } from 'ui/utils';
 import { transferAddress2Display } from 'ui/utils';
 import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
 import AccountSelect from 'ui/components/AccountSelect';
-import { ETH, Transaction } from 'constants/transaction';
+import {
+  ETH,
+  Transaction,
+  TransactionEnvelopeTypes,
+} from 'constants/transaction';
 import { BaseAccount } from 'types/extend';
 import { Token } from 'types/token';
 import { generateTokenTransferData } from 'ui/context/send.utils';
@@ -22,6 +32,10 @@ import { CustomButton, TokenIcon, WalletName } from 'ui/components/Widgets';
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import './style.less';
 import BigNumber from 'bignumber.js';
+import { utils } from 'ethers';
+import { useDispatch, useSelector } from 'react-redux';
+import { getCurrentChainId } from 'ui/selectors/selectors';
+import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -32,6 +46,7 @@ const { Option } = Select;
 
 const Send = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const wallet = useWallet();
   const [selected, setSelected] = useState<BaseAccount | undefined>();
   const { t } = useTranslation();
@@ -46,6 +61,28 @@ const Send = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [selectedToken, setSelectedToken] = useState<Token>();
   const [recentAddressList, setRecentAddressList] = useState<string[]>();
+
+  const chainId = useSelector(getCurrentChainId);
+  const draftTransaction = useSelector(
+    (state) => state.send.draftTransaction.txParams
+  );
+  const isSupport1559 = useSelector((state) => state.send.eip1559support);
+
+  const cleanup = useCallback(() => {
+    dispatch(resetSendState());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (chainId !== undefined) {
+      dispatch(initializeSendState());
+    }
+  }, [chainId, dispatch, cleanup]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetSendState());
+    };
+  }, [dispatch, cleanup]);
 
   useAsyncEffect(async () => {
     const current: BaseAccount | undefined = await wallet.getCurrentAccount();
@@ -87,12 +124,14 @@ const Send = () => {
         fromDenomination: EthDenomination.ETH,
       }).toString()
     );
+    const type = isSupport1559
+      ? TransactionEnvelopeTypes.FEE_MARKET
+      : TransactionEnvelopeTypes.LEGACY;
     const params: Record<string, any> = {
       from: fromAccount?.address,
       value: '0x0',
       isSend: true,
-      type: '0x2',
-      gas: '0x11359',
+      type: type,
     };
     if (selectedToken?.isNative) {
       params.to = toAddress;
@@ -105,11 +144,18 @@ const Send = () => {
         amount: userInputAmount,
       });
     }
+    if (isSupport1559) {
+      delete params.gasPrice;
+    } else {
+      delete params.maxFeePerGas;
+      delete params.maxPriorityFeePerGas;
+      params.gas = draftTransaction.gas;
+    }
     params.txParam = {
       from: fromAccount?.address,
       to: toAddress,
       value: userInputAmount,
-      type: '0x2',
+      type: type,
       symbol: selectedToken?.symbol,
     };
     wallet.sendRequest({
@@ -277,10 +323,7 @@ const Send = () => {
             !selectedToken ||
             (selectedToken.amount &&
               new BigNumber(
-                denom2SymbolRatio(
-                  selectedToken?.amount || 0,
-                  selectedToken?.decimal || 0
-                )
+                utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
               ).lessThan(amount))
           }
           onClick={next}

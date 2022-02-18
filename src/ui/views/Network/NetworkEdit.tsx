@@ -5,13 +5,16 @@ import './style.less';
 import { useHistory, useParams } from 'react-router';
 import axios, { AxiosError } from 'axios';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
-import { Button, Form, Input, message, Select } from 'antd';
+import { Button, Form, Input, Select } from 'antd';
 import Header from 'ui/components/Header';
 import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import DefaulutIcon from 'assets/tokens/default.svg';
 import { isString } from 'util';
 import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber } from 'ethers';
+import { defaultNetworks } from 'constants/defaultNetwork';
+import { useSelector } from 'react-redux';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const Icon = (src: string) => <img className="category-icon" src={src} />;
 
@@ -51,12 +54,20 @@ const NetworkEdit = () => {
   }, [isEdit, formattedIdx, networkContext]);
 
   const [form] = Form.useForm();
+  const customNetworks = useSelector((s) => s.customNetworks);
 
   const checkRpcUrlAndSetChainId = useCallback(
     async (value: string) => {
       console.info(`RPC URL is ${value}`);
       try {
         if (!value) return setErrorMessage('rpcUrl');
+
+        const isExistedRpc =
+          customNetworks.filter((p) => p.rpcUrl === value).length > 0;
+        if (isExistedRpc && !isEdit) {
+          throw new Error(t('same_rpc_url'));
+        }
+
         checkIsTrimmed(value);
         checkIsLegitURL(value);
         type JsonRpcResult = {
@@ -102,7 +113,7 @@ const NetworkEdit = () => {
         setErrorMessage('rpcUrl', uiErrorMsg);
       }
     },
-    [form]
+    [form, customNetworks]
   );
 
   const editNetwork = useCallback(
@@ -139,7 +150,7 @@ const NetworkEdit = () => {
         );
       }
 
-      message.success({
+      ClickToCloseMessage.success({
         content: t('Custom Provider Saved!'),
       });
       history.goBack();
@@ -147,15 +158,35 @@ const NetworkEdit = () => {
     [history, networkContext, isEdit, formattedIdx]
   );
 
-  const checkNetworkNickname = (_: unknown, value: string) => {
-    const maxCharsInNickname = 20;
-    checkIsTrimmed(value);
-    if (value.length > maxCharsInNickname) {
-      throw new Error(
-        `The length of ${'nickname'} is no longer than ${maxCharsInNickname} chars.`
-      );
-    }
-  };
+  const checkNetworkNickname = useCallback(
+    (_: unknown, value: string) => {
+      const maxCharsInNickname = 20;
+      checkIsTrimmed(value);
+      if (value.length > maxCharsInNickname) {
+        throw new Error(
+          `The length of ${'nickname'} is no longer than ${maxCharsInNickname} chars.`
+        );
+      }
+
+      const sameNameWithDefaultNet =
+        Object.values(defaultNetworks).filter(
+          (p) => Boolean(p) && p.nickname === value
+        ).length > 0;
+      if (sameNameWithDefaultNet) {
+        throw new Error(
+          'Same name with our preset provider, please rename your provider name.'
+        );
+      }
+      const sameNameWithCustomNetwork =
+        customNetworks.filter((p) => p.nickname === value).length > 0;
+      if (sameNameWithCustomNetwork && !isEdit) {
+        throw new Error(
+          'Same name with existed provider, please rename your provider name.'
+        );
+      }
+    },
+    [customNetworks]
+  );
 
   const setErrorMessage = useCallback(
     (fieldName: string, message?: string) => {

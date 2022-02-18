@@ -52,6 +52,7 @@ class NotificationService {
   getApproval = () => this.approval?.data;
 
   resolveApproval = (data?: any) => {
+    console.log('============resolveApproval(data)==========', data);
     this.approval?.resolve && this.approval?.resolve(data);
     this.approval = null;
   };
@@ -70,7 +71,7 @@ class NotificationService {
         'please request after current approval resolve'
       );
     }
-
+    console.log('============requestApproval(data)==========', data);
     return new Promise((resolve, reject) => {
       this.approval = {
         data,

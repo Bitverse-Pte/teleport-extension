@@ -19,7 +19,7 @@ export default function configureStore() {
     const composeEnhancers = composeWithDevTools({
       name: 'Teleport-Wallet-Extension',
       hostname: 'localhost',
-      port: 8000,
+      port: 8001,
       realtime: true,
     });
     /**

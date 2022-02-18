@@ -174,8 +174,8 @@ export class EthereumProvider extends EventEmitter {
           return res;
         })
         .catch((err) => {
-          log('[response: error]', data.method, serializeError(err));
-          throw serializeError(err);
+          log('[response: error]', data.method, err);
+          throw err;
         });
     });
   };
