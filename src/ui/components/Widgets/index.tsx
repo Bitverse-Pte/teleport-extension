@@ -67,7 +67,12 @@ function _getDefaultIcon(
   );
   if (!token.contractAddress) return defaultIcon;
   const contractAddress = utils.getAddress(token.contractAddress);
-  const src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
+  let src;
+  if (token.isNative) {
+    src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${token.chainCustomId}/info/logo.png`;
+  } else {
+    src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${token.chainCustomId}/assets/${contractAddress}/logo.png`;
+  }
   return loadError ? (
     defaultIcon
   ) : (
@@ -88,17 +93,7 @@ function _getDefaultIcon(
 export const TokenIcon = (props: TokenIconProps) => {
   const { token, useThemeBg, radius, scale } = props;
   if (!token) return null;
-  if (token!.isNative) {
-    const style: any = radius ? { width: radius, height: radius } : {};
-    if (scale) {
-      style.transform = `scale(${scale})`;
-    }
-    return (
-      <img src={eth} className="token-icon token-icon-logo" style={style} />
-    );
-  } else {
-    return _getDefaultIcon(token, radius, useThemeBg, scale);
-  }
+  return _getDefaultIcon(token, radius, useThemeBg, scale);
 };
 
 type DeletedProps = 'className';

@@ -41,7 +41,7 @@ export const AccountHeader = (props: AccountHeaderProps) => {
   };
 
   return (
-    <div className="account-header-container flex">
+    <div className="account-header-container flexR">
       <span className="account-header-title">{props.title}</span>
       <IconComponent
         name="close"

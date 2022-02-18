@@ -17,7 +17,7 @@ browser.windows.onRemoved.addListener((winId) => {
 const BROWSER_HEADER = 80;
 const WINDOW_SIZE = {
   width: 360 + (IS_WINDOWS ? 14 : 0), // idk why windows cut the width.
-  height: 640,
+  height: 600,
 };
 
 const create = async ({ url, ...rest }): Promise<number | undefined> => {

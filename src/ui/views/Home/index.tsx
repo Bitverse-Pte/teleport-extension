@@ -1,19 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
-import clsx from 'clsx';
 import Jazzicon from 'react-jazzicon';
 import { message, Drawer } from 'antd';
 import {
   useWallet,
-  useWalletRequest,
   useAsyncEffect,
   transferAddress2Display,
   denom2SymbolRatio,
   getTotalPricesByAmountAndPrice,
 } from 'ui/utils';
 import AccountSwitch from 'ui/components/AccountSwitch';
-import Setting, { LogoHeader } from 'ui/views/Setting';
+import Setting from 'ui/views/Setting';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { HomeHeader } from 'ui/components/Home/Header';
 import {
@@ -21,7 +19,6 @@ import {
   BaseAccount,
   DisplayWalletManage,
   HdAccountStruct,
-  HomeTabType,
 } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Token } from 'types/token';
@@ -36,7 +33,7 @@ import {
 import { Provider } from 'types/network';
 import { TransactionsList } from 'ui/components/TransactionList';
 import './style.less';
-import { Tabs, TipButtonEnum, WALLET_THEME_COLOR } from 'constants/wallet';
+import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
@@ -200,12 +197,12 @@ const Home = () => {
         </WalletName>
         <div className="home-preview-container flexCol content-wrap-padding">
           <div
-            className="home-preview-top-container flex"
+            className="home-preview-top-container flexR"
             onClick={() => {
               setPopupVisible(true);
             }}
           >
-            <div className="home-preview-top-left flex cursor">
+            <div className="home-preview-top-left flexR cursor">
               <Jazzicon
                 diameter={16}
                 seed={Number(account?.address?.substr(0, 8) || 0)}
@@ -218,11 +215,11 @@ const Home = () => {
             </div>
             <IconComponent name="chevron-down" cls="chevron-down" />
           </div>
-          <div className="home-preview-address-container flex">
+          <div className="home-preview-address-container flexR">
             <span className="home-preview-address">
               ({transferAddress2Display(account?.address)})
             </span>
-            <div className="home-preview-icon-container flex">
+            <div className="home-preview-icon-container flexR">
               <IconComponent
                 name="external-link"
                 cls="explorer"
@@ -233,7 +230,7 @@ const Home = () => {
               </CopyToClipboard>
             </div>
           </div>
-          <div className="home-preview-balance flex">
+          <div className="home-preview-balance flexR">
             <span className="home-preview-balance-amount">
               {denom2SymbolRatio(
                 nativeToken?.amount || 0,
@@ -252,7 +249,7 @@ const Home = () => {
               nativeToken?.price || 0
             )}
           </div>
-          <div className="home-preview-button-container flex">
+          <div className="home-preview-button-container flexR">
             <TipButton
               title="Send"
               type={TipButtonEnum.SEND}
@@ -286,7 +283,7 @@ const Home = () => {
                 Done
               </span>
             ) : (
-              <div className="home-search-icon-container flex">
+              <div className="home-search-icon-container flexR">
                 <IconComponent
                   name="edit"
                   cls="edit-icon cursor"
@@ -394,7 +391,7 @@ const Home = () => {
           style={{ width: '100%', height: '100%' }}
           className="account-switch-drawer flexCol"
         >
-          <div className="account-switch-header flex content-wrap-padding">
+          <div className="account-switch-header flexR content-wrap-padding">
             <IconComponent
               name="close"
               cls="icon icon-close"
@@ -403,10 +400,10 @@ const Home = () => {
               }}
             />
           </div>
-          <div className="account-switch-accounts flex content-wrap-padding">
+          <div className="account-switch-accounts flexR content-wrap-padding">
             <span className="account-switch-accounts-title">Accounts</span>
             <div
-              className="account-switch-accounts-manage-wallet-container flex cursor"
+              className="account-switch-accounts-manage-wallet-container flexR cursor"
               onClick={() => history.push('/wallet-manage')}
             >
               <span className="account-switch-accounts-manage-wallet">
