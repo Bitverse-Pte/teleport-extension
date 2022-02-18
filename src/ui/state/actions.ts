@@ -1,7 +1,13 @@
+import { GasFeeState } from '@metamask/controllers';
 import { addHexPrefix } from 'background/utils/lib-util';
 import { Dispatch } from 'redux';
 import { RootState } from '../reducer';
 import { getMethodDataAsync } from '../utils/transactions';
+
+let background: Record<string, any>;
+export function _setBackgroundConnection(backgroundConnection) {
+  background = backgroundConnection;
+}
 
 export function getContractMethodData(
   data = '',
@@ -41,4 +47,12 @@ export function getContractMethodData(
       }
     );
   };
+}
+
+export function estimateGas(params) {
+  return background.estimateGas(params);
+}
+
+export function fetchGasFeeEstimates(): any {
+  return background.fetchGasFeeEstimates();
 }

@@ -12,6 +12,7 @@ import configureStore from './store/store';
 
 // import './style/index.less'; //remove import index.less, using a built css, as the content of this file is usually not modified
 import './iconfont/iconfont.js';
+import * as actions from './state/actions';
 
 /*Sentry.init({
   dsn:
@@ -133,7 +134,7 @@ async function queryCurrentActiveTab() {
 
 async function launchTeleportWalletUi() {
   const activeTab = await queryCurrentActiveTab();
-
+  actions._setBackgroundConnection(wallet);
   const store = configureStore();
   wallet.getLocale().then((locale) => {
     addResourceBundle(locale).then(() => {

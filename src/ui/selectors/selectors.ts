@@ -485,6 +485,10 @@ export function getCurrentCurrency(state: RootState) {
 //   return suggestedAssets.length;
 // }
 
+export function getIsNonStandardEthChain(state) {
+  return !(getIsMainnet(state) || getIsTestnet(state) || process.env.IN_TEST);
+}
+
 export function getIsMainnet(state: RootState) {
   const chainId = getCurrentChainId(state);
   return chainId === MAINNET_CHAIN_ID;
