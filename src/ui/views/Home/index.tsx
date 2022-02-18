@@ -39,6 +39,9 @@ import './style.less';
 import { Tabs, TipButtonEnum, WALLET_THEME_COLOR } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
+import skynet from 'utils/skynet';
+
+const { sensors } = skynet;
 
 const onCopy = () => {
   message.success('Copied');
@@ -120,6 +123,9 @@ const Home = () => {
 
   const handleSendBtnClick = () => {
     history.push('/send');
+    sensors.track('teleport_send_click', {
+      page: 'home',
+    });
   };
   const handleAccountClick = async (account: BaseAccount) => {
     await wallet.changeAccount(account);
