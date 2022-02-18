@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Views from './views';
 import { Message } from 'utils';
+import skynet from 'utils/skynet';
 import { getUITypeName } from 'ui/utils';
 import eventBus from 'eventBus';
 import i18n, { addResourceBundle } from '../i18n';
@@ -77,6 +78,8 @@ function initAppMeta() {
 }
 
 initAppMeta();
+
+skynet.start();
 
 const { PortMessage } = Message;
 
