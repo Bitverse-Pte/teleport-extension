@@ -27,6 +27,7 @@ import {
 } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
 import { IconComponent } from 'ui/components/IconComponents';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const Icon = (src: string) => (
   <img
@@ -126,10 +127,10 @@ const RpcNetworkOptions = ({
         content: t('You might have to add this back, are you sure?'),
         onOk: async () => {
           await providerContext?.removeCustomProvider(network.idx as number);
-          message.success(t('remove_custom_provider_success'));
+          ClickToCloseMessage.success(t('remove_custom_provider_success'));
         },
         onCancel: () => {
-          message.info(t('remove_custom_provider_cancel'));
+          ClickToCloseMessage.info(t('remove_custom_provider_cancel'));
         },
       });
     },

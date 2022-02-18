@@ -3,6 +3,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';
 import { IconComponent } from 'ui/components/IconComponents';
 import clsx from 'clsx';
+import { ClickToCloseMessage } from './ClickToCloseMessage';
 
 interface CopyOrOpenInScanParameter extends HTMLAttributes<HTMLDivElement> {
   handleExplorerClick: (...args: any[]) => void;
@@ -26,7 +27,7 @@ export default function CopyOrOpenInScan({
       <CopyToClipboard
         text={textToBeCopy}
         onCopy={() => {
-          message.success('copied to clipboard');
+          ClickToCloseMessage.success('copied to clipboard');
         }}
       >
         <IconComponent

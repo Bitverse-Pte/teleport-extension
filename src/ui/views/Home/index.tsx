@@ -36,9 +36,10 @@ import './style.less';
 import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const onCopy = () => {
-  message.success('Copied');
+  ClickToCloseMessage.success('Copied');
 };
 const Home = () => {
   const history = useHistory();

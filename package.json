@@ -15,7 +15,7 @@
     "build:pro:contentScripts": "webpack --progress --env config=pro --env module=contentScripts",
     "build:pro": "yarn clean && concurrently npm:build:tailwindcss npm:build:pro:ui npm:build:pro:background npm:build:pro:contentScripts",
     "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx src",
-    "devtools:redux": "remotedev --hostname=localhost --port=8000",
+    "devtools:redux": "remotedev --hostname=localhost --port=8001",
     "prep:devtools:redux": "npm i -g remotedev-server --no-save",
     "test": "jest",
     "pub": "node build/release.js"

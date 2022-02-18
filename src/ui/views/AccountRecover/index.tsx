@@ -21,6 +21,7 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { Tabs } from 'constants/wallet';
 import { useSeedPhraseValidation } from 'ui/hooks/validation/useSeedPhraseValidation';
 import { usePrivateKeyValidation } from 'ui/hooks/validation/usePrivateKeyValidation';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const { TextArea } = Input;
 
@@ -83,19 +84,19 @@ const AccountRecover = () => {
 
     switch (e?.code) {
       case ErrorCode.ADDRESS_REPEAT:
-        message.error('this address is exist already');
+        ClickToCloseMessage.error('this address is exist already');
         break;
       case ErrorCode.INVALID_MNEMONIC:
-        message.error('invalid mnemonic');
+        ClickToCloseMessage.error('invalid mnemonic');
         break;
       case ErrorCode.INVALID_PRIVATE_KEY:
-        message.error('invalid private key');
+        ClickToCloseMessage.error('invalid private key');
         break;
       default:
         if (importType === Tabs.FIRST) {
-          message.error('invalid mnemonic');
+          ClickToCloseMessage.error('invalid mnemonic');
         } else {
-          message.error('invalid private key');
+          ClickToCloseMessage.error('invalid private key');
         }
     }
   };
@@ -147,20 +148,20 @@ const AccountRecover = () => {
 
   const submit = () => {
     if (!name.trim()) {
-      message.error('name is necessary ');
+      ClickToCloseMessage.error('name is necessary ');
       return;
     }
     if (name.length > 20) {
-      message.error('the length of name should less than 20');
+      ClickToCloseMessage.error('the length of name should less than 20');
       return;
     }
     if (policyShow) {
       if (!psd.trim() || psd.trim().length < MIN_PASSWORD_LENGTH) {
-        message.error('password need more than 8 words');
+        ClickToCloseMessage.error('password need more than 8 words');
         return;
       }
       if (psd.trim() !== confirmPsd.trim()) {
-        message.error('two password is different');
+        ClickToCloseMessage.error('two password is different');
         return;
       }
     }

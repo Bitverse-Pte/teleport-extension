@@ -38,7 +38,7 @@ import {
   multipyHexes,
   decGWEIToHexWEI,
 } from 'ui/utils/conversion';
-import { ETH } from 'constants/transaction';
+import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
 import { current } from '@reduxjs/toolkit';
 import { Token } from 'types/token';
 import { CustomButton } from 'ui/components/Widgets';
@@ -141,14 +141,22 @@ const SignTx = ({ params, origin }) => {
 
   const handleAllow = async () => {
     dispatch(showLoadingIndicator());
-    resolveApproval({
-      ...tx,
-      gasLimit: '0x5208',
-      maxFeePerGas: maxFeePerGas,
-      maxPriorityFeePerGas: maxPriorityFeePerGas,
-    })
-      .then(() => delay(1000))
-      .then(() => dispatch(hideLoadingIndicator()));
+    if (tx.type === TransactionEnvelopeTypes.FEE_MARKET) {
+      resolveApproval({
+        ...tx,
+        maxFeePerGas: maxFeePerGas,
+        maxPriorityFeePerGas: maxPriorityFeePerGas,
+      })
+        .then(() => delay(1000))
+        .then(() => dispatch(hideLoadingIndicator()));
+    } else {
+      resolveApproval({
+        ...tx,
+        gasPrice: '0xd31db1',
+      })
+        .then(() => delay(1000))
+        .then(() => dispatch(hideLoadingIndicator()));
+    }
   };
   const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));
 

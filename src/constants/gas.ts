@@ -7,9 +7,9 @@ const ONE_HUNDRED_THOUSAND = 100000;
 
 export const GAS_LIMITS = {
   // maximum gasLimit of a simple send
-  SIMPLE: addHexPrefix(MIN_GAS_LIMIT_HEX),
+  SIMPLE: '0x5208', //addHexPrefix(MIN_GAS_LIMIT_HEX),
   // a base estimate for token transfers.
-  BASE_TOKEN_ESTIMATE: addHexPrefix(ONE_HUNDRED_THOUSAND.toString(16)),
+  BASE_TOKEN_ESTIMATE: '0x186a0', //addHexPrefix(ONE_HUNDRED_THOUSAND.toString(16)),
 };
 
 /**
