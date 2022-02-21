@@ -147,6 +147,28 @@ class NetworkPreferenceService extends EventEmitter {
       );
     });
     this.on(NETWORK_EVENTS.NETWORK_DID_CHANGE, this.lookupNetwork);
+
+    setTimeout(this._customNetworkStoreMigration.bind(this), 5 * 1000);
+  }
+
+  /**
+   * @todo: remove this in next release
+   */
+  private _customNetworkStoreMigration() {
+    console.info('_customNetworkStoreMigration start');
+    const { customNetworks } = this._store.getState();
+    Object.keys(customNetworks).forEach((key) => {
+      if (!customNetworks[key].ecsystem) {
+        delete customNetworks[key]['category'];
+        delete customNetworks[key]['isEthereumCompatible'];
+        customNetworks[key].ecsystem = EcoSystem.EVM;
+        customNetworks[key].prefix = '0x';
+      }
+    });
+    this._store.updateState({
+      customNetworks
+    });
+    console.info('_customNetworkStoreMigration end', customNetworks);
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
