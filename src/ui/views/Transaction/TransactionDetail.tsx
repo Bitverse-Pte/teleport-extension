@@ -188,7 +188,7 @@ export function _ActivityDetail({
               type="button"
               onClick={() => alert('Gas Edit to be implemented')}
             >
-              <IconComponent name="rocket" />
+              {/* <IconComponent name="rocket" /> */}
               Gas
             </button>
             <button
@@ -196,7 +196,7 @@ export function _ActivityDetail({
               type="button"
               onClick={() => alert('Cancel Tx to be implemented')}
             >
-              <IconComponent name="cancel" />
+              {/* <IconComponent name="cancel" /> */}
               Cancel
             </button>
           </div>
