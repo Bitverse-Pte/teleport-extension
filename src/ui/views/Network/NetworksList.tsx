@@ -21,10 +21,7 @@ import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import { Provider } from 'types/network';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Modal, message, Button } from 'antd';
-import {
-  categoryToIconSVG,
-  IdToChainLogoSVG,
-} from 'ui/utils/networkCategoryToIcon';
+import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
 import { IconComponent } from 'ui/components/IconComponents';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
@@ -58,49 +55,31 @@ function useProviderList() {
   const providerContext = useContext(NetworkProviderContext);
   const networkList: NetworksCategories = useMemo(() => {
     const category: NetworksCategories = {
-      ETH: {
-        displayName: 'Ethereum Network',
+      EVM: {
+        displayName: 'EVM Networks',
         icon: categoryToIconSVG('ETH'),
         networks: [],
       },
-      BSC: {
-        displayName: 'Binance Chain',
+      COSMOS: {
+        displayName: 'Cosmos Networks',
         icon: categoryToIconSVG('BSC'),
         networks: [],
       },
-      POLYGON: {
-        displayName: 'Polygon',
+      POLKADOT: {
+        displayName: 'Polkadot Networks',
         icon: categoryToIconSVG('POLYGON'),
         networks: [],
       },
-      ARBITRUM: {
-        displayName: 'Arbitrum',
-        icon: categoryToIconSVG('ARBITRUM'),
-        networks: [],
-      },
-      // OTHER: {
-      //   displayName: 'Others',
-      //   icon: categoryToIconSVG('OTHER'),
-      //   networks: [],
-      // },
     };
     // inject preset providers
     Object.values(defaultNetworks)
       .filter((v) => Boolean(v))
       .forEach((val) => {
-        if (category[val.category]) {
-          category[val.category].networks.push(val);
-        }
-        // category['ETH'].networks.push(val);
+        category['EVM'].networks.push(val);
       });
     providerContext?.customProviders.forEach((_pro, idx) => {
       const withIdx = { ..._pro, idx };
-      if (category[_pro.category]) {
-        category[_pro.category].networks.push(withIdx);
-      } else {
-        // category.OTHER.networks.push(withIdx);
-        category.ETH.networks.push(withIdx);
-      }
+      category['EVM'].networks.push(withIdx);
     });
     return category;
   }, [providerContext]);

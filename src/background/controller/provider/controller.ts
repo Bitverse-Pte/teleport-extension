@@ -18,7 +18,7 @@ import { Tx } from 'types/tx';
 import Wallet from '../wallet';
 import { SAFE_RPC_METHODS } from 'constants/index';
 import BaseController from '../base';
-import { CoinType } from 'types/network';
+import { CoinType, EcoSystem } from 'types/network';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { chainIdToCategory } from 'utils/chain';
@@ -360,11 +360,12 @@ class ProviderController extends BaseController {
       chainParams.chainName,
       chainParams.rpcUrls[0],
       chainParams.chainId,
-      chainIdToCategory(chainParams.chainId),
       chainParams.nativeCurrency.symbol,
       chainParams.blockExplorerUrls[0],
-      true,
-      CoinType.ETH
+      CoinType.ETH,
+      'ETH',
+      EcoSystem.EVM,
+      '0x'
     );
     networkPreferenceService.setProviderConfig({
       ...network,

@@ -13,7 +13,7 @@ const EVMProviderSharedProperties = {
   coinType: CoinType.ETH,
   ecsystem: EcoSystem.EVM,
   prefix: '0x',
-}
+};
 
 export const defaultNetworks: {
   [key in CHAINS]?: Provider;
@@ -28,7 +28,7 @@ export const defaultNetworks: {
     },
     id: PresetNetworkId.MAINNET,
     type: 'mainnet',
-    ...EVMProviderSharedProperties
+    ...EVMProviderSharedProperties,
   },
   // [CHAINS.ROPSTEN]: {
   //     rpcUrl: `https://ropsten.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,

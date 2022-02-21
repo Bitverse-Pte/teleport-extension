@@ -93,7 +93,6 @@ export class WalletController extends BaseController {
     nickname: string,
     rpcUrl: string,
     chainId: string,
-    category: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => {
@@ -101,7 +100,6 @@ export class WalletController extends BaseController {
       nickname,
       rpcUrl,
       chainId,
-      category,
       ticker,
       blockExplorerUrl
     );
@@ -131,10 +129,8 @@ export class WalletController extends BaseController {
     newNickname: string,
     rpcUrl: string,
     chainId: string,
-    category: string,
     ticker?: string,
     blockExplorerUrl?: string,
-    isEthereumCompatible = true,
     coinType = CoinType.ETH,
     chainName = 'ETH'
   ) => {
@@ -144,8 +140,6 @@ export class WalletController extends BaseController {
       nickname: newNickname,
       rpcUrl,
       chainId,
-      category,
-      isEthereumCompatible,
       coinType,
       ticker,
       chainName,

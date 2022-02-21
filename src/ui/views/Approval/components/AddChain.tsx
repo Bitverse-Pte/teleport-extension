@@ -12,7 +12,7 @@ import { intToHex } from 'ethereumjs-util';
 import { useWallet, useApproval } from 'ui/utils';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { BigNumber } from 'ethers';
-import { CoinType, Provider } from 'types/network';
+import { CoinType, EcoSystem, Provider } from 'types/network';
 import DefaulutIcon from 'assets/tokens/default.svg';
 import { nanoid } from 'nanoid';
 import './addChain.less';
@@ -154,9 +154,10 @@ const AddChain = ({ params }: { params: AddChainProps }) => {
         ticker: data.nativeCurrency.symbol,
         category: chainIdToCategory(data.chainId),
         coinType: CoinType.ETH,
-        isEthereumCompatible: true,
         chainName: 'ETH',
         id: nanoid(),
+        ecsystem: EcoSystem.EVM,
+        prefix: '0x',
       };
     } else {
       return matchedExistedProviderToSwitch as Provider;
