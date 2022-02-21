@@ -166,7 +166,7 @@ class NetworkPreferenceService extends EventEmitter {
       }
     });
     this._store.updateState({
-      customNetworks
+      customNetworks,
     });
     console.info('_customNetworkStoreMigration end', customNetworks);
   }

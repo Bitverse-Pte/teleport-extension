@@ -11,9 +11,9 @@ export enum CoinType {
 }
 
 export enum EcoSystem {
-  EVM,
-  COSMOS,
-  POLKADOT,
+  EVM = 'EVM',
+  COSMOS = 'COSMOS',
+  POLKADOT = 'POLKADOT',
 }
 
 export interface Network {
