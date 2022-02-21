@@ -21,6 +21,7 @@ import { AddressCard } from 'ui/components/universal/AddressCard';
 import { IconComponent } from 'ui/components/IconComponents';
 import { TokenIcon } from 'ui/components/Widgets';
 import { Tooltip } from 'antd';
+import { TransactionFee } from './TransactionFee';
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -169,21 +170,7 @@ export function _ActivityDetail({
             </div>
           </div>
         )}
-        {
-          <div className="row">
-            <div className="field-name">Transaction Fee</div>
-            <div className="field-value">
-              {utils.formatEther(
-                BigNumber.from(
-                  // use gasPrice (legacy) or maxFeePerGas(1559 network)
-                  transaction.primaryTransaction.txParams.maxFeePerGas ||
-                    transaction.primaryTransaction.txParams.gasPrice
-                ).mul(transaction.primaryTransaction.txParams.gas)
-              )}{' '}
-              {primaryCurrency.split(' ')[1]}
-            </div>
-          </div>
-        }
+        <TransactionFee transaction={transaction} />
         {!isPending && (
           <div className="row">
             <div className="field-name">Time</div>
