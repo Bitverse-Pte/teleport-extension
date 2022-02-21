@@ -39,7 +39,6 @@ export const NetworkProviderContext = React.createContext<{
     nickname: string,
     rpcUrl: string,
     chainId: string,
-    category: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => Promise<any>;
@@ -48,7 +47,6 @@ export const NetworkProviderContext = React.createContext<{
     newNickname: string,
     rpcUrl: string,
     chainId: string,
-    category: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => Promise<any>;
@@ -92,10 +90,8 @@ export function NetworkStoreProvider({
       newNickname: string,
       rpcUrl: string,
       chainId: string,
-      category: string,
       ticker?: string,
       blockExplorerUrl?: string,
-      isEthereumCompatible = true,
       coinType = CoinType.ETH
     ) => {
       await wallet.editCustomNetwork(
@@ -103,10 +99,8 @@ export function NetworkStoreProvider({
         newNickname,
         rpcUrl,
         chainId,
-        category,
         ticker,
         blockExplorerUrl,
-        isEthereumCompatible,
         coinType
       );
     },
@@ -129,20 +123,16 @@ export function NetworkStoreProvider({
       nickname: string,
       rpcUrl: string,
       chainId: string,
-      category: string,
       ticker?: string,
       blockExplorerUrl?: string,
-      isEthereumCompatible = true,
       coinType = CoinType.ETH
     ) => {
       await wallet.addCustomNetwork(
         nickname,
         rpcUrl,
         chainId,
-        category,
         ticker,
         blockExplorerUrl,
-        isEthereumCompatible,
         coinType
       );
     },

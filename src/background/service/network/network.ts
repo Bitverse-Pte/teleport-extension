@@ -3,6 +3,7 @@ import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
 import { BigNumber } from 'ethers';
 import {
   CoinType,
+  EcoSystem,
   Network,
   NetworkBg2UIMessage,
   NetworkController,
@@ -112,10 +113,10 @@ class NetworkPreferenceService extends EventEmitter {
         rpcPrefs: {},
         chainId: '0x539',
         ticker: 'ETH',
-        category: 'ETH',
-        isEthereumCompatible: true,
         chainName: 'ETH',
         coinType: CoinType.ETH,
+        ecsystem: EcoSystem.EVM,
+        prefix: '0x',
       },
     });
     this.networkStore = new ObservableStore<NetworkController>({
@@ -146,6 +147,28 @@ class NetworkPreferenceService extends EventEmitter {
       );
     });
     this.on(NETWORK_EVENTS.NETWORK_DID_CHANGE, this.lookupNetwork);
+
+    setTimeout(this._customNetworkStoreMigration.bind(this), 5 * 1000);
+  }
+
+  /**
+   * @todo: remove this in next release
+   */
+  private _customNetworkStoreMigration() {
+    console.info('_customNetworkStoreMigration start');
+    const { customNetworks } = this._store.getState();
+    Object.keys(customNetworks).forEach((key) => {
+      if (!customNetworks[key].ecsystem) {
+        delete customNetworks[key]['category'];
+        delete customNetworks[key]['isEthereumCompatible'];
+        customNetworks[key].ecsystem = EcoSystem.EVM;
+        customNetworks[key].prefix = '0x';
+      }
+    });
+    this._store.updateState({
+      customNetworks,
+    });
+    console.info('_customNetworkStoreMigration end', customNetworks);
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
@@ -159,12 +182,12 @@ class NetworkPreferenceService extends EventEmitter {
     nickname: string,
     rpcUrl: string,
     chainId: string,
-    category: string,
     ticker?: string,
     blockExplorerUrl?: string,
-    isEthereumCompatible = true,
     coinType = CoinType.ETH,
-    chainName = 'ETH'
+    chainName = 'ETH',
+    ecsystem = EcoSystem.EVM,
+    prefix = '0x'
   ) {
     this.checkIsCustomNetworkNameLegit(nickname);
     const network: Network = {
@@ -175,12 +198,11 @@ class NetworkPreferenceService extends EventEmitter {
       },
       rpcUrl,
       chainId: BigNumber.from(chainId).toHexString(),
-      category,
-      // @todo: make this customizable in the future
-      isEthereumCompatible,
       coinType,
       chainName,
       ticker,
+      ecsystem,
+      prefix,
     };
     this.customNetworksStore.updateState([
       ...this.getCustomNetworks(),
@@ -420,71 +442,68 @@ class NetworkPreferenceService extends EventEmitter {
     return NETWORK_TYPE_TO_ID_MAP[type]?.chainId || configChainId;
   }
 
-  /**
-   * @deprecated, use setProviderConfig will do
-   * @param id
-   * @param rpcUrl
-   * @param chainId
-   * @param ticker
-   * @param nickname
-   * @param rpcPrefs
-   */
-  setRpcTarget(
-    id: string,
-    rpcUrl: string,
-    chainId: string,
-    ticker = 'ETH',
-    nickname = '',
-    rpcPrefs: { blockExplorerUrl?: string } = {}
-  ) {
-    assert.ok(
-      isPrefixedFormattedHexString(chainId),
-      `Invalid chain ID "${chainId}": invalid hex string.`
-    );
-    assert.ok(
-      isSafeChainId(parseInt(chainId, 16)),
-      `Invalid chain ID "${chainId}": numerical value greater than max safe value.`
-    );
-    this.setProviderConfig({
-      id,
-      type: NETWORK_TYPE_RPC,
-      rpcUrl,
-      chainId,
-      ticker,
-      nickname,
-      rpcPrefs,
-      category: 'OTHERS',
-      coinType: CoinType.ETH,
-      isEthereumCompatible: false,
-      chainName: 'ETH',
-    });
-  }
+  // /**
+  //  * @deprecated, use setProviderConfig will do
+  //  * @param id
+  //  * @param rpcUrl
+  //  * @param chainId
+  //  * @param ticker
+  //  * @param nickname
+  //  * @param rpcPrefs
+  //  */
+  // setRpcTarget(
+  //   id: string,
+  //   rpcUrl: string,
+  //   chainId: string,
+  //   ticker = 'ETH',
+  //   nickname = '',
+  //   rpcPrefs: { blockExplorerUrl?: string } = {}
+  // ) {
+  //   assert.ok(
+  //     isPrefixedFormattedHexString(chainId),
+  //     `Invalid chain ID "${chainId}": invalid hex string.`
+  //   );
+  //   assert.ok(
+  //     isSafeChainId(parseInt(chainId, 16)),
+  //     `Invalid chain ID "${chainId}": numerical value greater than max safe value.`
+  //   );
+  //   this.setProviderConfig({
+  //     id,
+  //     type: NETWORK_TYPE_RPC,
+  //     rpcUrl,
+  //     chainId,
+  //     ticker,
+  //     nickname,
+  //     rpcPrefs,
+  //     coinType: CoinType.ETH,
+  //     chainName: 'ETH',
+  //   });
+  // }
 
-  async setProviderType(type: Provider['type']) {
-    assert.notStrictEqual(
-      type,
-      NETWORK_TYPE_RPC,
-      `NetworkController - cannot call "setProviderType" with type "${NETWORK_TYPE_RPC}". Use "setRpcTarget"`
-    );
-    assert.ok(
-      INFURA_PROVIDER_TYPES.includes(type),
-      `Unknown Infura provider type "${type}".`
-    );
-    const { chainId } = NETWORK_TYPE_TO_ID_MAP[type];
-    this.setProviderConfig({
-      type,
-      id: type,
-      rpcUrl: '',
-      chainId,
-      ticker: 'ETH',
-      nickname: '',
-      rpcPrefs: {},
-      category: 'OTHERS',
-      coinType: CoinType.ETH,
-      isEthereumCompatible: false,
-      chainName: 'ETH',
-    });
-  }
+  // async setProviderType(type: Provider['type']) {
+  //   assert.notStrictEqual(
+  //     type,
+  //     NETWORK_TYPE_RPC,
+  //     `NetworkController - cannot call "setProviderType" with type "${NETWORK_TYPE_RPC}". Use "setRpcTarget"`
+  //   );
+  //   assert.ok(
+  //     INFURA_PROVIDER_TYPES.includes(type),
+  //     `Unknown Infura provider type "${type}".`
+  //   );
+  //   const { chainId } = NETWORK_TYPE_TO_ID_MAP[type];
+  //   this.setProviderConfig({
+  //     type,
+  //     id: type,
+  //     rpcUrl: '',
+  //     chainId,
+  //     ticker: 'ETH',
+  //     nickname: '',
+  //     rpcPrefs: {},
+  //     category: 'OTHERS',
+  //     coinType: CoinType.ETH,
+  //     chainName: 'ETH',
+  //   });
+  // }
 
   resetConnection() {
     this.setProviderConfig(this.getProviderConfig());

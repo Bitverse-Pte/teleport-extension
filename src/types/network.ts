@@ -10,6 +10,12 @@ export enum CoinType {
   // You can add as you like
 }
 
+export enum EcoSystem {
+  EVM = 'EVM',
+  COSMOS = 'COSMOS',
+  POLKADOT = 'POLKADOT',
+}
+
 export interface Network {
   // MetaMask use HexString for ChainId, so we should do the same
   chainId: string;
@@ -19,11 +25,9 @@ export interface Network {
   };
   rpcUrl: string;
   ticker?: string;
-  category: string;
 
   // leaving this field for future support of non-EVM based chains
   coinType: CoinType;
-  isEthereumCompatible: boolean;
 
   // for further question please contact lsc
   chainName: string;
@@ -34,6 +38,14 @@ export interface Network {
    * for `rpc` provider, used `nanoid` for type
    */
   id: PresetNetworkId | string;
+
+  /**
+   * Future-proof design
+   */
+  ecsystem: EcoSystem;
+
+  // mainly for cosmos / polkadot
+  prefix: string;
 }
 export interface Provider extends Network {
   type:

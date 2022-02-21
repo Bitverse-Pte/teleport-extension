@@ -7,8 +7,8 @@ import axios, { AxiosError } from 'axios';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { Button, Form, Input, Select } from 'antd';
 import Header from 'ui/components/Header';
-import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
-import DefaulutIcon from 'assets/tokens/default.svg';
+// import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
+// import DefaulutIcon from 'assets/tokens/default.svg';
 import { isString } from 'util';
 import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber } from 'ethers';
@@ -16,7 +16,7 @@ import { defaultNetworks } from 'constants/defaultNetwork';
 import { useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
-const Icon = (src: string) => <img className="category-icon" src={src} />;
+// const Icon = (src: string) => <img className="category-icon" src={src} />;
 
 const NetworkEdit = () => {
   const { t } = useTranslation();
@@ -34,7 +34,7 @@ const NetworkEdit = () => {
       chainId: '',
       explorerUrl: '',
       networkName: '',
-      category: 'ETH',
+      // category: 'ETH',
       rpcUrl: '',
       symbol: '',
     };
@@ -46,7 +46,6 @@ const NetworkEdit = () => {
         explorerUrl: provider.rpcPrefs.blockExplorerUrl || '',
         chainId: provider.chainId || '',
         networkName: provider.nickname || '',
-        category: provider.category,
         rpcUrl: provider.rpcUrl || '',
         symbol: provider.ticker || '',
       };
@@ -121,7 +120,6 @@ const NetworkEdit = () => {
       chainId,
       explorerUrl,
       networkName,
-      category,
       rpcUrl,
       symbol,
     }: {
@@ -134,7 +132,6 @@ const NetworkEdit = () => {
           networkName as string,
           rpcUrl,
           chainId,
-          category || 'ETH',
           symbol,
           explorerUrl
         );
@@ -144,7 +141,6 @@ const NetworkEdit = () => {
           networkName as string,
           rpcUrl,
           chainId,
-          category || 'ETH',
           symbol,
           explorerUrl
         );
@@ -267,7 +263,7 @@ const NetworkEdit = () => {
               placeholder="should automatically filled if RPC URL provided"
             />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="category"
             label={t('Belonging Chain')}
             rules={[{ required: true }]}
@@ -285,7 +281,7 @@ const NetworkEdit = () => {
                 );
               })}
             </Select>
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item name="symbol" label={t('Currency Symbol')}>
             <Input
               className="rounded-md"
