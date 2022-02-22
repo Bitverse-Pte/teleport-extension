@@ -146,6 +146,8 @@ const Send = () => {
     }
     if (isSupport1559) {
       delete params.gasPrice;
+      params.maxFeePerGas = draftTransaction.maxFeePerGas;
+      params.maxPriorityFeePerGas = draftTransaction.maxPriorityFeePerGas;
     } else {
       delete params.maxFeePerGas;
       delete params.maxPriorityFeePerGas;
