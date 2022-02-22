@@ -12,7 +12,8 @@ import {
   Transaction,
 } from 'constants/transaction';
 import { hexToDecimal } from '../utils/conversion';
-// import txHelper from '../helpers/utils/tx-helper';
+import txHelper from '../helpers/utils/tx-helper';
+
 // import {
 //   TransactionStatuses,
 //   TransactionTypes,
@@ -40,7 +41,8 @@ export const incomingTxListSelector = (state: RootState) => {
   //       transactionMatchesNetwork(tx, chainId, network),
   //   );
 };
-// export const unapprovedMsgsSelector = (state: RootState) => state.metamask.unapprovedMsgs;
+export const unapprovedMsgsSelector = (state: RootState) => ({});
+// state.metamask.unapprovedMsgs;
 export const currentNetworkTxListSelector = (state: RootState) => {
   // state.metamask.currentNetworkTxList;
   const { chainId } = state.network.provider;
@@ -48,14 +50,16 @@ export const currentNetworkTxListSelector = (state: RootState) => {
     return BigNumber.from(tx.chainId).eq(chainId);
   });
 };
-// export const unapprovedPersonalMsgsSelector = (state: RootState) =>
-//   state.metamask.unapprovedPersonalMsgs;
-// export const unapprovedDecryptMsgsSelector = (state: RootState) =>
-//   state.metamask.unapprovedDecryptMsgs;
-// export const unapprovedEncryptionPublicKeyMsgsSelector = (state: RootState) =>
-//   state.metamask.unapprovedEncryptionPublicKeyMsgs;
-// export const unapprovedTypedMessagesSelector = (state: RootState) =>
-//   state.metamask.unapprovedTypedMessages;
+export const unapprovedPersonalMsgsSelector = (state: RootState) => ({});
+// state.metamask.unapprovedPersonalMsgs;
+export const unapprovedDecryptMsgsSelector = (state: RootState) => ({});
+// state.metamask.unapprovedDecryptMsgs;
+export const unapprovedEncryptionPublicKeyMsgsSelector = (
+  state: RootState
+) => ({});
+// state.metamask.unapprovedEncryptionPublicKeyMsgs;
+export const unapprovedTypedMessagesSelector = (state: RootState) => ({});
+// state.metamask.unapprovedTypedMessages;
 
 export const selectedAddressTxListSelector = createSelector(
   getSelectedAddress,
@@ -68,52 +72,44 @@ export const selectedAddressTxListSelector = createSelector(
   }
 );
 
-// export const unapprovedMessagesSelector = createSelector(
-//   unapprovedMsgsSelector,
-//   unapprovedPersonalMsgsSelector,
-//   unapprovedDecryptMsgsSelector,
-//   unapprovedEncryptionPublicKeyMsgsSelector,
-//   unapprovedTypedMessagesSelector,
-//   deprecatedGetCurrentNetworkId,
-//   getCurrentChainId,
-//   (
-//     unapprovedMsgs = {},
-//     unapprovedPersonalMsgs = {},
-//     unapprovedDecryptMsgs = {},
-//     unapprovedEncryptionPublicKeyMsgs = {},
-//     unapprovedTypedMessages = {},
-//     network,
-//     chainId,
-//   ) =>
-//     txHelper(
-//       {},
-//       unapprovedMsgs,
-//       unapprovedPersonalMsgs,
-//       unapprovedDecryptMsgs,
-//       unapprovedEncryptionPublicKeyMsgs,
-//       unapprovedTypedMessages,
-//       network,
-//       chainId,
-//     ) || [],
-// );
+export const unapprovedMessagesSelector = createSelector(
+  unapprovedMsgsSelector,
+  unapprovedPersonalMsgsSelector,
+  unapprovedDecryptMsgsSelector,
+  unapprovedEncryptionPublicKeyMsgsSelector,
+  unapprovedTypedMessagesSelector,
+  getCurrentChainId,
+  (
+    unapprovedMsgs = {},
+    unapprovedPersonalMsgs = {},
+    unapprovedDecryptMsgs = {},
+    unapprovedEncryptionPublicKeyMsgs = {},
+    unapprovedTypedMessages = {},
+    chainId
+  ) =>
+    txHelper(
+      {},
+      unapprovedMsgs,
+      unapprovedPersonalMsgs,
+      unapprovedDecryptMsgs,
+      unapprovedEncryptionPublicKeyMsgs,
+      unapprovedTypedMessages,
+      chainId
+    ) || []
+);
 
-// export const transactionSubSelector = createSelector(
-//   unapprovedMessagesSelector,
-//   incomingTxListSelector,
-//   (unapprovedMessages = [], incomingTxList = []) => {
-//     return unapprovedMessages.concat(incomingTxList);
-//   },
-// );
+export const transactionSubSelector = createSelector(
+  unapprovedMessagesSelector,
+  incomingTxListSelector,
+  (unapprovedMessages = [], incomingTxList = []) => {
+    return unapprovedMessages.concat(incomingTxList);
+  }
+);
 
 export const transactionsSelector = createSelector(
-  //   transactionSubSelector,
+  transactionSubSelector,
   selectedAddressTxListSelector,
-  (
-    //   subSelectorTxList: Transaction[] = [],
-    selectedAddressTxList = []
-  ) => {
-    // @todo: transactionSubSelector
-    const subSelectorTxList = [];
+  (subSelectorTxList = [], selectedAddressTxList = []) => {
     const txsToRender = selectedAddressTxList.concat(subSelectorTxList);
 
     return txsToRender.sort((a, b) => b.time - a.time);
