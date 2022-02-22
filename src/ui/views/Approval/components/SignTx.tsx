@@ -108,9 +108,10 @@ const SignTx = ({ params, origin }) => {
   const [visible, setVisible] = useState(false);
   const tx = normalizeTxParams(params.data[0]);
 
-  const [maxFeePerGas, setMaxFeePerGas] = useState<string>('0x0');
-  const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] =
-    useState<string>('0x0');
+  const [maxFeePerGas, setMaxFeePerGas] = useState<string>(tx.maxFeePerGas);
+  const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState<string>(
+    tx.maxPriorityFeePerGas
+  );
   const [totalGasfee, setTotalGasFee] = useState<string>('0x0');
   const [currency, setCurrency] = useState('ETH');
 
