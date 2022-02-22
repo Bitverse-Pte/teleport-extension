@@ -22,7 +22,19 @@ import txHelper from '../helpers/utils/tx-helper';
 import { getCurrentChainId, getSelectedAddress } from './selectors';
 import { RootState } from '../reducer';
 import { BigNumber } from 'ethers';
+import { pickBy } from 'lodash';
+import { transactionMatchesNetwork } from 'background/service/transactions/lib/util';
 // import { getSelectedAddress } from '.';
+
+export const unapprovedTxsSelector = (state: RootState) => {
+  const { chainId } = state.network.provider;
+  return pickBy(
+    state.transactions,
+    (transaction) =>
+      transaction.status === TransactionStatuses.UNAPPROVED &&
+      transactionMatchesNetwork(transaction, chainId)
+  );
+};
 
 export const incomingTxListSelector = (state: RootState) => {
   //   const { showIncomingTransactions } = state.metamask.featureFlags;
@@ -88,6 +100,10 @@ export const unapprovedMessagesSelector = createSelector(
     chainId
   ) =>
     txHelper(
+      /**
+       * since unapproved tx is in `transactions` already
+       * there is no needd to put them here.
+       */
       {},
       unapprovedMsgs,
       unapprovedPersonalMsgs,
