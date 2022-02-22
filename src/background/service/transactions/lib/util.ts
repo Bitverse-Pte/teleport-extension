@@ -5,6 +5,7 @@ import {
   TransactionStatuses as TRANSACTION_STATUSES,
   TransactionEnvelopeTypes as TRANSACTION_ENVELOPE_TYPES,
   TxParams,
+  Transaction,
 } from '../typing';
 import { isHexString } from 'ethereumjs-util';
 
@@ -33,7 +34,11 @@ export function createRandomId() {
   return idCounter++;
 }
 
-export function transactionMatchesNetwork(transaction, chainId, networkId) {
+export function transactionMatchesNetwork(
+  transaction: Transaction,
+  chainId: string,
+  networkId?: string
+) {
   if (typeof transaction.chainId !== 'undefined') {
     return transaction.chainId === chainId;
   }
