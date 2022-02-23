@@ -6,7 +6,7 @@ import { AddChain } from './Approval/components';
 
 const AccountCreate = lazy(() => import('ui/views/AccountCreate'));
 const MnemonicBackup = lazy(() => import('ui/views/MnemonicBackup'));
-const NetworksList = lazy(() => import('./Network/NetworksList'));
+const NetworkSelection = lazy(() => import('./Network/NetworksSelectionPage'));
 const NetworkEdit = lazy(() => import('./Network/NetworkEdit'));
 // const NetworkEdit = lazy(() => import('./Network/NetworkEdit'));
 const AccountRecover = lazy(() => import('ui/views/AccountRecover'));
@@ -42,7 +42,7 @@ const Main = () => {
         </LazyPrivateRoute>
 
         <LazyPrivateRoute exact path="/network">
-          <NetworksList />
+          <NetworkSelection />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/network/edit/:idx">
           <NetworkEdit />

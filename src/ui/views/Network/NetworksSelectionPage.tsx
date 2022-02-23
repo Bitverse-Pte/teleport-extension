@@ -40,18 +40,6 @@ const Icon = (src: string) => (
   />
 );
 
-const ColorFulDot = ({ idx }: { idx: number }) => {
-  const colorMap = ['#0F83FF', '#FFA800', '#57CC75', '#E33376', '#000000'];
-  return (
-    <span
-      className="colorful_dot"
-      style={{ color: colorMap[idx % colorMap.length] }}
-    >
-      •
-    </span>
-  );
-};
-
 function useProviderList() {
   const providerContext = useContext(NetworkProviderContext);
   const networkList: NetworksCategories = useMemo(() => {
@@ -166,7 +154,7 @@ const NetworkActions = ({
   );
 };
 
-const NetworksList = () => {
+const NetworksSelectionContainer = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const providerContext = useContext(NetworkProviderContext);
@@ -226,7 +214,6 @@ const NetworksList = () => {
                     })}
                     onClick={() => selectProvider(network)}
                   >
-                    {/* {Icon(IdToChainLogoSVG(network.id as PresetNetworkId))} */}
                     <span className="network-name">{network.nickname}</span>
                     <NetworkActions network={network} />
                   </div>
@@ -238,7 +225,6 @@ const NetworksList = () => {
       </div>
       <div
         key="customize"
-        // style={{ paddingLeft: '0px' }}
         className="cursor-pointer hover-to-highlight custom-network-card flex items-center"
         onClick={() => history.push('/network/add')}
       >
@@ -257,4 +243,4 @@ const NetworksList = () => {
   );
 };
 
-export default NetworksList;
+export default NetworksSelectionContainer;
