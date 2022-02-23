@@ -25,6 +25,7 @@ import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
 import { IconComponent } from 'ui/components/IconComponents';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import clsx from 'clsx';
 
 const Icon = (src: string) => (
   <img
@@ -200,7 +201,7 @@ const NetworksList = () => {
 
   return (
     <div className="flexCol network-page-container">
-      <GeneralHeader title="Teleport Wallet" />
+      <GeneralHeader title="Teleport Wallet" extCls="network-list-header" />
       <div className="networkList">
         {Object.keys(networkList).map((key) => {
           const currentCategory = networkList[key];
@@ -214,18 +215,23 @@ const NetworksList = () => {
                 {Icon(currentCategory.icon || DefaulutIcon)}
                 <h2 className="category-name">{currentCategory.displayName}</h2>
               </div>
-              {currentCategory.networks.map((network, idx) => (
-                <div
-                  key={network.chainId}
-                  className="flex items-center network-item"
-                  onClick={() => selectProvider(network)}
-                >
-                  {/* <ColorFulDot idx={idx} /> */}
-                  {/* {Icon(IdToChainLogoSVG(network.id as PresetNetworkId))} */}
-                  <span className="network-name">{network.nickname}</span>
-                  <NetworkActions network={network} />
-                </div>
-              ))}
+              {currentCategory.networks.map((network, idx) => {
+                // @todo: deal with it later
+                const isSelectedNetwork = true;
+                return (
+                  <div
+                    key={network.chainId}
+                    className={clsx('flex items-center network-item', {
+                      'network-item-active': isSelectedNetwork,
+                    })}
+                    onClick={() => selectProvider(network)}
+                  >
+                    {/* {Icon(IdToChainLogoSVG(network.id as PresetNetworkId))} */}
+                    <span className="network-name">{network.nickname}</span>
+                    <NetworkActions network={network} />
+                  </div>
+                );
+              })}
             </div>
           );
         })}
