@@ -242,7 +242,7 @@ const NetworksList = () => {
         className="cursor-pointer hover-to-highlight custom-network-card flex items-center"
         onClick={() => history.push('/network/add')}
       >
-        <h2 className="category-name">Customize Network</h2>
+        <h2 className="category-name">{t('CustomizeNetwork')}</h2>
         <div className="actions" style={{ marginLeft: 'auto' }}>
           <Button type="text">
             <IconComponent

@@ -29,6 +29,9 @@
   "View__Mnemonic": {
     "message": "View Mnemonic"
   },
+  "CustomizeNetwork": {
+    "message": "Customize Network"
+  },
   "add": {
     "message": "Add"
   },
