@@ -8,9 +8,10 @@ import { Provider } from 'types/network';
 import { IconButton } from 'ui/components/IconButton';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
-import IconCheck from 'assets/action-icon/check.svg';
 import IconTrash from 'assets/action-icon/trash.svg';
 import IconEdit from 'assets/action-icon/edit.svg';
+import { IconComponent } from 'ui/components/IconComponents';
+import './style.less';
 
 type NetworkProviderWithOptionalTag = Provider & { idx?: number };
 
@@ -69,7 +70,7 @@ const NetworkActions = ({
   return (
     <span className="actions flex justify-center items-center">
       {isSelectedNetwork ? (
-        <IconButton icon={IconCheck} size={12} />
+        <IconComponent name="check" />
       ) : (
         <div className="actions-not-selected">
           <RpcNetworkOptions network={network} />
@@ -89,7 +90,7 @@ const RpcNetworkOptions = ({
   const history = useHistory();
 
   const handleRemove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: React.MouseEvent<any>) => {
       // stop the parent's onClick event
       e.stopPropagation();
       Modal.confirm({
@@ -119,10 +120,17 @@ const RpcNetworkOptions = ({
 
   return (
     <div className="flex justify-center items-center">
-      <IconButton icon={IconTrash} size={12} onClick={handleRemove} />
+      <IconButton
+        icon={IconTrash}
+        className="narrow-padding"
+        size={16}
+        onClick={handleRemove}
+      />
+      {/* <IconComponent name="trash" onClick={handleRemove} /> */}
       <IconButton
         icon={IconEdit}
-        size={12}
+        size={16}
+        className="narrow-padding"
         onClick={(e) => {
           // stop the parent's onClick event
           e.stopPropagation();
