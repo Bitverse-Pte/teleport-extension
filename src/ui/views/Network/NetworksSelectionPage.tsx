@@ -159,7 +159,7 @@ const NetworksSelectionContainer = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const providerContext = useContext(NetworkProviderContext);
-
+  const currentProviderId = useSelector((s) => s.network.provider.id);
   const networkList = useProviderList();
 
   useEffect(() => {
@@ -204,9 +204,8 @@ const NetworksSelectionContainer = () => {
                 {Icon(currentCategory.icon || DefaulutIcon)}
                 <h2 className="category-name">{currentCategory.displayName}</h2>
               </div>
-              {currentCategory.networks.map((network, idx) => {
-                // @todo: deal with it later
-                const isSelectedNetwork = true;
+              {currentCategory.networks.map((network) => {
+                const isSelectedNetwork = network.id === currentProviderId;
                 return (
                   <div
                     key={network.chainId}
