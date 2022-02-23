@@ -1,4 +1,10 @@
-import React, { Fragment, useContext, useEffect, useMemo } from 'react';
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { NetworksCategories } from './typing';
@@ -58,14 +64,30 @@ function useProviderList() {
     });
     return category;
   }, [customProviders]);
-  return networkList;
+
+  const currentProviderId = useSelector((s) => s.network.provider.id);
+  const currentSelectedCategory = useMemo(() => {
+    const [name] = Object.entries(networkList).filter(([_, { networks }]) => {
+      return networks.filter((n) => n.id === currentProviderId).length > 0;
+    })[0];
+    return name;
+  }, [currentProviderId]);
+
+  return { networkList, currentSelectedCategory };
 }
 
 const NetworksSelectionContainer = () => {
   const { t } = useTranslation();
   const history = useHistory();
+  const [activeKeys, setActiveKeys] = useState<Record<string, boolean>>({});
   const providerContext = useContext(NetworkProviderContext);
-  const networkList = useProviderList();
+  const { networkList, currentSelectedCategory } = useProviderList();
+
+  useEffect(() => {
+    setActiveKeys({
+      [currentSelectedCategory]: true,
+    });
+  }, []);
 
   if (!providerContext) {
     return <p>Loading...</p>;
@@ -86,10 +108,21 @@ const NetworksSelectionContainer = () => {
               <div className="category-tag flex items-center">
                 <ChainCategoryIcon src={currentCategory.icon} />
                 <h2 className="category-name">{currentCategory.displayName}</h2>
+                <IconComponent
+                  name={`chevron-${!activeKeys[key] ? 'down' : 'up'}`}
+                  cls="ml-auto"
+                  onClick={() => {
+                    setActiveKeys({
+                      ...activeKeys,
+                      [key]: !activeKeys[key],
+                    });
+                  }}
+                />
               </div>
-              {currentCategory.networks.map((network) => (
-                <NetworkSelectionItem network={network} key={network.id} />
-              ))}
+              {activeKeys[key] &&
+                currentCategory.networks.map((network) => (
+                  <NetworkSelectionItem network={network} key={network.id} />
+                ))}
             </div>
           );
         })}
