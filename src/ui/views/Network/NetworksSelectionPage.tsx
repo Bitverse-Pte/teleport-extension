@@ -41,7 +41,7 @@ const Icon = (src: string) => (
 );
 
 function useProviderList() {
-  const providerContext = useContext(NetworkProviderContext);
+  const customProviders = useSelector((s) => s.customNetworks);
   const networkList: NetworksCategories = useMemo(() => {
     const category: NetworksCategories = {
       EVM: {
@@ -66,12 +66,12 @@ function useProviderList() {
       .forEach((val) => {
         category['EVM'].networks.push(val);
       });
-    providerContext?.customProviders.forEach((_pro, idx) => {
+    customProviders.forEach((_pro, idx) => {
       const withIdx = { ..._pro, idx };
       category['EVM'].networks.push(withIdx);
     });
     return category;
-  }, [providerContext]);
+  }, [customProviders]);
   return networkList;
 }
 
@@ -109,6 +109,12 @@ const RpcNetworkOptions = ({
     return <p>Loading</p>;
   }
 
+  if (network.type !== 'rpc') {
+    // Only `rpc` type are editable
+    // other type was preset that cannot edit
+    return null;
+  }
+
   return (
     <div className="flex justify-center items-center">
       <IconButton icon={IconTrash} size={12} onClick={handleRemove} />
@@ -138,16 +144,11 @@ const NetworkActions = ({
   }, [network, currentNetworkController]);
   return (
     <span className="actions flex justify-center items-center">
-      {isSelectedNetwork}
       {isSelectedNetwork ? (
         <IconButton icon={IconCheck} size={12} />
       ) : (
         <div className="actions-not-selected">
-          {
-            // Only `rpc` type are editable
-            // other type was preset that cannot edit
-            network.type === 'rpc' && <RpcNetworkOptions network={network} />
-          }
+          <RpcNetworkOptions network={network} />
         </div>
       )}
     </span>
