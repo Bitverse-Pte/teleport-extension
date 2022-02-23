@@ -447,6 +447,9 @@ export class WalletController extends BaseController {
   getTxState() {
     return txController.getState();
   }
+  cancelTransaction(txId: string) {
+    return txController.cancelTransaction(txId);
+  }
   addKnownMethodData = (fourBytePrefix: string, data: KnownMethodData) => {
     return knownMethodService.addKnownMethodData(fourBytePrefix, data);
   };

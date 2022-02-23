@@ -108,6 +108,10 @@ export function _ActivityDetail({
     }
   }, [displayedStatusKey]);
 
+  const cancelTx = useCallback(() => {
+    alert('Cancel Tx to be implemented');
+  }, []);
+
   /**
    * This fn is only build for UI
    */
@@ -191,11 +195,7 @@ export function _ActivityDetail({
               {/* <IconComponent name="rocket" /> */}
               Gas
             </button>
-            <button
-              className="cancelBtn"
-              type="button"
-              onClick={() => alert('Cancel Tx to be implemented')}
-            >
+            <button className="cancelBtn" type="button" onClick={cancelTx}>
               {/* <IconComponent name="cancel" /> */}
               Cancel
             </button>

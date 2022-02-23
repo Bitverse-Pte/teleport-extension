@@ -205,7 +205,7 @@ const NetworkEdit = () => {
 
   return (
     <div className="flexCol network-page-container network-edit">
-      <Header title={t('Customize Network')} />
+      <Header title={t('CustomizeNetwork')} />
       <Form
         form={form}
         layout="vertical"
