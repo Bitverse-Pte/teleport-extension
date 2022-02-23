@@ -6089,6 +6089,18 @@ ethereumjs-util@*, ethereumjs-util@^7.0.10, ethereumjs-util@^7.0.9, ethereumjs-u
     ethereum-cryptography "^0.1.3"
     rlp "^2.2.4"
 
+ethereumjs-util@7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/ethereumjs-util/-/ethereumjs-util-7.1.0.tgz#e2b43a30bfcdbcb432a4eb42bd5f2393209b3fd5"
+  integrity sha512-kR+vhu++mUDARrsMMhsjjzPduRVAeundLGXucGRHF3B4oEltOUspfgCVco4kckucj3FMlLaZHUl9n7/kdmr6Tw==
+  dependencies:
+    "@types/bn.js" "^5.1.0"
+    bn.js "^5.1.2"
+    create-hash "^1.1.2"
+    ethereum-cryptography "^0.1.3"
+    ethjs-util "0.1.6"
+    rlp "^2.2.4"
+
 ethereumjs-util@^5.0.0, ethereumjs-util@^5.1.1, ethereumjs-util@^5.1.2, ethereumjs-util@^5.1.5:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/ethereumjs-util/-/ethereumjs-util-5.2.1.tgz#a833f0e5fca7e5b361384dc76301a721f537bf65"
@@ -11314,6 +11326,11 @@ rxjs@^7.2.0:
   integrity sha512-KExVEeZWxMZnZhUZtsJcFwz8IvPvgu4G2Z2QyqjZQzUGr32KDYuSxrEYO4w3tFFNbfLozcrKUTvTPi+E9ywJkQ==
   dependencies:
     tslib "^2.1.0"
+
+sa-sdk-javascript@^1.21.7:
+  version "1.21.7"
+  resolved "https://registry.npmjs.org/sa-sdk-javascript/-/sa-sdk-javascript-1.21.7.tgz#642569c4aa63634ea3d42fee2bcc11f89c718a5b"
+  integrity sha512-uSBwkXpbOqcq86aGFnSC/7yCOSPUGaTxWDzWAPjRcezhjFPxJXgGS5uU/i3BwTk3eOR8NEH1PPbZ7BO/S/KTYg==
 
 safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"

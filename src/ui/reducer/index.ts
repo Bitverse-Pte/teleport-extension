@@ -7,6 +7,7 @@ import knownMethodReducer from './knownMethod.reducer';
 import preferenceReducer from './preference.reducer';
 import appStateReducer from './appState.reducer';
 import gasReducer from './gas.reducer';
+import sendReducer from './send.reducer';
 import currentBlockReducer from './block.reducer';
 
 const rootReducer = combineReducers({
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   preference: preferenceReducer,
   appState: appStateReducer,
   gas: gasReducer,
+  send: sendReducer,
   currentBlock: currentBlockReducer,
 });
 

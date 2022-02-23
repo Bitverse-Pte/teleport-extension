@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
     }
   };
   return (
-    <div className="header flex content-wrap-padding">
+    <div className="header flexR content-wrap-padding">
       <IconComponent
         name="back"
         cls="icon back-icon"

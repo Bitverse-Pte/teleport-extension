@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Views from './views';
 import { Message } from 'utils';
+import skynet from 'utils/skynet';
 import { getUITypeName } from 'ui/utils';
 import eventBus from 'eventBus';
 import i18n, { addResourceBundle } from '../i18n';
@@ -12,6 +13,7 @@ import configureStore from './store/store';
 
 // import './style/index.less'; //remove import index.less, using a built css, as the content of this file is usually not modified
 import './iconfont/iconfont.js';
+import * as actions from './state/actions';
 
 /*Sentry.init({
   dsn:
@@ -77,6 +79,8 @@ function initAppMeta() {
 
 initAppMeta();
 
+skynet.start();
+
 const { PortMessage } = Message;
 
 const portMessageChannel = new PortMessage();
@@ -133,7 +137,7 @@ async function queryCurrentActiveTab() {
 
 async function launchTeleportWalletUi() {
   const activeTab = await queryCurrentActiveTab();
-
+  actions._setBackgroundConnection(wallet);
   const store = configureStore();
   wallet.getLocale().then((locale) => {
     addResourceBundle(locale).then(() => {

@@ -22,6 +22,7 @@ import { CoinType, EcoSystem } from 'types/network';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { chainIdToCategory } from 'utils/chain';
+import { TransactionEnvelopeTypes } from 'constants/transaction';
 import { MESSAGE_TYPE } from 'constants/app';
 
 interface ApprovalRes extends Tx {
@@ -200,8 +201,12 @@ class ProviderController extends BaseController {
     };
     delete txParams.txParam;
     txParams.gas = approvalRes.gas;
-    txParams.maxFeePerGas = approvalRes.maxFeePerGas;
-    txParams.maxPriorityFeePerGas = approvalRes.maxPriorityFeePerGas;
+    if (txParams.type === TransactionEnvelopeTypes.FEE_MARKET) {
+      txParams.maxFeePerGas = approvalRes.maxFeePerGas;
+      txParams.maxPriorityFeePerGas = approvalRes.maxPriorityFeePerGas;
+    } else {
+      txParams.gasPrice = approvalRes.gasPrice;
+    }
     console.log(
       '--------------txController.newUnapprovedTransaction ===> start: ---------------',
       txParams,

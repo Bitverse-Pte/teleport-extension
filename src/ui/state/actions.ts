@@ -16,8 +16,14 @@ import {
 //   unapprovedEncryptionPublicKeyMsgsSelector,
 //   unapprovedTypedMessagesSelector,
 // } from 'ui/selectors/transactions';
+import { GasFeeState } from '@metamask/controllers';
 import { RootState } from '../reducer';
 import { getMethodDataAsync } from '../utils/transactions';
+
+let background: Record<string, any>;
+export function _setBackgroundConnection(backgroundConnection) {
+  background = backgroundConnection;
+}
 
 export function getContractMethodData(
   data = '',
@@ -171,4 +177,12 @@ export function completedTx(id: string) {
     //   },
     // });
   };
+}
+
+export function estimateGas(params) {
+  return background.estimateGas(params);
+}
+
+export function fetchGasFeeEstimates(): any {
+  return background.fetchGasFeeEstimates();
 }

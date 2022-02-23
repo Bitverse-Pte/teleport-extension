@@ -86,6 +86,7 @@ const txController = new TransactionController({
 
 const latestBlockDataHub = new LatestBlockDataHubService({
   blockTracker: networkController.getProviderAndBlockTracker().blockTracker,
+  gasFeeTracker: gasFeeController,
   networkProviderStore: networkController.networkStore,
 });
 
