@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { BigNumber, utils } from 'ethers';
 import { useParams } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Header from 'ui/components/Header';
 import { TxDirectionLogo } from 'ui/components/TransactionList/TxDirectionLogo';
 import './activity-detail.less';
@@ -22,6 +22,8 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { TokenIcon } from 'ui/components/Widgets';
 import { Tooltip } from 'antd';
 import { TransactionFee } from './TransactionFee';
+import { cancelTxs } from 'ui/state/actions';
+import { useWallet } from 'ui/utils';
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -84,6 +86,8 @@ export function _ActivityDetail({
     token,
   } = useTransactionDisplayData(transaction);
 
+  const dispatch = useDispatch();
+
   const {
     provider: { rpcPrefs },
   } = useSelector((state) => state.network);
@@ -108,9 +112,11 @@ export function _ActivityDetail({
     }
   }, [displayedStatusKey]);
 
+  const walletController = useWallet();
+
   const cancelTx = useCallback(() => {
-    alert('Cancel Tx to be implemented');
-  }, []);
+    dispatch(cancelTxs(transaction.transactions, walletController));
+  }, [dispatch]);
 
   /**
    * This fn is only build for UI
