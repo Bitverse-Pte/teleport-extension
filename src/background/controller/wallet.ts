@@ -9,7 +9,6 @@ import {
   txController,
   networkController,
   gasFeeController,
-  txHistoryService,
   knownMethodService,
 } from 'background/service';
 import BaseController from './base';
@@ -450,11 +449,14 @@ export class WalletController extends BaseController {
   cancelTransaction(txId: string) {
     return txController.cancelTransaction(txId);
   }
+  setPopupOpen(val: boolean) {
+    preferenceService.setPopupOpen(val);
+  }
   addKnownMethodData = (fourBytePrefix: string, data: KnownMethodData) => {
     return knownMethodService.addKnownMethodData(fourBytePrefix, data);
   };
   getTxHistory() {
-    return txHistoryService.getTransactionList();
+    return txController.txStateManager.getTransactionList();
   }
 }
 

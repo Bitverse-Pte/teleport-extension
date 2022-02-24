@@ -15,7 +15,6 @@ import sessionService from './session';
 import i18n from './i18n';
 import TokenService from './token/TokenService';
 import platform from './extension';
-import txHistoryService from './transactions/history';
 import knownMethodService from './knownMethod';
 import { LatestBlockDataHubService } from './network/latestBlockDataHub';
 
@@ -111,7 +110,6 @@ export {
   i18n,
   knownMethodService,
   TokenService,
-  txHistoryService,
   latestBlockDataHub,
 };
 

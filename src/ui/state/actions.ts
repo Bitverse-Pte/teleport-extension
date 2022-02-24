@@ -70,31 +70,22 @@ export function cancelTx(
   _showLoadingIndication = true,
   background: any
 ) {
-  return (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {
+  return async (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {
     _showLoadingIndication && dispatch(showLoadingIndicator());
-    return new Promise<void>((resolve, reject) => {
-      background.cancelTransaction(txData.id, (error) => {
-        if (error) {
-          reject(error);
-          return;
-        }
+    try {
+      await background.cancelTransaction(txData.id);
+      // dispatch(resetSendState());
+      // dispatch(completedTx(txData.id));
+      dispatch(hideLoadingIndicator());
+      console.debug('hideLoadingIndicator::after');
+      // @todo:
+      // dispatch(closeCurrentNotificationWindow());
 
-        resolve();
-      });
-    })
-      .then(() => {
-        // dispatch(resetSendState());
-        dispatch(completedTx(txData.id));
-        dispatch(hideLoadingIndicator());
-        // @todo:
-        // dispatch(closeCurrentNotificationWindow());
-
-        return txData;
-      })
-      .catch((error) => {
-        dispatch(hideLoadingIndicator());
-        throw error;
-      });
+      return txData;
+    } catch (error) {
+      dispatch(hideLoadingIndicator());
+      throw error;
+    }
   };
 }
 
@@ -109,34 +100,22 @@ export function cancelTxs(txDataList: { id: string }[], background: any) {
 
     try {
       const txIds = txDataList.map(({ id }) => id);
-      const cancellations = txIds.map(
-        (id) =>
-          new Promise<void>((resolve, reject) => {
-            background.cancelTransaction(id, (err) => {
-              if (err) {
-                reject(err);
-                return;
-              }
-
-              resolve();
-            });
-          })
-      );
-
+      const cancellations = txIds.map((id) => background.cancelTransaction(id));
+      console.debug('before promise');
       await Promise.all(cancellations);
-
+      console.debug('after promise');
       // @todo:
       // dispatch(resetSendState());
 
-      txIds.forEach((id) => {
-        dispatch(completedTx(id));
-      });
+      // txIds.forEach((id) => {
+      //   dispatch(completedTx(id));
+      // });
     } finally {
+      // hiding loading indicator no matter what
+      dispatch(hideLoadingIndicator());
+      console.debug('hideLoadingIndicator::after');
       if (getEnvironmentType() === ENVIRONMENT_TYPE_NOTIFICATION) {
-        // @todo:
-        // closeNotificationPopup();
-      } else {
-        dispatch(hideLoadingIndicator());
+        closeNotificationPopup();
       }
     }
   };
@@ -185,4 +164,8 @@ export function estimateGas(params) {
 
 export function fetchGasFeeEstimates(): any {
   return background.fetchGasFeeEstimates();
+}
+
+export function closeNotificationPopup() {
+  return background.setPopupOpen(false);
 }
