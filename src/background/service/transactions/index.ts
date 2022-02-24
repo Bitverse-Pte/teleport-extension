@@ -47,7 +47,6 @@ import * as txUtils from './lib/util';
 import eventBus from 'eventBus';
 import { EVENTS } from 'constants/index';
 import preferenceService from '../preference';
-import historyService from './history';
 import { NetworkController } from 'types/network';
 import { CustomGasSettings } from 'types/tx';
 
@@ -152,8 +151,8 @@ export default class TransactionController extends EventEmitter {
 
     this.txGasUtil = new TxGasUtil(this.provider);
     this._mapMethods();
+
     this.txStateManager = new TransactionStateManager({
-      initState: opts.initState,
       txHistoryLimit: opts.txHistoryLimit,
       getNetwork: this.getNetwork.bind(this),
       getCurrentChainId: opts.getCurrentChainId,
@@ -190,11 +189,8 @@ export default class TransactionController extends EventEmitter {
     );
     this._setupListeners();
     // memstore is computed from a few different stores
-    this._updateMemstore();
-    this.txStateManager.store.subscribe(() => this._updateMemstore());
     this.networkStore.subscribe(() => {
       this._onBootCleanUp();
-      this._updateMemstore();
     });
 
     // request state update to finalize initialization
@@ -1283,17 +1279,6 @@ export default class TransactionController extends EventEmitter {
     }
   }
 
-  /**
-    Updates the memStore in transaction controller
-  */
-  _updateMemstore() {
-    const unapprovedTxs = this.txStateManager.getUnapprovedTxList();
-    const currentNetworkTxList = this.txStateManager.getTransactions({
-      limit: MAX_MEMSTORE_TX_LIST_SIZE,
-    });
-    this.memStore!.updateState({ unapprovedTxs, currentNetworkTxList });
-    historyService.addTransactionsToList(currentNetworkTxList);
-  }
   /**
    * Extracts relevant properties from a transaction meta
    * object and uses them to create and send metrics for various transaction
