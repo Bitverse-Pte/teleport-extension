@@ -449,6 +449,9 @@ export class WalletController extends BaseController {
   cancelTransaction(txId: string) {
     return txController.cancelTransaction(txId);
   }
+  setPopupOpen(val: boolean) {
+    preferenceService.setPopupOpen(val);
+  }
   addKnownMethodData = (fourBytePrefix: string, data: KnownMethodData) => {
     return knownMethodService.addKnownMethodData(fourBytePrefix, data);
   };

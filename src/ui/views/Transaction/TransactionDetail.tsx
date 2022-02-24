@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { BigNumber, utils } from 'ethers';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from 'ui/components/Header';
 import { TxDirectionLogo } from 'ui/components/TransactionList/TxDirectionLogo';
@@ -87,6 +87,7 @@ export function _ActivityDetail({
   } = useTransactionDisplayData(transaction);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const {
     provider: { rpcPrefs },
@@ -116,7 +117,8 @@ export function _ActivityDetail({
 
   const cancelTx = useCallback(() => {
     dispatch(cancelTxs(transaction.transactions, walletController));
-  }, [dispatch]);
+    history.goBack();
+  }, [dispatch, history]);
 
   /**
    * This fn is only build for UI
