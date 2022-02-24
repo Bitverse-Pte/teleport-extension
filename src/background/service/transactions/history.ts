@@ -12,13 +12,6 @@ class TransactionHistoryService {
       'transaction_history',
       {
         transactions: {},
-        outgoingTransactions: {
-          transactions: {},
-        },
-        incomingTransactionsController: {
-          incomingTransactions: {},
-          incomingTxLastFetchedBlockByChainId: {},
-        },
       }
     );
 
