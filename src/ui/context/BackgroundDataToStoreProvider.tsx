@@ -30,14 +30,6 @@ export function BackgroundDataSyncMiddleware() {
       method: `dataSyncService.fetch.${storageName}`,
     });
 
-  const onPageUnloadDisablePollingBlocks = (e: BeforeUnloadEvent) => {
-    // push UI closed event if clean up
-    eventBus.emit(EVENTS.broadcastToBackground, {
-      method: 'UI_STATUS',
-      data: false,
-    });
-  };
-
   useEffect(() => {
     // only for the beginning of this hook
     const onTxServiceBackgroundMessage = (txs: TransactionHistoryStore) => {
@@ -104,16 +96,6 @@ export function BackgroundDataSyncMiddleware() {
     fetchStorageDataFromBackground('customNetworksStore');
     fetchStorageDataFromBackground('latestBlockData');
 
-    /**
-     * For Lastest Block Datahub Service use
-     * not fetching data if page are closed
-     */
-    eventBus.emit(EVENTS.broadcastToBackground, {
-      method: 'UI_STATUS',
-      data: true,
-    });
-    window.addEventListener('beforeunload', onPageUnloadDisablePollingBlocks);
-
     return () => {
       eventBus.removeEventListener(
         'dataSyncService.transactionHistory',
@@ -142,11 +124,6 @@ export function BackgroundDataSyncMiddleware() {
       eventBus.removeEventListener(
         'dataSyncService.latestBlockData',
         onCurrentBlockStore
-      );
-
-      window.removeEventListener(
-        'beforeunload',
-        onPageUnloadDisablePollingBlocks
       );
     };
   }, []);
