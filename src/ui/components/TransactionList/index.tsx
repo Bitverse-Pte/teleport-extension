@@ -24,7 +24,7 @@ import {
 import { isEqualCaseInsensitive, shortenAddress } from 'ui/utils/utils';
 import { useShouldShowSpeedUp } from 'ui/hooks/metamask/useShouldShowSpeedUp';
 import { Button, Tooltip } from 'antd';
-import CancelButton from './CancelButton';
+import CancelButton from './CancelAndSpeedUp/CancelButton';
 import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
