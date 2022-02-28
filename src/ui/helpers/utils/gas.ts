@@ -8,11 +8,11 @@ import { hexWEIToDecGWEI } from 'utils/conversion';
 export const gasEstimateGreaterThanGasUsedPlusTenPercent = (
   gasUsed: any,
   gasFeeEstimates: any,
-  estimate: PRIORITY_LEVELS,
+  estimate: PRIORITY_LEVELS
 ) => {
   let { maxFeePerGas: maxFeePerGasInTransaction } = gasUsed;
   maxFeePerGasInTransaction = new BigNumber(
-    hexWEIToDecGWEI(addTenPercentAndRound(maxFeePerGasInTransaction)),
+    hexWEIToDecGWEI(addTenPercentAndRound(maxFeePerGasInTransaction))
   );
 
   const maxFeePerGasFromEstimate =
@@ -28,7 +28,10 @@ export const gasEstimateGreaterThanGasUsedPlusTenPercent = (
  * @param conversionOptions
  * @returns {string | undefined} hex value in WEI 10% higher than the param.
  */
-export function addTenPercent(hexStringValue?: string, conversionOptions: any = {}): string | undefined {
+export function addTenPercent(
+  hexStringValue?: string,
+  conversionOptions: any = {}
+): string | undefined {
   if (hexStringValue === undefined) {
     return undefined;
   }
@@ -39,7 +42,7 @@ export function addTenPercent(hexStringValue?: string, conversionOptions: any = 
       multiplierBase: 10,
       numberOfDecimals: 0,
       ...conversionOptions,
-    }),
+    })
   );
 }
 
@@ -50,7 +53,9 @@ export function addTenPercent(hexStringValue?: string, conversionOptions: any = 
  * @param {string | undefined} hexStringValue - hex value in wei to be incremented
  * @returns {string | undefined} hex value in WEI 10% higher than the param.
  */
-export function addTenPercentAndRound(hexStringValue?: string): string | undefined {
+export function addTenPercentAndRound(
+  hexStringValue?: string
+): string | undefined {
   return addTenPercent(hexStringValue, { numberOfDecimals: 0 });
 }
 

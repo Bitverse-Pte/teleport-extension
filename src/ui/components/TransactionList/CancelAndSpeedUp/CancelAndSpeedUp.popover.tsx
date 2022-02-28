@@ -31,38 +31,33 @@ import { Button, Tooltip } from 'antd';
 import { gasEstimateGreaterThanGasUsedPlusTenPercent } from 'ui/helpers/utils/gas';
 
 interface CancelAndSpeedUpPopoverParams {
-    editGasMode: EDIT_GAS_MODES;
-    cancelTransaction: () => void;
-    speedUpTransaction: () => void;
-    transaction: Transaction;
-    // updateTransaction: () => void;
-    updateTransactionToTenPercentIncreasedGasFee: (v: boolean) => void;
-    updateTransactionUsingEstimate: (l: PRIORITY_LEVELS) => void;
+  editGasMode: EDIT_GAS_MODES;
+  cancelTransaction: () => void;
+  speedUpTransaction: () => void;
+  transaction: Transaction;
+  // updateTransaction: () => void;
+  updateTransactionToTenPercentIncreasedGasFee: (v: boolean) => void;
+  updateTransactionUsingEstimate: (l: PRIORITY_LEVELS) => void;
 }
 
 const CancelSpeedupPopover = ({
-    cancelTransaction,
-    speedUpTransaction,
-    editGasMode,
-    transaction,
-    updateTransactionToTenPercentIncreasedGasFee,
-    updateTransactionUsingEstimate,
+  cancelTransaction,
+  speedUpTransaction,
+  editGasMode,
+  transaction,
+  updateTransactionToTenPercentIncreasedGasFee,
+  updateTransactionUsingEstimate,
 }: CancelAndSpeedUpPopoverParams) => {
   const { t } = useTranslation();
   const [showPopOver, setShowPopOver] = useState(false);
-//   const appIsLoading = useSelector(getAppIsLoading);
+  //   const appIsLoading = useSelector(getAppIsLoading);
   const appIsLoading = false;
 
   // @todo: gasFeeEstimates
   const gasFeeEstimates: any = {};
 
-
   useEffect(() => {
-    if (
-      (transaction as any).previousGas ||
-      appIsLoading ||
-      !showPopOver
-    ) {
+    if ((transaction as any).previousGas || appIsLoading || !showPopOver) {
       return;
     }
     // If gas used previously + 10% is less than medium estimated gas
@@ -72,7 +67,7 @@ const CancelSpeedupPopover = ({
       gasEstimateGreaterThanGasUsedPlusTenPercent(
         transaction.txParams,
         gasFeeEstimates,
-        PRIORITY_LEVELS.MEDIUM,
+        PRIORITY_LEVELS.MEDIUM
       );
     if (gasUsedLessThanMedium) {
       updateTransactionUsingEstimate(PRIORITY_LEVELS.MEDIUM);
@@ -103,32 +98,28 @@ const CancelSpeedupPopover = ({
   };
 
   return (
-    <div
-      className="cancel-speedup-popover"
-    >
-      
+    <div className="cancel-speedup-popover">
       <div className="popover-header">
-        <p className="header-title">{editGasMode === EDIT_GAS_MODES.CANCEL
-                ? `❌${t('cancel')}`
-                : `🚀${t('speedUp')}`}
+        <p className="header-title">
+          {editGasMode === EDIT_GAS_MODES.CANCEL
+            ? `❌${t('cancel')}`
+            : `🚀${t('speedUp')}`}
         </p>
-        <IconComponent name="close" onClick={() => setShowPopOver(false) } />
+        <IconComponent name="close" onClick={() => setShowPopOver(false)} />
       </div>
       {/* <AppLoadingSpinner className="cancel-speedup-popover__spinner" /> */}
       <div className="cancel-speedup-popover__wrapper">
-        <h6
-          className="flex items-center"
-          style={{ margin: '0, 0, 2, 0' }}
-        >
-          { t('cancelSpeedUpLabel', {
-              replace: {
-                replace: 'replace'
-              }
-           }) }
+        <h6 className="flex items-center" style={{ margin: '0, 0, 2, 0' }}>
+          {t('cancelSpeedUpLabel', {
+            replace: {
+              replace: 'replace',
+            },
+          })}
           <Tooltip
             // position="top"
             placement="top"
-            title={<div>
+            title={
+              <div>
                 <div>
                   <a
                     href="https://community.metamask.io/t/how-to-speed-up-or-cancel-transactions-on-metamask/3296"
@@ -138,12 +129,13 @@ const CancelSpeedupPopover = ({
                     {t('learnMoreUpperCase')}
                   </a>
                 </div>
-              </div>}
+              </div>
+            }
           >
-              {t('cancelSpeedUpTransactionTooltip', [
-                  EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp'),
-                ])}
-              </Tooltip>
+            {t('cancelSpeedUpTransactionTooltip', [
+              EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp'),
+            ])}
+          </Tooltip>
         </h6>
         <div className="cancel-speedup-popover__separator" />
         {/* <div
@@ -160,7 +152,7 @@ const CancelSpeedupPopover = ({
           </div>
         </div> */}
         <Button type="primary" onClick={submitTransactionChange}>
-          { t('submit') }
+          {t('submit')}
         </Button>
       </div>
     </div>
