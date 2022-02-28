@@ -10,11 +10,11 @@ import {
   preferenceService,
   sessionService,
   keyringService,
-  txHistoryService,
   TokenService,
   knownMethodService,
   networkPreferenceService,
   latestBlockDataHub,
+  txController,
 } from './service';
 import { providerController, walletController } from './controller';
 import i18n from './service/i18n';
@@ -65,7 +65,7 @@ async function restoreAppState() {
 
   new DataSyncService({
     tokenStore: TokenService.store,
-    transactionHistory: txHistoryService.store,
+    transactionHistory: txController.store,
     knownMethod: knownMethodService.store,
     preference: preferenceService.store,
     networkStore: networkPreferenceService.networkStore,

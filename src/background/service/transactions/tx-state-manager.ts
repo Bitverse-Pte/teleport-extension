@@ -27,6 +27,10 @@ import {
   Transaction,
   TransactionStatuses,
 } from './typing';
+// import { txHistoryService } from '..';
+import { ObservableStorage } from 'background/utils/obsStorage';
+import eventBus from 'eventBus';
+import { EVENTS } from '../../../constants';
 
 interface TransactionState {
   transactions: Record<string, Transaction>;
@@ -54,30 +58,51 @@ interface SearchCriteria {
   from?: string;
 }
 interface TransactionStateManagerConstructorParams {
-  initState?: TransactionState;
   txHistoryLimit: number;
   getNetwork: () => string;
   getCurrentChainId: () => string;
 }
 
 export default class TransactionStateManager extends EventEmitter {
-  store: ObservableStore<TransactionState>;
+  store: ObservableStorage<TransactionState>;
   txHistoryLimit: number;
   getNetwork: () => string;
   getCurrentChainId: () => string;
   constructor({
-    initState = { transactions: {} },
     txHistoryLimit,
     getNetwork,
     getCurrentChainId,
   }: TransactionStateManagerConstructorParams) {
     super();
 
-    this.store = new ObservableStore(initState);
-
+    this.store = new ObservableStorage<TransactionState>(
+      'transaction_history',
+      {
+        transactions: {},
+      }
+    );
     this.txHistoryLimit = txHistoryLimit;
     this.getNetwork = getNetwork;
     this.getCurrentChainId = getCurrentChainId;
+  }
+
+  getTransactionList() {
+    return this.store.getState().transactions;
+  }
+
+  addTransactionToList(txData: Transaction) {
+    this.store.updateState({
+      transactions: {
+        ...this.getTransactionList(),
+        [txData.id]: txData,
+      },
+    });
+  }
+
+  addTransactionsToList(txList: Transaction[]) {
+    for (const tx of txList) {
+      this.addTransactionToList(tx);
+    }
   }
 
   /**

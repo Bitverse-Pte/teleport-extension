@@ -13,3 +13,11 @@ export interface Tx {
   s?: string;
   v?: string;
 }
+
+export interface CustomGasSettings {
+  gas?: string;
+  gasPrice?: string;
+  maxFeePerGas?: string;
+  maxPriorityFeePerGas?: string;
+  gasLimit?: string;
+}

@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { BigNumber, utils } from 'ethers';
-import { useParams } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useHistory, useParams } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
 import Header from 'ui/components/Header';
 import { TxDirectionLogo } from 'ui/components/TransactionList/TxDirectionLogo';
 import './activity-detail.less';
@@ -22,6 +22,8 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { TokenIcon } from 'ui/components/Widgets';
 import { Tooltip } from 'antd';
 import { TransactionFee } from './TransactionFee';
+import { cancelTxs } from 'ui/state/actions';
+import { useWallet } from 'ui/utils';
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -84,6 +86,9 @@ export function _ActivityDetail({
     token,
   } = useTransactionDisplayData(transaction);
 
+  const dispatch = useDispatch();
+  const history = useHistory();
+
   const {
     provider: { rpcPrefs },
   } = useSelector((state) => state.network);
@@ -107,6 +112,13 @@ export function _ActivityDetail({
         return 'default';
     }
   }, [displayedStatusKey]);
+
+  const walletController = useWallet();
+
+  const cancelTx = useCallback(() => {
+    dispatch(cancelTxs(transaction.transactions, walletController));
+    history.goBack();
+  }, [dispatch, history]);
 
   /**
    * This fn is only build for UI
@@ -191,11 +203,7 @@ export function _ActivityDetail({
               {/* <IconComponent name="rocket" /> */}
               Gas
             </button>
-            <button
-              className="cancelBtn"
-              type="button"
-              onClick={() => alert('Cancel Tx to be implemented')}
-            >
+            <button className="cancelBtn" type="button" onClick={cancelTx}>
               {/* <IconComponent name="cancel" /> */}
               Cancel
             </button>
