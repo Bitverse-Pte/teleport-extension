@@ -112,6 +112,7 @@ const TokenManage = () => {
         <CustomTab
           tab1="Search"
           tab2="Customize"
+          currentTab={tokenManageTab}
           handleTabClick={(tab: Tabs) => {
             setTokenManageTab(tab);
           }}

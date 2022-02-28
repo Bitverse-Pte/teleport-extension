@@ -164,8 +164,12 @@
           cursor: pointer;
 
           &:hover {
-            background: #FAFCFE;
+            background: #F8FAFC;
+            .name-account-key-container{
+              display:flex !important;
+            }
           }
+          
 
           .circle {
             width: 32px;
@@ -190,6 +194,49 @@
               font-size: 14px;
             }
 
+            .name-account-wrap{
+              align-items: center;
+              .name-account {
+                .name-account-name {
+                  font-family: MontserratBold;
+                  font-size: 14px;
+                }
+  
+                .name-account-address {
+                  font-size: 12px;
+                  color: #A3B4CC;
+                }
+              }
+              .name-account-key-container{
+                width: 24px;
+                height: 24px;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+                margin-left: 4px;
+                display: none;
+                .key-default-icon{
+                  display:block;
+                }
+                
+                .key-active-icon{
+                  display:none;
+                }
+
+                &:hover{
+                  background: #F0F9FF;
+                  .key-default-icon{
+                    display:none;
+                  }
+                  
+                  .key-active-icon{
+                    display: block;
+                  }
+                }
+                
+              }
+            }
+            
             .name-account {
               .name-account-name {
                 font-family: MontserratBold;
@@ -219,13 +266,16 @@
             }
 
             .icons-container {
-              width: 104px;
-              flex: 0 0 104px;
+              width: 50px;
+              flex: 0 0 50px;
               justify-content: space-between;
               align-items: center;
             }
 
           }
+        }
+        ._active{
+          background: #D6EFFF;
         }
       }
 
@@ -262,43 +312,6 @@
 
 .adm-popover-arrow {
   display: none;
-}
-
-.menu-node {
-  height: 99px;
-  width: 140px;
-  box-sizing: border-box;
-
-  .menu-item {
-    height: 33px;
-    width: 100%;
-    justify-content: flex-start;
-    align-items: center;
-    padding-left: 14px;
-    box-sizing: border-box;
-
-    .item {
-      font-style: normal;
-      font-weight: normal;
-      font-size: 11px;
-      font-size: 11px;
-      color: #9EA2A9;
-    }
-
-    &:hover {
-      background: #FAFCFE;
-
-      .item {
-        font-weight: 500;
-        color: @baseTextColor;
-      }
-    }
-
-    .icon {
-      margin-right: 10px;
-    }
-
-  }
 }
 
 .wallet-header-container{

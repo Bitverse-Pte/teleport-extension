@@ -14,19 +14,17 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Jazzicon from 'react-jazzicon';
 import * as _ from 'lodash';
 import { IconComponent } from 'ui/components/IconComponents';
+import clsx from 'clsx';
 import {
   CustomButton,
   CustomInput,
   CustomPasswordInput,
   WalletName,
 } from 'ui/components/Widgets';
-import { Provider } from 'types/network';
+import { Ecosystem, Provider } from 'types/network';
 import { IdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
-import { WalletHeader } from '../WalletManage';
-import addImg from 'assets/addImg.svg';
-import editImg from 'assets/editImg.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
-import AccountManageWidget from 'ui/components/AccountManageWidget';
+import { CoinTypeEcosystemMapping } from 'constants/wallet';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -35,223 +33,164 @@ interface ICustomChain extends BaseAccount {
   }[];
 }
 
-const AccountManage: React.FC = () => {
-  const history = useHistory();
-  const [accounts, setAccounts] = useState<any>([]);
-  const [isEdit, setIsEdit] = useState(false);
-  const [addPopupVisible, setAddPopupVisible] = useState(false);
-  const [renamePopupVisible, setRenamePopupVisible] = useState(false);
-  const [deletePopupVisible, setDeletePopupVisible] = useState(false);
-  const [currentAccountName, setCurrentAccountName] = useState('');
-  const [currentAccountIndex, setCurrentAccountIndex] = useState(0);
-  const wallet = useWallet();
+export interface IAccountManageWidgetProps {
+  hdWalletId: string;
+}
 
-  const { state } = useLocation<{
-    hdWalletId: string;
-    hdWalletName: string;
-  }>();
-  const { hdWalletId, hdWalletName } = state;
+interface IDisplayAccountManage {
+  ethAddress?: string; // for avatar
+  hdPathIndex: number;
+  selected?: boolean;
+  ecosystems: {
+    accounts: ICustomChain[];
+    ecosystem: Ecosystem;
+    ecosystemName: string;
+  }[];
+}
+
+const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
+  props: IAccountManageWidgetProps
+) => {
+  const [tempAccounts, setTempAccounts] = useState<IDisplayAccountManage[]>();
+  const wallet = useWallet();
+  const { hdWalletId } = props;
 
   const queryAccounts = async () => {
-    const accounts: {
-      accountName: string;
-      accounts: ICustomChain[];
-      hdPathIndex: number;
-    }[] = await wallet.getAccountListByHdWalletId(hdWalletId);
+    const accounts: ICustomChain[] = await wallet.getAccountListByHdWalletId(
+      hdWalletId
+    );
+    const currentAccount: BaseAccount | null = await wallet.getCurrentAccount();
+    const displayAccounts: IDisplayAccountManage[] = [];
 
-    if (accounts && accounts.length > 0) {
+    if (accounts && accounts.length > 0 && currentAccount) {
       for (const a of accounts) {
-        for (const subAccount of a.accounts) {
-          const { coinType } = subAccount;
-          const chains: Provider[] = await wallet.getSameChainsByCoinType(
-            coinType
-          );
-          if (chains?.length) {
-            chains.forEach((p: Provider) => {
-              const chainItem = {
-                chainCustomId: p.id,
-                chainName: p.nickname,
-              };
-              if (subAccount?.chainList) {
-                subAccount.chainList.push(chainItem);
-              } else {
-                subAccount.chainList = [chainItem];
-              }
+        a.chainList = [];
+        let ecosystem,
+          ecosystemName = '';
+        for (const eco in CoinTypeEcosystemMapping) {
+          if (CoinTypeEcosystemMapping[eco].coinType.includes(a.coinType)) {
+            ecosystem = eco;
+            ecosystemName = CoinTypeEcosystemMapping[eco].ecosystemName;
+          }
+        }
+        const chains: Provider[] = await wallet.getSameChainsByCoinType(
+          a.coinType
+        );
+        if (chains?.length) {
+          chains.forEach((p: Provider) => {
+            const chainItem = {
+              chainCustomId: p.id,
+              chainName: p.nickname,
+            };
+            a?.chainList?.push(chainItem);
+          });
+        }
+        if (
+          displayAccounts.some(
+            (da: IDisplayAccountManage) =>
+              da.hdPathIndex === a.hdPathIndex &&
+              da.ecosystems.some((subDa) => subDa.ecosystem === ecosystem)
+          )
+        ) {
+          displayAccounts
+            .find(
+              (da: IDisplayAccountManage) => da.hdPathIndex === a.hdPathIndex
+            )
+            ?.ecosystems?.find((subDa) => subDa.ecosystem === ecosystem)
+            ?.accounts.push(a);
+        } else {
+          if (
+            displayAccounts.some(
+              (da: IDisplayAccountManage) => da.hdPathIndex === a.hdPathIndex
+            )
+          ) {
+            displayAccounts
+              .find(
+                (da: IDisplayAccountManage) => da.hdPathIndex === a.hdPathIndex
+              )
+              ?.ecosystems?.push({
+                accounts: [a],
+                ecosystem,
+                ecosystemName,
+              });
+          } else {
+            displayAccounts.push({
+              hdPathIndex: a.hdPathIndex,
+              selected: a.address === currentAccount.address,
+              ecosystems: [
+                {
+                  accounts: [a],
+                  ecosystem,
+                  ecosystemName,
+                },
+              ],
             });
           }
         }
       }
-      setAccounts(accounts);
-    } else {
-      history.replace('/welcome');
-    }
-  };
-
-  const [add, addLoading] = useWalletRequest(
-    wallet.addNewDisplayAccountByExistKeyring,
-    {
-      onSuccess: () => {
-        setAddPopupVisible(false);
-        queryAccounts();
-      },
-      onError: (e) => {
-        ClickToCloseMessage.error('add account failed');
-      },
-    }
-  );
-
-  //useAsyncEffect(queryAccounts, []);
-
-  const onRenameConfirm = async (accountName) => {
-    if (!accountName) {
-      ClickToCloseMessage.error('invalid account name');
-      return;
-    }
-    if (accountName.length > 20) {
-      ClickToCloseMessage.error('the length of name should less than 20');
-      return;
-    }
-    const renamed = await wallet
-      .renameDisplayAccount(hdWalletId, accountName, currentAccountIndex)
-      .catch((e) => {
-        ClickToCloseMessage.error('this name is exist already');
+      displayAccounts.forEach((da: IDisplayAccountManage) => {
+        if (da.ecosystems.some((e) => e.ecosystem === Ecosystem.EVM)) {
+          da.ethAddress = da.ecosystems.find(
+            (e) => e.ecosystem === Ecosystem.EVM
+          )?.accounts[0].address;
+        } else {
+          da.ethAddress = da.ecosystems[0].accounts[0].address;
+        }
       });
-    if (renamed) {
-      setRenamePopupVisible(false);
-      queryAccounts();
+      console.error(displayAccounts);
+      setTempAccounts(displayAccounts);
     }
   };
 
-  const onDeleteConfirm = async () => {
-    await wallet.deleteDisplayAccountByExistKeyringAndIndex(
-      hdWalletId,
-      currentAccountIndex
-    );
-    setDeletePopupVisible(false);
-    queryAccounts();
+  useAsyncEffect(queryAccounts, []);
+
+  const handleAccountClick = (a: IDisplayAccountManage) => {
+    console.log(a);
   };
 
   return (
-    <div className="account-manage flexCol">
-      {isEdit ? (
-        <WalletHeader
-          title="Accounts"
-          handleDoneClick={() => setIsEdit(!isEdit)}
-        />
-      ) : (
-        <Header
-          title={
-            <WalletName cls="bold" width={160}>
-              {`wallet: ${hdWalletName}`}
-            </WalletName>
-          }
-        />
-      )}
-
-      <div
-        className="wallet-manage-button-container flexR content-wrap-padding"
-        style={isEdit ? { display: 'none' } : {}}
-      >
-        <div
-          className="wallet-manage-button-item cursor flexCol _edit"
-          onClick={() => setIsEdit(!isEdit)}
-        >
-          <div className="wallet-manage-button-wrap flexR">
-            <img src={editImg} alt="" className="wallet-manage-img" />
-          </div>
-          <span className="wallet-manage-button-item-title">Edit</span>
-        </div>
-
-        <div
-          onClick={() => setAddPopupVisible(true)}
-          className="wallet-manage-button-item cursor flexCol _add"
-        >
-          <div className="wallet-manage-button-wrap flexR">
-            <img src={addImg} alt="" className="wallet-manage-img" />
-          </div>
-          <span className="wallet-manage-button-item-title">Add</span>
-        </div>
-      </div>
-
-      {isEdit ? (
-        <div className="content flexCol content-wrap-padding">
-          {accounts.map((a, i) => (
-            <div className="edit-account flexR" key={`edit_${i}`}>
-              <div className="edit-left flexR">
-                <Jazzicon
-                  diameter={30}
-                  seed={Number(a.accounts[0].address.substr(0, 8) || 0)}
-                />
-                <WalletName cls="account" width={100}>
-                  {a.accountName}
-                </WalletName>
-              </div>
-              <div className="edit-right flexR">
-                <IconComponent
-                  name="edit"
-                  cls="base-text-color"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentAccountName(a.accountName);
-                    setCurrentAccountIndex(a.hdPathIndex);
-                    setRenamePopupVisible(true);
-                  }}
-                />
-                <IconComponent
-                  name="trash"
-                  cls="base-text-color right"
-                  onClick={(e) => {
-                    if (i === 0) {
-                      ClickToCloseMessage.warning(
-                        'can not delete the last account'
-                      );
-                      return;
-                    }
-                    e.stopPropagation();
-                    setCurrentAccountName(a.accountName);
-                    setCurrentAccountIndex(a.hdPathIndex);
-                    setDeletePopupVisible(true);
-                  }}
-                />
-              </div>
+    <div className="account-manage-widget flexR">
+      <div className="side-bar flexCol">
+        {tempAccounts?.map((account: IDisplayAccountManage, i) => {
+          return (
+            <div
+              className={clsx('flexR id-item', {
+                'active-item': account.selected,
+              })}
+              onClick={() => handleAccountClick(account)}
+              key={i}
+            >
+              <Jazzicon
+                diameter={30}
+                seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
+              />
             </div>
-          ))}
-        </div>
-      ) : (
-        <AccountManageWidget hdWalletId={state.hdWalletId} />
-      )}
-      {/* <div className="content flexCol content-wrap-padding">
-        
-        <div
-          className="account-manage-content-container"
-          style={{
-            display: isEdit ? 'none' : 'block',
-          }}
+          );
+        })}
+      </div>
+      <div className="account-manage-widget-content flexCol">
+        <Collapse
+          expandIconPosition="right"
+          bordered={false}
+          ghost={true}
+          expandIcon={({ isActive }) =>
+            isActive ? (
+              <IconComponent name="chevron-up" cls="base-text-color" />
+            ) : (
+              <IconComponent name="chevron-down" cls="base-text-color" />
+            )
+          }
         >
-          <Collapse
-            expandIconPosition="right"
-            bordered={false}
-            ghost={true}
-            expandIcon={({ isActive }) =>
-              isActive ? (
-                <IconComponent name="chevron-up" cls="base-text-color" />
-              ) : (
-                <IconComponent name="chevron-down" cls="base-text-color" />
-              )
-            }
-          >
-            {accounts.map((a, i) => {
+          {tempAccounts
+            ?.find((a: IDisplayAccountManage) => a.selected)
+            ?.ecosystems.map((a, i) => {
               return (
                 <Collapse.Panel
                   key={i}
                   header={
                     <div className="account-item flexR">
-                      <Jazzicon
-                        diameter={32}
-                        seed={Number(a.accounts[0].address.substr(0, 8) || 0)}
-                      />
                       <WalletName cls="account-address bold" width={180}>
-                        {a.accountName}
+                        {a.ecosystemName}
                       </WalletName>
                     </div>
                   }
@@ -299,42 +238,106 @@ const AccountManage: React.FC = () => {
                 </Collapse.Panel>
               );
             })}
-          </Collapse>
+        </Collapse>
+      </div>
+      {/* {isEdit ? (
+        <WalletHeader
+          title="Accounts"
+          handleDoneClick={() => setIsEdit(!isEdit)}
+        />
+      ) : (
+        <Header
+          title={
+            <WalletName cls="bold" width={160}>
+              {`wallet: ${hdWalletName}`}
+            </WalletName>
+          }
+        />
+      )}
+
+      <div
+        className="wallet-manage-button-container flexR content-wrap-padding"
+        style={isEdit ? { display: 'none' } : {}}
+      >
+        <div
+          className="wallet-manage-button-item cursor flexCol _edit"
+          onClick={() => setIsEdit(!isEdit)}
+        >
+          <div className="wallet-manage-button-wrap flexR">
+            <img src={editImg} alt="" className="wallet-manage-img" />
+          </div>
+          <span className="wallet-manage-button-item-title">Edit</span>
         </div>
+
+        <div
+          onClick={() => setAddPopupVisible(true)}
+          className="wallet-manage-button-item cursor flexCol _add"
+        >
+          <div className="wallet-manage-button-wrap flexR">
+            <img src={addImg} alt="" className="wallet-manage-img" />
+          </div>
+          <span className="wallet-manage-button-item-title">Add</span>
+        </div>
+      </div>
+      <div className="content flexCol content-wrap-padding">
+        {isEdit
+          ? accounts.map((a, i) => (
+            <div className="edit-account flexR" key={`edit_${i}`}>
+              <div className="edit-left flexR">
+                <Jazzicon
+                  diameter={30}
+                  seed={Number(a.accounts[0].address.substr(0, 8) || 0)}
+                />
+                <WalletName cls="account" width={100}>
+                  {a.accountName}
+                </WalletName>
+              </div>
+              <div className="edit-right flexR">
+                <IconComponent
+                  name="edit"
+                  cls="base-text-color"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentAccountName(a.accountName);
+                    setCurrentAccountIndex(a.hdPathIndex);
+                    setRenamePopupVisible(true);
+                  }}
+                />
+                <IconComponent
+                  name="trash"
+                  cls="base-text-color right"
+                  onClick={(e) => {
+                    if (i === 0) {
+                      ClickToCloseMessage.warning(
+                        'can not delete the last account'
+                      );
+                      return;
+                    }
+                    e.stopPropagation();
+                    setCurrentAccountName(a.accountName);
+                    setCurrentAccountIndex(a.hdPathIndex);
+                    setDeletePopupVisible(true);
+                  }}
+                />
+              </div>
+            </div>
+          ))
+          : null}
+        <div
+          className="account-manage-content-container"
+          style={{
+            display: isEdit ? 'none' : 'block',
+          }}
+        >
+          
+        </div>
+
       </div> */}
-      <Add
-        title="Add Account"
-        visible={addPopupVisible}
-        setVisible={(visible: boolean) => {
-          setAddPopupVisible(visible);
-        }}
-        loading={addLoading}
-        add={(name) => add(hdWalletId, name)}
-      />
-
-      <Rename
-        title="Rename Account"
-        visible={renamePopupVisible}
-        defaultValue={currentAccountName}
-        setVisible={(visible: boolean) => {
-          setRenamePopupVisible(visible);
-        }}
-        onConfirm={onRenameConfirm}
-      />
-
-      <Delete
-        title="Delete Account"
-        visible={deletePopupVisible}
-        setVisible={(visible: boolean) => {
-          setDeletePopupVisible(visible);
-        }}
-        onConfirm={onDeleteConfirm}
-      />
     </div>
   );
 };
 
-export default AccountManage;
+export default AccountManageWidget;
 
 export interface IAddProps {
   visible: boolean;

@@ -320,22 +320,17 @@ export interface TabInterface {
   tab1: string;
   tab2: string;
   handleTabClick: (Tabs) => void;
-  defaultTab?: Tabs;
+  currentTab: Tabs;
 }
 
 export const CustomTab = (props: TabInterface) => {
-  const [active, setActive] = useState(
-    props.defaultTab ? props.defaultTab : Tabs.FIRST
-  );
-
   return (
     <div className="widgets-tab-container flexR">
       <span
         className={classnames('tab-item', 'cursor', {
-          'tab-item-active': active === Tabs.FIRST,
+          'tab-item-active': props.currentTab === Tabs.FIRST,
         })}
         onClick={() => {
-          setActive(Tabs.FIRST);
           props.handleTabClick(Tabs.FIRST);
         }}
       >
@@ -343,10 +338,9 @@ export const CustomTab = (props: TabInterface) => {
       </span>
       <span
         className={classnames('tab-item', 'cursor', {
-          'tab-item-active': active === Tabs.SECOND,
+          'tab-item-active': props.currentTab === Tabs.SECOND,
         })}
         onClick={() => {
-          setActive(Tabs.SECOND);
           props.handleTabClick(Tabs.SECOND);
         }}
       >
