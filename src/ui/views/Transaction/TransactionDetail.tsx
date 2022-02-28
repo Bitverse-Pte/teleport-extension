@@ -151,111 +151,111 @@ export function _ActivityDetail({
   }, [primaryCurrency]);
 
   return (
-    <div className={'activity-detail ' + statusBackground}>
-      <Header title={title} />
-      <div className="txdetail-direction-logo flex justify-center">
-        {/* workaround as hook treat native token as undefined */}
-        <TokenIcon
-          token={token || ({ isNative: true } as any)}
-          useThemeBg
-          radius={48}
-        />
-      </div>
-      <div className="txdetail-values flex flex-wrap justify-center">
-        <div className="txdetail-value-display">
-          <p className="txdetail-value items-baseline">
-            {displayPrimaryCurrency.amount}
-            <span className="unit">{displayPrimaryCurrency.unit}</span>
+    <>
+      <div className={'activity-detail ' + statusBackground}>
+        <Header title={title} />
+        <div className="txdetail-direction-logo flex justify-center">
+          {/* workaround as hook treat native token as undefined */}
+          <TokenIcon
+            token={token || ({ isNative: true } as any)}
+            useThemeBg
+            radius={48}
+          />
+        </div>
+        <div className="txdetail-values flex flex-wrap justify-center">
+          <div className="txdetail-value-display">
+            <p className="txdetail-value items-baseline">
+              {displayPrimaryCurrency.amount}
+              <span className="unit">{displayPrimaryCurrency.unit}</span>
+            </p>
+          </div>
+          <div className="break"></div>
+          <p className={'txdetail-status capitalize ' + statusBackground}>
+            {displayedStatusKey}
           </p>
         </div>
-        <div className="break"></div>
-        <p className={'txdetail-status capitalize ' + statusBackground}>
-          {displayedStatusKey}
-        </p>
-      </div>
-      <div className="details content-wrap-padding">
-        <div className="row from-and-to justify-center">
-          <AddressCard title="From" address={senderAddress} />
-          <IconComponent name="arrow-right" cls="to-icon" />
-          {recipientAddress && (
-            <AddressCard title="To" address={recipientAddress} />
+        <div className="details content-wrap-padding">
+          <div className="row from-and-to justify-center">
+            <AddressCard title="From" address={senderAddress} />
+            <IconComponent name="arrow-right" cls="to-icon" />
+            {recipientAddress && (
+              <AddressCard title="To" address={recipientAddress} />
+            )}
+          </div>
+          {transaction.primaryTransaction.hash && (
+            <div className="row">
+              <div className="field-name">Transaction ID</div>
+              <div className="field-value">
+                <Tooltip
+                  placement="topRight"
+                  title={transaction.primaryTransaction.hash}
+                >
+                  {shortenedStr(transaction.primaryTransaction.hash, 4)}
+                </Tooltip>
+                <CopyOrOpenInScan
+                  handleExplorerClick={() =>
+                    handleExplorerClick(
+                      'tx',
+                      transaction.primaryTransaction.hash!
+                    )
+                  }
+                  textToBeCopy={transaction.primaryTransaction.hash}
+                />
+              </div>
+            </div>
           )}
-        </div>
-        {transaction.primaryTransaction.hash && (
-          <div className="row">
-            <div className="field-name">Transaction ID</div>
-            <div className="field-value">
-              <Tooltip
-                placement="topRight"
-                title={transaction.primaryTransaction.hash}
-              >
-                {shortenedStr(transaction.primaryTransaction.hash, 4)}
-              </Tooltip>
-              <CopyOrOpenInScan
-                handleExplorerClick={() =>
-                  handleExplorerClick(
-                    'tx',
-                    transaction.primaryTransaction.hash!
-                  )
-                }
-                textToBeCopy={transaction.primaryTransaction.hash}
-              />
+          <TransactionFee transaction={transaction} />
+          {!isPending && (
+            <div className="row">
+              <div className="field-name">Time</div>
+              <div className="field-value" title={date}>
+                {dayjs(transaction.initialTransaction.time).format(
+                  'YYYY-MM-DD HH:mm:ss'
+                )}
+              </div>
             </div>
-          </div>
-        )}
-        <TransactionFee transaction={transaction} />
-        {!isPending && (
-          <div className="row">
-            <div className="field-name">Time</div>
-            <div className="field-value" title={date}>
-              {dayjs(transaction.initialTransaction.time).format(
-                'YYYY-MM-DD HH:mm:ss'
-              )}
-            </div>
-          </div>
-        )}
-        {isPending && (
-          <div className="row pending-tx-actions">
-            <button
-              className="editGasBtn"
-              type="button"
-              onClick={handleSpeedUpClick}
-            >
-              {/* <IconComponent name="rocket" /> */}
-              Gas
-            </button>
-            <button
-              className="cancelBtn"
-              type="button"
-              onClick={handleCancelClick}
-            >
-              {/* <IconComponent name="cancel" /> */}
-              Cancel
-            </button>
-          </div>
-        )}
-        <div className="cancel-speedup-popover">
+          )}
           {isPending && (
-            <CancelSpeedupPopover
-              editGasMode={currentEditGasMode}
-              showPopOver={showCancelPopOver}
-              setShowPopOver={setShowCancelPopOver}
-              cancelTransaction={cancelTx}
-              speedUpTransaction={speedUpTx}
-              transaction={transaction.primaryTransaction}
-              updateTransactionToTenPercentIncreasedGasFee={(fee) => {
-                console.debug(
-                  'updateTransactionToTenPercentIncreasedGasFee::val',
-                  fee
-                );
-              }}
-              updateTransactionUsingEstimate={(l) => {
-                console.debug('updateTransactionUsingEstimate::val', l);
-              }}
-            />
+            <div className="row pending-tx-actions">
+              <button
+                className="editGasBtn"
+                type="button"
+                onClick={handleSpeedUpClick}
+              >
+                {/* <IconComponent name="rocket" /> */}
+                Gas
+              </button>
+              <button
+                className="cancelBtn"
+                type="button"
+                onClick={handleCancelClick}
+              >
+                {/* <IconComponent name="cancel" /> */}
+                Cancel
+              </button>
+            </div>
           )}
         </div>
       </div>
-    </div>
+      {isPending && (
+        <CancelSpeedupPopover
+          editGasMode={currentEditGasMode}
+          showPopOver={showCancelPopOver}
+          setShowPopOver={setShowCancelPopOver}
+          cancelTransaction={cancelTx}
+          speedUpTransaction={speedUpTx}
+          transaction={transaction.primaryTransaction}
+          updateTransactionToTenPercentIncreasedGasFee={(fee) => {
+            console.debug(
+              'updateTransactionToTenPercentIncreasedGasFee::val',
+              fee
+            );
+          }}
+          updateTransactionUsingEstimate={(l) => {
+            console.debug('updateTransactionUsingEstimate::val', l);
+          }}
+        />
+      )}
+    </>
   );
 }
