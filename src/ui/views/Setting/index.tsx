@@ -3,9 +3,11 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.svg';
-import { useWallet } from 'ui/utils';
+import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
+import { Switch } from 'antd';
+import { stat } from 'fs';
 
 interface ISettingFeat {
   title: string;
@@ -73,6 +75,16 @@ export interface ISettingProps {
 const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   const history = useHistory();
   const wallet = useWallet();
+  const [isDefaultWallet, setIsDefaultWallet] = useState(false);
+
+  const init = async () => {
+    const status = await wallet.isDefaultWallet();
+    setIsDefaultWallet(status);
+  };
+
+  useAsyncEffect(async () => {
+    init();
+  }, []);
 
   const handleWalletManageClick = () => {
     history.push('/wallet-manage');
@@ -81,6 +93,12 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   const handleLockClick = () => {
     history.replace('/unlock');
     wallet.lockWallet();
+  };
+
+  const handleDefaultWalletChange = (checked: boolean) => {
+    console.log(`switch to ${checked}`);
+    wallet.setIsDefaultWallet(checked);
+    setIsDefaultWallet(checked);
   };
 
   return (
@@ -96,6 +114,14 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           title="Lock"
           type={TipButtonEnum.LOCK}
           handleClick={handleLockClick}
+        />
+      </div>
+      <div className="setting-item flexR cursor" key="isDefault">
+        <span className="title">Default Wallet</span>
+        <span className="tag" style={{ display: 'none' }}></span>
+        <Switch
+          checked={isDefaultWallet}
+          onChange={handleDefaultWalletChange}
         />
       </div>
       {SettingFeat.map((setting: ISettingFeat) => (
