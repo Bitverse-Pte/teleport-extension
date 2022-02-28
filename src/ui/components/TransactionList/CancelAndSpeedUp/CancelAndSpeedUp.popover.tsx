@@ -29,6 +29,7 @@ import { Transaction } from 'constants/transaction';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Button, Tooltip } from 'antd';
 import { gasEstimateGreaterThanGasUsedPlusTenPercent } from 'ui/helpers/utils/gas';
+import { SimpleModal } from 'ui/components/universal/SimpleModal';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -49,7 +50,7 @@ const CancelSpeedupPopover = ({
   updateTransactionUsingEstimate,
 }: CancelAndSpeedUpPopoverParams) => {
   const { t } = useTranslation();
-  const [showPopOver, setShowPopOver] = useState(false);
+  const [showPopOver, setShowPopOver] = useState(true);
   //   const appIsLoading = useSelector(getAppIsLoading);
   const appIsLoading = false;
 
@@ -98,21 +99,25 @@ const CancelSpeedupPopover = ({
   };
 
   return (
-    <div className="cancel-speedup-popover">
-      <div className="popover-header">
-        <p className="header-title">
-          {editGasMode === EDIT_GAS_MODES.CANCEL
-            ? `❌${t('cancel')}`
-            : `🚀${t('speedUp')}`}
-        </p>
-        <IconComponent name="close" onClick={() => setShowPopOver(false)} />
-      </div>
+    // <div className="cancel-speedup-popover">
+    <SimpleModal
+      title={
+        editGasMode === EDIT_GAS_MODES.CANCEL
+          ? `❌${t('cancel')}`
+          : `🚀${t('speedUp')}`
+      }
+      visible={showPopOver}
+      isTitleCentered={false}
+      onClose={() => {
+        setShowPopOver(false);
+      }}
+    >
       {/* <AppLoadingSpinner className="cancel-speedup-popover__spinner" /> */}
       <div className="cancel-speedup-popover__wrapper">
-        <h6 className="flex items-center" style={{ margin: '0, 0, 2, 0' }}>
+        <h6 className="flex items-center flex-wrap" style={{ margin: '0, 0, 2, 0' }}>
           {t('cancelSpeedUpLabel', {
             replace: {
-              replace: 'replace',
+              $1: 'replace',
             },
           })}
           <Tooltip
@@ -132,9 +137,11 @@ const CancelSpeedupPopover = ({
               </div>
             }
           >
-            {t('cancelSpeedUpTransactionTooltip', [
-              EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp'),
-            ])}
+            {t('cancelSpeedUpTransactionTooltip', {
+              replace: {
+                $1: EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp'),
+              },
+            })}
           </Tooltip>
         </h6>
         <div className="cancel-speedup-popover__separator" />
@@ -155,7 +162,7 @@ const CancelSpeedupPopover = ({
           {t('submit')}
         </Button>
       </div>
-    </div>
+    </SimpleModal>
   );
 };
 
