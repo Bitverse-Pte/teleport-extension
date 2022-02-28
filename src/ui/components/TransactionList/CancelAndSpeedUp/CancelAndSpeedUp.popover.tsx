@@ -39,6 +39,8 @@ interface CancelAndSpeedUpPopoverParams {
   // updateTransaction: () => void;
   updateTransactionToTenPercentIncreasedGasFee: (v: boolean) => void;
   updateTransactionUsingEstimate: (l: PRIORITY_LEVELS) => void;
+  showPopOver: boolean;
+  setShowPopOver: (v: boolean) => void;
 }
 
 const CancelSpeedupPopover = ({
@@ -48,9 +50,10 @@ const CancelSpeedupPopover = ({
   transaction,
   updateTransactionToTenPercentIncreasedGasFee,
   updateTransactionUsingEstimate,
+  showPopOver,
+  setShowPopOver,
 }: CancelAndSpeedUpPopoverParams) => {
   const { t } = useTranslation();
-  const [showPopOver, setShowPopOver] = useState(true);
   //   const appIsLoading = useSelector(getAppIsLoading);
   const appIsLoading = false;
 
@@ -114,7 +117,10 @@ const CancelSpeedupPopover = ({
     >
       {/* <AppLoadingSpinner className="cancel-speedup-popover__spinner" /> */}
       <div className="cancel-speedup-popover__wrapper">
-        <h6 className="flex items-center flex-wrap" style={{ margin: '0, 0, 2, 0' }}>
+        <h6
+          className="flex items-center flex-wrap"
+          style={{ margin: '0, 0, 2, 0' }}
+        >
           {t('cancelSpeedUpLabel', {
             replace: {
               $1: 'replace',

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { BigNumber, utils } from 'ethers';
 import { useHistory, useParams } from 'react-router';
@@ -24,6 +24,8 @@ import { Tooltip } from 'antd';
 import { TransactionFee } from './TransactionFee';
 import { cancelTxs } from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
+import CancelSpeedupPopover from 'ui/components/TransactionList/CancelAndSpeedUp/CancelAndSpeedUp.popover';
+import { EDIT_GAS_MODES } from 'constants/gas';
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -100,6 +102,12 @@ export function _ActivityDetail({
     [rpcPrefs]
   );
 
+  const [currentEditGasMode, setEditGasMode] = useState<EDIT_GAS_MODES>(
+    EDIT_GAS_MODES.MODIFY_IN_PLACE
+  );
+
+  const [showCancelPopOver, setShowCancelPopOver] = useState(false);
+
   const statusBackground = useMemo(() => {
     switch (displayedStatusKey) {
       case TransactionStatuses.DROPPED:
@@ -119,6 +127,19 @@ export function _ActivityDetail({
     dispatch(cancelTxs(transaction.transactions, walletController));
     history.goBack();
   }, [dispatch, history]);
+
+  const speedUpTx = useCallback(() => {
+    alert('Gas Edit to be implemented');
+  }, []);
+
+  const handleSpeedUpClick = useCallback(() => {
+    setEditGasMode(EDIT_GAS_MODES.SPEED_UP);
+    setShowCancelPopOver(true);
+  }, []);
+  const handleCancelClick = useCallback(() => {
+    setEditGasMode(EDIT_GAS_MODES.CANCEL);
+    setShowCancelPopOver(true);
+  }, []);
 
   /**
    * This fn is only build for UI
@@ -198,17 +219,42 @@ export function _ActivityDetail({
             <button
               className="editGasBtn"
               type="button"
-              onClick={() => alert('Gas Edit to be implemented')}
+              onClick={handleSpeedUpClick}
             >
               {/* <IconComponent name="rocket" /> */}
               Gas
             </button>
-            <button className="cancelBtn" type="button" onClick={cancelTx}>
+            <button
+              className="cancelBtn"
+              type="button"
+              onClick={handleCancelClick}
+            >
               {/* <IconComponent name="cancel" /> */}
               Cancel
             </button>
           </div>
         )}
+        <div className="cancel-speedup-popover">
+          {isPending && (
+            <CancelSpeedupPopover
+              editGasMode={currentEditGasMode}
+              showPopOver={showCancelPopOver}
+              setShowPopOver={setShowCancelPopOver}
+              cancelTransaction={cancelTx}
+              speedUpTransaction={speedUpTx}
+              transaction={transaction.primaryTransaction}
+              updateTransactionToTenPercentIncreasedGasFee={(fee) => {
+                console.debug(
+                  'updateTransactionToTenPercentIncreasedGasFee::val',
+                  fee
+                );
+              }}
+              updateTransactionUsingEstimate={(l) => {
+                console.debug('updateTransactionUsingEstimate::val', l);
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
