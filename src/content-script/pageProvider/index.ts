@@ -269,12 +269,14 @@ provider
     }
   });
 
-window.ethereum = new Proxy(provider, {
-  deleteProperty: () => true,
-});
+if (!window.ethereum) {
+  window.ethereum = new Proxy(provider, {
+    deleteProperty: () => true,
+  });
 
-window.web3 = {
-  currentProvider: window.ethereum,
-};
+  window.web3 = {
+    currentProvider: window.ethereum,
+  };
+}
 
 window.dispatchEvent(new Event('ethereum#initialized'));
