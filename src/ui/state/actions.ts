@@ -19,6 +19,7 @@ import {
 import { GasFeeState } from '@metamask/controllers';
 import { RootState } from '../reducer';
 import { getMethodDataAsync } from '../utils/transactions';
+import { Transaction } from 'constants/transaction';
 
 let background: Record<string, any>;
 export function _setBackgroundConnection(backgroundConnection) {
@@ -155,6 +156,108 @@ export function completedTx(id: string) {
     //     unconfirmedActionsCount: otherUnconfirmedActions.length,
     //   },
     // });
+  };
+}
+
+export function updateTransactionParams(id: string, txParams: any) {
+  // let { currentNetworkTxList } = metamaskState;
+  // currentNetworkTxList = currentNetworkTxList.map((tx) => {
+  //   if (tx.id === txId) {
+  //     const newTx = { ...tx };
+  //     newTx.txParams = value;
+  //     return newTx;
+  //   }
+  //   return tx;
+  // });
+  // return {
+  //   ...metamaskState,
+  //   currentNetworkTxList,
+  // };
+}
+
+export function updateTransaction(
+  txData: Transaction,
+  dontShowLoadingIndicator?: boolean
+) {
+  return async (dispatch) => {
+    !dontShowLoadingIndicator && dispatch(showLoadingIndicator());
+
+    try {
+      await background.updateTransaction(txData);
+    } catch (error) {
+      dispatch(updateTransactionParams(txData.id, txData.txParams));
+      // dispatch(hideLoadingIndication());
+      // dispatch(txError(error));
+      // dispatch(goHome());
+      // log.error(error.message);
+      throw error;
+    }
+
+    try {
+      dispatch(updateTransactionParams(txData.id, txData.txParams));
+      // dispatch(updateMetamaskState(newState));
+      // dispatch(showConfTxPage({ id: txData.id }));
+      return txData;
+    } finally {
+      dispatch(hideLoadingIndicator());
+    }
+  };
+}
+
+export function createCancelTransaction(
+  txId: string,
+  customGasSettings: any,
+  newTxMetaProps: any
+) {
+  console.debug('background.cancelTransaction');
+  // let newTxId: string;
+
+  return async (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {
+    // await new Promise((resolve, reject) => {
+    await background.createCancelTransaction(
+      txId,
+      customGasSettings,
+      newTxMetaProps
+    );
+
+    // const { currentNetworkTxList } = newState;
+    // const { id } = currentNetworkTxList[currentNetworkTxList.length - 1];
+    // newTxId = id;
+    // return newTxId;
+  };
+}
+
+export function createSpeedUpTransaction(
+  txId: string,
+  customGasSettings: any,
+  newTxMetaProps: any
+) {
+  console.debug('background.createSpeedUpTransaction');
+  // let newTx;
+
+  return async (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {
+    // await new Promise((resolve, reject) => {
+    await background.createSpeedUpTransaction(
+      txId,
+      customGasSettings,
+      newTxMetaProps
+    );
+    // const { currentNetworkTxList } = newState;
+    // newTx = currentNetworkTxList[currentNetworkTxList.length - 1];
+    // return newTx;
+  };
+}
+
+export function createRetryTransaction(txId: string, customGasSettings: any) {
+  // let newTx;
+
+  return async (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {
+    // await new Promise((resolve, reject) => {
+    await background.createSpeedUpTransaction(txId, customGasSettings);
+
+    // const { currentNetworkTxList } = newState;
+    // newTx = currentNetworkTxList[currentNetworkTxList.length - 1];
+    // return newTx;
   };
 }
 
