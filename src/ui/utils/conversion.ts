@@ -397,6 +397,13 @@ function hexToDecimal(hexValue: string | BigNumber) {
   });
 }
 
+function decimalToHex(decimal: string | BigNumber) {
+  return conversionUtil(decimal, {
+    fromNumericBase: 'dec',
+    toNumericBase: 'hex',
+  });
+}
+
 export {
   conversionUtil,
   getValueFromWeiHex,
@@ -411,6 +418,7 @@ export {
   conversionLTE,
   conversionMax,
   toNegative,
+  decimalToHex,
   subtractCurrencies,
   decGWEIToHexWEI,
   toBigNumber,
