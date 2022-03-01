@@ -6,7 +6,7 @@ import walletLogo from 'assets/walletLogo.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
-import { Switch } from 'antd';
+import Switch from 'react-switch';
 import { stat } from 'fs';
 
 interface ISettingFeat {
@@ -96,7 +96,6 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   };
 
   const handleDefaultWalletChange = (checked: boolean) => {
-    console.log(`switch to ${checked}`);
     wallet.setIsDefaultWallet(checked);
     setIsDefaultWallet(checked);
   };
@@ -120,6 +119,14 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
         <span className="title">Default Wallet</span>
         <span className="tag" style={{ display: 'none' }}></span>
         <Switch
+          onColor="#CDEBFF"
+          onHandleColor="#1484F5"
+          offColor="#A3B4CC"
+          offHandleColor="#FFFFFF"
+          uncheckedIcon={false}
+          checkedIcon={false}
+          height={20}
+          width={36}
           checked={isDefaultWallet}
           onChange={handleDefaultWalletChange}
         />
