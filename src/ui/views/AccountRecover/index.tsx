@@ -199,6 +199,7 @@ const AccountRecover = () => {
         <CustomTab
           tab1="Mnemonic"
           tab2="Private Key"
+          currentTab={importType}
           handleTabClick={(tab: Tabs) => {
             setImportType(tab);
           }}

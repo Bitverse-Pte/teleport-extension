@@ -97,14 +97,10 @@
           align-items: center;
           justify-content: flex-end;
 
-          .explorer,
           .copy {
             fill: @themeColor;
           }
 
-          .explorer {
-            margin-right: 10px;
-          }
         }
       }
 
@@ -308,52 +304,19 @@
     flex: 0 0 24px;
     align-items: center;
     margin-bottom: 6px;
+    justify-content: space-between;
 
     .wrap {
-      width: 232px;
-
+      flex:1;
     }
 
-    .home-search-icon-container {
-      align-items: center;
-
-      .edit-icon {
-        margin-left: 13px;
-        flex: 0 0 18px;
-      }
-
-      .home-search-add-icon {
-        width: 24px;
-        height: 24px;
-        margin-left: 22px;
-      }
-    }
-
-    .edit-icon {
-      margin-left: 13px;
-      flex: 0 0 18px;
-    }
-
-    .done {
-      width: 62px;
-      flex: 0 0 62px;
+    .home-search-add-icon {
+      width: 24px;
       height: 24px;
-      background: #1484F5;
-      border-radius: 12px;
-      margin-left: 6px;
-      font-family: MontserratBold;
-      font-size: 12px;
-      text-align: center;
-      line-height: 24px;
-      color: #ffffff;
+      flex:0 0 24px;
+      margin-left: 22px;
     }
 
-    .edit-icon {
-      fill: @baseTextColor;
-    }
-    .add-assets-button{
-      
-    }
   }
 
   .token-list {
@@ -442,19 +405,7 @@
     }
   
     div.account-switch-accounts-manage-wallet-container {
-      align-items: center;
-      justify-content: flex-end;
-      span.account-switch-accounts-manage-wallet {
-        font-family: MontserratBold;
-        font-size: 12px;
-        color: @themeColor;
-        line-height: 1;
-      }
-      .account-switch-link{
-        margin-left: 8px;
-        fill: @themeColor;
-      }
-      
+      width: 14px;      
     }
   }
 }

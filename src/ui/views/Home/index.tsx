@@ -36,11 +36,13 @@ import './style.less';
 import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
+import WalletManageNewIcon from '../../../assets/walletManageNew.svg';
 import skynet from 'utils/skynet';
 
 const { sensors } = skynet;
 
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 
 const onCopy = () => {
   ClickToCloseMessage.success('Copied');
@@ -54,7 +56,6 @@ const Home = () => {
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
   const [tabType, setTabType] = useState(Tabs.FIRST);
   const [tokens, setTokens] = useState<Token[]>([]);
-  const [isEdit, setIsEdit] = useState(false);
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
 
@@ -146,19 +147,7 @@ const Home = () => {
     setFilterCondition(e.target.value);
   };
 
-  const handleTokenDeleteClick = async (t: Token) => {
-    const updated = await wallet
-      .setTokenDisplay(t.tokenId, !t.display)
-      .catch((e) => {
-        console.error(e);
-      });
-    if (updated) {
-      getTokenBalancesSync();
-    }
-  };
-
   const handleTokenClick = (t: Token) => {
-    if (isEdit) return;
     history.push({
       pathname: `/single-token/${t.tokenId}`,
     });
@@ -177,17 +166,6 @@ const Home = () => {
   const displayTokenList = useMemo(() => {
     return tokenList.filter((t: Token) => t.display);
   }, [tokenList]);
-
-  const handleExplorerClick = async () => {
-    const provider: Provider = await wallet.getCurrentChain().catch((e) => {
-      console.error(e);
-    });
-    if (provider?.rpcPrefs?.blockExplorerUrl && account?.address) {
-      window.open(
-        `${provider.rpcPrefs.blockExplorerUrl}/address/${account.address}`
-      );
-    }
-  };
 
   return (
     <div className="home flexCol">
@@ -227,11 +205,6 @@ const Home = () => {
               ({transferAddress2Display(account?.address)})
             </span>
             <div className="home-preview-icon-container flexR">
-              <IconComponent
-                name="external-link"
-                cls="explorer"
-                onClick={handleExplorerClick}
-              />
               <CopyToClipboard text={account?.address} onCopy={onCopy}>
                 <IconComponent name="copy" cls="copy" />
               </CopyToClipboard>
@@ -274,6 +247,7 @@ const Home = () => {
         <CustomTab
           tab1="Assets"
           tab2="Activity"
+          currentTab={tabType}
           handleTabClick={(tab: Tabs) => {
             setTabType(tab);
           }}
@@ -285,24 +259,11 @@ const Home = () => {
             <div className="wrap">
               <SearchInput onChange={handleInputChange} placeholder="Search" />
             </div>
-            {isEdit ? (
-              <span className="done cursor" onClick={() => setIsEdit(false)}>
-                Done
-              </span>
-            ) : (
-              <div className="home-search-icon-container flexR">
-                <IconComponent
-                  name="edit"
-                  cls="edit-icon cursor"
-                  onClick={() => setIsEdit(true)}
-                />
-                <img
-                  onClick={handleAddTokenBtnClick}
-                  src={AddTokenImg}
-                  className="home-search-add-icon cursor"
-                />
-              </div>
-            )}
+            <img
+              onClick={handleAddTokenBtnClick}
+              src={AddTokenImg}
+              className="home-search-add-icon cursor"
+            />
           </div>
         ) : null}
         {tabType === Tabs.FIRST && (
@@ -333,18 +294,7 @@ const Home = () => {
                         </span>
                       </div>
                     </div>
-                    {isEdit ? (
-                      <IconComponent
-                        name="trash"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTokenDeleteClick(t);
-                        }}
-                        cls="right-icon"
-                      />
-                    ) : (
-                      <IconComponent name="chevron-right" cls="right-icon" />
-                    )}
+                    <IconComponent name="chevron-right" cls="right-icon" />
                   </div>
                 );
               })
@@ -409,21 +359,23 @@ const Home = () => {
           </div>
           <div className="account-switch-accounts flexR content-wrap-padding">
             <span className="account-switch-accounts-title">Accounts</span>
-            <div
-              className="account-switch-accounts-manage-wallet-container flexR cursor"
-              onClick={() => history.push('/wallet-manage')}
-            >
-              <span className="account-switch-accounts-manage-wallet">
-                Manage Wallet
-              </span>
-              <IconComponent
-                name="chevron-right"
-                cls="base-text-color account-switch-link"
-              />
-            </div>
+            <img
+              onClick={() => {
+                history.push({
+                  pathname: '/account-manage',
+                  state: {
+                    hdWalletId: account?.hdWalletId,
+                    hdWalletName: account?.hdWalletName,
+                    accountCreateType: account?.accountCreateType,
+                  },
+                });
+              }}
+              src={WalletManageNewIcon}
+              className="account-switch-accounts-manage-wallet-container cursor"
+            />
           </div>
 
-          <AccountSwitch
+          <CurrentWalletAccountSwitch
             visible={accountPopupVisible}
             handleAccountClick={handleAccountClick}
           />

@@ -6,11 +6,12 @@ import type { PresetNetworkId } from 'constants/defaultNetwork';
 export enum CoinType {
   ETH = 60, // 0
   COSMOS = 118, // 1
+  POLKADOT = 354,
   // SOME_OTHER_CHAIN_COIN // 2 etc...
   // You can add as you like
 }
 
-export enum EcoSystem {
+export enum Ecosystem {
   EVM = 'EVM',
   COSMOS = 'COSMOS',
   POLKADOT = 'POLKADOT',
@@ -42,7 +43,7 @@ export interface Network {
   /**
    * Future-proof design
    */
-  ecsystem: EcoSystem;
+  ecosystem: Ecosystem;
 
   // mainly for cosmos / polkadot
   prefix: string;

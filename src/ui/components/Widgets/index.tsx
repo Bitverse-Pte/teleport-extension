@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Input } from 'antd';
+import { Button, Input, Tooltip } from 'antd';
 import { IconComponent } from '../IconComponents';
 import eth from 'assets/tokens/eth.svg';
 import passwordChecked from 'assets/passwordChecked.svg';
@@ -320,37 +320,57 @@ export interface TabInterface {
   tab1: string;
   tab2: string;
   handleTabClick: (Tabs) => void;
-  defaultTab?: Tabs;
+  currentTab: Tabs;
+  showToolTips?: boolean;
+  tip1?: string;
+  tip2?: string;
 }
 
 export const CustomTab = (props: TabInterface) => {
-  const [active, setActive] = useState(
-    props.defaultTab ? props.defaultTab : Tabs.FIRST
-  );
+  const [tooltip, setTooltip] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
 
   return (
     <div className="widgets-tab-container flexR">
       <span
         className={classnames('tab-item', 'cursor', {
-          'tab-item-active': active === Tabs.FIRST,
+          'tab-item-active': props.currentTab === Tabs.FIRST,
         })}
         onClick={() => {
-          setActive(Tabs.FIRST);
           props.handleTabClick(Tabs.FIRST);
         }}
+        onMouseOver={() => {
+          if (props.showToolTips && props.tip1) {
+            setTooltip(props.tip1);
+            setShowTooltip(true);
+          }
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
       >
         {props.tab1}
       </span>
       <span
         className={classnames('tab-item', 'cursor', {
-          'tab-item-active': active === Tabs.SECOND,
+          'tab-item-active': props.currentTab === Tabs.SECOND,
         })}
         onClick={() => {
-          setActive(Tabs.SECOND);
           props.handleTabClick(Tabs.SECOND);
         }}
+        onMouseOver={() => {
+          if (props.showToolTips && props.tip2) {
+            setTooltip(props.tip2);
+            setShowTooltip(true);
+          }
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
       >
         {props.tab2}
+      </span>
+      <span
+        className="custom-tab-tooltip"
+        style={props.showToolTips && showTooltip ? {} : { display: 'none' }}
+      >
+        {tooltip}
       </span>
     </div>
   );

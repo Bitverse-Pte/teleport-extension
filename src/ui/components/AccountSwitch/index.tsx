@@ -131,6 +131,7 @@ const AccountSwitch: React.FC<AccountSwitchProps> = (
         <CustomTab
           tab1="ID Wallet"
           tab2="Normal Wallet"
+          currentTab={accountCreateType}
           handleTabClick={handleTabClick}
         />
       </div>

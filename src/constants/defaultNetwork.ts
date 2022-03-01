@@ -1,4 +1,4 @@
-import { CoinType, EcoSystem, Provider } from 'types/network';
+import { CoinType, Ecosystem, Provider } from 'types/network';
 import { CHAINS } from './chain';
 
 export enum PresetNetworkId {
@@ -11,7 +11,7 @@ export enum PresetNetworkId {
 const EVMProviderSharedProperties = {
   chainName: 'ETH',
   coinType: CoinType.ETH,
-  ecsystem: EcoSystem.EVM,
+  ecosystem: Ecosystem.EVM,
   prefix: '0x',
 };
 
