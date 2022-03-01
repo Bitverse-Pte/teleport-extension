@@ -230,6 +230,9 @@ export class WalletController extends BaseController {
 
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 
+  setIsDefaultWallet = (val: boolean) =>
+    preferenceService.setIsDefaultWallet(val);
+
   _setCurrentAccount = async (account: BaseAccount) => {
     preferenceService.setCurrentAccount(account);
   };
