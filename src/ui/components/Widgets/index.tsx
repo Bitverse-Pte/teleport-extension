@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Input } from 'antd';
+import { Button, Input, Tooltip } from 'antd';
 import { IconComponent } from '../IconComponents';
 import eth from 'assets/tokens/eth.svg';
 import passwordChecked from 'assets/passwordChecked.svg';
@@ -321,9 +321,15 @@ export interface TabInterface {
   tab2: string;
   handleTabClick: (Tabs) => void;
   currentTab: Tabs;
+  showToolTips?: boolean;
+  tip1?: string;
+  tip2?: string;
 }
 
 export const CustomTab = (props: TabInterface) => {
+  const [tooltip, setTooltip] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
+
   return (
     <div className="widgets-tab-container flexR">
       <span
@@ -333,6 +339,13 @@ export const CustomTab = (props: TabInterface) => {
         onClick={() => {
           props.handleTabClick(Tabs.FIRST);
         }}
+        onMouseOver={() => {
+          if (props.showToolTips && props.tip1) {
+            setTooltip(props.tip1);
+            setShowTooltip(true);
+          }
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
       >
         {props.tab1}
       </span>
@@ -343,8 +356,21 @@ export const CustomTab = (props: TabInterface) => {
         onClick={() => {
           props.handleTabClick(Tabs.SECOND);
         }}
+        onMouseOver={() => {
+          if (props.showToolTips && props.tip2) {
+            setTooltip(props.tip2);
+            setShowTooltip(true);
+          }
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
       >
         {props.tab2}
+      </span>
+      <span
+        className="custom-tab-tooltip"
+        style={props.showToolTips && showTooltip ? {} : { display: 'none' }}
+      >
+        {tooltip}
       </span>
     </div>
   );

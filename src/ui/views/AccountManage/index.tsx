@@ -1,16 +1,10 @@
 import './style.less';
 import React, { useMemo, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Header from 'ui/components/Header';
-import { message, Drawer, Collapse, Tooltip } from 'antd';
-import {
-  transferAddress2Display,
-  useAsyncEffect,
-  useWallet,
-  useWalletRequest,
-} from 'ui/utils';
-import { BaseAccount } from 'types/extend';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Drawer } from 'antd';
+import { useAsyncEffect, useWallet, useWalletRequest } from 'ui/utils';
+import { AccountCreateType, BaseAccount } from 'types/extend';
 import Jazzicon from 'react-jazzicon';
 import * as _ from 'lodash';
 import { IconComponent } from 'ui/components/IconComponents';
@@ -20,23 +14,13 @@ import {
   CustomPasswordInput,
   WalletName,
 } from 'ui/components/Widgets';
-import { Provider } from 'types/network';
-import { IdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 import { WalletHeader } from '../WalletManage';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import AccountManageWidget from 'ui/components/AccountManageWidget';
 
-interface ICustomChain extends BaseAccount {
-  chainList?: {
-    chainCustomId: string;
-    chainName: string;
-  }[];
-}
-
 const AccountManage: React.FC = () => {
-  const history = useHistory();
   const [accounts, setAccounts] = useState<any>([]);
   const [isEdit, setIsEdit] = useState(false);
   const [addPopupVisible, setAddPopupVisible] = useState(false);
@@ -49,41 +33,23 @@ const AccountManage: React.FC = () => {
   const { state } = useLocation<{
     hdWalletId: string;
     hdWalletName: string;
+    accountCreateType: AccountCreateType;
   }>();
-  const { hdWalletId, hdWalletName } = state;
+  const { hdWalletId, hdWalletName, accountCreateType } = state;
 
   const queryAccounts = async () => {
-    const accounts: {
-      accountName: string;
-      accounts: ICustomChain[];
-      hdPathIndex: number;
-    }[] = await wallet.getAccountListByHdWalletId(hdWalletId);
+    const accountList: BaseAccount[] = await wallet.getAccountListByHdWalletId(
+      hdWalletId
+    );
 
-    if (accounts && accounts.length > 0) {
-      for (const a of accounts) {
-        for (const subAccount of a.accounts) {
-          const { coinType } = subAccount;
-          const chains: Provider[] = await wallet.getSameChainsByCoinType(
-            coinType
-          );
-          if (chains?.length) {
-            chains.forEach((p: Provider) => {
-              const chainItem = {
-                chainCustomId: p.id,
-                chainName: p.nickname,
-              };
-              if (subAccount?.chainList) {
-                subAccount.chainList.push(chainItem);
-              } else {
-                subAccount.chainList = [chainItem];
-              }
-            });
-          }
+    if (accountList && accountList.length > 0) {
+      const tempAccounts: BaseAccount[] = [];
+      accountList.forEach((a: BaseAccount) => {
+        if (tempAccounts.every((t) => t.hdPathIndex !== a.hdPathIndex)) {
+          tempAccounts.push(a);
         }
-      }
-      setAccounts(accounts);
-    } else {
-      history.replace('/welcome');
+      });
+      setAccounts(accountList);
     }
   };
 
@@ -100,7 +66,7 @@ const AccountManage: React.FC = () => {
     }
   );
 
-  //useAsyncEffect(queryAccounts, []);
+  useAsyncEffect(queryAccounts, []);
 
   const onRenameConfirm = async (accountName) => {
     if (!accountName) {
@@ -164,6 +130,11 @@ const AccountManage: React.FC = () => {
 
         <div
           onClick={() => setAddPopupVisible(true)}
+          style={
+            accountCreateType === AccountCreateType.PRIVATE_KEY
+              ? { display: 'none' }
+              : {}
+          }
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">
@@ -180,10 +151,10 @@ const AccountManage: React.FC = () => {
               <div className="edit-left flexR">
                 <Jazzicon
                   diameter={30}
-                  seed={Number(a.accounts[0].address.substr(0, 8) || 0)}
+                  seed={Number(a.address.substr(0, 8) || 0)}
                 />
                 <WalletName cls="account" width={100}>
-                  {a.accountName}
+                  {a.accountName || a.hdWalletName}
                 </WalletName>
               </div>
               <div className="edit-right flexR">
@@ -220,88 +191,6 @@ const AccountManage: React.FC = () => {
       ) : (
         <AccountManageWidget hdWalletId={state.hdWalletId} />
       )}
-      {/* <div className="content flexCol content-wrap-padding">
-        
-        <div
-          className="account-manage-content-container"
-          style={{
-            display: isEdit ? 'none' : 'block',
-          }}
-        >
-          <Collapse
-            expandIconPosition="right"
-            bordered={false}
-            ghost={true}
-            expandIcon={({ isActive }) =>
-              isActive ? (
-                <IconComponent name="chevron-up" cls="base-text-color" />
-              ) : (
-                <IconComponent name="chevron-down" cls="base-text-color" />
-              )
-            }
-          >
-            {accounts.map((a, i) => {
-              return (
-                <Collapse.Panel
-                  key={i}
-                  header={
-                    <div className="account-item flexR">
-                      <Jazzicon
-                        diameter={32}
-                        seed={Number(a.accounts[0].address.substr(0, 8) || 0)}
-                      />
-                      <WalletName cls="account-address bold" width={180}>
-                        {a.accountName}
-                      </WalletName>
-                    </div>
-                  }
-                >
-                  <div className="address-container flexCol">
-                    {a.accounts.map((item: ICustomChain) => {
-                      return (
-                        <div className="address-item" key={item.address}>
-                          <div className="address-chain-container flexR">
-                            {item?.chainList?.map((c) => (
-                              <Tooltip
-                                title={c.chainName}
-                                key={c.chainCustomId}
-                              >
-                                <img
-                                  src={IdToChainLogoSVG(c.chainCustomId)}
-                                  className="chain-icon"
-                                />
-                              </Tooltip>
-                            ))}
-                          </div>
-                          <div className="address-chain-address-container flexR">
-                            <span className="address-chain-address">
-                              {transferAddress2Display(item.address)}
-                            </span>
-                            <CopyToClipboard
-                              text={item.address}
-                              onCopy={() =>
-                                ClickToCloseMessage.success('Copied')
-                              }
-                            >
-                              <IconComponent
-                                name="copy"
-                                cls="copy-icon"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                              />
-                            </CopyToClipboard>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </Collapse.Panel>
-              );
-            })}
-          </Collapse>
-        </div>
-      </div> */}
       <Add
         title="Add Account"
         visible={addPopupVisible}

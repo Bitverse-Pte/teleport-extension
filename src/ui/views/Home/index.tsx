@@ -366,6 +366,7 @@ const Home = () => {
                   state: {
                     hdWalletId: account?.hdWalletId,
                     hdWalletName: account?.hdWalletName,
+                    accountCreateType: account?.accountCreateType,
                   },
                 });
               }}
@@ -378,10 +379,6 @@ const Home = () => {
             visible={accountPopupVisible}
             handleAccountClick={handleAccountClick}
           />
-          {/* <AccountSwitch
-            visible={accountPopupVisible}
-            handleAccountClick={handleAccountClick}
-          /> */}
         </div>
       </Drawer>
       <Drawer

@@ -27,17 +27,17 @@
       font-size: 14px;
       color: #ffffff;
       margin-bottom: 20px;
-      opacity: .25;
       cursor: pointer;
+      position:relative;
+      .account-manage-selected-icon{
+        position: absolute;
+        width:12px;
+        height: 12px;
+        right:0;
+        bottom:0;
+      }
     }
 
-    .active-item {
-      width: 40px;
-      height: 40px;
-      flex: 0 0 40px;
-      border-radius: 12px;
-      opacity: 1;
-    }
   }
 
   .account-manage-widget-content {
@@ -45,6 +45,14 @@
     width: 100%;
     padding: 0 24px;
     box-sizing: border-box;
+  }
+  .account-manage-widget-account-name{
+    font-size: 16px;
+    height: 42px;
+    line-height: 42px;
+    margin-bottom: 0;
+    color: @themeColor;
+    font-family: MontserratBold;
   }
 
 }
@@ -65,6 +73,11 @@
 
       .account-address {
         font-size: 16px;
+      }
+      .account-item-ecosystem-icon{
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
       }
     }
 
@@ -109,4 +122,5 @@
 
 .ant-collapse-content-box{
   padding-left:0 !important;
+  padding-right:0 !important;
 }

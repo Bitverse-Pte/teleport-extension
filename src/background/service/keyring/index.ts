@@ -768,19 +768,11 @@ class KeyringService extends EventEmitter {
       return Promise.reject(new Error('no account found'));
     }
 
-    if (currentAccount.accountCreateType === AccountCreateType.MNEMONIC) {
-      accounts = this.accounts.filter(
-        (a: BaseAccount) =>
-          a.coinType === currentChainCoinType &&
-          a.hdWalletId === currentAccount.hdWalletId
-      );
-    } else {
-      accounts = this.accounts.filter(
-        (a: BaseAccount) =>
-          a.coinType === currentChainCoinType &&
-          a.accountCreateType === AccountCreateType.PRIVATE_KEY
-      );
-    }
+    accounts = this.accounts.filter(
+      (a: BaseAccount) =>
+        a.coinType === currentChainCoinType &&
+        a.hdWalletId === currentAccount.hdWalletId
+    );
     return Promise.resolve(accounts);
   }
 

@@ -2,26 +2,25 @@ import './style.less';
 import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from 'ui/components/Header';
-import { message } from 'antd';
-import clsx from 'clsx';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
-import { BaseAccount, DisplayWalletManage } from 'types/extend';
+import {
+  AccountCreateType,
+  BaseAccount,
+  DisplayWalletManage,
+} from 'types/extend';
 import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import Backup from 'ui/components/Backup';
-import { CustomButton, CustomTab, WalletName } from 'ui/components/Widgets';
+import { CustomTab, WalletName } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
-import ChainIcons from 'ui/components/ChainIcons';
 import noAssets from 'assets/noAssets.svg';
 import { Delete, Rename } from '../AccountManage';
 import { ErrorCode } from 'constants/code';
-import reversEnter from 'assets/reverseEnter.svg';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import importImg from 'assets/importImg.svg';
 import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
 
 export interface WalletHeaderProps {
   title: string;
@@ -214,6 +213,9 @@ const WalletManage: React.FC = () => {
           tab1="ID Wallet"
           currentTab={accountType}
           tab2="Normal Wallet"
+          showToolTips
+          tip1="Created/Imported with mnemonic words"
+          tip2="Imported with private key"
           handleTabClick={(tab: Tabs) => {
             setAccountType(tab);
           }}
@@ -231,37 +233,41 @@ const WalletManage: React.FC = () => {
                 : simpleWalletAccounts
               ).map((w: BaseAccount | any, i: number) => (
                 <div
-                  className={`item flexR ${
-                    currentAccount?.hdWalletId === w?.hdWalletId
+                  className={`item flexR ${currentAccount?.hdWalletId === w?.hdWalletId
                       ? '_active'
                       : ''
-                  }`}
+                    }`}
                   key={w.hdWalletName}
                   onClick={(e) => {
                     if (isEdit) return;
                     handleWalletClick(w);
                   }}
                 >
-                  <span
+                  <div
                     className="circle flexR"
                     style={{ background: WALLET_THEME_COLOR[i % 5] }}
                   >
                     {w?.hdWalletName?.substr(0, 1)}
-                  </span>
+                    <div className="circle-wrap flexR">
+                      <img
+                        src={coinTypeToIconSVG(w?.coinType)}
+                        style={{
+                          display:
+                            w?.accountCreateType === AccountCreateType.PRIVATE_KEY
+                              ? 'block'
+                              : 'none',
+                        }}
+                        className="circle-ecosystem-icon"
+                      />
+                    </div>
+
+                  </div>
                   <div className="right flexR">
                     <div className="name-account-wrap flexR">
                       <div className="name-account flexCol">
                         <WalletName cls="name-account-name" width={100}>
                           {w?.hdWalletName}
                         </WalletName>
-                        <span
-                          className="name-account-address"
-                          style={{
-                            display: isHd ? 'none' : 'block',
-                          }}
-                        >
-                          {transferAddress2Display(w.address)}
-                        </span>
                       </div>
                       <div
                         className="name-account-key-container"
@@ -299,7 +305,7 @@ const WalletManage: React.FC = () => {
                       }}
                     >
                       {currentAccount?.hdWalletId === w?.hdWalletId ||
-                      currentAccount?.address === w?.address ? (
+                        currentAccount?.address === w?.address ? (
                         <IconComponent name="check" cls="base-text-color" />
                       ) : null}
                     </div>

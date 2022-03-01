@@ -1,30 +1,22 @@
 import './style.less';
-import React, { useMemo, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-import Header from 'ui/components/Header';
-import { message, Drawer, Collapse, Tooltip } from 'antd';
-import {
-  transferAddress2Display,
-  useAsyncEffect,
-  useWallet,
-  useWalletRequest,
-} from 'ui/utils';
+import React, { useState } from 'react';
+import { Collapse, Tooltip } from 'antd';
+import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import { BaseAccount } from 'types/extend';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Jazzicon from 'react-jazzicon';
 import * as _ from 'lodash';
 import { IconComponent } from 'ui/components/IconComponents';
 import clsx from 'clsx';
+import { WalletName } from 'ui/components/Widgets';
+import { CoinType, Ecosystem, Provider } from 'types/network';
 import {
-  CustomButton,
-  CustomInput,
-  CustomPasswordInput,
-  WalletName,
-} from 'ui/components/Widgets';
-import { Ecosystem, Provider } from 'types/network';
-import { IdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
+  ecosystemToIconSVG,
+  IdToChainLogoSVG,
+} from 'ui/utils/networkCategoryToIcon';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { CoinTypeEcosystemMapping } from 'constants/wallet';
+import selectedIcon from '../../../assets/accountSelected.svg';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -52,6 +44,8 @@ const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
   props: IAccountManageWidgetProps
 ) => {
   const [tempAccounts, setTempAccounts] = useState<IDisplayAccountManage[]>();
+  const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
+
   const wallet = useWallet();
   const { hdWalletId } = props;
 
@@ -63,6 +57,7 @@ const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
     const displayAccounts: IDisplayAccountManage[] = [];
 
     if (accounts && accounts.length > 0 && currentAccount) {
+      setCurrentAccount(currentAccount);
       for (const a of accounts) {
         a.chainList = [];
         let ecosystem,
@@ -144,8 +139,24 @@ const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
 
   useAsyncEffect(queryAccounts, []);
 
-  const handleAccountClick = (a: IDisplayAccountManage) => {
+  const handleAccountClick = async (a: IDisplayAccountManage) => {
+    if (a.ethAddress === currentAccount) return;
     console.log(a);
+    let coinType: CoinType, account;
+    const currentChain: Provider | null = await wallet.getCurrentChain();
+    if (currentChain) {
+      coinType = currentChain.coinType;
+    }
+    a.ecosystems.forEach((e) =>
+      e.accounts.forEach((ic: ICustomChain) => {
+        if (ic.coinType === coinType) {
+          account = ic;
+        }
+      })
+    );
+    console.error(account);
+    await wallet.changeAccount(account);
+    queryAccounts();
   };
 
   return (
@@ -154,25 +165,38 @@ const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
         {tempAccounts?.map((account: IDisplayAccountManage, i) => {
           return (
             <div
-              className={clsx('flexR id-item', {
-                'active-item': account.selected,
-              })}
+              className={clsx('flexR id-item')}
               onClick={() => handleAccountClick(account)}
+              style={account.selected ? { width: '40px', height: '40px' } : {}}
               key={i}
             >
               <Jazzicon
-                diameter={30}
+                diameter={account.selected ? 40 : 30}
                 seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
+              />
+              <img
+                src={selectedIcon}
+                className="account-manage-selected-icon"
+                style={{ display: account.selected ? 'block' : 'none' }}
               />
             </div>
           );
         })}
       </div>
       <div className="account-manage-widget-content flexCol">
+        <p className="account-manage-widget-account-name">
+          {(() => {
+            const account = tempAccounts?.find(
+              (a: IDisplayAccountManage) => a.selected
+            )?.ecosystems[0]?.accounts[0];
+            return account?.accountName || account?.hdWalletName;
+          })()}
+        </p>
         <Collapse
           expandIconPosition="right"
           bordered={false}
           ghost={true}
+          defaultActiveKey={[Ecosystem.EVM]}
           expandIcon={({ isActive }) =>
             isActive ? (
               <IconComponent name="chevron-up" cls="base-text-color" />
@@ -186,9 +210,13 @@ const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
             ?.ecosystems.map((a, i) => {
               return (
                 <Collapse.Panel
-                  key={i}
+                  key={a.ecosystem}
                   header={
                     <div className="account-item flexR">
+                      <img
+                        src={ecosystemToIconSVG(a.ecosystem)}
+                        className="account-item-ecosystem-icon"
+                      />
                       <WalletName cls="account-address bold" width={180}>
                         {a.ecosystemName}
                       </WalletName>
@@ -240,340 +268,8 @@ const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
             })}
         </Collapse>
       </div>
-      {/* {isEdit ? (
-        <WalletHeader
-          title="Accounts"
-          handleDoneClick={() => setIsEdit(!isEdit)}
-        />
-      ) : (
-        <Header
-          title={
-            <WalletName cls="bold" width={160}>
-              {`wallet: ${hdWalletName}`}
-            </WalletName>
-          }
-        />
-      )}
-
-      <div
-        className="wallet-manage-button-container flexR content-wrap-padding"
-        style={isEdit ? { display: 'none' } : {}}
-      >
-        <div
-          className="wallet-manage-button-item cursor flexCol _edit"
-          onClick={() => setIsEdit(!isEdit)}
-        >
-          <div className="wallet-manage-button-wrap flexR">
-            <img src={editImg} alt="" className="wallet-manage-img" />
-          </div>
-          <span className="wallet-manage-button-item-title">Edit</span>
-        </div>
-
-        <div
-          onClick={() => setAddPopupVisible(true)}
-          className="wallet-manage-button-item cursor flexCol _add"
-        >
-          <div className="wallet-manage-button-wrap flexR">
-            <img src={addImg} alt="" className="wallet-manage-img" />
-          </div>
-          <span className="wallet-manage-button-item-title">Add</span>
-        </div>
-      </div>
-      <div className="content flexCol content-wrap-padding">
-        {isEdit
-          ? accounts.map((a, i) => (
-            <div className="edit-account flexR" key={`edit_${i}`}>
-              <div className="edit-left flexR">
-                <Jazzicon
-                  diameter={30}
-                  seed={Number(a.accounts[0].address.substr(0, 8) || 0)}
-                />
-                <WalletName cls="account" width={100}>
-                  {a.accountName}
-                </WalletName>
-              </div>
-              <div className="edit-right flexR">
-                <IconComponent
-                  name="edit"
-                  cls="base-text-color"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentAccountName(a.accountName);
-                    setCurrentAccountIndex(a.hdPathIndex);
-                    setRenamePopupVisible(true);
-                  }}
-                />
-                <IconComponent
-                  name="trash"
-                  cls="base-text-color right"
-                  onClick={(e) => {
-                    if (i === 0) {
-                      ClickToCloseMessage.warning(
-                        'can not delete the last account'
-                      );
-                      return;
-                    }
-                    e.stopPropagation();
-                    setCurrentAccountName(a.accountName);
-                    setCurrentAccountIndex(a.hdPathIndex);
-                    setDeletePopupVisible(true);
-                  }}
-                />
-              </div>
-            </div>
-          ))
-          : null}
-        <div
-          className="account-manage-content-container"
-          style={{
-            display: isEdit ? 'none' : 'block',
-          }}
-        >
-          
-        </div>
-
-      </div> */}
     </div>
   );
 };
 
 export default AccountManageWidget;
-
-export interface IAddProps {
-  visible: boolean;
-  title: string;
-  loading: boolean;
-  setVisible?: (visible: boolean) => void;
-  add?: (name: string) => void;
-}
-
-export const Add: React.FC<IAddProps> = (props: IAddProps) => {
-  const [value, setValue] = useState('');
-
-  const handleConfirmBtnClick = () => {
-    if (props.add && props.add instanceof Function) {
-      props.add(value);
-    }
-  };
-
-  return (
-    <Drawer
-      visible={props.visible}
-      placement="bottom"
-      closable={false}
-      height="236px"
-      bodyStyle={{
-        boxSizing: 'border-box',
-        padding: '0 24px 24px 24px',
-      }}
-      contentWrapperStyle={{
-        borderRadius: '16px 16px 0 0',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-      }}
-      key="top"
-    >
-      <div className="backup-popup-container flexCol">
-        <DrawerHeader
-          title={props.title}
-          handleCloseIconClick={() => {
-            if (props.setVisible) {
-              props.setVisible(false);
-            }
-          }}
-        />
-        <span className="popup-item-title">Account name</span>
-        <CustomInput
-          value={value}
-          cls="popup-container-input"
-          placeholder="Enter Account Name"
-          onChange={(e) => setValue(e.target.value)}
-        />
-        <CustomButton
-          type="primary"
-          loading={props.loading}
-          onClick={handleConfirmBtnClick}
-          block
-          cls="popup-container-top popup-add-btn"
-          disabled={_.isEmpty(value)}
-        >
-          Add
-        </CustomButton>
-      </div>
-    </Drawer>
-  );
-};
-export interface IRenameProps {
-  visible: boolean;
-  defaultValue: string;
-  title: string;
-  setVisible?: (visible: boolean) => void;
-  onConfirm?: (name: string) => void;
-}
-
-interface DrawerHeaderProps {
-  title: string;
-  handleCloseIconClick: () => void;
-}
-
-const DrawerHeader = (props: DrawerHeaderProps) => {
-  return (
-    <div className="drawer-header-container-common flexR">
-      <span className="drawer-header-title">{props.title}</span>
-      <IconComponent
-        name="close"
-        onClick={props.handleCloseIconClick}
-        cls="drawer-header-close-icon"
-      />
-    </div>
-  );
-};
-
-export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
-  const [value, setValue] = useState(props.defaultValue);
-
-  const resetState = () => {
-    setValue(props.defaultValue);
-  };
-
-  useMemo(() => {
-    if (props.visible) {
-      resetState();
-    }
-  }, [props.visible]);
-
-  const handleConfirmBtnClick = () => {
-    if (props.onConfirm && props.onConfirm instanceof Function) {
-      props.onConfirm(value);
-    }
-  };
-
-  return (
-    <Drawer
-      visible={props.visible}
-      placement="bottom"
-      closable={false}
-      height="236px"
-      bodyStyle={{
-        boxSizing: 'border-box',
-        padding: '0 24px 24px 24px',
-      }}
-      contentWrapperStyle={{
-        borderRadius: '16px 16px 0 0',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-      }}
-      key="top"
-    >
-      <div className="backup-popup-container flexCol">
-        <DrawerHeader
-          title={props.title}
-          handleCloseIconClick={() => {
-            if (props.setVisible) {
-              props.setVisible(false);
-            }
-          }}
-        />
-        <span className="popup-item-title">New account name</span>
-        <CustomInput
-          value={value}
-          cls="popup-container-input"
-          onChange={(e) => setValue(e.target.value)}
-        />
-        <CustomButton
-          type="primary"
-          onClick={handleConfirmBtnClick}
-          block
-          cls="popup-container-top"
-          disabled={_.isEmpty(value)}
-        >
-          Rename
-        </CustomButton>
-      </div>
-    </Drawer>
-  );
-};
-export interface IDeleteProps {
-  visible: boolean;
-  title: string;
-  setVisible?: (visible: boolean) => void;
-  onConfirm?: () => void;
-}
-
-export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
-  const [psd, setPsd] = useState('');
-  const wallet = useWallet();
-
-  const resetState = () => {
-    setPsd('');
-  };
-
-  useMemo(() => {
-    if (!props.visible) {
-      resetState();
-    }
-  }, [props.visible]);
-
-  const handleConfirmBtnClick = async () => {
-    const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error('wrong password');
-    });
-    if (checksumPassed) {
-      if (props.onConfirm && props.onConfirm instanceof Function) {
-        props.onConfirm();
-      }
-    }
-  };
-
-  return (
-    <Drawer
-      visible={props.visible}
-      placement="bottom"
-      closable={false}
-      height="284px"
-      bodyStyle={{
-        boxSizing: 'border-box',
-        padding: '0 24px 24px 24px',
-      }}
-      contentWrapperStyle={{
-        borderRadius: '16px 16px 0 0',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-      }}
-      key="top"
-    >
-      <div className="backup-popup-container flexCol">
-        <DrawerHeader
-          title={props.title}
-          handleCloseIconClick={() => {
-            if (props.setVisible) {
-              props.setVisible(false);
-            }
-          }}
-        />
-        <div className="popup-delete-notice">
-          All information in this account will be lost, and the operation can't
-          be undo.
-        </div>
-        <span className="popup-item-title">Input password to delete</span>
-        <CustomPasswordInput
-          cls="popup-container-input"
-          value={psd}
-          placeholder="Enter your password"
-          onChange={(e) => {
-            setPsd(e.target.value);
-          }}
-        />
-        <CustomButton
-          type="primary"
-          cls="popup-container-top popup-delete-btn"
-          onClick={handleConfirmBtnClick}
-          block
-          disabled={_.isEmpty(psd)}
-        >
-          Delete
-        </CustomButton>
-      </div>
-    </Drawer>
-  );
-};
