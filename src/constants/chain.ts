@@ -7,7 +7,7 @@ import {
 } from './network';
 
 export enum CHAINS {
-  ETH = 'mainnet',
+  ETH = 'ethereum',
   KOVAN = 'kovan',
   RINKEBY = 'rinkeby',
   ROPSTEN = 'ropsten',

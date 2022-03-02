@@ -51,7 +51,7 @@ import { ComposedStore, ObservableStore } from '@metamask/obs-store';
 import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
 
-let defaultProviderConfigOpts = defaultNetworks['mainnet'] as Provider;
+let defaultProviderConfigOpts = defaultNetworks['ethereum'] as Provider;
 if (process.env.IN_TEST === 'true') {
   defaultProviderConfigOpts = defaultNetworks['rinkeby'] as Provider;
 }

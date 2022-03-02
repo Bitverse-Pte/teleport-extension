@@ -179,7 +179,7 @@ class TokenService {
   async queryTokenPrices(target = 'usd') {
     const currentChain = networkPreferenceService.getProviderConfig().type;
     //TODO(Jayce) needs to be uncommented；
-    //if (currentChain !== 'mainnet') return Promise.resolve(null);
+    //if (currentChain !== 'ethereum') return Promise.resolve(null);
     const tokensStr = this.store
       .getState()
       .tokens.map((t: Token) => t.symbol)
