@@ -17,7 +17,7 @@ export const networkSlice = createSlice<
   name: 'networkController',
   initialState: {
     network: 'loading',
-    provider: defaultNetworks['mainnet'] as Provider,
+    provider: defaultNetworks['ethereum'] as Provider,
     networkDetails: {
       EIPS: {
         '1559': false,

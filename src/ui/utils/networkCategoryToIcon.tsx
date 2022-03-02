@@ -39,7 +39,7 @@ export function categoryToIconSVG(category?: string): string | undefined {
  */
 export function IdToChainLogoSVG(id: PresetNetworkId | string) {
   switch (id) {
-    case PresetNetworkId.MAINNET:
+    case PresetNetworkId.ETHEREUM:
       return EthIconB; // rinkeby
     case PresetNetworkId.BSC:
       return BinanceIconB; // bsc

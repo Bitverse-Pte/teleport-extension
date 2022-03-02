@@ -149,7 +149,7 @@ function bnToHex(inputBn) {
 
 function getChainType(chainId) {
   if (chainId === MAINNET_CHAIN_ID) {
-    return 'mainnet';
+    return 'ethereum';
   } else if (TEST_CHAINS.includes(chainId)) {
     return 'testnet';
   }

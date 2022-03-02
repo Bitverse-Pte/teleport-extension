@@ -1,7 +1,7 @@
 export const ROPSTEN = 'ropsten';
 export const RINKEBY = 'rinkeby';
 export const KOVAN = 'kovan';
-export const MAINNET = 'mainnet';
+export const MAINNET = 'ethereum';
 export const GOERLI = 'goerli';
 export const NETWORK_TYPE_RPC = 'rpc';
 
@@ -42,7 +42,7 @@ const getRpcUrl = (network) =>
 export const ROPSTEN_RPC_URL = getRpcUrl('ropsten');
 export const RINKEBY_RPC_URL = getRpcUrl('rinkeby');
 export const KOVAN_RPC_URL = getRpcUrl('kovan');
-export const MAINNET_RPC_URL = getRpcUrl('mainnet');
+export const MAINNET_RPC_URL = getRpcUrl('ethereum');
 export const GOERLI_RPC_URL = getRpcUrl('goerli');
 
 export const ETH_SYMBOL = 'ETH';
