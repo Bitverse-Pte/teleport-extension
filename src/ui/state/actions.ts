@@ -207,7 +207,7 @@ export function updateTransaction(
 export function createCancelTransaction(
   txId: string,
   customGasSettings: any,
-  newTxMetaProps: any
+  newTxMetaProps: Partial<Transaction>
 ) {
   console.debug('background.cancelTransaction');
   // let newTxId: string;
@@ -230,7 +230,7 @@ export function createCancelTransaction(
 export function createSpeedUpTransaction(
   txId: string,
   customGasSettings: any,
-  newTxMetaProps: any
+  newTxMetaProps: Partial<Transaction>
 ) {
   console.debug('background.createSpeedUpTransaction');
   // let newTx;
