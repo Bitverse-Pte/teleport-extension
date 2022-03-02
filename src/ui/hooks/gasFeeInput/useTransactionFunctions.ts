@@ -9,10 +9,21 @@ import {
   createSpeedUpTransaction,
   updateTransaction as updateTransactionFn,
 } from 'ui/state/actions';
+import { Transaction } from 'constants/transaction';
 // import {
 //   updateCustomSwapsEIP1559GasParams,
 //   updateSwapsUserFeeLevel,
 // } from '../../store/actions';
+
+interface ParamsOfuseTransactionFunctions {
+  defaultEstimateToUse: any;
+  editGasMode: EDIT_GAS_MODES;
+  estimatedBaseFee: string;
+  gasFeeEstimates: any;
+  gasLimit: string;
+  maxPriorityFeePerGas: string;
+  transaction: Transaction;
+}
 
 export const useTransactionFunctions = ({
   defaultEstimateToUse,
@@ -22,7 +33,7 @@ export const useTransactionFunctions = ({
   gasLimit: gasLimitValue,
   maxPriorityFeePerGas: maxPriorityFeePerGasValue,
   transaction,
-}) => {
+}: ParamsOfuseTransactionFunctions) => {
   const dispatch = useDispatch();
   const getTxMeta = useCallback(() => {
     if (
@@ -64,7 +75,7 @@ export const useTransactionFunctions = ({
           maxPriorityFeePerGas || decGWEIToHexWEI(maxPriorityFeePerGasValue);
       }
       const txMeta = getTxMeta();
-      const updatedTxMeta = {
+      const updatedTxMeta: Transaction = {
         ...transaction,
         userFeeLevel: estimateUsed || PRIORITY_LEVELS.CUSTOM,
         txParams: {
@@ -82,7 +93,7 @@ export const useTransactionFunctions = ({
       //   );
       //   dispatch(updateCustomSwapsEIP1559GasParams(newGasSettings));
       // } else {
-        dispatch(updateTransactionFn(updatedTxMeta));
+      dispatch(updateTransactionFn(updatedTxMeta));
       // }
     },
     [
@@ -145,7 +156,7 @@ export const useTransactionFunctions = ({
   );
   const updateTransactionUsingDAPPSuggestedValues = useCallback(() => {
     const { maxFeePerGas, maxPriorityFeePerGas } =
-      transaction?.dappSuggestedGasFees;
+      transaction?.dappSuggestedGasFees!;
     updateTransaction({
       estimateUsed: PRIORITY_LEVELS.DAPP_SUGGESTED,
       maxFeePerGas,
