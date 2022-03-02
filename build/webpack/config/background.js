@@ -51,6 +51,7 @@ const backgroundConfig = {
       'process.env.version': JSON.stringify(
         `version: ${version} / ${new Date().toISOString()}`
       ),
+      window: "globalThis",
     }),
   ],
   resolve: {
