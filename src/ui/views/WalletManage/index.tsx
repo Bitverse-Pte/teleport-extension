@@ -233,10 +233,11 @@ const WalletManage: React.FC = () => {
                 : simpleWalletAccounts
               ).map((w: BaseAccount | any, i: number) => (
                 <div
-                  className={`item flexR ${currentAccount?.hdWalletId === w?.hdWalletId
+                  className={`item flexR ${
+                    currentAccount?.hdWalletId === w?.hdWalletId
                       ? '_active'
                       : ''
-                    }`}
+                  }`}
                   key={w.hdWalletName}
                   onClick={(e) => {
                     if (isEdit) return;
@@ -248,19 +249,20 @@ const WalletManage: React.FC = () => {
                     style={{ background: WALLET_THEME_COLOR[i % 5] }}
                   >
                     {w?.hdWalletName?.substr(0, 1)}
-                    <div className="circle-wrap flexR">
+                    <div
+                      className="circle-wrap flexR"
+                      style={{
+                        display:
+                          w?.accountCreateType === AccountCreateType.PRIVATE_KEY
+                            ? 'flex'
+                            : 'none',
+                      }}
+                    >
                       <img
                         src={coinTypeToIconSVG(w?.coinType)}
-                        style={{
-                          display:
-                            w?.accountCreateType === AccountCreateType.PRIVATE_KEY
-                              ? 'block'
-                              : 'none',
-                        }}
                         className="circle-ecosystem-icon"
                       />
                     </div>
-
                   </div>
                   <div className="right flexR">
                     <div className="name-account-wrap flexR">
@@ -305,7 +307,7 @@ const WalletManage: React.FC = () => {
                       }}
                     >
                       {currentAccount?.hdWalletId === w?.hdWalletId ||
-                        currentAccount?.address === w?.address ? (
+                      currentAccount?.address === w?.address ? (
                         <IconComponent name="check" cls="base-text-color" />
                       ) : null}
                     </div>

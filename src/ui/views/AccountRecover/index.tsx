@@ -183,7 +183,9 @@ const AccountRecover = () => {
       const importAccountOpts: ImportAccountOpts = {
         name,
         coinType,
-        privateKey: privateKey.trim(),
+        privateKey: privateKey.startsWith('0x')
+          ? privateKey.trim()
+          : `0x${privateKey.trim()}`,
       };
       if (policyShow) {
         importAccountOpts.password = psd;
@@ -296,6 +298,15 @@ const AccountRecover = () => {
           <CustomPasswordInput
             onChange={(e) => {
               setConfirmPsd(e.target.value);
+            }}
+            onBlur={(e) => {
+              if (
+                psd.trim() &&
+                e.target.value?.trim() &&
+                psd.trim() !== e.target.value?.trim()
+              ) {
+                ClickToCloseMessage.error('two password is different');
+              }
             }}
             placeholder="Enter password again"
           />

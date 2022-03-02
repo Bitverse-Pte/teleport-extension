@@ -1,5 +1,5 @@
 import './style.less';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from 'ui/components/Header';
 import { Drawer } from 'antd';
@@ -29,6 +29,7 @@ const AccountManage: React.FC = () => {
   const [currentAccountName, setCurrentAccountName] = useState('');
   const [currentAccountIndex, setCurrentAccountIndex] = useState(0);
   const wallet = useWallet();
+  const accountManageWidgetRef = useRef();
 
   const { state } = useLocation<{
     hdWalletId: string;
@@ -59,6 +60,8 @@ const AccountManage: React.FC = () => {
       onSuccess: () => {
         setAddPopupVisible(false);
         queryAccounts();
+        console.log(accountManageWidgetRef.current);
+        (accountManageWidgetRef.current as any).queryAccounts();
       },
       onError: (e) => {
         ClickToCloseMessage.error('add account failed');
@@ -189,7 +192,10 @@ const AccountManage: React.FC = () => {
           ))}
         </div>
       ) : (
-        <AccountManageWidget hdWalletId={state.hdWalletId} />
+        <AccountManageWidget
+          hdWalletId={state.hdWalletId}
+          ref={accountManageWidgetRef}
+        />
       )}
       <Add
         title="Add Account"

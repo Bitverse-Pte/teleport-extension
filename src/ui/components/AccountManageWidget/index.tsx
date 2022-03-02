@@ -1,5 +1,5 @@
 import './style.less';
-import React, { useState } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { Collapse, Tooltip } from 'antd';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import { BaseAccount } from 'types/extend';
@@ -40,9 +40,7 @@ interface IDisplayAccountManage {
   }[];
 }
 
-const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
-  props: IAccountManageWidgetProps
-) => {
+const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
   const [tempAccounts, setTempAccounts] = useState<IDisplayAccountManage[]>();
   const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
 
@@ -136,6 +134,12 @@ const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
       setTempAccounts(displayAccounts);
     }
   };
+
+  useImperativeHandle(ref, () => {
+    return {
+      queryAccounts,
+    };
+  });
 
   useAsyncEffect(queryAccounts, []);
 
@@ -272,4 +276,4 @@ const AccountManageWidget: React.FC<IAccountManageWidgetProps> = (
   );
 };
 
-export default AccountManageWidget;
+export default forwardRef(AccountManageWidget);
