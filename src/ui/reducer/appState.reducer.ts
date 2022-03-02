@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export const appStateSlice = createSlice<
-  any,
+  {
+    isLoading: boolean;
+  },
   {
     showLoadingIndicator: (state: any) => any;
     hideLoadingIndicator: (state: any) => any;
