@@ -82,7 +82,7 @@ export const useTransactionFunctions = ({
       //   );
       //   dispatch(updateCustomSwapsEIP1559GasParams(newGasSettings));
       // } else {
-      //   dispatch(updateTransactionFn(updatedTxMeta));
+        dispatch(updateTransactionFn(updatedTxMeta));
       // }
     },
     [
