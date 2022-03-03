@@ -127,7 +127,7 @@ const WalletManage: React.FC = () => {
 
   const onRenameConfirm = async (walletName) => {
     if (walletName.length > 20) {
-      ClickToCloseMessage.error(`Name length should be 1-20 chars`);
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     const renamed: boolean = await wallet
