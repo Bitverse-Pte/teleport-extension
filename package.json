@@ -194,7 +194,8 @@
     "zip-dir": "^2.0.0"
   },
   "resolutions": {
-    "eth-method-registry": "2.0.0"
+    "eth-method-registry": "2.0.0",
+    "xhr2": "https://codeload.github.com/Jam3/xhr-request/tar.gz/refs/tags/v1.1.0"
   },
   "keywords": [],
   "author": "",
