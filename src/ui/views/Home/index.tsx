@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
@@ -66,6 +66,11 @@ const Home = () => {
     if (balances && balances.length) setTokens(balances);
   };
 
+  useEffect(() => {
+    const timer = setInterval(getTokenBalancesAsync, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   const queryTokenPrices = async () => {
     const prices = await wallet.queryTokenPrices().catch((e) => {
       console.error(e);
@@ -89,16 +94,6 @@ const Home = () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList();
     setAccountList(accounts);
   };
-
-  const walletIndex = useMemo(() => {
-    if (accountList && accountList.hdAccount && account) {
-      const index = accountList.hdAccount.findIndex((hd: HdAccountStruct) =>
-        hd.accounts.some((a: BaseAccount) => a.address === account.address)
-      );
-      return index > -1 ? index : 0;
-    }
-    return 0;
-  }, [account, accountList]);
 
   useAsyncEffect(getAccountList, []);
   useAsyncEffect(updateAccount, []);

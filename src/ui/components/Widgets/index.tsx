@@ -69,9 +69,10 @@ function _getDefaultIcon(
   const contractAddress = utils.getAddress(token.contractAddress);
   let src;
   if (token.isNative) {
-    src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${token.chainCustomId}/info/logo.png`;
+    src =
+      'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
   } else {
-    src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${token.chainCustomId}/assets/${contractAddress}/logo.png`;
+    src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
   }
   return loadError ? (
     defaultIcon

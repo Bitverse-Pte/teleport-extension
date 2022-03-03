@@ -111,7 +111,7 @@ const SingleToken = () => {
                 updatedToken?.decimal || 0
               )}
             </span>
-            <span className="symbol">{updatedToken?.symbol}</span>
+            <span className="single-symbol">{updatedToken?.symbol}</span>
           </div>
           <span className="estimate">
             ≈{' '}

@@ -126,12 +126,8 @@ const WalletManage: React.FC = () => {
   };
 
   const onRenameConfirm = async (walletName) => {
-    if (!walletName) {
-      ClickToCloseMessage.error('invalid wallet name');
-      return;
-    }
     if (walletName.length > 20) {
-      ClickToCloseMessage.error('the length of name should less than 20');
+      ClickToCloseMessage.error(`Name length should be 1-20 chars`);
       return;
     }
     const renamed: boolean = await wallet
@@ -139,7 +135,7 @@ const WalletManage: React.FC = () => {
       .catch((e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error('wallet name is already exist');
+          ClickToCloseMessage.error('Name already exists');
         }
       });
     if (renamed) {
@@ -150,7 +146,7 @@ const WalletManage: React.FC = () => {
 
   const handleDeleteBtnClick = (e, hdWalletId) => {
     if (hdWalletAccounts.length + simpleWalletAccounts.length === 1) {
-      ClickToCloseMessage.warning('can not delete the last wallet');
+      ClickToCloseMessage.warning('Please keep alive at least one account');
       return;
     }
     e.stopPropagation();
@@ -238,6 +234,7 @@ const WalletManage: React.FC = () => {
                       ? '_active'
                       : ''
                   }`}
+                  style={isEdit ? { paddingRight: '24px' } : {}}
                   key={w.hdWalletName}
                   onClick={(e) => {
                     if (isEdit) return;
@@ -265,51 +262,33 @@ const WalletManage: React.FC = () => {
                     </div>
                   </div>
                   <div className="right flexR">
-                    <div className="name-account-wrap flexR">
-                      <div className="name-account flexCol">
-                        <WalletName cls="name-account-name" width={100}>
-                          {w?.hdWalletName}
-                        </WalletName>
-                      </div>
-                      <div
-                        className="name-account-key-container"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          history.push({
-                            pathname: '/mnemonic-check',
-                            state: {
-                              hdWalletId: w.hdWalletId,
-                              accountType,
-                            },
-                          });
-                        }}
-                        style={
-                          currentAccount?.hdWalletId === w?.hdWalletId
-                            ? { display: 'flex' }
-                            : {}
-                        }
-                      >
-                        <img
-                          src={keyDefaultIcon}
-                          className="home-no-assets key-default-icon"
-                        />
-                        <img
-                          src={keyActiveIcon}
-                          className="home-no-assets key-active-icon"
-                        />
-                      </div>
-                    </div>
-
+                    <WalletName cls="name-account-name" width={100}>
+                      {w?.hdWalletName}
+                    </WalletName>
                     <div
-                      className="normal-container flexR"
+                      className="normal-container flexR cursor"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        history.push({
+                          pathname: '/mnemonic-check',
+                          state: {
+                            hdWalletId: w.hdWalletId,
+                            accountType,
+                          },
+                        });
+                      }}
                       style={{
                         display: isEdit ? 'none' : 'flex',
                       }}
                     >
-                      {currentAccount?.hdWalletId === w?.hdWalletId ||
-                      currentAccount?.address === w?.address ? (
-                        <IconComponent name="check" cls="base-text-color" />
-                      ) : null}
+                      <img
+                        src={keyDefaultIcon}
+                        className="home-no-assets key-default-icon"
+                      />
+                      <img
+                        src={keyActiveIcon}
+                        className="home-no-assets key-active-icon"
+                      />
                     </div>
 
                     <div
@@ -318,23 +297,6 @@ const WalletManage: React.FC = () => {
                         display: isEdit ? 'flex' : 'none',
                       }}
                     >
-                      {/* <IconComponent
-                        name="eye"
-                        cls="base-text-color"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          history.push({
-                            pathname: '/mnemonic-check',
-                            state: {
-                              hdWalletId: w.hdWalletId,
-                              accountType,
-                            },
-                          });
-                        }}
-                        style={{
-                          display: isEdit ? 'block' : 'none',
-                        }}
-                      /> */}
                       <IconComponent
                         name="edit"
                         cls="base-text-color"

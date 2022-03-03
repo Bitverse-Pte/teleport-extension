@@ -163,9 +163,9 @@
           justify-content: space-between;
           align-items: center;
           width: 100%;
-          height: 64px;
-          flex: 0 0 64px;
-          padding: 0 @pagePaddingLeft;
+          height: 56px;
+          flex: 0 0 56px;
+          padding: 0 0 0 @pagePaddingLeft;
           box-sizing: border-box;
           cursor: pointer;
 
@@ -201,6 +201,7 @@
               justify-content: center;
               background: #ffffff;
               border-radius: 50%;
+
               .circle-ecosystem-icon {
                 width: 12px;
                 height: 12px;
@@ -214,59 +215,43 @@
             justify-content: space-between;
             align-items: center;
 
-            .name {
+            .name-account-name {
               font-family: MontserratBold;
               font-size: 14px;
             }
 
-            .name-account-wrap {
+            .normal-container {
+              justify-content: center;
               align-items: center;
-
-              .name-account {
-                .name-account-name {
-                  font-family: MontserratBold;
-                  font-size: 14px;
-                }
-
-                .name-account-address {
-                  font-size: 12px;
-                  color: #A3B4CC;
-                }
+              width: 72px;
+              height:56px;
+              &:hover{
+                background: #F0F9FF;
+              }
+              .key-default-icon {
+                display: block;
               }
 
-              .name-account-key-container {
-                width: 24px;
-                height: 24px;
-                justify-content: center;
-                align-items: center;
-                border-radius: 50%;
-                margin-left: 4px;
+              .key-active-icon {
                 display: none;
+              }
+
+              &:hover {
 
                 .key-default-icon {
-                  display: block;
-                }
-
-                .key-active-icon {
                   display: none;
                 }
 
-                &:hover {
-                  background: #F0F9FF;
-
-                  .key-default-icon {
-                    display: none;
-                  }
-
-                  .key-active-icon {
-                    display: block;
-                  }
+                .key-active-icon {
+                  display: block;
                 }
-
               }
+
             }
 
-            .name-account {
+
+
+            /* .name-account {
               .name-account-name {
                 font-family: MontserratBold;
                 font-size: 14px;
@@ -276,23 +261,9 @@
                 font-size: 12px;
                 color: #A3B4CC;
               }
-            }
+            } */
 
-            .normal-container {
-              justify-content: flex-end;
-              align-items: center;
 
-              .account-count {
-                text-align: right;
-                font-size: 14px;
-                color: #798CAD;
-              }
-
-              .svg-icon {
-                margin-left: 24px;
-                fill: #A3B4CC;
-              }
-            }
 
             .icons-container {
               width: 50px;
@@ -305,7 +276,7 @@
         }
 
         ._active {
-          background: #D6EFFF;
+          background: #D6EFFF !important;
         }
       }
 

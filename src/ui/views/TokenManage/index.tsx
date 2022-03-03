@@ -96,7 +96,7 @@ const TokenManage = () => {
     },
     onError(err) {
       console.error(err);
-      ClickToCloseMessage.error('no token found');
+      ClickToCloseMessage.error('Token not found');
     },
   });
 

@@ -64,7 +64,7 @@ const AccountManage: React.FC = () => {
         (accountManageWidgetRef.current as any).queryAccounts();
       },
       onError: (e) => {
-        ClickToCloseMessage.error('add account failed');
+        ClickToCloseMessage.error('Unknown error, please try again later');
       },
     }
   );
@@ -72,18 +72,14 @@ const AccountManage: React.FC = () => {
   useAsyncEffect(queryAccounts, []);
 
   const onRenameConfirm = async (accountName) => {
-    if (!accountName) {
-      ClickToCloseMessage.error('invalid account name');
-      return;
-    }
     if (accountName.length > 20) {
-      ClickToCloseMessage.error('the length of name should less than 20');
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     const renamed = await wallet
       .renameDisplayAccount(hdWalletId, accountName, currentAccountIndex)
       .catch((e) => {
-        ClickToCloseMessage.error('this name is exist already');
+        ClickToCloseMessage.error('Name already exist');
       });
     if (renamed) {
       setRenamePopupVisible(false);
@@ -177,7 +173,7 @@ const AccountManage: React.FC = () => {
                   onClick={(e) => {
                     if (i === 0) {
                       ClickToCloseMessage.warning(
-                        'can not delete the last account'
+                        'Please keep alive at least one account'
                       );
                       return;
                     }
@@ -243,8 +239,12 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
   const [value, setValue] = useState('');
 
   const handleConfirmBtnClick = () => {
+    if (value.trim().length > 20) {
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      return;
+    }
     if (props.add && props.add instanceof Function) {
-      props.add(value);
+      props.add(value.trim());
     }
   };
 
@@ -335,8 +335,12 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
   }, [props.visible]);
 
   const handleConfirmBtnClick = () => {
+    if (value.trim().length > 20) {
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      return;
+    }
     if (props.onConfirm && props.onConfirm instanceof Function) {
-      props.onConfirm(value);
+      props.onConfirm(value.trim());
     }
   };
 
@@ -377,7 +381,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
           onClick={handleConfirmBtnClick}
           block
           cls="popup-container-top"
-          disabled={_.isEmpty(value)}
+          disabled={_.isEmpty(value.trim())}
         >
           Rename
         </CustomButton>
@@ -408,7 +412,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
 
   const handleConfirmBtnClick = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error('wrong password');
+      ClickToCloseMessage.error('Wrong password');
     });
     if (checksumPassed) {
       if (props.onConfirm && props.onConfirm instanceof Function) {
