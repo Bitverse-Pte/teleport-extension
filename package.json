@@ -1,5 +1,5 @@
 {
-  "name": "teleport",
+  "name": "teleport-wallet",
   "version": "0.1.0",
   "description": "A multi-chain & multi-ID Wallet",
   "scripts": {
