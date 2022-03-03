@@ -16,6 +16,9 @@
   "History": {
     "message": "History"
   },
+  "loading": {
+    "message": "Loading"
+  },
   "Set__Unlock__Password": {
     "message": "Set Unlock Password"
   },
@@ -36,16 +39,19 @@
     "message": "Add"
   },
   "Bad_RPC_URL": {
-    "message": " 🤔 That didn't seems to be a valid RPC URL, please double check and try again."
+    "message": "That didn't seems to be a valid RPC URL, please double check and try again."
   },
   "same_rpc_url": {
     "message": "Provider with same rpcUrl existed, please double check and try again."
   },
   "rpc_url_404": {
-    "message": " 🤔 Server responded, but rejected, please double check the URL and try again."
+    "message": "  Server responded, but rejected, please double check the URL and try again."
   },
   "bad_chain_id": {
-    "message": "🤔 That didn't seems to be a valid ChainID. maybe you should refill RPC url?"
+    "message": " That didn't seems to be a valid ChainID. maybe you should refill RPC url?"
+  },
+  "mismatch_chain_id": {
+    "message": "Chain ID doesn’t match with the server,please check it again."
   },
   "remove_custom_provider_success": {
     "message": "You removed the custom provider"
@@ -63,7 +69,7 @@
     "message": "Invalid Mnemonic"
   },
   "rpc_url_500": {
-    "message": " 🤔 Server error, please try again later or turn off proxy."
+    "message": "Unable to connect with the node, please try again later."
   },
   "Created__by__Mnemonic": {
     "message": "Created by Mnemonic"

@@ -109,7 +109,7 @@ const RpcNetworkOptions = ({
   );
 
   if (!providerContext) {
-    return <p>Loading</p>;
+    return <p>{t('loading')}</p>;
   }
 
   if (network.type !== 'rpc') {
@@ -126,7 +126,6 @@ const RpcNetworkOptions = ({
         size={16}
         onClick={handleRemove}
       />
-      {/* <IconComponent name="trash" onClick={handleRemove} /> */}
       <IconButton
         icon={IconEdit}
         size={16}
