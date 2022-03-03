@@ -71,10 +71,10 @@ const FallbackImage = ({
       <div
         className="img-wrapper"
         style={{
-          background: loadSuccess ? `url(${url})` : bgColor,
+          background: loadSuccess ? '' : bgColor,
         }}
       >
-        {!loadFaild && (
+        {!loadFaild ? (
           <img
             src={url}
             alt={origin}
@@ -87,10 +87,11 @@ const FallbackImage = ({
             onLoad={handleImageLoadSuccess}
             onError={handleImageLoadError}
           />
-        )}
-        <img
+        ) : (<img
           src={bgText}
           alt={origin}
+          onLoad={handleImageLoadSuccess}
+          onError={handleImageLoadError}
           style={{
             width,
             height,
@@ -98,7 +99,8 @@ const FallbackImage = ({
             backgroundColor: bgColor,
             ...style,
           }}
-        />
+        />)}
+        
       </div>
     </div>
   );
