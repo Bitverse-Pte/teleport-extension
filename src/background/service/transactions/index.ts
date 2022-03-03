@@ -272,7 +272,12 @@ export default class TransactionController extends EventEmitter {
         networkId.network === 'loading' ? 0 : parseInt(networkId.network, 10),
     };
 
-    return Common.forCustomChain(MAINNET, customChainParams, hardfork);
+    // return Common.forCustomChain(MAINNET, customChainParams, hardfork);
+    // deprecated, replaced with the following:
+    return Common.custom(customChainParams, {
+      baseChain: chainId,
+      hardfork,
+    });
   }
 
   /**
