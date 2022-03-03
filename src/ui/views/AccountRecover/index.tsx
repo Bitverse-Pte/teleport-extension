@@ -153,7 +153,7 @@ const AccountRecover = () => {
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error(`Password don't match`);
+        ClickToCloseMessage.error("Password don't match");
         return;
       }
     }
@@ -297,7 +297,7 @@ const AccountRecover = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error(`Password don't match`);
+                ClickToCloseMessage.error("Password don't match");
               }
             }}
             placeholder="Enter password again"

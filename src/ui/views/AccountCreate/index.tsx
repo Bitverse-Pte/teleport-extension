@@ -65,7 +65,7 @@ const AccountCreate = () => {
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error(`Passwords don't match`);
+        ClickToCloseMessage.error("Passwords don't match");
         return;
       }
     }
@@ -124,7 +124,7 @@ const AccountCreate = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error(`Passwords don't match`);
+                ClickToCloseMessage.error("Passwords don't match");
               }
             }}
             placeholder="Enter password again"

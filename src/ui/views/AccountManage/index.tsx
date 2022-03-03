@@ -171,7 +171,7 @@ const AccountManage: React.FC = () => {
                   name="trash"
                   cls="base-text-color right"
                   onClick={(e) => {
-                    if (i === 0) {
+                    if (accounts?.length === 1) {
                       ClickToCloseMessage.warning(
                         'Please keep alive at least one account'
                       );
@@ -335,6 +335,14 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
   }, [props.visible]);
 
   const handleConfirmBtnClick = () => {
+    if (
+      value.trim() === props.defaultValue &&
+      props.setVisible &&
+      props.setVisible instanceof Function
+    ) {
+      props.setVisible(false);
+      return;
+    }
     if (value.trim().length > 20) {
       ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;

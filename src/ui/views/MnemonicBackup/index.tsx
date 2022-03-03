@@ -56,6 +56,7 @@ const MnemonicBackup = () => {
   }, []);
 
   const handleSkinClick = () => {
+    if (checkDisabled) return;
     setSecond(0);
   };
   const handleCopyClick = () => {
