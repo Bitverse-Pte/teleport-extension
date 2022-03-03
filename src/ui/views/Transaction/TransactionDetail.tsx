@@ -24,6 +24,7 @@ import { Tooltip } from 'antd';
 import { TransactionFee } from './TransactionFee';
 import { cancelTxs } from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
+import { useTranslation } from 'react-i18next';
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -88,6 +89,7 @@ export function _ActivityDetail({
 
   const dispatch = useDispatch();
   const history = useHistory();
+  const { t } = useTranslation();
 
   const {
     provider: { rpcPrefs },
@@ -131,7 +133,7 @@ export function _ActivityDetail({
 
   return (
     <div className={'activity-detail ' + statusBackground}>
-      <Header title={title} />
+      <Header title={t(title)} />
       <div className="txdetail-direction-logo flex justify-center">
         {/* workaround as hook treat native token as undefined */}
         <TokenIcon
@@ -201,11 +203,11 @@ export function _ActivityDetail({
               onClick={() => alert('Gas Edit to be implemented')}
             >
               {/* <IconComponent name="rocket" /> */}
-              Gas
+              {t('speedUp')}
             </button>
             <button className="cancelBtn" type="button" onClick={cancelTx}>
               {/* <IconComponent name="cancel" /> */}
-              Cancel
+              {t('cancel')}
             </button>
           </div>
         )}
