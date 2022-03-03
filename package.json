@@ -1,7 +1,7 @@
 {
   "name": "teleport",
-  "version": "0.0.1",
-  "description": "Multi-chain wallet for browser plugin",
+  "version": "0.1.0",
+  "description": "A multi-chain & multi-ID Wallet",
   "scripts": {
     "clean": "rm -rf dist && mkdir dist && cp -r _raw/* dist",
     "clean:win": " fse emptyDir --quiet dist&&fse copy --all --keepExisting --dereference --errorOnExist --preserveTimestamps --quiet _raw dist",
