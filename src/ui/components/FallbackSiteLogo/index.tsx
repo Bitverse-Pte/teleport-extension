@@ -87,20 +87,21 @@ const FallbackImage = ({
             onLoad={handleImageLoadSuccess}
             onError={handleImageLoadError}
           />
-        ) : (<img
-          src={bgText}
-          alt={origin}
-          onLoad={handleImageLoadSuccess}
-          onError={handleImageLoadError}
-          style={{
-            width,
-            height,
-            display: loadSuccess ? 'none' : 'block',
-            backgroundColor: bgColor,
-            ...style,
-          }}
-        />)}
-        
+        ) : (
+          <img
+            src={bgText}
+            alt={origin}
+            onLoad={handleImageLoadSuccess}
+            onError={handleImageLoadError}
+            style={{
+              width,
+              height,
+              display: loadSuccess ? 'none' : 'block',
+              backgroundColor: bgColor,
+              ...style,
+            }}
+          />
+        )}
       </div>
     </div>
   );

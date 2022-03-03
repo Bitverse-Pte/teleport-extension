@@ -36,7 +36,7 @@ const GeneralHeader = ({
         onClick={onXButtonClick || defaultAction}
       >
         {/* <Space> */}
-          <IconComponent name="close" cls="closeIcon base-text-color" />
+        <IconComponent name="close" cls="closeIcon base-text-color" />
         {/* </Space> */}
       </Button>
     </div>
