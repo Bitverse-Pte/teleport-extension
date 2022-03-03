@@ -50,7 +50,7 @@ export interface Network {
 }
 export interface Provider extends Network {
   type:
-    | 'mainnet'
+    | 'ethereum'
     | 'goerli'
     | 'rinkeby'
     | 'ropsten'

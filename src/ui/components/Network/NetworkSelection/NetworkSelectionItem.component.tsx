@@ -94,8 +94,8 @@ const RpcNetworkOptions = ({
       // stop the parent's onClick event
       e.stopPropagation();
       Modal.confirm({
-        title: t('Do you want to delete this network?'),
-        content: t('You might have to add this back, are you sure?'),
+        title: t('Delete_Provider_Ask_Title'),
+        content: t('Delete_Provider_Ask_Content'),
         onOk: async () => {
           await providerContext?.removeCustomProvider(network.idx as number);
           ClickToCloseMessage.success(t('remove_custom_provider_success'));
@@ -109,7 +109,7 @@ const RpcNetworkOptions = ({
   );
 
   if (!providerContext) {
-    return <p>Loading</p>;
+    return <p>{t('loading')}</p>;
   }
 
   if (network.type !== 'rpc') {
@@ -126,7 +126,6 @@ const RpcNetworkOptions = ({
         size={16}
         onClick={handleRemove}
       />
-      {/* <IconComponent name="trash" onClick={handleRemove} /> */}
       <IconButton
         icon={IconEdit}
         size={16}

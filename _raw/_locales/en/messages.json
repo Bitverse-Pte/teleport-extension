@@ -16,6 +16,9 @@
   "History": {
     "message": "History"
   },
+  "loading": {
+    "message": "Loading"
+  },
   "Set__Unlock__Password": {
     "message": "Set Unlock Password"
   },
@@ -35,17 +38,26 @@
   "add": {
     "message": "Add"
   },
+  "Bad_URL": {
+    "message": "Bad URL format, please check your input."
+  },
   "Bad_RPC_URL": {
-    "message": " 🤔 That didn't seems to be a valid RPC URL, please double check and try again."
+    "message": "That didn't seems to be a valid RPC URL, please double check and try again."
   },
   "same_rpc_url": {
     "message": "Provider with same rpcUrl existed, please double check and try again."
   },
   "rpc_url_404": {
-    "message": " 🤔 Server responded, but rejected, please double check the URL and try again."
+    "message": "  Server responded, but rejected, please double check the URL and try again."
+  },
+  "CHAIN_ID_INPUT_PLACEHOLDER": {
+    "message": "Enter Chain ID"
   },
   "bad_chain_id": {
-    "message": "🤔 That didn't seems to be a valid ChainID. maybe you should refill RPC url?"
+    "message": " That didn't seems to be a valid ChainID. maybe you should refill RPC url?"
+  },
+  "mismatch_chain_id": {
+    "message": "Chain ID doesn’t match with the server,please check it again."
   },
   "remove_custom_provider_success": {
     "message": "You removed the custom provider"
@@ -63,7 +75,7 @@
     "message": "Invalid Mnemonic"
   },
   "rpc_url_500": {
-    "message": " 🤔 Server error, please try again later or turn off proxy."
+    "message": "Unable to connect with the node, please try again later."
   },
   "Created__by__Mnemonic": {
     "message": "Created by Mnemonic"
@@ -531,6 +543,9 @@
   "Contract": {
     "message": "Contract"
   },
+  "speedUp": {
+    "message": "Speed Up"
+  },
   "gasCostTitle": {
     "message": "Est. gas cost"
   },
@@ -701,6 +716,26 @@
     "message": "From: {{$1}}",
     "description": "{{$1}} is the address to include in the From label. It is typically shortened first using shortenAddress"
   },
+  "from": {
+    "message": "From"
+  },
+  "to": {
+    "message": "To"
+  },
+  "unapproved": { "message": "Unapproved" },
+  "approved": {
+    "message": "Approved"
+  },
+  "rejected": { "message": "Rejected" },
+  "signed": { "message": "Signed" },
+  "submitted": { "message": "Submitted" },
+  "failed": { "message": "Failed" },
+  "dropped": { "message": "Dropped" },
+  "confirmed": { "message": "Confirmed" },
+  "copy_to_clipboard": { "message": "Copy To Clipboard" },
+  "copied_to_clipboard": { "message": "Copied To Clipboard" },
+  "Delete_Provider_Ask_Title": { "message": "Do you want to delete this network?" },
+  "Delete_Provider_Ask_Content": { "message": "You might have to add this back, are you sure?" },
   "toAddress": {
     "message": "To: {{$1}}",
     "description": "{{$1}} is the address to include in the To label. It is typically shortened first using shortenAddress"
@@ -723,9 +758,6 @@
   "approveSpendLimit": {
     "message": "Approve {{$1}} spend limit",
     "description": "The token symbol that is being approved"
-  },
-  "approved": {
-    "message": "Approved"
   },
   "receive": {
     "message": "Receive"

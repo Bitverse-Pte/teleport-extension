@@ -2,7 +2,7 @@ import { CoinType, Ecosystem, Provider } from 'types/network';
 import { CHAINS } from './chain';
 
 export enum PresetNetworkId {
-  MAINNET = 'mainnet',
+  ETHEREUM = 'ethereum',
   POLYGON = 'polygon',
   ARBITRUM = 'arbitrum',
   BSC = 'bsc',
@@ -26,8 +26,8 @@ export const defaultNetworks: {
     rpcPrefs: {
       blockExplorerUrl: 'https://etherscan.io',
     },
-    id: PresetNetworkId.MAINNET,
-    type: 'mainnet',
+    id: PresetNetworkId.ETHEREUM,
+    type: 'ethereum',
     ...EVMProviderSharedProperties,
   },
   // [CHAINS.ROPSTEN]: {

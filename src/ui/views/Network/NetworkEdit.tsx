@@ -260,7 +260,7 @@ const NetworkEdit = () => {
           >
             <Input
               className="rounded-md"
-              placeholder="should automatically filled if RPC URL provided"
+              placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
             />
           </Form.Item>
           {/* <Form.Item

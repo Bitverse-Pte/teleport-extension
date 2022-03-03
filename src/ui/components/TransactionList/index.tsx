@@ -162,7 +162,7 @@ function TransactionItem({
         onClick={hasCancelled ? cancelTransaction : retryTransaction}
         style={hasCancelled ? { width: 'auto' } : {}}
       >
-        {t('gas')}
+        {t('speedUp')}
       </button>
     );
   }, [
@@ -217,19 +217,19 @@ function TransactionItem({
           <div className="grey-02 from-and-to flex items-center mr-auto">
             <span className="from cursor-default">
               <Tooltip placement="top" title={senderAddress}>
-                From: {shortenedStr(senderAddress, 3)}
+                {t('from')}: {shortenedStr(senderAddress, 3)}
               </Tooltip>
             </span>
             <IconComponent name="chevron-right" cls="grey-05" />
             <span className="to cursor-default">
               <Tooltip placement="top" title={recipientAddress}>
-                To: {shortenedStr(recipientAddress, 3)}
+                {t('to')}: {shortenedStr(recipientAddress, 3)}
               </Tooltip>
             </span>
           </div>
         )}
         <span className={clsx('status capitalize', colorByStatus)}>
-          {displayedStatusKey}
+          {t(displayedStatusKey)}
         </span>
         {!isPending && (
           <span className="date">
