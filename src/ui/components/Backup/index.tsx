@@ -54,7 +54,7 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
 
   const checksumPsd = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error('wrong password');
+      ClickToCloseMessage.error('Wrong password');
       console.error(e.code);
     });
     if (checksumPassed) {

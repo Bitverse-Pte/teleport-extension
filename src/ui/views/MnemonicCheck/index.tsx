@@ -49,7 +49,7 @@ const BackupCheck = () => {
 
   const checksumPsd = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error('wrong password');
+      ClickToCloseMessage.error('Wrong password');
       console.error(e.code);
     });
     if (checksumPassed) {

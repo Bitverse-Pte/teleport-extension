@@ -210,6 +210,7 @@ class KeyringService extends EventEmitter {
     }
     const account: BaseAccount = {
       address: keyPair.address,
+      //address: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852', for test
       coinType: opts.coinType,
       publicKey: keyPair.publicKey,
       hdPathCoinType: 0,

@@ -39,7 +39,7 @@ const AccountCreate = () => {
     },
     onError(err) {
       console.error(err);
-      ClickToCloseMessage.error(t('Not a valid mnemonic'));
+      ClickToCloseMessage.error('Unknown error, please try again later');
     },
   });
 
@@ -47,38 +47,30 @@ const AccountCreate = () => {
     () => {
       const str =
         (policyShow &&
-          (!name || !agreed || !psd || !confirmPsd || !passwordCheckPassed)) ||
-        (!policyShow && !name);
+          (!name.trim() ||
+            !agreed ||
+            !psd ||
+            !confirmPsd ||
+            !passwordCheckPassed)) ||
+        (!policyShow && !name.trim());
       return Boolean(str);
     },
     policyShow ? [agreed, name, psd, confirmPsd, passwordCheckPassed] : [name]
   );
 
-  const handleBackClick = () => {
-    history.go(-1);
-  };
-
   const submit = () => {
-    if (!name) {
-      ClickToCloseMessage.error('name is necessary');
-      return;
-    }
-    if (name.length > 20) {
-      ClickToCloseMessage.error('the length of name should less than 20');
+    if (name.trim().length > 20) {
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     if (policyShow) {
-      if (!psd.trim() || psd.trim().length < MIN_PASSWORD_LENGTH) {
-        ClickToCloseMessage.error('password need more than 8 words');
-        return;
-      }
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error('two password is different');
+        ClickToCloseMessage.error(`Passwords don't match`);
         return;
       }
     }
     const createOpts: CreateAccountOpts = {
-      name,
+      name: name.trim(),
     };
     if (policyShow) {
       createOpts.password = psd;
@@ -125,6 +117,15 @@ const AccountCreate = () => {
           <CustomPasswordInput
             onChange={(e) => {
               setConfirmPsd(e.target.value);
+            }}
+            onBlur={(e) => {
+              if (
+                psd.trim() &&
+                e.target.value?.trim() &&
+                psd.trim() !== e.target.value?.trim()
+              ) {
+                ClickToCloseMessage.error(`Passwords don't match`);
+              }
             }}
             placeholder="Enter password again"
           />
