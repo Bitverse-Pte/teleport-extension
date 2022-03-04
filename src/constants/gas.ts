@@ -66,3 +66,14 @@ export enum EDIT_GAS_MODES {
   MODIFY_IN_PLACE = 'modify-in-place',
   SWAPS = 'swaps',
 }
+
+export enum GAS_FORM_ERRORS {
+  GAS_LIMIT_OUT_OF_BOUNDS = 'editGasLimitOutOfBounds',
+  MAX_PRIORITY_FEE_TOO_LOW = 'editGasMaxPriorityFeeLow',
+  MAX_FEE_TOO_LOW = 'editGasMaxFeeLow',
+  MAX_PRIORITY_FEE_BELOW_MINIMUM = 'editGasMaxPriorityFeeBelowMinimum',
+  MAX_PRIORITY_FEE_HIGH_WARNING = 'editGasMaxPriorityFeeHigh',
+  MAX_FEE_HIGH_WARNING = 'editGasMaxFeeHigh',
+  MAX_FEE_IMBALANCE = 'editGasMaxFeeImbalance',
+  GAS_PRICE_TOO_LOW = 'editGasPriceTooLow',
+}

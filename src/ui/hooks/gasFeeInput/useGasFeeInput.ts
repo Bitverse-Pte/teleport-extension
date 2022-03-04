@@ -1,29 +1,36 @@
-// import { useCallback, useEffect, useState } from 'react';
-// import { useSelector } from 'react-redux';
+import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-// // import { GAS_FORM_ERRORS } from '../../helpers/constants/gas';
+// import { GAS_FORM_ERRORS } from '../../helpers/constants/gas';
 // // import {
 // //   checkNetworkAndAccountSupports1559,
 // //   getAdvancedInlineGasShown,
 // //   getEIP1559V2Enabled,
 // // } from '../../selectors';
-// // import { hexToDecimal } from '../../helpers/utils/conversions.util';
-// // import { isLegacyTransaction } from '../../helpers/utils/transactions.util';
-// // import { useGasFeeEstimates } from '../useGasFeeEstimates';
+// import { hexToDecimal } from '../../helpers/utils/conversions.util';
+// import { isLegacyTransaction } from '../../helpers/utils/transactions.util';
+// import { useGasFeeEstimates } from '../useGasFeeEstimates';
 
 // // import { useGasFeeErrors } from './useGasFeeErrors';
 // // import { useGasPriceInput } from './useGasPriceInput';
 // // import { useMaxFeePerGasInput } from './useMaxFeePerGasInput';
 // // import { useMaxPriorityFeePerGasInput } from './useMaxPriorityFeePerGasInput';
 // // import { useGasEstimates } from './useGasEstimates';
-// import { useTransactionFunctions } from './useTransactionFunctions';
+import { useTransactionFunctions } from './useTransactionFunctions';
 import {
   CUSTOM_GAS_ESTIMATE,
   GAS_RECOMMENDATIONS,
   EDIT_GAS_MODES,
   PRIORITY_LEVELS,
+  GAS_FORM_ERRORS,
 } from 'constants/gas';
-// /**
+import { useGasFeeEstimates } from '../gas/useGasFeeEstimates';
+import { checkNetworkAndAccountSupports1559 } from 'ui/selectors/selectors';
+import { isLegacyTransaction } from 'utils/transaction.utils';
+import { hexToDecimal } from 'ui/utils/conversion';
+import { useGasPriceInput } from './useGasPriceInput';
+import { useMaxFeePerGasInput } from './useMaxFeePerGasInput';
+/**
 //  * In EIP_1559_V2 implementation as used by useGasfeeInputContext() the use of this hook is evolved.
 //  * It is no longer used to keep transient state of advance gas fee inputs.
 //  * Transient state of inputs is maintained locally in /ui/components/app/advance-gas-fee-popover component.
@@ -93,262 +100,262 @@ export function useGasFeeInputs(
   minimumGasLimit = '0x5208',
   editGasMode = EDIT_GAS_MODES.MODIFY_IN_PLACE
 ) {
-  //   const eip1559V2Enabled = useSelector(getEIP1559V2Enabled);
-  //   const supportsEIP1559 =
-  //     useSelector(checkNetworkAndAccountSupports1559) &&
-  //     !isLegacyTransaction(transaction?.txParams);
-  //   const supportsEIP1559V2 = supportsEIP1559 && eip1559V2Enabled;
-  //   // We need the gas estimates from the GasFeeController in the background.
-  //   // Calling this hooks initiates polling for new gas estimates and returns the
-  //   // current estimate.
-  //   const {
-  //     gasEstimateType,
-  //     gasFeeEstimates,
-  //     isGasEstimatesLoading,
-  //     estimatedGasFeeTimeBounds,
-  //     isNetworkBusy,
-  //   } = useGasFeeEstimates();
-  //   const userPrefersAdvancedGas = useSelector(getAdvancedInlineGasShown);
-  //   const [estimateToUse, setInternalEstimateToUse] = useState(() => {
-  //     if (
-  //       userPrefersAdvancedGas &&
-  //       transaction?.txParams?.maxPriorityFeePerGas &&
-  //       transaction?.txParams?.maxFeePerGas
-  //     ) {
-  //       return null;
-  //     }
-  //     if (transaction) {
-  //       return transaction?.userFeeLevel || null;
-  //     }
-  //     return defaultEstimateToUse;
-  //   });
-  //   const [estimateUsed, setEstimateUsed] = useState(() => {
-  //     if (estimateToUse) {
-  //       return estimateToUse;
-  //     }
-  //     return PRIORITY_LEVELS.CUSTOM;
-  //   });
-  //   const [gasLimit, setGasLimit] = useState(() =>
-  //     Number(hexToDecimal(transaction?.txParams?.gas ?? '0x0')),
-  //   );
-  //   const properGasLimit = Number(hexToDecimal(transaction?.originalGasEstimate));
-  //   const [userEditedGasLimit, setUserEditedGasLimit] = useState(() =>
-  //     Boolean(transaction?.userEditedGasLimit),
-  //   );
-  //   /**
-  //    * In EIP-1559 V2 designs change to gas estimate is always updated to transaction
-  //    * Thus callback setEstimateToUse can be deprecate in favour of this useEffect
-  //    * so that transaction is source of truth whenever possible.
-  //    */
-  //   useEffect(() => {
-  //     if (supportsEIP1559V2) {
-  //       if (transaction?.userFeeLevel) {
-  //         setEstimateUsed(transaction?.userFeeLevel);
-  //         setInternalEstimateToUse(transaction?.userFeeLevel);
-  //       }
-  //       setGasLimit(Number(hexToDecimal(transaction?.txParams?.gas ?? '0x0')));
-  //     }
-  //   }, [
-  //     setEstimateUsed,
-  //     setGasLimit,
-  //     setInternalEstimateToUse,
-  //     supportsEIP1559V2,
-  //     transaction,
-  //   ]);
-  //   const {
-  //     gasPrice,
-  //     setGasPrice,
-  //     setGasPriceHasBeenManuallySet,
-  //   } = useGasPriceInput({
-  //     estimateToUse,
-  //     gasEstimateType,
-  //     gasFeeEstimates,
-  //     transaction,
-  //   });
-  //   const {
-  //     maxFeePerGas,
-  //     maxFeePerGasFiat,
-  //     setMaxFeePerGas,
-  //   } = useMaxFeePerGasInput({
-  //     estimateToUse,
-  //     gasEstimateType,
-  //     gasFeeEstimates,
-  //     gasLimit,
-  //     gasPrice,
-  //     supportsEIP1559V2,
-  //     transaction,
-  //   });
-  //   const {
-  //     maxPriorityFeePerGas,
-  //     maxPriorityFeePerGasFiat,
-  //     setMaxPriorityFeePerGas,
-  //   } = useMaxPriorityFeePerGasInput({
-  //     estimateToUse,
-  //     gasEstimateType,
-  //     gasFeeEstimates,
-  //     gasLimit,
-  //     supportsEIP1559V2,
-  //     transaction,
-  //   });
-  //   const {
-  //     estimatedBaseFee,
-  //     estimatedMaximumFiat,
-  //     estimatedMinimumFiat,
-  //     estimatedMaximumNative,
-  //     estimatedMinimumNative,
-  //     maximumCostInHexWei,
-  //     minimumCostInHexWei,
-  //   } = useGasEstimates({
-  //     editGasMode,
-  //     gasEstimateType,
-  //     gasFeeEstimates,
-  //     gasLimit,
-  //     gasPrice,
-  //     maxFeePerGas,
-  //     maxPriorityFeePerGas,
-  //     minimumGasLimit,
-  //     transaction,
-  //   });
-  //   const {
-  //     balanceError,
-  //     estimatesUnavailableWarning,
-  //     gasErrors,
-  //     gasWarnings,
-  //     hasGasErrors,
-  //     hasSimulationError,
-  //   } = useGasFeeErrors({
-  //     gasEstimateType,
-  //     gasFeeEstimates,
-  //     isGasEstimatesLoading,
-  //     gasLimit,
-  //     gasPrice,
-  //     maxPriorityFeePerGas,
-  //     maxFeePerGas,
-  //     minimumCostInHexWei,
-  //     minimumGasLimit,
-  //     transaction,
-  //   });
-  //   const handleGasLimitOutOfBoundError = useCallback(() => {
-  //     if (gasErrors.gasLimit === GAS_FORM_ERRORS.GAS_LIMIT_OUT_OF_BOUNDS) {
-  //       const transactionGasLimitDec = hexToDecimal(transaction?.txParams?.gas);
-  //       const minimumGasLimitDec = hexToDecimal(minimumGasLimit);
-  //       setGasLimit(
-  //         transactionGasLimitDec > minimumGasLimitDec
-  //           ? transactionGasLimitDec
-  //           : minimumGasLimitDec,
-  //       );
-  //     }
-  //   }, [minimumGasLimit, gasErrors.gasLimit, transaction]);
-  //   const {
-  //     cancelTransaction,
-  //     speedUpTransaction,
-  //     updateTransaction,
-  //     updateTransactionToTenPercentIncreasedGasFee,
-  //     updateTransactionUsingDAPPSuggestedValues,
-  //     updateTransactionUsingEstimate,
-  //   } = useTransactionFunctions({
-  //     defaultEstimateToUse,
-  //     editGasMode,
-  //     gasFeeEstimates,
-  //     gasLimit,
-  //     maxPriorityFeePerGas,
-  //     minimumGasLimit,
-  //     transaction,
-  //   });
-  //   // When a user selects an estimate level, it will wipe out what they have
-  //   // previously put in the inputs. This returns the inputs to the estimated
-  //   // values at the level specified.
-  //   const setEstimateToUse = useCallback(
-  //     (estimateLevel) => {
-  //       setInternalEstimateToUse(estimateLevel);
-  //       handleGasLimitOutOfBoundError();
-  //       setMaxFeePerGas(null);
-  //       setMaxPriorityFeePerGas(null);
-  //       setGasPrice(null);
-  //       setGasPriceHasBeenManuallySet(false);
-  //       setEstimateUsed(estimateLevel);
-  //     },
-  //     [
-  //       setInternalEstimateToUse,
-  //       handleGasLimitOutOfBoundError,
-  //       setMaxFeePerGas,
-  //       setMaxPriorityFeePerGas,
-  //       setGasPrice,
-  //       setGasPriceHasBeenManuallySet,
-  //       setEstimateUsed,
-  //     ],
-  //   );
-  //   const onManualChange = useCallback(() => {
-  //     setInternalEstimateToUse(CUSTOM_GAS_ESTIMATE);
-  //     handleGasLimitOutOfBoundError();
-  //     // Restore existing values
-  //     setGasPrice(gasPrice);
-  //     setGasLimit(gasLimit);
-  //     setUserEditedGasLimit(true);
-  //     setMaxFeePerGas(maxFeePerGas);
-  //     setMaxPriorityFeePerGas(maxPriorityFeePerGas);
-  //     setGasPriceHasBeenManuallySet(true);
-  //     setEstimateUsed('custom');
-  //   }, [
-  //     setInternalEstimateToUse,
-  //     handleGasLimitOutOfBoundError,
-  //     setGasPrice,
-  //     gasPrice,
-  //     setGasLimit,
-  //     gasLimit,
-  //     setUserEditedGasLimit,
-  //     setMaxFeePerGas,
-  //     maxFeePerGas,
-  //     setMaxPriorityFeePerGas,
-  //     maxPriorityFeePerGas,
-  //     setGasPriceHasBeenManuallySet,
-  //   ]);
-  //   return {
-  //     transaction,
-  //     maxFeePerGas,
-  //     maxFeePerGasFiat,
-  //     setMaxFeePerGas,
-  //     maxPriorityFeePerGas,
-  //     maxPriorityFeePerGasFiat,
-  //     setMaxPriorityFeePerGas,
-  //     gasPrice,
-  //     setGasPrice,
-  //     gasLimit,
-  //     setGasLimit,
-  //     properGasLimit,
-  //     userEditedGasLimit,
-  //     editGasMode,
-  //     estimateToUse,
-  //     setEstimateToUse,
-  //     estimatedMinimumFiat,
-  //     estimatedMaximumFiat,
-  //     estimatedMaximumNative,
-  //     estimatedMinimumNative,
-  //     isGasEstimatesLoading,
-  //     maximumCostInHexWei,
-  //     minimumCostInHexWei,
-  //     estimateUsed,
-  //     gasFeeEstimates,
-  //     gasEstimateType,
-  //     estimatedGasFeeTimeBounds,
-  //     isNetworkBusy,
-  //     onManualChange,
-  //     estimatedBaseFee,
-  //     // error and warnings
-  //     balanceError,
-  //     estimatesUnavailableWarning,
-  //     gasErrors,
-  //     gasWarnings,
-  //     hasGasErrors,
-  //     hasSimulationError,
-  //     minimumGasLimitDec: hexToDecimal(minimumGasLimit),
-  //     supportsEIP1559,
-  //     supportsEIP1559V2,
-  //     cancelTransaction,
-  //     speedUpTransaction,
-  //     updateTransaction,
-  //     updateTransactionToTenPercentIncreasedGasFee,
-  //     updateTransactionUsingDAPPSuggestedValues,
-  //     updateTransactionUsingEstimate,
-  //   };
+  const eip1559V2Enabled = useSelector(
+    // disabled-selector getEIP1559V2Enabled
+    () => false
+  );
+  const supportsEIP1559 =
+    useSelector(checkNetworkAndAccountSupports1559) &&
+    !isLegacyTransaction(transaction?.txParams);
+  const supportsEIP1559V2 = supportsEIP1559 && eip1559V2Enabled;
+  // We need the gas estimates from the GasFeeController in the background.
+  // Calling this hooks initiates polling for new gas estimates and returns the
+  // current estimate.
+  const {
+    gasEstimateType,
+    gasFeeEstimates,
+    isGasEstimatesLoading,
+    estimatedGasFeeTimeBounds,
+    isNetworkBusy,
+  } = useGasFeeEstimates();
+  const userPrefersAdvancedGas = useSelector(
+    // disabled-selector getAdvancedInlineGasShown
+    () => false
+  );
+  const [estimateToUse, setInternalEstimateToUse] = useState(() => {
+    if (
+      userPrefersAdvancedGas &&
+      transaction?.txParams?.maxPriorityFeePerGas &&
+      transaction?.txParams?.maxFeePerGas
+    ) {
+      return null;
+    }
+    if (transaction) {
+      return transaction?.userFeeLevel || null;
+    }
+    return defaultEstimateToUse;
+  });
+  const [estimateUsed, setEstimateUsed] = useState(() => {
+    if (estimateToUse) {
+      return estimateToUse;
+    }
+    return PRIORITY_LEVELS.CUSTOM;
+  });
+  const [gasLimit, setGasLimit] = useState(() =>
+    Number(hexToDecimal(transaction?.txParams?.gas ?? '0x0'))
+  );
+  const properGasLimit = Number(hexToDecimal(transaction?.originalGasEstimate));
+  const [userEditedGasLimit, setUserEditedGasLimit] = useState(() =>
+    Boolean(transaction?.userEditedGasLimit)
+  );
+  /**
+   * In EIP-1559 V2 designs change to gas estimate is always updated to transaction
+   * Thus callback setEstimateToUse can be deprecate in favour of this useEffect
+   * so that transaction is source of truth whenever possible.
+   */
+  useEffect(() => {
+    if (supportsEIP1559V2) {
+      if (transaction?.userFeeLevel) {
+        setEstimateUsed(transaction?.userFeeLevel);
+        setInternalEstimateToUse(transaction?.userFeeLevel);
+      }
+      setGasLimit(Number(hexToDecimal(transaction?.txParams?.gas ?? '0x0')));
+    }
+  }, [
+    setEstimateUsed,
+    setGasLimit,
+    setInternalEstimateToUse,
+    supportsEIP1559V2,
+    transaction,
+  ]);
+  const { gasPrice, setGasPrice, setGasPriceHasBeenManuallySet } =
+    useGasPriceInput({
+      estimateToUse,
+      gasEstimateType,
+      gasFeeEstimates,
+      transaction,
+    });
+  const { maxFeePerGas, maxFeePerGasFiat, setMaxFeePerGas } =
+    useMaxFeePerGasInput({
+      estimateToUse,
+      gasEstimateType,
+      gasFeeEstimates,
+      gasLimit,
+      gasPrice,
+      supportsEIP1559V2,
+      transaction,
+    });
+  const {
+    maxPriorityFeePerGas,
+    maxPriorityFeePerGasFiat,
+    setMaxPriorityFeePerGas,
+  } = useMaxPriorityFeePerGasInput({
+    estimateToUse,
+    gasEstimateType,
+    gasFeeEstimates,
+    gasLimit,
+    supportsEIP1559V2,
+    transaction,
+  });
+  const {
+    estimatedBaseFee,
+    estimatedMaximumFiat,
+    estimatedMinimumFiat,
+    estimatedMaximumNative,
+    estimatedMinimumNative,
+    maximumCostInHexWei,
+    minimumCostInHexWei,
+  } = useGasEstimates({
+    editGasMode,
+    gasEstimateType,
+    gasFeeEstimates,
+    gasLimit,
+    gasPrice,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    minimumGasLimit,
+    transaction,
+  });
+  const {
+    balanceError,
+    estimatesUnavailableWarning,
+    gasErrors,
+    gasWarnings,
+    hasGasErrors,
+    hasSimulationError,
+  } = useGasFeeErrors({
+    gasEstimateType,
+    gasFeeEstimates,
+    isGasEstimatesLoading,
+    gasLimit,
+    gasPrice,
+    maxPriorityFeePerGas,
+    maxFeePerGas,
+    minimumCostInHexWei,
+    minimumGasLimit,
+    transaction,
+  });
+  const handleGasLimitOutOfBoundError = useCallback(() => {
+    if (gasErrors.gasLimit === GAS_FORM_ERRORS.GAS_LIMIT_OUT_OF_BOUNDS) {
+      const transactionGasLimitDec = hexToDecimal(transaction?.txParams?.gas);
+      const minimumGasLimitDec = hexToDecimal(minimumGasLimit);
+      setGasLimit(
+        transactionGasLimitDec > minimumGasLimitDec
+          ? transactionGasLimitDec
+          : minimumGasLimitDec
+      );
+    }
+  }, [minimumGasLimit, gasErrors.gasLimit, transaction]);
+  const {
+    cancelTransaction,
+    speedUpTransaction,
+    updateTransaction,
+    updateTransactionToTenPercentIncreasedGasFee,
+    updateTransactionUsingDAPPSuggestedValues,
+    updateTransactionUsingEstimate,
+  } = useTransactionFunctions({
+    defaultEstimateToUse,
+    editGasMode,
+    gasFeeEstimates,
+    gasLimit,
+    maxPriorityFeePerGas,
+    minimumGasLimit,
+    transaction,
+  });
+  // When a user selects an estimate level, it will wipe out what they have
+  // previously put in the inputs. This returns the inputs to the estimated
+  // values at the level specified.
+  const setEstimateToUse = useCallback(
+    (estimateLevel) => {
+      setInternalEstimateToUse(estimateLevel);
+      handleGasLimitOutOfBoundError();
+      setMaxFeePerGas(null);
+      setMaxPriorityFeePerGas(null);
+      setGasPrice(null);
+      setGasPriceHasBeenManuallySet(false);
+      setEstimateUsed(estimateLevel);
+    },
+    [
+      setInternalEstimateToUse,
+      handleGasLimitOutOfBoundError,
+      setMaxFeePerGas,
+      setMaxPriorityFeePerGas,
+      setGasPrice,
+      setGasPriceHasBeenManuallySet,
+      setEstimateUsed,
+    ]
+  );
+  const onManualChange = useCallback(() => {
+    setInternalEstimateToUse(CUSTOM_GAS_ESTIMATE);
+    handleGasLimitOutOfBoundError();
+    // Restore existing values
+    setGasPrice(gasPrice);
+    setGasLimit(gasLimit);
+    setUserEditedGasLimit(true);
+    setMaxFeePerGas(maxFeePerGas);
+    setMaxPriorityFeePerGas(maxPriorityFeePerGas);
+    setGasPriceHasBeenManuallySet(true);
+    setEstimateUsed('custom');
+  }, [
+    setInternalEstimateToUse,
+    handleGasLimitOutOfBoundError,
+    setGasPrice,
+    gasPrice,
+    setGasLimit,
+    gasLimit,
+    setUserEditedGasLimit,
+    setMaxFeePerGas,
+    maxFeePerGas,
+    setMaxPriorityFeePerGas,
+    maxPriorityFeePerGas,
+    setGasPriceHasBeenManuallySet,
+  ]);
+  return {
+    transaction,
+    maxFeePerGas,
+    maxFeePerGasFiat,
+    setMaxFeePerGas,
+    maxPriorityFeePerGas,
+    maxPriorityFeePerGasFiat,
+    setMaxPriorityFeePerGas,
+    gasPrice,
+    setGasPrice,
+    gasLimit,
+    setGasLimit,
+    properGasLimit,
+    userEditedGasLimit,
+    editGasMode,
+    estimateToUse,
+    setEstimateToUse,
+    estimatedMinimumFiat,
+    estimatedMaximumFiat,
+    estimatedMaximumNative,
+    estimatedMinimumNative,
+    isGasEstimatesLoading,
+    maximumCostInHexWei,
+    minimumCostInHexWei,
+    estimateUsed,
+    gasFeeEstimates,
+    gasEstimateType,
+    estimatedGasFeeTimeBounds,
+    isNetworkBusy,
+    onManualChange,
+    estimatedBaseFee,
+    // error and warnings
+    balanceError,
+    estimatesUnavailableWarning,
+    gasErrors,
+    gasWarnings,
+    hasGasErrors,
+    hasSimulationError,
+    minimumGasLimitDec: hexToDecimal(minimumGasLimit),
+    supportsEIP1559,
+    supportsEIP1559V2,
+    cancelTransaction,
+    speedUpTransaction,
+    updateTransaction,
+    updateTransactionToTenPercentIncreasedGasFee,
+    updateTransactionUsingDAPPSuggestedValues,
+    updateTransactionUsingEstimate,
+  };
 }

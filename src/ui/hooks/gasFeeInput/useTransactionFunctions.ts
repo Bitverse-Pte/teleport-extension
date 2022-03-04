@@ -20,7 +20,7 @@ interface ParamsOfuseTransactionFunctions {
   editGasMode: EDIT_GAS_MODES;
   estimatedBaseFee: string;
   gasFeeEstimates: any;
-  gasLimit: string;
+  gasLimit: number;
   maxPriorityFeePerGas: string;
   transaction: Transaction;
 }

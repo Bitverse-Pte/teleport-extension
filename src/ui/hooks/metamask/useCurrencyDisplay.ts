@@ -34,7 +34,7 @@ import { getCurrentCurrency, getNativeCurrency } from 'ui/selectors/selectors';
  */
 export interface UseCurrencyOptions {
   displayValue?: string;
-  prefix: string;
+  prefix?: string;
   numberOfDecimals: number;
   denomination?: string;
   currency: string;
@@ -50,7 +50,7 @@ export interface UseCurrencyOptions {
  * @property {string} [suffix]  - string to append to the value for display
  */
 export interface CurrencyDisplayParts {
-  prefix: string;
+  prefix?: string;
   value: string;
   suffix: string;
 }
