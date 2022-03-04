@@ -6,6 +6,9 @@ export enum PresetNetworkId {
   POLYGON = 'polygon',
   ARBITRUM = 'arbitrum',
   BSC = 'bsc',
+  FTM = 'ftm',
+  AVAX = 'avax',
+  OP = 'op',
 }
 
 const EVMProviderSharedProperties = {
@@ -67,7 +70,7 @@ export const defaultNetworks: {
     ...EVMProviderSharedProperties,
   },
   [CHAINS.FTM]: {
-    id: CHAINS.FTM,
+    id: PresetNetworkId.FTM,
     type: CHAINS.FTM,
     rpcUrl: 'https://rpc.ftm.tools/',
     chainId: '0xfa',
@@ -79,7 +82,7 @@ export const defaultNetworks: {
     ...EVMProviderSharedProperties,
   },
   [CHAINS.AVAX]: {
-    id: CHAINS.AVAX,
+    id: PresetNetworkId.AVAX,
     type: CHAINS.AVAX,
     rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
     chainId: '0xa86a',
@@ -91,7 +94,7 @@ export const defaultNetworks: {
     ...EVMProviderSharedProperties,
   },
   [CHAINS.OP]: {
-    id: CHAINS.OP,
+    id: PresetNetworkId.OP,
     type: CHAINS.OP,
     rpcUrl: 'https://mainnet.optimism.io',
     chainId: '0xa',
