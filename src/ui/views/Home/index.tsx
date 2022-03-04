@@ -321,7 +321,7 @@ const Home = () => {
         {tabType === Tabs.SECOND && (
           <div className="transaction-list">
             <TransactionsList
-              listContiannerHeight={250}
+              listContiannerHeight={206}
               txData={filterCondition}
             />
           </div>
