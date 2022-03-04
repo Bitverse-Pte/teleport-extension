@@ -30,6 +30,7 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { Button, Tooltip } from 'antd';
 import { gasEstimateGreaterThanGasUsedPlusTenPercent } from 'ui/helpers/utils/gas';
 import { SimpleModal } from 'ui/components/universal/SimpleModal';
+import { useTransactionFunctions } from 'ui/hooks/gasFeeInput/useTransactionFunctions';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -54,8 +55,18 @@ const CancelSpeedupPopover = ({
   setShowPopOver,
 }: CancelAndSpeedUpPopoverParams) => {
   const { t } = useTranslation();
-  //   const appIsLoading = useSelector(getAppIsLoading);
-  const appIsLoading = false;
+  const appIsLoading = useSelector((s) => s.appState.isLoading);
+  // const {
+
+  // } = useTransactionFunctions({
+  //   transaction,
+  //   editGasMode,
+  //   // gasLimit,
+  //   // gasFeeEstimates,
+  //   // maxPriorityFeePerGas,
+  //   // defaultEstimateToUse,
+  //   // estimatedBaseFee
+  // });
 
   // @todo: gasFeeEstimates
   const gasFeeEstimates: any = {};
@@ -151,19 +162,14 @@ const CancelSpeedupPopover = ({
           </Tooltip>
         </h6>
         <div className="cancel-speedup-popover__separator" />
-        {/* <div
-          display={DISPLAY.FLEX}
-          alignItems={ALIGN_ITEMS.CENTER}
-          flexDirection={FLEX_DIRECTION.COLUMN}
-          marginTop={4}
-        >
-          <div className="cancel-speedup-popover__edit-gas-button">
+        <div className="flex items-center flex-col" style={{ marginTop: 4 }}>
+          {/* <div className="cancel-speedup-popover__edit-gas-button">
             {!appIsLoading && <EditGasFeeButton />}
           </div>
           <div className="cancel-speedup-popover__gas-details">
             <GasDetailsItem />
-          </div>
-        </div> */}
+          </div> */}
+        </div>
         <Button type="primary" onClick={submitTransactionChange}>
           {t('submit')}
         </Button>
