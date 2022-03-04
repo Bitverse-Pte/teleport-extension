@@ -214,12 +214,7 @@ const NetworkEdit = () => {
         className="content-wrap-padding"
       >
         <div className="form-body">
-          <Form.Item
-            label={t('Network Name')}
-            name="networkName"
-            required
-            rules={[{ required: true }]}
-          >
+          <Form.Item label={t('Network Name')} name="networkName" required>
             <Input
               className="rounded-md"
               placeholder="Enter Network Name"
@@ -239,34 +234,26 @@ const NetworkEdit = () => {
               onBlur={({ target }) => checkRpcUrlAndSetChainId(target.value)}
             />
           </Form.Item>
-          <Form.Item
-            label={t('Chain ID')}
-            name="chainId"
-            required
-            rules={[
-              { required: true },
-              {
-                validator: async (_, value) => {
-                  try {
-                    checkIsTrimmed(value);
-                    BigNumber.from(value);
-                  } catch (error) {
-                    setErrorMessage('chainId', t('bad_chain_id'));
-                    console.error('chainId::validator', error);
-                  }
-                },
-              },
-            ]}
-          >
+          <Form.Item label={t('Chain ID')} name="chainId" required>
             <Input
               className="rounded-md"
               placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
+              onBlur={({ target }) => {
+                try {
+                  if (target.value == '') return setErrorMessage('chainId');
+                  checkIsTrimmed(target.value);
+                  BigNumber.from(target.value);
+                  setErrorMessage('chainId');
+                } catch (error) {
+                  setErrorMessage('chainId', t('bad_chain_id'));
+                  console.error('chainId::validator', error);
+                }
+              }}
             />
           </Form.Item>
           {/* <Form.Item
             name="category"
             label={t('Belonging Chain')}
-            rules={[{ required: true }]}
           >
             <Select>
               {categories.map(({ label, value }) => {

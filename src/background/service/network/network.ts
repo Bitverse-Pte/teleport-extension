@@ -415,7 +415,8 @@ class NetworkPreferenceService extends EventEmitter {
     const isInfura = INFURA_PROVIDER_TYPES.includes(type);
 
     if (isInfura) {
-      this._checkInfuraAvailability(type);
+      const _tmpInfuraType = type === 'ethereum' ? 'mainnet' : type;
+      this._checkInfuraAvailability(_tmpInfuraType);
     } else {
       this.emit(NETWORK_EVENTS.INFURA_IS_UNBLOCKED);
     }
@@ -661,8 +662,9 @@ class NetworkPreferenceService extends EventEmitter {
 
   private _configureInfuraProvider(type, projectId: string) {
     log.info('NetworkController - configureInfuraProvider', type);
+    const _tmpInfuraType = type === 'ethereum' ? 'mainnet' : type;
     const networkClient = createInfuraClient({
-      network: type,
+      network: _tmpInfuraType,
       projectId,
     });
     this._setNetworkClient(networkClient);
