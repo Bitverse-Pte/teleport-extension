@@ -218,7 +218,6 @@ const NetworkEdit = () => {
             label={t('Network Name')}
             name="networkName"
             required
-            rules={[{ required: true }]}
           >
             <Input
               className="rounded-md"
@@ -243,30 +242,26 @@ const NetworkEdit = () => {
             label={t('Chain ID')}
             name="chainId"
             required
-            rules={[
-              { required: true },
-              {
-                validator: async (_, value) => {
-                  try {
-                    checkIsTrimmed(value);
-                    BigNumber.from(value);
-                  } catch (error) {
-                    setErrorMessage('chainId', t('bad_chain_id'));
-                    console.error('chainId::validator', error);
-                  }
-                },
-              },
-            ]}
           >
             <Input
               className="rounded-md"
               placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
+              onBlur={({ target }) => {
+                try {
+                  if (target.value == '') return setErrorMessage('chainId');
+                  checkIsTrimmed(target.value);
+                  BigNumber.from(target.value);
+                  setErrorMessage('chainId');
+                } catch (error) {
+                  setErrorMessage('chainId', t('bad_chain_id'));
+                  console.error('chainId::validator', error);
+                }
+              }}
             />
           </Form.Item>
           {/* <Form.Item
             name="category"
             label={t('Belonging Chain')}
-            rules={[{ required: true }]}
           >
             <Select>
               {categories.map(({ label, value }) => {
