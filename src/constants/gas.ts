@@ -21,7 +21,7 @@ export enum GAS_ESTIMATE_TYPES {
   LEGACY = 'legacy',
   ETH_GASPRICE = 'eth_gasPrice',
   NONE = 'none',
-};
+}
 
 /**
  * These represent gas recommendation levels presented in the UI
