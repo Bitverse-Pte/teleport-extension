@@ -214,11 +214,7 @@ const NetworkEdit = () => {
         className="content-wrap-padding"
       >
         <div className="form-body">
-          <Form.Item
-            label={t('Network Name')}
-            name="networkName"
-            required
-          >
+          <Form.Item label={t('Network Name')} name="networkName" required>
             <Input
               className="rounded-md"
               placeholder="Enter Network Name"
@@ -238,11 +234,7 @@ const NetworkEdit = () => {
               onBlur={({ target }) => checkRpcUrlAndSetChainId(target.value)}
             />
           </Form.Item>
-          <Form.Item
-            label={t('Chain ID')}
-            name="chainId"
-            required
-          >
+          <Form.Item label={t('Chain ID')} name="chainId" required>
             <Input
               className="rounded-md"
               placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
