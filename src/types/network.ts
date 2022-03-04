@@ -58,6 +58,9 @@ export interface Provider extends Network {
     | 'BSC'
     | 'POLYGON'
     | 'ARBITRUM'
+    | 'FANTOM'
+    | 'AVAX'
+    | 'OP'
     | 'rpc';
 }
 

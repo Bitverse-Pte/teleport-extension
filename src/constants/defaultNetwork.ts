@@ -50,7 +50,7 @@ export const defaultNetworks: {
     ticker: 'ETH',
     nickname: 'Arbitrum',
     rpcPrefs: {
-      blockExplorerUrl: 'https://arbiscan.io/'
+      blockExplorerUrl: 'https://arbiscan.io/',
     },
     ...EVMProviderSharedProperties,
   },
@@ -62,7 +62,43 @@ export const defaultNetworks: {
     ticker: 'MATIC',
     nickname: 'Polygon Mainnet',
     rpcPrefs: {
-      blockExplorerUrl: 'https://polygonscan.com'
+      blockExplorerUrl: 'https://polygonscan.com',
+    },
+    ...EVMProviderSharedProperties,
+  },
+  [CHAINS.FTM]: {
+    id: CHAINS.FTM,
+    type: CHAINS.FTM,
+    rpcUrl: 'https://rpc.ftm.tools/',
+    chainId: '0xfa',
+    ticker: 'FTM',
+    nickname: 'Fantom Opera',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://ftmscan.com',
+    },
+    ...EVMProviderSharedProperties,
+  },
+  [CHAINS.AVAX]: {
+    id: CHAINS.AVAX,
+    type: CHAINS.AVAX,
+    rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
+    chainId: '0xa86a',
+    ticker: 'AVAX',
+    nickname: 'Avalanche Network',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://snowtrace.io',
+    },
+    ...EVMProviderSharedProperties,
+  },
+  [CHAINS.OP]: {
+    id: CHAINS.OP,
+    type: CHAINS.OP,
+    rpcUrl: 'https://mainnet.optimism.io',
+    chainId: '0xa',
+    ticker: 'ETH',
+    nickname: 'Optimistic Ethereum',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://optimistic.ethereum.io',
     },
     ...EVMProviderSharedProperties,
   },
