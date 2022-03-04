@@ -1,3 +1,3 @@
 # TeleportWallet
 
- > The most powerful wallet for Teleport
+ > A multi-chain & multi-ID Wallet 

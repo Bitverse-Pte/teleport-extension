@@ -1,8 +1,8 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "__MSG_appName__",
   "short_name": "__MSG_appName__",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "default_locale": "en",
   "description": "__MSG_appDescription__",
   "icons": {
@@ -13,7 +13,7 @@
     "128": "images/icons/128.png",
     "512": "images/icons/512.png"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "images/icons/16.png",
       "32": "images/icons/32.png",
@@ -25,8 +25,7 @@
   },
   "author": "https://teleport.network/",
   "background": {
-    "persistent": true,
-    "scripts": ["webextension-polyfill.js", "vendors.js", "background.js"]
+    "service_worker": "bg-loader.js"
   },
   "content_scripts": [
     {
@@ -40,7 +39,13 @@
       "js": ["vendor/trezor/trezor-content-script.js"]
     }
   ],
-  "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'",
+    "sandbox": "sandbox allow-scripts; script-src 'self' 'https://www.google-analytics.com'; object-src 'self'"
+  },
   "permissions": ["storage", "activeTab", "notifications"],
-  "web_accessible_resources": ["user-media-permission.html"]
+  "web_accessible_resources": [{
+    "resources": ["user-media-permission.html"],
+    "matches": ["<all_urls>"]
+  }]
 }

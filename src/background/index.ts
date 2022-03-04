@@ -36,21 +36,21 @@ let appStoreLoaded = false;
   tracesSampleRate: 1.0
 });*/
 
-function initAppMeta() {
-  const head = document.querySelector('head');
-  const icon = document.createElement('link');
-  icon.href = '/images/logo.png';
-  icon.rel = 'icon';
-  head?.appendChild(icon);
-  const name = document.createElement('meta');
-  name.name = 'name';
-  name.content = 'TeleportWallet';
-  head?.appendChild(name);
-  const description = document.createElement('meta');
-  description.name = 'description';
-  description.content = i18n.t('appDescription');
-  head?.appendChild(description);
-}
+// function initAppMeta() {
+//   const head = document.querySelector('head');
+//   const icon = document.createElement('link');
+//   icon.href = '/images/logo.png';
+//   icon.rel = 'icon';
+//   head?.appendChild(icon);
+//   const name = document.createElement('meta');
+//   name.name = 'name';
+//   name.content = 'TeleportWallet';
+//   head?.appendChild(name);
+//   const description = document.createElement('meta');
+//   description.name = 'description';
+//   description.content = i18n.t('appDescription');
+//   head?.appendChild(description);
+// }
 
 async function restoreAppState() {
   const keyringState = await storage.get('keyringState');
@@ -75,7 +75,7 @@ async function restoreAppState() {
 
   appStoreLoaded = true;
 
-  initAppMeta();
+  // initAppMeta();
 }
 
 restoreAppState();
