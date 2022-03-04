@@ -18,7 +18,13 @@ export function TransactionFee({ transaction }: Params) {
     );
   }, []);
 
-  if (!isTxSigned) {
+  const isTxFeeDataExist = useMemo(() => {
+    const { maxFeePerGas, gasPrice, gas } =
+      transaction.primaryTransaction.txParams;
+    return Boolean(maxFeePerGas || gasPrice) && Boolean(gas);
+  }, [transaction]);
+
+  if (!isTxSigned || !isTxFeeDataExist) {
     return null;
   }
 
@@ -31,7 +37,7 @@ export function TransactionFee({ transaction }: Params) {
             // use gasPrice (legacy) or maxFeePerGas(1559 network)
             transaction.primaryTransaction.txParams.maxFeePerGas ||
               transaction.primaryTransaction.txParams.gasPrice
-          ).mul(transaction.primaryTransaction.txParams.gas)
+          ).mul(transaction.primaryTransaction.txParams.gas!)
         )}{' '}
         {primaryCurrency.split(' ')[1]}
       </div>
