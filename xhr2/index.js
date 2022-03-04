@@ -47,7 +47,7 @@ class XMLHttpRequestShim extends Dispatch {
       signal: this._controller.signal,
       body: payload,
     })
-      .then(async (response) => {
+      .then((response) => {
         this.readyState = this.HEADERS_RECEIVED;
         this.responseURL = response.url;
         this.responseType = response.type;
@@ -70,25 +70,23 @@ class XMLHttpRequestShim extends Dispatch {
         }
         return response.text();
       })
-      .then(
-        (value) => {
-          this.response = value;
-          this.readyState = this.DONE;
-          this.dispatch('readystatechange');
-          this.upload.dispatch('load');
-          this.dispatch('load');
-          this.upload.dispatch('progress');
-          this.dispatch('progress');
-          this.upload.dispatch('loadend');
-          this.dispatch('loadend');
-        },
-        (err) => {
-          this.dispatch('error');
-          this.upload.dispatch('error');
-          this.readyState = this.DONE;
-          this.dispatch('readystatechange');
-        }
-      );
+      .then((value) => {
+        this.response = value;
+        this.readyState = this.DONE;
+        this.dispatch('readystatechange');
+        this.upload.dispatch('load');
+        this.dispatch('load');
+        this.upload.dispatch('progress');
+        this.dispatch('progress');
+        this.upload.dispatch('loadend');
+        this.dispatch('loadend');
+      })
+      .catch((err) => {
+        this.dispatch('error');
+        this.upload.dispatch('error');
+        this.readyState = this.DONE;
+        this.dispatch('readystatechange');
+      });
   }
   get responseText() {
     if (this.response) {
@@ -103,6 +101,7 @@ class XMLHttpRequestShim extends Dispatch {
       }
       return this.response;
     }
+    return '';
   }
 
   // No response headers suport yet!
@@ -110,8 +109,5 @@ class XMLHttpRequestShim extends Dispatch {
     return ''; // todo fix headers at HEADERS_RECEIVED
   }
 }
-if (typeof module === 'object' && module.exports) {
-  module.exports = XMLHttpRequestShim;
-} else {
-  (globalThis || self).XMLHttpRequestShim = XMLHttpRequest;
-}
+
+module.exports = XMLHttpRequestShim;
