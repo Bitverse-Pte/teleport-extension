@@ -210,6 +210,7 @@ class KeyringService extends EventEmitter {
     }
     const account: BaseAccount = {
       address: keyPair.address,
+      //address: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852', for test
       coinType: opts.coinType,
       publicKey: keyPair.publicKey,
       hdPathCoinType: 0,
@@ -759,6 +760,23 @@ class KeyringService extends EventEmitter {
     return Promise.resolve(secrets);
   }
 
+  async getCurrentChainAccounts(): Promise<BaseAccount[]> {
+    const currentChainCoinType: CoinType =
+      networkPreferenceService.getProviderConfig().coinType;
+    const currentAccount = preference.getCurrentAccount();
+    let accounts: BaseAccount[] = [];
+    if (!currentAccount) {
+      return Promise.reject(new Error('no account found'));
+    }
+
+    accounts = this.accounts.filter(
+      (a: BaseAccount) =>
+        a.coinType === currentChainCoinType &&
+        a.hdWalletId === currentAccount.hdWalletId
+    );
+    return Promise.resolve(accounts);
+  }
+
   getAccountList(useCurrentChain = false): DisplayWalletManage {
     const coinType = networkPreferenceService.getProviderConfig().coinType;
     const accounts: DisplayWalletManage = {
@@ -793,11 +811,11 @@ class KeyringService extends EventEmitter {
     return accounts;
   }
 
-  getAccountListByHdWalletId(hdWalletId: string): DisplayAccountManage[] {
-    const accounts: BaseAccount[] = cloneDeep(this.accounts).filter(
+  getAccountListByHdWalletId(hdWalletId: string): BaseAccount[] {
+    return cloneDeep(this.accounts).filter(
       (a: BaseAccount) => a.hdWalletId === hdWalletId
     );
-    const displayAccounts: DisplayAccountManage[] = [];
+    /* const displayAccounts: DisplayAccountManage[] = [];
     if (accounts && accounts.length > 0) {
       accounts.forEach((a: BaseAccount) => {
         const match = displayAccounts.find(
@@ -815,7 +833,7 @@ class KeyringService extends EventEmitter {
       });
     }
 
-    return displayAccounts;
+    return displayAccounts; */
   }
 
   getAccountAllList() {

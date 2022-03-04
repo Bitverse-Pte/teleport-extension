@@ -105,18 +105,20 @@ const NetworksSelectionContainer = () => {
           }
           return (
             <div className="networklist-category" key={key}>
-              <div className="category-tag flex items-center">
+              <div
+                className="category-tag flex items-center cursor-pointer"
+                onClick={() => {
+                  setActiveKeys({
+                    ...activeKeys,
+                    [key]: !activeKeys[key],
+                  });
+                }}
+              >
                 <ChainCategoryIcon src={currentCategory.icon} />
                 <h2 className="category-name">{currentCategory.displayName}</h2>
                 <IconComponent
                   name={`chevron-${!activeKeys[key] ? 'down' : 'up'}`}
                   cls="ml-auto"
-                  onClick={() => {
-                    setActiveKeys({
-                      ...activeKeys,
-                      [key]: !activeKeys[key],
-                    });
-                  }}
                 />
               </div>
               {activeKeys[key] &&

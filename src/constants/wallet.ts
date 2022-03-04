@@ -1,12 +1,8 @@
-import { CHAINS_ENUM } from './index';
+import { CoinType, Ecosystem } from 'types/network';
 
 export const MIN_PASSWORD_LENGTH = 8;
 
 export const POLICY_AGREED = 'policy_agreed';
-
-export enum CoinType {
-  ETH = 60,
-}
 
 export const WALLET_THEME_COLOR: string[] = [
   '#0F83FF',
@@ -41,3 +37,23 @@ export enum TipButtonEnum {
   WALLET_MANAGE,
   LOCK,
 }
+
+export const CoinTypeEcosystemMapping: {
+  [key in keyof typeof Ecosystem]: {
+    coinType: CoinType[];
+    ecosystemName: string;
+  };
+} = {
+  [Ecosystem.EVM]: {
+    coinType: [CoinType.ETH],
+    ecosystemName: 'ETH Network',
+  },
+  [Ecosystem.COSMOS]: {
+    coinType: [CoinType.COSMOS],
+    ecosystemName: 'Cosmos Network',
+  },
+  [Ecosystem.POLKADOT]: {
+    coinType: [CoinType.POLKADOT],
+    ecosystemName: 'Polkadot Network',
+  },
+};

@@ -231,6 +231,9 @@ export class WalletController extends BaseController {
 
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 
+  setIsDefaultWallet = (val: boolean) =>
+    preferenceService.setIsDefaultWallet(val);
+
   _setCurrentAccount = async (account: BaseAccount) => {
     preferenceService.setCurrentAccount(account);
   };
@@ -292,6 +295,10 @@ export class WalletController extends BaseController {
     return Promise.resolve(keyringService.getAccountList(useCurrentChain));
   }
 
+  getCurrentChainAccounts(): Promise<BaseAccount[]> {
+    return keyringService.getCurrentChainAccounts();
+  }
+
   getAccountByAddress(hexAddress: HexString): Promise<BaseAccount | undefined> {
     const find = keyringService
       .getAccountAllList()
@@ -299,9 +306,7 @@ export class WalletController extends BaseController {
     return Promise.resolve(find);
   }
 
-  getAccountListByHdWalletId(
-    hdWalletId: string
-  ): Promise<DisplayAccountManage[]> {
+  getAccountListByHdWalletId(hdWalletId: string): Promise<BaseAccount[]> {
     return Promise.resolve(
       keyringService.getAccountListByHdWalletId(hdWalletId)
     );

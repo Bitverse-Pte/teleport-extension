@@ -1,0 +1,11 @@
+{
+  "name": "shim-xhr-to-fetch",
+  "version": "1.0.0",
+  "description": "XMLHttpRequest, reimplemented using fetch.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

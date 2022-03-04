@@ -2,24 +2,25 @@ import './style.less';
 import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from 'ui/components/Header';
-import { message } from 'antd';
-import clsx from 'clsx';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
-import { BaseAccount, DisplayWalletManage } from 'types/extend';
+import {
+  AccountCreateType,
+  BaseAccount,
+  DisplayWalletManage,
+} from 'types/extend';
 import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import Backup from 'ui/components/Backup';
-import { CustomButton, CustomTab, WalletName } from 'ui/components/Widgets';
+import { CustomTab, WalletName } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
-import ChainIcons from 'ui/components/ChainIcons';
 import noAssets from 'assets/noAssets.svg';
 import { Delete, Rename } from '../AccountManage';
 import { ErrorCode } from 'constants/code';
-import reversEnter from 'assets/reverseEnter.svg';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import importImg from 'assets/importImg.svg';
+import keyDefaultIcon from 'assets/keyDefault.svg';
+import keyActiveIcon from 'assets/keyActive.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
 
 export interface WalletHeaderProps {
   title: string;
@@ -55,6 +56,7 @@ const WalletManage: React.FC = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [renamePopupVisible, setRenamePopupVisible] = useState(false);
   const [currentWalletName, setCurrentWalletName] = useState('');
+  const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
 
   const queryWallets = async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList(true);
@@ -68,11 +70,36 @@ const WalletManage: React.FC = () => {
     }
   };
 
+  const queryCurrentAccount = async () => {
+    const account: BaseAccount = await wallet.getCurrentAccount();
+    console.log('current account', account);
+    if (account) {
+      setCurrentAccount(account);
+    }
+  };
+
   useAsyncEffect(queryWallets, []);
+  useAsyncEffect(queryCurrentAccount, []);
 
   const isHd = useMemo(() => {
     return accountType === Tabs.FIRST;
   }, [accountType]);
+
+  useMemo(() => {
+    if (currentAccount && hdWalletAccounts && simpleWalletAccounts) {
+      if (
+        hdWalletAccounts.some((account) =>
+          account.accounts.some(
+            (subAccount) => subAccount.address === currentAccount.address
+          )
+        )
+      ) {
+        setAccountType(Tabs.FIRST);
+      } else {
+        setAccountType(Tabs.SECOND);
+      }
+    }
+  }, [hdWalletAccounts, simpleWalletAccounts, currentAccount]);
 
   const handleCreateBtnClick = () => {
     history.push('/create');
@@ -89,14 +116,9 @@ const WalletManage: React.FC = () => {
     queryWallets();
   };
 
-  const handleWalletClick = (w: any) => {
-    history.push({
-      pathname: '/account-manage',
-      state: {
-        hdWalletId: w.hdWalletId,
-        hdWalletName: w.hdWalletName,
-      },
-    });
+  const handleWalletClick = async (w: any) => {
+    await wallet.changeAccount(w?.accounts ? w?.accounts[0] : w);
+    history.goBack();
   };
 
   const setBackupVisible = (visible: boolean) => {
@@ -104,12 +126,8 @@ const WalletManage: React.FC = () => {
   };
 
   const onRenameConfirm = async (walletName) => {
-    if (!walletName) {
-      ClickToCloseMessage.error('invalid wallet name');
-      return;
-    }
     if (walletName.length > 20) {
-      ClickToCloseMessage.error('the length of name should less than 20');
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     const renamed: boolean = await wallet
@@ -117,7 +135,7 @@ const WalletManage: React.FC = () => {
       .catch((e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error('wallet name is already exist');
+          ClickToCloseMessage.error('Name already exists');
         }
       });
     if (renamed) {
@@ -128,7 +146,7 @@ const WalletManage: React.FC = () => {
 
   const handleDeleteBtnClick = (e, hdWalletId) => {
     if (hdWalletAccounts.length + simpleWalletAccounts.length === 1) {
-      ClickToCloseMessage.warning('can not delete the last wallet');
+      ClickToCloseMessage.warning('Please keep alive at least one account');
       return;
     }
     e.stopPropagation();
@@ -148,10 +166,17 @@ const WalletManage: React.FC = () => {
       )}
       <div
         className="wallet-manage-button-container flexR content-wrap-padding"
-        style={isEdit ? { display: 'none' } : {}}
+        style={{
+          display: isEdit ? 'none' : 'flex',
+          justifyContent:
+            accountType === Tabs.FIRST ? 'space-between' : 'center',
+        }}
       >
         <div
           className="wallet-manage-button-item cursor flexCol _edit"
+          style={{
+            marginRight: accountType === Tabs.FIRST ? '0px' : '132px',
+          }}
           onClick={() => setIsEdit(!isEdit)}
         >
           <div className="wallet-manage-button-wrap flexR">
@@ -170,6 +195,7 @@ const WalletManage: React.FC = () => {
         </div>
         <div
           onClick={handleCreateBtnClick}
+          style={{ display: accountType === Tabs.FIRST ? 'flex' : 'none' }}
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">
@@ -181,7 +207,11 @@ const WalletManage: React.FC = () => {
       <div className="tab-container flexR content-wrap-padding">
         <CustomTab
           tab1="ID Wallet"
+          currentTab={accountType}
           tab2="Normal Wallet"
+          showToolTips
+          tip1="Created/Imported with mnemonic words"
+          tip2="Imported with private key"
           handleTabClick={(tab: Tabs) => {
             setAccountType(tab);
           }}
@@ -199,86 +229,74 @@ const WalletManage: React.FC = () => {
                 : simpleWalletAccounts
               ).map((w: BaseAccount | any, i: number) => (
                 <div
-                  className="item flexR"
+                  className={`item flexR ${
+                    currentAccount?.hdWalletId === w?.hdWalletId
+                      ? '_active'
+                      : ''
+                  }`}
+                  style={isEdit ? { paddingRight: '24px' } : {}}
                   key={w.hdWalletName}
                   onClick={(e) => {
-                    if (!isHd || isEdit) return;
+                    if (isEdit) return;
                     handleWalletClick(w);
                   }}
                 >
-                  <span
+                  <div
                     className="circle flexR"
                     style={{ background: WALLET_THEME_COLOR[i % 5] }}
                   >
                     {w?.hdWalletName?.substr(0, 1)}
-                  </span>
-                  <div className="right flexR">
-                    <div className="name-account flexCol">
-                      <WalletName cls="name-account-name" width={100}>
-                        {w?.hdWalletName}
-                      </WalletName>
-                      <span
-                        className="name-account-address"
-                        style={{
-                          display: isHd ? 'none' : 'block',
-                        }}
-                      >
-                        {transferAddress2Display(w.address)}
-                      </span>
-                    </div>
                     <div
-                      className="normal-container flexR"
+                      className="circle-wrap flexR"
                       style={{
-                        display: isHd && !isEdit ? 'flex' : 'none',
+                        display:
+                          w?.accountCreateType === AccountCreateType.PRIVATE_KEY
+                            ? 'flex'
+                            : 'none',
                       }}
                     >
-                      <span className="account-count">
-                        {w?.accounts?.length} accounts
-                      </span>
-                      <IconComponent name="chevron-right" />
+                      <img
+                        src={coinTypeToIconSVG(w?.coinType)}
+                        className="circle-ecosystem-icon"
+                      />
+                    </div>
+                  </div>
+                  <div className="right flexR">
+                    <WalletName cls="name-account-name" width={100}>
+                      {w?.hdWalletName}
+                    </WalletName>
+                    <div
+                      className="normal-container flexR cursor"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        history.push({
+                          pathname: '/mnemonic-check',
+                          state: {
+                            hdWalletId: w.hdWalletId,
+                            accountType,
+                          },
+                        });
+                      }}
+                      style={{
+                        display: isEdit ? 'none' : 'flex',
+                      }}
+                    >
+                      <img
+                        src={keyDefaultIcon}
+                        className="home-no-assets key-default-icon"
+                      />
+                      <img
+                        src={keyActiveIcon}
+                        className="home-no-assets key-active-icon"
+                      />
                     </div>
 
-                    <div
-                      className="normal-container flexR"
-                      style={{
-                        display: !isHd && !isEdit ? 'flex' : 'none',
-                      }}
-                    >
-                      <ChainIcons coinType={w?.coinType} />
-                      <CopyToClipboard
-                        text={w.address}
-                        onCopy={() => ClickToCloseMessage.success('Copied')}
-                      >
-                        <IconComponent
-                          name="copy"
-                          cls="base-text-color arrow-right-icon"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </CopyToClipboard>
-                    </div>
                     <div
                       className="icons-container flexR"
                       style={{
                         display: isEdit ? 'flex' : 'none',
                       }}
                     >
-                      <IconComponent
-                        name="eye"
-                        cls="base-text-color"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          history.push({
-                            pathname: '/mnemonic-check',
-                            state: {
-                              hdWalletId: w.hdWalletId,
-                              accountType,
-                            },
-                          });
-                        }}
-                        style={{
-                          display: isEdit ? 'block' : 'none',
-                        }}
-                      />
                       <IconComponent
                         name="edit"
                         cls="base-text-color"

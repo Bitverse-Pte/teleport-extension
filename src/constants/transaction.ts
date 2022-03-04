@@ -147,7 +147,7 @@ export interface TxParams {
 
   data?: HexString;
   from: HexString;
-  gas: HexString;
+  gas?: HexString;
   gasLimit?: HexString;
   gasPrice?: HexString;
   estimateSuggested?: string;

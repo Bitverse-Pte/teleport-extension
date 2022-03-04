@@ -12,7 +12,7 @@ import { intToHex } from 'ethereumjs-util';
 import { useWallet, useApproval } from 'ui/utils';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { BigNumber } from 'ethers';
-import { CoinType, EcoSystem, Provider } from 'types/network';
+import { CoinType, Ecosystem, Provider } from 'types/network';
 import DefaulutIcon from 'assets/tokens/default.svg';
 import { nanoid } from 'nanoid';
 import './addChain.less';
@@ -156,7 +156,7 @@ const AddChain = ({ params }: { params: AddChainProps }) => {
         coinType: CoinType.ETH,
         chainName: 'ETH',
         id: nanoid(),
-        ecsystem: EcoSystem.EVM,
+        ecosystem: Ecosystem.EVM,
         prefix: '0x',
       };
     } else {

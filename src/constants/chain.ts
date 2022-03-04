@@ -16,7 +16,7 @@ export enum CHAINS {
   DAI = 'DAI',
   HECO = 'HECO',
   POLYGON = 'POLYGON',
-  FTM = 'FTM',
+  FTM = 'FANTOM',
   OKT = 'OKT',
   ARBITRUM = 'ARBITRUM',
   AVAX = 'AVAX',

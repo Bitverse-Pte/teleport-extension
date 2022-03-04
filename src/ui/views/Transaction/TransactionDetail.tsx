@@ -26,6 +26,7 @@ import { cancelTxs } from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
 import CancelSpeedupPopover from 'ui/components/TransactionList/CancelAndSpeedUp/CancelAndSpeedUp.popover';
 import { EDIT_GAS_MODES } from 'constants/gas';
+import { useTranslation } from 'react-i18next';
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -90,6 +91,7 @@ export function _ActivityDetail({
 
   const dispatch = useDispatch();
   const history = useHistory();
+  const { t } = useTranslation();
 
   const {
     provider: { rpcPrefs },
@@ -153,7 +155,7 @@ export function _ActivityDetail({
   return (
     <>
       <div className={'activity-detail ' + statusBackground}>
-        <Header title={title} />
+        <Header title={t(title)} />
         <div className="txdetail-direction-logo flex justify-center">
           {/* workaround as hook treat native token as undefined */}
           <TokenIcon
@@ -171,7 +173,7 @@ export function _ActivityDetail({
           </div>
           <div className="break"></div>
           <p className={'txdetail-status capitalize ' + statusBackground}>
-            {displayedStatusKey}
+            {t(displayedStatusKey)}
           </p>
         </div>
         <div className="details content-wrap-padding">

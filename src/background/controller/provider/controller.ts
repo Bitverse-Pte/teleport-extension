@@ -18,7 +18,7 @@ import { Tx } from 'types/tx';
 import Wallet from '../wallet';
 import { SAFE_RPC_METHODS } from 'constants/index';
 import BaseController from '../base';
-import { CoinType, EcoSystem } from 'types/network';
+import { CoinType, Ecosystem } from 'types/network';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { chainIdToCategory } from 'utils/chain';
@@ -369,7 +369,7 @@ class ProviderController extends BaseController {
       chainParams.blockExplorerUrls[0],
       CoinType.ETH,
       'ETH',
-      EcoSystem.EVM,
+      Ecosystem.EVM,
       '0x'
     );
     networkPreferenceService.setProviderConfig({

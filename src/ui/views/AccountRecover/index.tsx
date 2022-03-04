@@ -84,19 +84,19 @@ const AccountRecover = () => {
 
     switch (e?.code) {
       case ErrorCode.ADDRESS_REPEAT:
-        ClickToCloseMessage.error('this address is exist already');
+        ClickToCloseMessage.error('Account already exists');
         break;
       case ErrorCode.INVALID_MNEMONIC:
-        ClickToCloseMessage.error('invalid mnemonic');
+        ClickToCloseMessage.error('Invalid mnemonic');
         break;
       case ErrorCode.INVALID_PRIVATE_KEY:
-        ClickToCloseMessage.error('invalid private key');
+        ClickToCloseMessage.error('Invalid private key');
         break;
       default:
         if (importType === Tabs.FIRST) {
-          ClickToCloseMessage.error('invalid mnemonic');
+          ClickToCloseMessage.error('Invalid mnemonic');
         } else {
-          ClickToCloseMessage.error('invalid private key');
+          ClickToCloseMessage.error('Invalid private key');
         }
     }
   };
@@ -125,12 +125,12 @@ const AccountRecover = () => {
             (importType === Tabs.SECOND && !privateKey) ||
             !psd ||
             !confirmPsd ||
-            !name ||
+            !name.trim() ||
             !passwordCheckPassed)) ||
         (!policyShow &&
           ((importType === Tabs.FIRST && !mnemonic) ||
             (importType === Tabs.SECOND && !privateKey) ||
-            !name));
+            !name.trim()));
       return Boolean(str);
     },
     policyShow
@@ -147,21 +147,13 @@ const AccountRecover = () => {
   );
 
   const submit = () => {
-    if (!name.trim()) {
-      ClickToCloseMessage.error('name is necessary ');
-      return;
-    }
-    if (name.length > 20) {
-      ClickToCloseMessage.error('the length of name should less than 20');
+    if (name.trim().length > 20) {
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     if (policyShow) {
-      if (!psd.trim() || psd.trim().length < MIN_PASSWORD_LENGTH) {
-        ClickToCloseMessage.error('password need more than 8 words');
-        return;
-      }
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error('two password is different');
+        ClickToCloseMessage.error("Password don't match");
         return;
       }
     }
@@ -172,7 +164,7 @@ const AccountRecover = () => {
      */
     if (importType === Tabs.FIRST) {
       const importAccountOpts: CreateAccountOpts = {
-        name,
+        name: name.trim(),
         mnemonic: mnemonic.trim(),
       };
       if (policyShow) {
@@ -181,9 +173,11 @@ const AccountRecover = () => {
       recover(importAccountOpts);
     } else {
       const importAccountOpts: ImportAccountOpts = {
-        name,
+        name: name.trim(),
         coinType,
-        privateKey: privateKey.trim(),
+        privateKey: privateKey.startsWith('0x')
+          ? privateKey.trim()
+          : `0x${privateKey.trim()}`,
       };
       if (policyShow) {
         importAccountOpts.password = psd;
@@ -199,6 +193,7 @@ const AccountRecover = () => {
         <CustomTab
           tab1="Mnemonic"
           tab2="Private Key"
+          currentTab={importType}
           handleTabClick={(tab: Tabs) => {
             setImportType(tab);
           }}
@@ -295,6 +290,15 @@ const AccountRecover = () => {
           <CustomPasswordInput
             onChange={(e) => {
               setConfirmPsd(e.target.value);
+            }}
+            onBlur={(e) => {
+              if (
+                psd.trim() &&
+                e.target.value?.trim() &&
+                psd.trim() !== e.target.value?.trim()
+              ) {
+                ClickToCloseMessage.error("Password don't match");
+              }
             }}
             placeholder="Enter password again"
           />

@@ -19,7 +19,7 @@ const Unlock = () => {
       resolveApproval();
     },
     onError(err) {
-      ClickToCloseMessage.error('wrong password');
+      ClickToCloseMessage.error('Wrong password');
     },
   });
 

@@ -35,9 +35,9 @@ const GeneralHeader = ({
         className="closeWindowBtn"
         onClick={onXButtonClick || defaultAction}
       >
-        <Space>
-          <IconComponent name="close" cls="closeIcon base-text-color" />
-        </Space>
+        {/* <Space> */}
+        <IconComponent name="close" cls="closeIcon base-text-color" />
+        {/* </Space> */}
       </Button>
     </div>
   );

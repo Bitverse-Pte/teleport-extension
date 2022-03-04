@@ -1,16 +1,10 @@
 import './style.less';
-import React, { useMemo, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import React, { useMemo, useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from 'ui/components/Header';
-import { message, Drawer, Collapse, Tooltip } from 'antd';
-import {
-  transferAddress2Display,
-  useAsyncEffect,
-  useWallet,
-  useWalletRequest,
-} from 'ui/utils';
-import { BaseAccount } from 'types/extend';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Drawer } from 'antd';
+import { useAsyncEffect, useWallet, useWalletRequest } from 'ui/utils';
+import { AccountCreateType, BaseAccount } from 'types/extend';
 import Jazzicon from 'react-jazzicon';
 import * as _ from 'lodash';
 import { IconComponent } from 'ui/components/IconComponents';
@@ -20,22 +14,13 @@ import {
   CustomPasswordInput,
   WalletName,
 } from 'ui/components/Widgets';
-import { Provider } from 'types/network';
-import { IdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 import { WalletHeader } from '../WalletManage';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
-
-interface ICustomChain extends BaseAccount {
-  chainList?: {
-    chainCustomId: string;
-    chainName: string;
-  }[];
-}
+import AccountManageWidget from 'ui/components/AccountManageWidget';
 
 const AccountManage: React.FC = () => {
-  const history = useHistory();
   const [accounts, setAccounts] = useState<any>([]);
   const [isEdit, setIsEdit] = useState(false);
   const [addPopupVisible, setAddPopupVisible] = useState(false);
@@ -44,45 +29,28 @@ const AccountManage: React.FC = () => {
   const [currentAccountName, setCurrentAccountName] = useState('');
   const [currentAccountIndex, setCurrentAccountIndex] = useState(0);
   const wallet = useWallet();
+  const accountManageWidgetRef = useRef();
 
   const { state } = useLocation<{
     hdWalletId: string;
     hdWalletName: string;
+    accountCreateType: AccountCreateType;
   }>();
-  const { hdWalletId, hdWalletName } = state;
+  const { hdWalletId, hdWalletName, accountCreateType } = state;
 
   const queryAccounts = async () => {
-    const accounts: {
-      accountName: string;
-      accounts: ICustomChain[];
-      hdPathIndex: number;
-    }[] = await wallet.getAccountListByHdWalletId(hdWalletId);
+    const accountList: BaseAccount[] = await wallet.getAccountListByHdWalletId(
+      hdWalletId
+    );
 
-    if (accounts && accounts.length > 0) {
-      for (const a of accounts) {
-        for (const subAccount of a.accounts) {
-          const { coinType } = subAccount;
-          const chains: Provider[] = await wallet.getSameChainsByCoinType(
-            coinType
-          );
-          if (chains?.length) {
-            chains.forEach((p: Provider) => {
-              const chainItem = {
-                chainCustomId: p.id,
-                chainName: p.nickname,
-              };
-              if (subAccount?.chainList) {
-                subAccount.chainList.push(chainItem);
-              } else {
-                subAccount.chainList = [chainItem];
-              }
-            });
-          }
+    if (accountList && accountList.length > 0) {
+      const tempAccounts: BaseAccount[] = [];
+      accountList.forEach((a: BaseAccount) => {
+        if (tempAccounts.every((t) => t.hdPathIndex !== a.hdPathIndex)) {
+          tempAccounts.push(a);
         }
-      }
-      setAccounts(accounts);
-    } else {
-      history.replace('/welcome');
+      });
+      setAccounts(accountList);
     }
   };
 
@@ -92,9 +60,11 @@ const AccountManage: React.FC = () => {
       onSuccess: () => {
         setAddPopupVisible(false);
         queryAccounts();
+        console.log(accountManageWidgetRef.current);
+        (accountManageWidgetRef.current as any).queryAccounts();
       },
       onError: (e) => {
-        ClickToCloseMessage.error('add account failed');
+        ClickToCloseMessage.error('Unknown error, please try again later');
       },
     }
   );
@@ -102,18 +72,14 @@ const AccountManage: React.FC = () => {
   useAsyncEffect(queryAccounts, []);
 
   const onRenameConfirm = async (accountName) => {
-    if (!accountName) {
-      ClickToCloseMessage.error('invalid account name');
-      return;
-    }
     if (accountName.length > 20) {
-      ClickToCloseMessage.error('the length of name should less than 20');
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     const renamed = await wallet
       .renameDisplayAccount(hdWalletId, accountName, currentAccountIndex)
       .catch((e) => {
-        ClickToCloseMessage.error('this name is exist already');
+        ClickToCloseMessage.error('Name already exist');
       });
     if (renamed) {
       setRenamePopupVisible(false);
@@ -163,6 +129,11 @@ const AccountManage: React.FC = () => {
 
         <div
           onClick={() => setAddPopupVisible(true)}
+          style={
+            accountCreateType === AccountCreateType.PRIVATE_KEY
+              ? { display: 'none' }
+              : {}
+          }
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">
@@ -171,121 +142,57 @@ const AccountManage: React.FC = () => {
           <span className="wallet-manage-button-item-title">Add</span>
         </div>
       </div>
-      <div className="content flexCol content-wrap-padding">
-        {isEdit
-          ? accounts.map((a, i) => (
-              <div className="edit-account flexR" key={`edit_${i}`}>
-                <div className="edit-left flexR">
-                  <Jazzicon
-                    diameter={30}
-                    seed={Number(a.accounts[0].address.substr(0, 8) || 0)}
-                  />
-                  <WalletName cls="account" width={100}>
-                    {a.accountName}
-                  </WalletName>
-                </div>
-                <div className="edit-right flexR">
-                  <IconComponent
-                    name="edit"
-                    cls="base-text-color"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentAccountName(a.accountName);
-                      setCurrentAccountIndex(a.hdPathIndex);
-                      setRenamePopupVisible(true);
-                    }}
-                  />
-                  <IconComponent
-                    name="trash"
-                    cls="base-text-color right"
-                    onClick={(e) => {
-                      if (i === 0) {
-                        ClickToCloseMessage.warning(
-                          'can not delete the last account'
-                        );
-                        return;
-                      }
-                      e.stopPropagation();
-                      setCurrentAccountName(a.accountName);
-                      setCurrentAccountIndex(a.hdPathIndex);
-                      setDeletePopupVisible(true);
-                    }}
-                  />
-                </div>
+
+      {isEdit ? (
+        <div className="content flexCol content-wrap-padding">
+          {accounts.map((a, i) => (
+            <div className="edit-account flexR" key={`edit_${i}`}>
+              <div className="edit-left flexR">
+                <Jazzicon
+                  diameter={30}
+                  seed={Number(a.address.substr(0, 8) || 0)}
+                />
+                <WalletName cls="account" width={100}>
+                  {a.accountName || a.hdWalletName}
+                </WalletName>
               </div>
-            ))
-          : null}
-        <Collapse
-          expandIconPosition="right"
-          bordered={false}
-          ghost={true}
-          expandIcon={({ isActive }) =>
-            isActive ? (
-              <IconComponent name="chevron-up" cls="base-text-color" />
-            ) : (
-              <IconComponent name="chevron-down" cls="base-text-color" />
-            )
-          }
-          style={{
-            display: isEdit ? 'none' : 'block',
-          }}
-        >
-          {accounts.map((a, i) => {
-            return (
-              <Collapse.Panel
-                key={i}
-                header={
-                  <div className="account-item flexR">
-                    <Jazzicon
-                      diameter={32}
-                      seed={Number(a.accounts[0].address.substr(0, 8) || 0)}
-                    />
-                    <WalletName cls="account-address bold" width={180}>
-                      {a.accountName}
-                    </WalletName>
-                  </div>
-                }
-              >
-                <div className="address-container flexCol">
-                  {a.accounts.map((item: ICustomChain) => {
-                    return (
-                      <div className="address-item" key={item.address}>
-                        <div className="address-chain-container flexR">
-                          {item?.chainList?.map((c) => (
-                            <Tooltip title={c.chainName} key={c.chainCustomId}>
-                              <img
-                                src={IdToChainLogoSVG(c.chainCustomId)}
-                                className="chain-icon"
-                              />
-                            </Tooltip>
-                          ))}
-                        </div>
-                        <div className="address-chain-address-container flexR">
-                          <span className="address-chain-address">
-                            {transferAddress2Display(item.address)}
-                          </span>
-                          <CopyToClipboard
-                            text={item.address}
-                            onCopy={() => ClickToCloseMessage.success('Copied')}
-                          >
-                            <IconComponent
-                              name="copy"
-                              cls="copy-icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                            />
-                          </CopyToClipboard>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </Collapse.Panel>
-            );
-          })}
-        </Collapse>
-      </div>
+              <div className="edit-right flexR">
+                <IconComponent
+                  name="edit"
+                  cls="base-text-color"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentAccountName(a.accountName);
+                    setCurrentAccountIndex(a.hdPathIndex);
+                    setRenamePopupVisible(true);
+                  }}
+                />
+                <IconComponent
+                  name="trash"
+                  cls="base-text-color right"
+                  onClick={(e) => {
+                    if (accounts?.length === 1) {
+                      ClickToCloseMessage.warning(
+                        'Please keep alive at least one account'
+                      );
+                      return;
+                    }
+                    e.stopPropagation();
+                    setCurrentAccountName(a.accountName);
+                    setCurrentAccountIndex(a.hdPathIndex);
+                    setDeletePopupVisible(true);
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <AccountManageWidget
+          hdWalletId={state.hdWalletId}
+          ref={accountManageWidgetRef}
+        />
+      )}
       <Add
         title="Add Account"
         visible={addPopupVisible}
@@ -332,8 +239,12 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
   const [value, setValue] = useState('');
 
   const handleConfirmBtnClick = () => {
+    if (value.trim().length > 20) {
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      return;
+    }
     if (props.add && props.add instanceof Function) {
-      props.add(value);
+      props.add(value.trim());
     }
   };
 
@@ -424,8 +335,20 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
   }, [props.visible]);
 
   const handleConfirmBtnClick = () => {
+    if (
+      value.trim() === props.defaultValue &&
+      props.setVisible &&
+      props.setVisible instanceof Function
+    ) {
+      props.setVisible(false);
+      return;
+    }
+    if (value.trim().length > 20) {
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      return;
+    }
     if (props.onConfirm && props.onConfirm instanceof Function) {
-      props.onConfirm(value);
+      props.onConfirm(value.trim());
     }
   };
 
@@ -466,7 +389,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
           onClick={handleConfirmBtnClick}
           block
           cls="popup-container-top"
-          disabled={_.isEmpty(value)}
+          disabled={_.isEmpty(value.trim())}
         >
           Rename
         </CustomButton>
@@ -497,7 +420,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
 
   const handleConfirmBtnClick = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error('wrong password');
+      ClickToCloseMessage.error('Wrong password');
     });
     if (checksumPassed) {
       if (props.onConfirm && props.onConfirm instanceof Function) {

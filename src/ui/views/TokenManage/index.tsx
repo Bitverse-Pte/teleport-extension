@@ -96,7 +96,7 @@ const TokenManage = () => {
     },
     onError(err) {
       console.error(err);
-      ClickToCloseMessage.error('no token found');
+      ClickToCloseMessage.error('Token not found');
     },
   });
 
@@ -112,6 +112,7 @@ const TokenManage = () => {
         <CustomTab
           tab1="Search"
           tab2="Customize"
+          currentTab={tokenManageTab}
           handleTabClick={(tab: Tabs) => {
             setTokenManageTab(tab);
           }}

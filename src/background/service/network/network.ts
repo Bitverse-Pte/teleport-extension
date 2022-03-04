@@ -3,7 +3,7 @@ import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
 import { BigNumber } from 'ethers';
 import {
   CoinType,
-  EcoSystem,
+  Ecosystem,
   Network,
   NetworkBg2UIMessage,
   NetworkController,
@@ -115,7 +115,7 @@ class NetworkPreferenceService extends EventEmitter {
         ticker: 'ETH',
         chainName: 'ETH',
         coinType: CoinType.ETH,
-        ecsystem: EcoSystem.EVM,
+        ecosystem: Ecosystem.EVM,
         prefix: '0x',
       },
     });
@@ -158,10 +158,10 @@ class NetworkPreferenceService extends EventEmitter {
     console.info('_customNetworkStoreMigration start');
     const { customNetworks } = this._store.getState();
     Object.keys(customNetworks).forEach((key) => {
-      if (!customNetworks[key].ecsystem) {
+      if (!customNetworks[key].Ecosystem) {
         delete customNetworks[key]['category'];
         delete customNetworks[key]['isEthereumCompatible'];
-        customNetworks[key].ecsystem = EcoSystem.EVM;
+        customNetworks[key].Ecosystem = Ecosystem.EVM;
         customNetworks[key].prefix = '0x';
       }
     });
@@ -186,7 +186,7 @@ class NetworkPreferenceService extends EventEmitter {
     blockExplorerUrl?: string,
     coinType = CoinType.ETH,
     chainName = 'ETH',
-    ecsystem = EcoSystem.EVM,
+    ecosystem = Ecosystem.EVM,
     prefix = '0x'
   ) {
     this.checkIsCustomNetworkNameLegit(nickname);
@@ -201,7 +201,7 @@ class NetworkPreferenceService extends EventEmitter {
       coinType,
       chainName,
       ticker,
-      ecsystem,
+      ecosystem,
       prefix,
     };
     this.customNetworksStore.updateState([
@@ -415,7 +415,8 @@ class NetworkPreferenceService extends EventEmitter {
     const isInfura = INFURA_PROVIDER_TYPES.includes(type);
 
     if (isInfura) {
-      this._checkInfuraAvailability(type);
+      const _tmpInfuraType = type === 'ethereum' ? 'mainnet' : type;
+      this._checkInfuraAvailability(_tmpInfuraType);
     } else {
       this.emit(NETWORK_EVENTS.INFURA_IS_UNBLOCKED);
     }
@@ -661,8 +662,9 @@ class NetworkPreferenceService extends EventEmitter {
 
   private _configureInfuraProvider(type, projectId: string) {
     log.info('NetworkController - configureInfuraProvider', type);
+    const _tmpInfuraType = type === 'ethereum' ? 'mainnet' : type;
     const networkClient = createInfuraClient({
-      network: type,
+      network: _tmpInfuraType,
       projectId,
     });
     this._setNetworkClient(networkClient);
