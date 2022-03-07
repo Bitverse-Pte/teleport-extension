@@ -1,6 +1,6 @@
 import './style.less';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
@@ -11,35 +11,35 @@ import { stat } from 'fs';
 
 interface ISettingFeat {
   title: string;
-  link: string;
+  link?: string;
   opts?: any;
 }
 
 const SettingFeat: ISettingFeat[] = [
   {
     title: 'Exchange',
-    link: '/exchange',
+    // link: '/exchange',
     opts: {
       tag: 'USD',
     },
   },
   {
     title: 'Language',
-    link: '/language',
+    // link: '/language',
     opts: {
       tag: 'English',
     },
   },
   {
     title: 'Address Book',
-    link: '/address-book',
+    // link: '/address-book',
   },
   {
     title: 'Safety Setting',
-    link: '/safety setting',
+    // link: '/safety-setting',
   },
   {
-    title: 'About Me',
+    title: 'About Us',
     link: '/about',
   },
 ];
@@ -100,6 +100,15 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
     setIsDefaultWallet(checked);
   };
 
+  const jumpToPage = (setting: ISettingFeat) => {
+    console.debug('jumpToPage', setting);
+    if (setting.link) history.push(setting.link);
+    else
+      console.warn(
+        `'link' for ${setting.title} is undefined, click will be ignored. Please edit in ui/views/Setting/index.tsx about the 'SettingFeat'`
+      );
+  };
+
   return (
     <div className="setting flexCol">
       <LogoHeader handleCloseClick={props.handleCloseClick} />
@@ -132,7 +141,11 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
         />
       </div>
       {SettingFeat.map((setting: ISettingFeat) => (
-        <div className="setting-item flexR cursor" key={setting.title}>
+        <div
+          className="setting-item flexR cursor"
+          key={setting.title}
+          onClick={() => jumpToPage(setting)}
+        >
           <span className="title">{setting.title}</span>
           <span
             className="tag"
