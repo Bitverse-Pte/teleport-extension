@@ -10,7 +10,7 @@ export default function AboutSoftware() {
   const { t } = useTranslation();
   return (
     <div className="about-software">
-      <Header title="About Us" />
+      <Header title="About" />
       <div className="page-container flex flex-col items-center">
         <img
           src={TeleportLogoURI}
