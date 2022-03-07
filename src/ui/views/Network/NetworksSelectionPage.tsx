@@ -67,11 +67,13 @@ function useProviderList() {
 
   const currentProviderId = useSelector((s) => s.network.provider.id);
   const currentSelectedCategory: string | undefined = useMemo(() => {
-    const foundedInNetworks = Object.entries(networkList).filter(([_, { networks }]) => {
-      return networks.filter((n) => n.id === currentProviderId).length > 0;
-    });
+    const foundedInNetworks = Object.entries(networkList).filter(
+      ([_, { networks }]) => {
+        return networks.filter((n) => n.id === currentProviderId).length > 0;
+      }
+    );
     if (foundedInNetworks.length > 0) {
-      const [ name ] = foundedInNetworks[0];
+      const [name] = foundedInNetworks[0];
       return name;
     } else {
       return undefined;
