@@ -17,7 +17,7 @@ interface ISettingFeat {
 
 const SettingFeat: ISettingFeat[] = [
   {
-    title: 'Exchange',
+    title: 'Currency',
     // link: '/exchange',
     opts: {
       tag: 'USD',
@@ -31,15 +31,15 @@ const SettingFeat: ISettingFeat[] = [
     },
   },
   {
-    title: 'Address Book',
-    // link: '/address-book',
+    title: 'Support',
+    /**
+     * link start with http(s) will be open in a new page
+     * since it's not in the extension's context
+     */
+    // link: 'https://doc.google.com',
   },
   {
-    title: 'Safety Setting',
-    // link: '/safety-setting',
-  },
-  {
-    title: 'About Us',
+    title: 'About',
     link: '/about',
   },
 ];
@@ -102,8 +102,10 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
 
   const jumpToPage = (setting: ISettingFeat) => {
     console.debug('jumpToPage', setting);
-    if (setting.link) history.push(setting.link);
-    else
+    if (setting.link) {
+      if (setting.link.slice(0, 4) !== 'http') history.push(setting.link);
+      else window.open(setting.link);
+    } else
       console.warn(
         `'link' for ${setting.title} is undefined, click will be ignored. Please edit in ui/views/Setting/index.tsx about the 'SettingFeat'`
       );
