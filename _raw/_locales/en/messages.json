@@ -705,6 +705,9 @@
   "Notice__Third": {
     "message": "Do not use screenshots or network transmission to backup and save"
   },
+  "about_software_introductions": {
+    "message": "{{software_name}} is a secured multi-chain & multi-ID browser extension wallet for crypto transfers, enabling decentralized applications(dApps) interacts on Ethereum liked EVM networks, Cosmos networks, Polkadot networks, Solana and so on."
+  },
   "copy__successfully": {
     "message": "Copy successfully"
   },
