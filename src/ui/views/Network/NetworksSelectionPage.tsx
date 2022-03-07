@@ -66,11 +66,16 @@ function useProviderList() {
   }, [customProviders]);
 
   const currentProviderId = useSelector((s) => s.network.provider.id);
-  const currentSelectedCategory = useMemo(() => {
-    const [name] = Object.entries(networkList).filter(([_, { networks }]) => {
+  const currentSelectedCategory: string | undefined = useMemo(() => {
+    const foundedInNetworks = Object.entries(networkList).filter(([_, { networks }]) => {
       return networks.filter((n) => n.id === currentProviderId).length > 0;
-    })[0];
-    return name;
+    });
+    if (foundedInNetworks.length > 0) {
+      const [ name ] = foundedInNetworks[0];
+      return name;
+    } else {
+      return undefined;
+    }
   }, [currentProviderId]);
 
   return { networkList, currentSelectedCategory };
@@ -84,9 +89,10 @@ const NetworksSelectionContainer = () => {
   const { networkList, currentSelectedCategory } = useProviderList();
 
   useEffect(() => {
-    setActiveKeys({
-      [currentSelectedCategory]: true,
-    });
+    if (currentSelectedCategory)
+      setActiveKeys({
+        [currentSelectedCategory]: true,
+      });
   }, []);
 
   if (!providerContext) {
