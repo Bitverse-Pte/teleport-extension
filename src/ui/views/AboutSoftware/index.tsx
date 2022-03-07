@@ -8,6 +8,11 @@ import { IconComponent } from 'ui/components/IconComponents';
 export default function AboutSoftware() {
   const version = process.env.version;
   const { t } = useTranslation();
+
+  const onTeleportHomePage = () => {
+    window.open('https://teleport.network');
+  };
+
   return (
     <div className="about-software">
       <Header title="About" />
@@ -25,7 +30,10 @@ export default function AboutSoftware() {
             },
           })}
         </p>
-        <div className="jump-to-home-page cursor-pointer flex">
+        <div
+          className="jump-to-home-page cursor-pointer flex"
+          onClick={onTeleportHomePage}
+        >
           <img
             src={TeleportLogoURI}
             alt="Teleport Network Logo"
