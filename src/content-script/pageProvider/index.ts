@@ -7,7 +7,9 @@ import { domReadyCall, $ } from './utils';
 import ReadyPromise from './readyPromise';
 import DedupePromise from './dedupePromise';
 
-declare const channelName;
+const channelName = window.channelName;
+
+console.log('-----channelName:-----', channelName);
 
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -248,6 +250,7 @@ declare global {
     web3: {
       currentProvider: EthereumProvider;
     };
+    channelName: string;
   }
 }
 

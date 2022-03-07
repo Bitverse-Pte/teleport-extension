@@ -3,6 +3,8 @@ import { nanoid } from 'nanoid';
 import extension from 'extensionizer';
 
 const channelName = nanoid();
+window.channelName = channelName;
+console.log('--window.channelName:--', window.channelName);
 
 // the script element with src won't execute immediately
 // use inline script element instead!
