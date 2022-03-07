@@ -1,5 +1,6 @@
 import { Message } from 'utils';
 import { nanoid } from 'nanoid';
+import extension from 'extensionizer';
 
 const channelName = nanoid();
 
@@ -10,9 +11,12 @@ const ele = document.createElement('script');
 // in prevent of webpack optimized code do some magic(e.g. double/sigle quote wrap),
 // seperate content assignment to two line
 // use AssetReplacePlugin to replace pageprovider content
-let content = `var channelName = '${channelName}';`;
-content += '#PAGEPROVIDER#';
-ele.textContent = content;
+// let content = `var channelName = '${channelName}';`;
+// content += '#PAGEPROVIDER#';
+ele.src = extension.runtime.getURL('pageProvider.js');
+ele.onload = function () {
+  console.log('script injected');
+};
 container.insertBefore(ele, container.children[0]);
 container.removeChild(ele);
 

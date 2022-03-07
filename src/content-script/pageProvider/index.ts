@@ -6,8 +6,10 @@ import PushEventHandlers from './pushEventHandlers';
 import { domReadyCall, $ } from './utils';
 import ReadyPromise from './readyPromise';
 import DedupePromise from './dedupePromise';
+import { nanoid } from 'nanoid';
 
-declare const channelName;
+const channelName = nanoid();
+//declare const channelName;
 
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
