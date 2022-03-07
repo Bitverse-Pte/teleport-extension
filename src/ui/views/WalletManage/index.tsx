@@ -136,6 +136,8 @@ const WalletManage: React.FC = () => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
           ClickToCloseMessage.error('Name already exists');
+        } else {
+          ClickToCloseMessage.error('Unknown error, please try again later');
         }
       });
     if (renamed) {

@@ -19,6 +19,7 @@ import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import AccountManageWidget from 'ui/components/AccountManageWidget';
+import { ErrorCode } from 'constants/code';
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -64,7 +65,12 @@ const AccountManage: React.FC = () => {
         (accountManageWidgetRef.current as any).queryAccounts();
       },
       onError: (e) => {
-        ClickToCloseMessage.error('Unknown error, please try again later');
+        console.error(e.code);
+        if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
+          ClickToCloseMessage.error('Name already exists');
+        } else {
+          ClickToCloseMessage.error('Unknown error, please try again later');
+        }
       },
     }
   );
