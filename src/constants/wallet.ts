@@ -46,14 +46,14 @@ export const CoinTypeEcosystemMapping: {
 } = {
   [Ecosystem.EVM]: {
     coinType: [CoinType.ETH],
-    ecosystemName: 'ETH Network',
+    ecosystemName: 'EVM Networks',
   },
   [Ecosystem.COSMOS]: {
     coinType: [CoinType.COSMOS],
-    ecosystemName: 'Cosmos Network',
+    ecosystemName: 'Cosmos Networks',
   },
   [Ecosystem.POLKADOT]: {
     coinType: [CoinType.POLKADOT],
-    ecosystemName: 'Polkadot Network',
+    ecosystemName: 'Polkadot Networks',
   },
 };

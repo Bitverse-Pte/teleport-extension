@@ -130,7 +130,6 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
           da.ethAddress = da.ecosystems[0].accounts[0].address;
         }
       });
-      console.error(displayAccounts);
       setTempAccounts(displayAccounts);
     }
   };
@@ -145,7 +144,6 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
 
   const handleAccountClick = async (a: IDisplayAccountManage) => {
     if (a.ethAddress === currentAccount) return;
-    console.log(a);
     let coinType: CoinType, account;
     const currentChain: Provider | null = await wallet.getCurrentChain();
     if (currentChain) {
@@ -158,7 +156,6 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
         }
       })
     );
-    console.error(account);
     await wallet.changeAccount(account);
     queryAccounts();
   };

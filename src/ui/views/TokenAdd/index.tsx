@@ -76,9 +76,7 @@ const TokenAdd = () => {
             <span className="token-add-balance-amount">
               {denom2SymbolRatio(state.balance || 0, state.decimal || 0)}
             </span>
-            <span className="token-add-balance-symbol">
-              {state.symbol?.toUpperCase()}
-            </span>
+            <span className="token-add-balance-symbol">{state.symbol}</span>
           </div>
           <p className="token-add-chain">{state.chain}</p>
           <div className="token-add-item">
@@ -90,9 +88,7 @@ const TokenAdd = () => {
 
           <div className="token-add-item">
             <p className="token-add-item-title">Token Symbol:</p>
-            <p className="token-add-item-content">
-              {state.symbol?.toUpperCase()}
-            </p>
+            <p className="token-add-item-content">{state.symbol}</p>
           </div>
           <div className="token-add-item">
             <p className="token-add-item-title">Decimals of Precision:</p>

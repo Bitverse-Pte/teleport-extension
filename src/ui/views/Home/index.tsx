@@ -272,7 +272,7 @@ const Home = () => {
                     onClick={() => handleTokenClick(t)}
                   >
                     <div className="left flexR">
-                      <TokenIcon token={t} useThemeBg />
+                      <TokenIcon token={t} radius={32} />
                       <div className="balance-container flexCol">
                         <span className="balance">
                           {denom2SymbolRatio(t.amount || 0, t.decimal)}{' '}

@@ -14,6 +14,7 @@ import SendImg from '../../../assets/send.svg';
 import ReceiveImg from '../../../assets/receive.svg';
 import LockImg from '../../../assets/lock.svg';
 import WalletManageImg from '../../../assets/walletManage.svg';
+import { PresetNetworkId } from 'constants/defaultNetwork';
 
 export interface SearchInputProps {
   onChange: (value) => void;
@@ -53,9 +54,10 @@ function _getDefaultIcon(
     style.background = token!.themeColor;
   }
   if (radius) {
-    style.width = radius;
-    style.height = radius;
-    style.borderRadius = radius;
+    style.width = `${radius}px`;
+    style.height = `${radius}px`;
+    style.lineHeight = `${radius}px`;
+    style.borderRadius = `${radius}px`;
   }
   if (scale) {
     style.transform = `scale(${scale})`;
@@ -65,15 +67,74 @@ function _getDefaultIcon(
       {token?.symbol?.substr(0, 1)?.toUpperCase()}
     </span>
   );
-  if (!token.contractAddress) return defaultIcon;
-  const contractAddress = utils.getAddress(token.contractAddress);
+  if (!token.isNative && !token.contractAddress) return defaultIcon;
+  const contractAddress = (token as any).contractAddress
+    ? utils.getAddress((token as any).contractAddress)
+    : '';
   let src;
-  if (token.isNative) {
-    src =
-      'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+  if (token.icon) {
+    src = token.icon;
   } else {
-    src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
+    switch (token.chainCustomId) {
+      case PresetNetworkId.ETHEREUM:
+        if (token.isNative) {
+          src =
+            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+        } else {
+          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
+        }
+        break;
+      case PresetNetworkId.BSC:
+        if (token.isNative) {
+          src =
+            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
+        } else {
+          src = token.icon;
+        }
+        break;
+      case PresetNetworkId.POLYGON:
+        if (token.isNative) {
+          src =
+            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png';
+        } else {
+          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/${contractAddress}/logo.png`;
+        }
+        break;
+      case PresetNetworkId.ARBITRUM:
+        if (token.isNative) {
+          src =
+            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png';
+        } else {
+          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/assets/${contractAddress}/logo.png`;
+        }
+        break;
+      case PresetNetworkId.FTM:
+        if (token.isNative) {
+          src =
+            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/info/logo.png';
+        } else {
+          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/assets/${contractAddress}/logo.png`;
+        }
+        break;
+      case PresetNetworkId.AVAX:
+        if (token.isNative) {
+          src =
+            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/info/logo.png';
+        } else {
+          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/assets/${contractAddress}/logo.png`;
+        }
+        break;
+      case PresetNetworkId.OP:
+        if (token.isNative) {
+          src =
+            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png';
+        } else {
+          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/assets/${contractAddress}/logo.png`;
+        }
+        break;
+    }
   }
+
   return loadError ? (
     defaultIcon
   ) : (
