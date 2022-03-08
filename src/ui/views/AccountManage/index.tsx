@@ -251,6 +251,7 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
     }
     if (props.add && props.add instanceof Function) {
       props.add(value.trim());
+      setValue('');
     }
   };
 

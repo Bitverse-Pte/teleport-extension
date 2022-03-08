@@ -54,9 +54,10 @@ function _getDefaultIcon(
     style.background = token!.themeColor;
   }
   if (radius) {
-    style.width = radius;
-    style.height = radius;
-    style.borderRadius = radius;
+    style.width = `${radius}px`;
+    style.height = `${radius}px`;
+    style.lineHeight = `${radius}px`;
+    style.borderRadius = `${radius}px`;
   }
   if (scale) {
     style.transform = `scale(${scale})`;
@@ -71,9 +72,9 @@ function _getDefaultIcon(
     ? utils.getAddress((token as any).contractAddress)
     : '';
   let src;
-  if(token.icon){
-    src = token.icon
-  }else{
+  if (token.icon) {
+    src = token.icon;
+  } else {
     switch (token.chainCustomId) {
       case PresetNetworkId.ETHEREUM:
         if (token.isNative) {
@@ -133,7 +134,7 @@ function _getDefaultIcon(
         break;
     }
   }
-  
+
   return loadError ? (
     defaultIcon
   ) : (
