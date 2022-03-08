@@ -3,21 +3,15 @@ import { nanoid } from 'nanoid';
 import extension from 'extensionizer';
 
 const channelName = nanoid();
-window.channelName = channelName;
-console.log('--window.channelName:--', window.channelName);
 
-// the script element with src won't execute immediately
-// use inline script element instead!
+// the inline script element is banned in v3
 const container = document.head || document.documentElement;
 const ele = document.createElement('script');
-// in prevent of webpack optimized code do some magic(e.g. double/sigle quote wrap),
-// seperate content assignment to two line
-// use AssetReplacePlugin to replace pageprovider content
-// let content = `var channelName = '${channelName}';`;
-// content += '#PAGEPROVIDER#';
 ele.src = extension.runtime.getURL('pageProvider.js');
 ele.onload = function () {
   console.log('script injected');
+  // when script injected -> send INIT_PROVIDER event to page
+  window.postMessage({ type: 'INIT_PROVIDER', channelName: channelName });
 };
 container.insertBefore(ele, container.children[0]);
 container.removeChild(ele);
