@@ -275,7 +275,6 @@ export default class TransactionController extends EventEmitter {
     // return Common.forCustomChain(MAINNET, customChainParams, hardfork);
     // deprecated, replaced with the following:
     return Common.custom(customChainParams, {
-      baseChain: chainId,
       hardfork,
     });
   }
