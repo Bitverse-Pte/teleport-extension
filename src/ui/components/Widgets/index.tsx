@@ -33,10 +33,13 @@ export interface TokenIconProps {
   token:
     | Pick<
         Token,
-        'symbol' | 'decimal' | 'contractAddress' | 'isNative' | 'themeColor'
+        | 'symbol'
+        | 'decimal'
+        | 'contractAddress'
+        | 'isNative'
+        | 'chainCustomId'
       >
     | undefined;
-  useThemeBg?: boolean;
   radius?: number;
   scale?: number;
 }
@@ -44,15 +47,11 @@ export interface TokenIconProps {
 function _getDefaultIcon(
   token: Partial<Token>,
   radius?: number,
-  useThemeBg?: boolean,
   scale?: number
 ) {
   const [loadError, setLoadError] = useState(false);
 
   const style: any = {};
-  if (useThemeBg) {
-    style.background = token!.themeColor;
-  }
   if (radius) {
     style.width = `${radius}px`;
     style.height = `${radius}px`;
@@ -153,9 +152,9 @@ function _getDefaultIcon(
 // if you want to use a different size, pls use the scale property to set transform style
 // calc scale newSize = scale*30
 export const TokenIcon = (props: TokenIconProps) => {
-  const { token, useThemeBg, radius, scale } = props;
+  const { token, radius, scale } = props;
   if (!token) return null;
-  return _getDefaultIcon(token, radius, useThemeBg, scale);
+  return _getDefaultIcon(token, radius, scale);
 };
 
 type DeletedProps = 'className';

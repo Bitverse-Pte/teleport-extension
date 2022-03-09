@@ -69,7 +69,7 @@ const TokenAdd = () => {
               decimal: state.decimal,
               contractAddress: state.contractAddress,
               isNative: false,
-              themeColor: '#1484F5',
+              chainCustomId: state.chainCustomId,
             }}
           />
           <div className="token-add-balance-container">

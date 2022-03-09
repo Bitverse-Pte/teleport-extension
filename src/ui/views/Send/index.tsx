@@ -193,7 +193,7 @@ const Send = () => {
       label: (
         <div className="assets-option flexR">
           <div className="assets-option-left flexR">
-            <TokenIcon token={t} scale={0.8} useThemeBg />
+            <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
           </div>
           <span className="assets-option-right">
@@ -206,7 +206,7 @@ const Send = () => {
       selected: (
         <div className="assets-option flexR">
           <div className="assets-option-left flexR">
-            <TokenIcon token={t} scale={0.8} useThemeBg />
+            <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
             <span className="assets-option-symbol-name">{`(${t.name})`}</span>
           </div>

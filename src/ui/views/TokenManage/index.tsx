@@ -141,7 +141,7 @@ const TokenManage = () => {
                 onClick={() => handleTokenClick(t)}
               >
                 <div className="left flexR">
-                  <TokenIcon token={t} useThemeBg />
+                  <TokenIcon token={t} />
                   <div className="token-info flexCol">
                     <span className="balance">
                       {denom2SymbolRatio(t.amount || 0, t.decimal)} {t.symbol}

@@ -138,7 +138,6 @@ export function _ActivityDetail({
         {/* workaround as hook treat native token as undefined */}
         <TokenIcon
           token={token || ({ isNative: true } as any)}
-          useThemeBg
           radius={48}
         />
       </div>
