@@ -256,7 +256,7 @@ window.addEventListener('message', function (event) {
   // We only accept messages from ourselves
   if (event.source != window) return;
 
-  if (event.data.type && event.data.type == 'INIT_PROVIDER') {
+  if (event.data.type && event.data.type == 'INIT_TELEPORT_PROVIDER') {
     const channelName = event.data.channelName;
     const provider = new EthereumProvider({ channelName });
     provider
