@@ -133,7 +133,9 @@ export function _ActivityDetail({
 
   const matchedNativeToken = useSelector((s) => {
     const currentProviderId = s.network.provider.id;
-    return s.tokens.tokens.find((t) => t.isNative && t.chainCustomId === currentProviderId);
+    return s.tokens.tokens.find(
+      (t) => t.isNative && t.chainCustomId === currentProviderId
+    );
   });
 
   return (
@@ -141,10 +143,7 @@ export function _ActivityDetail({
       <Header title={t(title)} />
       <div className="txdetail-direction-logo flex justify-center">
         {/* workaround as hook treat native token as undefined */}
-        <TokenIcon
-          token={token || matchedNativeToken}
-          radius={48}
-        />
+        <TokenIcon token={token || matchedNativeToken} radius={48} />
       </div>
       <div className="txdetail-values flex flex-wrap justify-center">
         <div className="txdetail-value-display">
