@@ -133,6 +133,7 @@ export class EthereumProvider extends EventEmitter {
   private _requestPromiseCheckVisibility = () => {
     if (document.visibilityState === 'visible') {
       this._requestPromise.check(1);
+      this._requestPromise.check(2);
     } else {
       this._requestPromise.uncheck(1);
     }
