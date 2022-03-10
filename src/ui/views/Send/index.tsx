@@ -268,6 +268,7 @@ const Send = () => {
         <Input
           placeholder={t('Enter Address')}
           value={toAddress}
+          className="customInputStyle"
           onFocus={() => setShowToList(true)}
           onChange={(e) => setToAddress(e.target.value)}
         />
