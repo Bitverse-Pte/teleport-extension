@@ -58,6 +58,8 @@ const Home = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
+  const start = new Date().getTime();
+  (window as any).wallet = wallet;
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {

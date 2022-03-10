@@ -33,11 +33,7 @@ export interface TokenIconProps {
   token:
     | Pick<
         Token,
-        | 'symbol'
-        | 'decimal'
-        | 'contractAddress'
-        | 'isNative'
-        | 'chainCustomId'
+        'symbol' | 'decimal' | 'contractAddress' | 'isNative' | 'chainCustomId'
       >
     | undefined;
   radius?: number;
