@@ -238,7 +238,8 @@ const AccountRecover = () => {
           )} */}
         </div>
 
-        <p
+        {/* @todo: enable below when cosmos supported */}
+        {/* <p
           className="account-recover-title"
           style={{
             display: importType === Tabs.SECOND ? 'block' : 'none',
@@ -253,7 +254,7 @@ const AccountRecover = () => {
           handleChainSelect={(chain: Provider) => {
             setCoinType(chain.coinType);
           }}
-        />
+        /> */}
 
         <p className="account-recover-title">Wallet name</p>
         <CustomInput

@@ -133,6 +133,7 @@ export class EthereumProvider extends EventEmitter {
   private _requestPromiseCheckVisibility = () => {
     if (document.visibilityState === 'visible') {
       this._requestPromise.check(1);
+      this._requestPromise.check(2);
     } else {
       this._requestPromise.uncheck(1);
     }
@@ -255,7 +256,7 @@ window.addEventListener('message', function (event) {
   // We only accept messages from ourselves
   if (event.source != window) return;
 
-  if (event.data.type && event.data.type == 'INIT_PROVIDER') {
+  if (event.data.type && event.data.type == 'INIT_TELEPORT_PROVIDER') {
     const channelName = event.data.channelName;
     const provider = new EthereumProvider({ channelName });
     provider

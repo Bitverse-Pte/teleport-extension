@@ -46,8 +46,7 @@ function _getDefaultIcon(
   scale?: number
 ) {
   const [loadError, setLoadError] = useState(false);
-
-  const style: any = {};
+  const style: Record<string, any> = {};
   if (radius) {
     style.width = `${radius}px`;
     style.height = `${radius}px`;
@@ -66,71 +65,75 @@ function _getDefaultIcon(
   const contractAddress = (token as any).contractAddress
     ? utils.getAddress((token as any).contractAddress)
     : '';
-  let src;
-  if (token.icon) {
-    src = token.icon;
-  } else {
-    switch (token.chainCustomId) {
-      case PresetNetworkId.ETHEREUM:
-        if (token.isNative) {
-          src =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
-        } else {
-          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
-        }
-        break;
-      case PresetNetworkId.BSC:
-        if (token.isNative) {
-          src =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
-        } else {
-          src = token.icon;
-        }
-        break;
-      case PresetNetworkId.POLYGON:
-        if (token.isNative) {
-          src =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png';
-        } else {
-          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/${contractAddress}/logo.png`;
-        }
-        break;
-      case PresetNetworkId.ARBITRUM:
-        if (token.isNative) {
-          src =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png';
-        } else {
-          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/assets/${contractAddress}/logo.png`;
-        }
-        break;
-      case PresetNetworkId.FTM:
-        if (token.isNative) {
-          src =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/info/logo.png';
-        } else {
-          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/assets/${contractAddress}/logo.png`;
-        }
-        break;
-      case PresetNetworkId.AVAX:
-        if (token.isNative) {
-          src =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/info/logo.png';
-        } else {
-          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/assets/${contractAddress}/logo.png`;
-        }
-        break;
-      case PresetNetworkId.OP:
-        if (token.isNative) {
-          src =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png';
-        } else {
-          src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/assets/${contractAddress}/logo.png`;
-        }
-        break;
-    }
-  }
 
-  return loadError ? (
+  const src = useMemo(() => {
+    let _src: string | undefined;
+    if (token.icon) {
+      _src = token.icon;
+    } else {
+      switch (token.chainCustomId) {
+        case PresetNetworkId.ETHEREUM:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.BSC:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
+          } else {
+            _src = token.icon;
+          }
+          break;
+        case PresetNetworkId.POLYGON:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.ARBITRUM:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.FTM:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.AVAX:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.OP:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/assets/${contractAddress}/logo.png`;
+          }
+          break;
+      }
+    }
+    return _src;
+  }, [token]);
+
+  return loadError || !src ? (
     defaultIcon
   ) : (
     <img

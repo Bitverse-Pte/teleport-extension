@@ -10,8 +10,11 @@ const ele = document.createElement('script');
 ele.src = extension.runtime.getURL('pageProvider.js');
 ele.onload = function () {
   console.log('script injected');
-  // when script injected -> send INIT_PROVIDER event to page
-  window.postMessage({ type: 'INIT_PROVIDER', channelName: channelName });
+  // when script injected -> send INIT_TELEPORT_PROVIDER event to page
+  window.postMessage({
+    type: 'INIT_TELEPORT_PROVIDER',
+    channelName: channelName,
+  });
 };
 container.insertBefore(ele, container.children[0]);
 container.removeChild(ele);
