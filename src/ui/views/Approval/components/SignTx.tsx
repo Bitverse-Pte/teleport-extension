@@ -14,7 +14,6 @@ import {
   Checkbox,
   Spin,
   Tabs,
-  Space,
   Divider,
   message,
 } from 'antd';
@@ -52,7 +51,7 @@ import { BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
 import { useMethodData } from 'ui/hooks/metamask/useMethodData';
-import Header, { HeaderWithFlex } from 'ui/components/Header';
+import { HeaderWithFlex } from 'ui/components/Header';
 
 const { TabPane } = Tabs;
 
@@ -238,14 +237,8 @@ const SignTx = ({ params, origin }) => {
 
   return (
     <div className="approval-tx flexCol">
-      <Space
-        size="middle"
-        direction="vertical"
-        align="center"
-        wrap={true}
-        className="top-part-container flexCol"
-      >
-        <HeaderWithFlex title={<NetworkDisplay />} />
+      <div className="top-part-container flexCol flex-wrap items-center">
+        <HeaderWithFlex title={<NetworkDisplay />} handleBackClick={handleCancel} />
         <SenderToRecipient
           senderAddress={tx.txParam.from || tx.from}
           senderName={senderName}
@@ -258,8 +251,7 @@ const SignTx = ({ params, origin }) => {
           token={txToken}
           origin={origin}
         />
-      </Space>
-      <Divider style={{ margin: 0 }} />
+      </div>
       {renderContent()}
       <FeeSelector visible={visible} onClose={() => setVisible(false)} />
       <div className="tx-button-container flexCol content-wrap-padding">
@@ -269,15 +261,7 @@ const SignTx = ({ params, origin }) => {
           cls="theme tx-btn-container-top"
           block
         >
-          {t('Confirm')}
-        </CustomButton>
-        <CustomButton
-          type="default"
-          cls="custom-button-default"
-          onClick={handleCancel}
-          block
-        >
-          {t('Decline')}
+          {t('Send')}
         </CustomButton>
       </div>
     </div>
@@ -331,7 +315,11 @@ const TxDetailComponent = ({
 
   return (
     <div className="transaction-detail">
-      <div className="gas-edit-button flex" onClick={() => setVisible(true)}>
+      <Divider style={{ marginTop: 0, marginBottom: 16 }} />
+      <div
+        className="gas-edit-button flex ml-auto"
+        onClick={() => setVisible(true)}
+      >
         <IconComponent name="edit" cls="edit-icon" />
         <div>{t('Edit')}</div>
       </div>
@@ -340,16 +328,16 @@ const TxDetailComponent = ({
         detailTitle={t('Referral gas fee')}
         subTitle={undefined}
         detailText={`${renderTotalGasFeeAmount()}`}
-        detailSubText={`≈$ ${renderTotalGasFeeFiat()}`}
+        detailSubText={`$ ${renderTotalGasFeeFiat()}`}
         detailMax={`Max fee: ${renderTotalGasFeeAmount()}`}
       />
-      <Divider style={{ margin: 10 }} />
+      <Divider style={{ margin: '16px 0' }} />
       <TransactionDetailItem
         key="total-item"
-        detailTitle={t('Lump sum')}
+        detailTitle={t('Sum')}
         subTitle={t('Amount + gas fee')}
         detailText={renderTotalMaxAmount()}
-        detailSubText={`≈$ ${renderTotalMaxFiat()}`}
+        detailSubText={`$ ${renderTotalMaxFiat()}`}
         detailMax={`Max amount: ${renderTotalMaxAmount()}`}
       />
     </div>

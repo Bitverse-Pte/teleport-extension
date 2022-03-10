@@ -97,7 +97,7 @@ const AccountCreate = () => {
         >
           <p className="account-create-title">Password</p>
           <p className="account-create-notice">
-           Will be used to encrypt your data and unlock your wallet.
+            Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
             cls="custom-password-input"
