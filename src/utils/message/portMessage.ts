@@ -28,6 +28,14 @@ class PortMessage extends Message {
       }
     });
 
+    this.port.onDisconnect.addListener(() => {
+      console.error('service worker disconnected, reconnecting...');
+      this.port = browser.runtime.connect(
+        undefined,
+        name ? { name } : undefined
+      );
+    });
+
     return this;
   };
 

@@ -272,8 +272,7 @@ const AccountRecover = () => {
         >
           <p className="account-recover-title">Password</p>
           <p className="account-create-notice">
-            We will use this password to encrypt your data. You will need this
-            password to unlock you wallet.
+            Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
             onChange={(e) => {
