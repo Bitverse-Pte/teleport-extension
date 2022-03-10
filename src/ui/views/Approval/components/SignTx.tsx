@@ -52,6 +52,7 @@ import { BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
 import { useMethodData } from 'ui/hooks/metamask/useMethodData';
+import Header, { HeaderWithFlex } from 'ui/components/Header';
 
 const { TabPane } = Tabs;
 
@@ -244,7 +245,7 @@ const SignTx = ({ params, origin }) => {
         wrap={true}
         className="top-part-container flexCol"
       >
-        <NetworkDisplay />
+        <HeaderWithFlex title={<NetworkDisplay />} />
         <SenderToRecipient
           senderAddress={tx.txParam.from || tx.from}
           senderName={senderName}
