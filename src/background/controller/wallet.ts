@@ -10,7 +10,9 @@ import {
   networkController,
   gasFeeController,
   knownMethodService,
+  contactBookService
 } from 'background/service';
+import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
 import { INTERNAL_REQUEST_ORIGIN } from 'constants/index';
 import {
@@ -463,6 +465,21 @@ export class WalletController extends BaseController {
   getTxHistory() {
     return txController.txStateManager.getTransactionList();
   }
+  addContact = (data: ContactBookItem) => {
+    contactBookService.addContact(data);
+  };
+  addContactByDefaultName = (address) => {
+    contactBookService.addContactByDefaultName(address);
+  }
+  updateContact = (data: ContactBookItem) => {
+    contactBookService.updateContact(data);
+  };
+  removeContact = (address: string) => {
+    contactBookService.removeContact(address);
+  };
+  listContact = () => contactBookService.listContacts();
+  getContactByAddress = (address: string) =>
+    contactBookService.getContactByAddress(address);
 }
 
 export default new WalletController();

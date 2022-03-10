@@ -15,6 +15,7 @@ import {
   networkPreferenceService,
   latestBlockDataHub,
   txController,
+  contactBookService,
 } from './service';
 import { providerController, walletController } from './controller';
 import i18n from './service/i18n';
@@ -61,6 +62,7 @@ async function restoreAppState() {
     permissionService.init(),
     preferenceService.init(),
     TokenService.init(),
+    contactBookService.init(),
   ]);
 
   new DataSyncService({
