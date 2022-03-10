@@ -208,7 +208,6 @@ const Send = () => {
           <div className="assets-option-left flexR">
             <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
-            <span className="assets-option-symbol-name">{`(${t.name})`}</span>
           </div>
         </div>
       ),
@@ -251,7 +250,9 @@ const Send = () => {
           controls={false}
           addonAfter={addonSymbol}
           value={amount}
-          onChange={(v) => {
+          stringMode
+          onChange={(v: string) => {
+            console.log(selectedToken?.decimal);
             setAmount(v);
           }}
         />
@@ -297,6 +298,7 @@ const Send = () => {
                   setShowToList(false);
                 }}
                 className="recent"
+                key={addr}
               >
                 {transferAddress2Display(addr)}
               </p>
