@@ -274,11 +274,7 @@ const Send = () => {
         />
         {showToList && (
           <Card
-            title={
-              <span className="card-title" onClick={myAccountsSelect}>
-                {t('Transfer between my accounts >')}
-              </span>
-            }
+            title="Recent Address"
             extra={
               <svg
                 className="icon"
@@ -304,6 +300,9 @@ const Send = () => {
             ))}
           </Card>
         )}
+        <span className="tbmy" onClick={myAccountsSelect}>
+          {t('Transfer between my accounts >')}
+        </span>
         <AccountSelect
           currentSelect={selected}
           visible={accountSelectPopupVisible}
