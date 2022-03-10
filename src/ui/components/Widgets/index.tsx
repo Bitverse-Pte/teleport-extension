@@ -62,9 +62,17 @@ function _getDefaultIcon(
     </span>
   );
   if (!token.isNative && !token.contractAddress) return defaultIcon;
-  const contractAddress = (token as any).contractAddress
+  let contractAddress = '';
+  try {
+    contractAddress = (token as any).contractAddress
+      ? utils.getAddress((token as any).contractAddress)
+      : '';
+  } catch {
+    setLoadError(true);
+  }
+  /* const contractAddress = (token as any).contractAddress
     ? utils.getAddress((token as any).contractAddress)
-    : '';
+    : ''; */
 
   const src = useMemo(() => {
     let _src: string | undefined;
