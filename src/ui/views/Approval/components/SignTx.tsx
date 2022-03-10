@@ -238,7 +238,10 @@ const SignTx = ({ params, origin }) => {
   return (
     <div className="approval-tx flexCol">
       <div className="top-part-container flexCol flex-wrap items-center">
-        <HeaderWithFlex title={<NetworkDisplay />} handleBackClick={handleCancel} />
+        <HeaderWithFlex
+          title={<NetworkDisplay />}
+          handleBackClick={handleCancel}
+        />
         <SenderToRecipient
           senderAddress={tx.txParam.from || tx.from}
           senderName={senderName}
