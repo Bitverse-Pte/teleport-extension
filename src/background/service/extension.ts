@@ -261,7 +261,7 @@ class ExtensionPlatform {
     extension.notifications.create(url, {
       type: 'basic',
       title,
-      iconUrl: extension.extension.getURL('/images/icons/64.png'),
+      iconUrl: extension.runtime.getURL('/images/icons/64.png'),
       message,
     });
   }
