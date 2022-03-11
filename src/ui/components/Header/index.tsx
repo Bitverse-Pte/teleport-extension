@@ -38,4 +38,36 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   );
 };
 
+export const HeaderWithFlex: React.FC<HeaderProps> = (props: HeaderProps) => {
+  const history = useHistory();
+
+  const handleBackClick = () => {
+    if (props.handleBackClick) {
+      props.handleBackClick();
+    } else {
+      history.go(-1);
+    }
+  };
+  return (
+    <div className="header-flex">
+      <IconComponent
+        name="back"
+        cls="icon back-icon"
+        style={{ display: props.hidden ? 'none' : 'block' }}
+        onClick={handleBackClick}
+      />
+      <div className="content">
+        {typeof props.title === 'string' ? (
+          <span className="title capitalize bold">{props.title}</span>
+        ) : (
+          props.title
+        )}
+      </div>
+      {props.component ? (
+        <div className="ml-auto">{props.component}</div>
+      ) : null}
+    </div>
+  );
+};
+
 export default Header;

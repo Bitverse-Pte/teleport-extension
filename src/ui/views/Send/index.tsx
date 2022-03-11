@@ -36,6 +36,7 @@ import { utils } from 'ethers';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentChainId } from 'ui/selectors/selectors';
 import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
+import { shortenAddress } from 'ui/utils/utils';
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -103,12 +104,11 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const txHistory: Record<string, Transaction> = await wallet.getTxHistory();
-    const recentAddress = Object.values(txHistory)
-      .filter((tx) => tx.txParams.to)
-      .map((tx) => tx.txParams.to as string)
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .slice(0, 5);
+    const list = await wallet.listContact();
+    console.log(list);
+    const recentAddress = list.map((item) => {
+      return item.address;
+    });
     setRecentAddressList(recentAddress);
   }, []);
 
@@ -160,6 +160,7 @@ const Send = () => {
       type: type,
       symbol: selectedToken?.symbol,
     };
+    await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({
       method: 'eth_sendTransaction',
       params: [params],
@@ -208,7 +209,6 @@ const Send = () => {
           <div className="assets-option-left flexR">
             <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
-            <span className="assets-option-symbol-name">{`(${t.name})`}</span>
           </div>
         </div>
       ),
@@ -217,7 +217,19 @@ const Send = () => {
   });
 
   return (
-    <div className="send flexCol">
+    <div
+      className="send flexCol"
+      onClick={() => {
+        if (showToList) {
+          /**
+           * Clicks in the whole container will close 
+           * `to` selection list
+           * for other onClick, use `e.stopPropagation()` to avoid this execution
+           */
+          setShowToList(false);
+        }
+      }}
+    >
       <GeneralHeader title={t('Send')} hideLogo />
       <div className="send-container">
         <div className="from-container flexCol">
@@ -251,7 +263,9 @@ const Send = () => {
           controls={false}
           addonAfter={addonSymbol}
           value={amount}
-          onChange={(v) => {
+          stringMode
+          onChange={(v: string) => {
+            console.log(selectedToken?.decimal);
             setAmount(v);
           }}
         />
@@ -268,41 +282,30 @@ const Send = () => {
         <Input
           placeholder={t('Enter Address')}
           value={toAddress}
+          className="customInputStyle"
           onFocus={() => setShowToList(true)}
+          onClick={(e) => e.stopPropagation()}
           onChange={(e) => setToAddress(e.target.value)}
         />
         {showToList && (
-          <Card
-            title={
-              <span className="card-title" onClick={myAccountsSelect}>
-                {t('Transfer between my accounts >')}
-              </span>
-            }
-            extra={
-              <svg
-                className="icon"
-                aria-hidden="true"
-                onClick={myAccountsSelect}
-              >
-                <use xlinkHref="#icon-chevron-right"></use>
-              </svg>
-            }
-            size="small"
-          >
-            <p className="recent-title">{t('Recent Address')}</p>
-            {recentAddressList?.map((a) => (
+          <Card title={t('Recent Address')} size="small">
+            {recentAddressList?.map((addr) => (
               <p
                 onClick={() => {
-                  setToAddress(a);
+                  setToAddress(addr);
                   setShowToList(false);
                 }}
                 className="recent"
+                key={addr}
               >
-                {a}
+                {transferAddress2Display(addr)}
               </p>
             ))}
           </Card>
         )}
+        <span className="tbmy" onClick={myAccountsSelect}>
+          {t('Transfer between my accounts >')}
+        </span>
         <AccountSelect
           currentSelect={selected}
           visible={accountSelectPopupVisible}
