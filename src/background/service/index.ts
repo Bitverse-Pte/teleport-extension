@@ -17,6 +17,7 @@ import TokenService from './token/TokenService';
 import platform from './extension';
 import knownMethodService from './knownMethod';
 import { LatestBlockDataHubService } from './network/latestBlockDataHub';
+import contactBookService from './contactBook';
 
 const controllerMessenger = new ControllerMessenger();
 
@@ -111,6 +112,7 @@ export {
   knownMethodService,
   TokenService,
   latestBlockDataHub,
+  contactBookService,
 };
 
 async function newUnapprovedTransaction(txParams, req) {

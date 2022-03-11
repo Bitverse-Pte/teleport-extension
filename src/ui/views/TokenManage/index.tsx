@@ -28,6 +28,7 @@ import { NoContent } from 'ui/components/universal/NoContent';
 import tokenHide from '../../../assets/tokenHide.svg';
 import tokenShow from '../../../assets/tokenShow.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import { isValidAddress } from 'ethereumjs-util';
 
 const TokenManage = () => {
   const history = useHistory();
@@ -96,11 +97,19 @@ const TokenManage = () => {
     },
     onError(err) {
       console.error(err);
-      ClickToCloseMessage.error('Token not found');
+      if (err?.code === ErrorCode.INVALID_CONTRACT_ADDRESS) {
+        ClickToCloseMessage.error('Invalid contract address');
+      } else {
+        ClickToCloseMessage.error('Token not found');
+      }
     },
   });
 
   const handleNextBtnClick = async () => {
+    if (!isValidAddress(contractAddress)) {
+      ClickToCloseMessage.error('Invalid contract address');
+      return;
+    }
     if (!contractAddress) return;
     queryToken(currentChain?.rpcUrl, contractAddress);
   };

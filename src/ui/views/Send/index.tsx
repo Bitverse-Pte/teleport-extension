@@ -104,12 +104,11 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const txHistory: Record<string, Transaction> = await wallet.getTxHistory();
-    const recentAddress = Object.values(txHistory)
-      .filter((tx) => tx.txParams.to)
-      .map((tx) => tx.txParams.to as string)
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .slice(0, 5);
+    const list = await wallet.listContact();
+    console.log(list);
+    const recentAddress = list.map((item) => {
+      return item.address;
+    });
     setRecentAddressList(recentAddress);
   }, []);
 
@@ -161,6 +160,7 @@ const Send = () => {
       type: type,
       symbol: selectedToken?.symbol,
     };
+    await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({
       method: 'eth_sendTransaction',
       params: [params],
@@ -209,7 +209,6 @@ const Send = () => {
           <div className="assets-option-left flexR">
             <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
-            <span className="assets-option-symbol-name">{`(${t.name})`}</span>
           </div>
         </div>
       ),
@@ -264,7 +263,9 @@ const Send = () => {
           controls={false}
           addonAfter={addonSymbol}
           value={amount}
-          onChange={(v) => {
+          stringMode
+          onChange={(v: string) => {
+            console.log(selectedToken?.decimal);
             setAmount(v);
           }}
         />
@@ -295,8 +296,9 @@ const Send = () => {
                   setShowToList(false);
                 }}
                 className="recent"
+                key={addr}
               >
-                {addr.slice(0, 10)}...{addr.slice(-8)}
+                {transferAddress2Display(addr)}
               </p>
             ))}
           </Card>
