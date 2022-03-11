@@ -10,6 +10,7 @@ import './style.less';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import { useTranslation } from 'react-i18next';
+import Jazzicon from 'react-jazzicon';
 
 const SendToken = () => {
   const wallet = useWallet();
@@ -35,7 +36,13 @@ const SendToken = () => {
         </div>
 
         <div className="account-and-qrcode">
-          <div className="account-box">{fromAccount?.accountName}</div>
+          <div className="account-box">
+            <Jazzicon
+              diameter={30}
+              seed={Number(fromAccount?.address?.substr(0, 8) || 0)}
+            />
+            <span className="account-address">{fromAccount?.accountName}</span>
+          </div>
           <QrCodeView
             data={fromAccount?.address || ''}
             color="#364361"
