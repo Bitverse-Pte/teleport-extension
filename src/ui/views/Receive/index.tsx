@@ -11,6 +11,7 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import { useTranslation } from 'react-i18next';
 import Jazzicon from 'react-jazzicon';
+import { ChainIdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 
 const SendToken = () => {
   const wallet = useWallet();
@@ -29,6 +30,7 @@ const SendToken = () => {
       <GeneralHeader title="Receive" hideLogo extCls="receive-header" />
       <div className="receive">
         <div className="chain-box">
+          <img src={ChainIdToChainLogoSVG(currentNetworkController.provider.chainId)} alt="Chain Logo" className="chain-logo" />
           <h1>{currentNetworkController.provider.chainName} </h1>{' '}
           <span className="chain-name">
             ({currentNetworkController.provider.nickname})
