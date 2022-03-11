@@ -36,6 +36,7 @@ import { utils } from 'ethers';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentChainId } from 'ui/selectors/selectors';
 import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
+import { shortenAddress } from 'ui/utils/utils';
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -273,29 +274,16 @@ const Send = () => {
           onChange={(e) => setToAddress(e.target.value)}
         />
         {showToList && (
-          <Card
-            title="Recent Address"
-            extra={
-              <svg
-                className="icon"
-                aria-hidden="true"
-                onClick={myAccountsSelect}
-              >
-                <use xlinkHref="#icon-chevron-right"></use>
-              </svg>
-            }
-            size="small"
-          >
-            <p className="recent-title">{t('Recent Address')}</p>
-            {recentAddressList?.map((a) => (
+          <Card title={t('Recent Address')} size="small">
+            {recentAddressList?.map((addr) => (
               <p
                 onClick={() => {
-                  setToAddress(a);
+                  setToAddress(addr);
                   setShowToList(false);
                 }}
                 className="recent"
               >
-                {a}
+                {addr.slice(0, 10)}...{addr.slice(-8)}
               </p>
             ))}
           </Card>
