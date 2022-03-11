@@ -240,7 +240,8 @@ function TransactionItem({
         )}
         {isPending && (
           <div className="pending-tx-actions ml-auto">
-            {speedUpButton}
+            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
+            {/* {speedUpButton} */}
             {/* {!hasCancelled && !isUnapproved && (
               <CancelButton
                 transaction={transactionGroup.primaryTransaction}

@@ -200,16 +200,15 @@ export function _ActivityDetail({
         )}
         {isPending && (
           <div className="row pending-tx-actions">
-            <button
+            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
+            {/* <button
               className="editGasBtn"
               type="button"
               onClick={() => alert('Gas Edit to be implemented')}
             >
-              {/* <IconComponent name="rocket" /> */}
               {t('speedUp')}
-            </button>
+            </button> */}
             <button className="cancelBtn" type="button" onClick={cancelTx}>
-              {/* <IconComponent name="cancel" /> */}
               {t('cancel')}
             </button>
           </div>
