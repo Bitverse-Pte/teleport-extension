@@ -107,11 +107,14 @@ const SignTx = ({ params, origin }) => {
   const gasState: any = useSelector((state) => state.gas);
   const [visible, setVisible] = useState(false);
   const tx = normalizeTxParams(params.data[0]);
-
+  // for 1559 tx
   const [maxFeePerGas, setMaxFeePerGas] = useState<string>(tx.maxFeePerGas);
   const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState<string>(
     tx.maxPriorityFeePerGas
   );
+  // for non-1559 tx
+  const [gas, setGas] = useState<string>(tx.gas);
+
   const [totalGasfee, setTotalGasFee] = useState<string>('0x0');
   const [currency, setCurrency] = useState('ETH');
 
@@ -134,11 +137,16 @@ const SignTx = ({ params, origin }) => {
   });
 
   useEffect(() => {
-    const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
     const MIN_GAS_LIMIT_DEC = '21000';
-    const total = multipyHexes(a, MIN_GAS_LIMIT_DEC).toString();
-    setTotalGasFee(addHexPrefix(total));
-  }, [maxFeePerGas, maxPriorityFeePerGas]);
+    if (tx.type === '0x0') {
+      const total = multipyHexes(tx.gas, MIN_GAS_LIMIT_DEC).toString();
+      setTotalGasFee(addHexPrefix(total));
+    } else {
+      const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
+      const total = multipyHexes(a, MIN_GAS_LIMIT_DEC).toString();
+      setTotalGasFee(addHexPrefix(total));
+    }
+  }, [maxFeePerGas, maxPriorityFeePerGas, gas]);
 
   const handleAllow = async () => {
     dispatch(showLoadingIndicator());
@@ -316,16 +324,19 @@ const TxDetailComponent = ({
     );
   };
 
+  const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
   return (
     <div className="transaction-detail">
       <Divider style={{ marginTop: 0, marginBottom: 16 }} />
-      <div
-        className="gas-edit-button flex ml-auto"
-        onClick={() => setVisible(true)}
-      >
-        <IconComponent name="edit" cls="edit-icon" />
-        <div>{t('Edit')}</div>
-      </div>
+      {supportsEIP1559 && (
+        <div
+          className="gas-edit-button flex ml-auto"
+          onClick={() => setVisible(true)}
+        >
+          <IconComponent name="edit" cls="edit-icon" />
+          <div>{t('Edit')}</div>
+        </div>
+      )}
       <TransactionDetailItem
         key="gas-item"
         detailTitle={t('Referral gas fee')}
