@@ -463,8 +463,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
           }}
         />
         <div className="popup-delete-notice">
-          All information in this account will be lost, and the operation can't
-          be undo.
+        Make sure you’ve backed up this wallet,all accounts belonging to this wallet will be deleted,and the operation can’t reverse.
         </div>
         <span className="popup-item-title">Input password to delete</span>
         <CustomPasswordInput
