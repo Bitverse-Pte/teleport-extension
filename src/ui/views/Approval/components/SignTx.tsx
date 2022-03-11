@@ -266,6 +266,14 @@ const SignTx = ({ params, origin }) => {
         >
           {t('Send')}
         </CustomButton>
+        <CustomButton
+          type="default"
+          cls="custom-button-default"
+          onClick={handleCancel}
+          block
+        >
+          {t('Decline')}
+        </CustomButton>
       </div>
     </div>
   );

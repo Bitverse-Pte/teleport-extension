@@ -3,8 +3,19 @@ import qrCode from 'qrcode-generator';
 import { isHexPrefixed } from 'ethereumjs-util';
 import { toChecksumHexAddress } from 'ui/utils';
 
-function QrCodeView(props) {
-  const { data } = props;
+interface QRCodeViewProps {
+  data: string;
+  color?: string;
+  margin?: number;
+  cellSize?: number;
+}
+
+function QrCodeView({
+  data,
+  color = '#000000',
+  margin,
+  cellSize = 4,
+}: QRCodeViewProps) {
   const address = `${
     isHexPrefixed(data) ? 'ethereum:' : ''
   }${toChecksumHexAddress(data)}`;
@@ -17,7 +28,12 @@ function QrCodeView(props) {
       <div
         className="qr-code__wrapper"
         dangerouslySetInnerHTML={{
-          __html: qrImage.createTableTag(4),
+          __html: qrImage
+            .createTableTag(cellSize, margin)
+            .replaceAll(
+              'background-color: #000000;',
+              `background-color: ${color}`
+            ),
         }}
       />
     </div>
