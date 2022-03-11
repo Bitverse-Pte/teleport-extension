@@ -10,7 +10,7 @@ import {
   networkController,
   gasFeeController,
   knownMethodService,
-  contactBookService
+  contactBookService,
 } from 'background/service';
 import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
@@ -470,7 +470,7 @@ export class WalletController extends BaseController {
   };
   addContactByDefaultName = (address) => {
     contactBookService.addContactByDefaultName(address);
-  }
+  };
   updateContact = (data: ContactBookItem) => {
     contactBookService.updateContact(data);
   };
