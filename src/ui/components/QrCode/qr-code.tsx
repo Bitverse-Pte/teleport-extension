@@ -3,8 +3,11 @@ import qrCode from 'qrcode-generator';
 import { isHexPrefixed } from 'ethereumjs-util';
 import { toChecksumHexAddress } from 'ui/utils';
 
-function QrCodeView(props) {
-  const { data } = props;
+interface QRCodeViewProps {
+  data: string;
+}
+
+function QrCodeView({ data }: QRCodeViewProps) {
   const address = `${
     isHexPrefixed(data) ? 'ethereum:' : ''
   }${toChecksumHexAddress(data)}`;
