@@ -30,7 +30,13 @@ const SendToken = () => {
       <GeneralHeader title="Receive" hideLogo extCls="receive-header" />
       <div className="receive">
         <div className="chain-box">
-          <img src={ChainIdToChainLogoSVG(currentNetworkController.provider.chainId)} alt="Chain Logo" className="chain-logo" />
+          <img
+            src={ChainIdToChainLogoSVG(
+              currentNetworkController.provider.chainId
+            )}
+            alt="Chain Logo"
+            className="chain-logo"
+          />
           <h1>{currentNetworkController.provider.chainName} </h1>{' '}
           <span className="chain-name">
             ({currentNetworkController.provider.nickname})
@@ -49,6 +55,7 @@ const SendToken = () => {
             data={fromAccount?.address || ''}
             color="#364361"
             margin={0}
+            cellSize={5}
           />
         </div>
 

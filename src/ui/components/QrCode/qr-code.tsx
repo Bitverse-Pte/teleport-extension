@@ -7,9 +7,15 @@ interface QRCodeViewProps {
   data: string;
   color?: string;
   margin?: number;
+  cellSize?: number;
 }
 
-function QrCodeView({ data, color = '#000000', margin }: QRCodeViewProps) {
+function QrCodeView({
+  data,
+  color = '#000000',
+  margin,
+  cellSize = 4,
+}: QRCodeViewProps) {
   const address = `${
     isHexPrefixed(data) ? 'ethereum:' : ''
   }${toChecksumHexAddress(data)}`;
@@ -23,7 +29,7 @@ function QrCodeView({ data, color = '#000000', margin }: QRCodeViewProps) {
         className="qr-code__wrapper"
         dangerouslySetInnerHTML={{
           __html: qrImage
-            .createTableTag(4, margin)
+            .createTableTag(cellSize, margin)
             .replaceAll(
               'background-color: #000000;',
               `background-color: ${color}`
