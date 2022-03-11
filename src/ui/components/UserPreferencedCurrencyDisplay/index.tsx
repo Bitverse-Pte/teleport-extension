@@ -12,7 +12,7 @@ export default function UserPreferencedCurrencyDisplay({ value, token }) {
   });
 
   return token ? (
-    <div className="flexR">
+    <div className="flexR items-end">
       <TokenIcon token={token} radius={30} />
       <span className="dec">{decimalNumber} </span>
       <span className="symbol">{token.symbol} </span>

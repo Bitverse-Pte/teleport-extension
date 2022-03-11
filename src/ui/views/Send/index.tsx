@@ -36,6 +36,7 @@ import { utils } from 'ethers';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentChainId } from 'ui/selectors/selectors';
 import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
+import { shortenAddress } from 'ui/utils/utils';
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -216,7 +217,19 @@ const Send = () => {
   });
 
   return (
-    <div className="send flexCol">
+    <div
+      className="send flexCol"
+      onClick={() => {
+        if (showToList) {
+          /**
+           * Clicks in the whole container will close 
+           * `to` selection list
+           * for other onClick, use `e.stopPropagation()` to avoid this execution
+           */
+          setShowToList(false);
+        }
+      }}
+    >
       <GeneralHeader title={t('Send')} hideLogo />
       <div className="send-container">
         <div className="from-container flexCol">
@@ -269,28 +282,13 @@ const Send = () => {
         <Input
           placeholder={t('Enter Address')}
           value={toAddress}
+          className="customInputStyle"
           onFocus={() => setShowToList(true)}
+          onClick={(e) => e.stopPropagation()}
           onChange={(e) => setToAddress(e.target.value)}
         />
         {showToList && (
-          <Card
-            title={
-              <span className="card-title" onClick={myAccountsSelect}>
-                {t('Transfer between my accounts >')}
-              </span>
-            }
-            extra={
-              <svg
-                className="icon"
-                aria-hidden="true"
-                onClick={myAccountsSelect}
-              >
-                <use xlinkHref="#icon-chevron-right"></use>
-              </svg>
-            }
-            size="small"
-          >
-            <p className="recent-title">{t('Recent Address')}</p>
+          <Card title={t('Recent Address')} size="small">
             {recentAddressList?.map((addr) => (
               <p
                 onClick={() => {
@@ -305,6 +303,9 @@ const Send = () => {
             ))}
           </Card>
         )}
+        <span className="tbmy" onClick={myAccountsSelect}>
+          {t('Transfer between my accounts >')}
+        </span>
         <AccountSelect
           currentSelect={selected}
           visible={accountSelectPopupVisible}
