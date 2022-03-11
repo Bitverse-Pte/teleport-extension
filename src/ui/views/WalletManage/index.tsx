@@ -170,15 +170,10 @@ const WalletManage: React.FC = () => {
         className="wallet-manage-button-container flexR content-wrap-padding"
         style={{
           display: isEdit ? 'none' : 'flex',
-          justifyContent:
-            accountType === Tabs.FIRST ? 'space-between' : 'center',
         }}
       >
         <div
           className="wallet-manage-button-item cursor flexCol _edit"
-          style={{
-            marginRight: accountType === Tabs.FIRST ? '0px' : '132px',
-          }}
           onClick={() => setIsEdit(!isEdit)}
         >
           <div className="wallet-manage-button-wrap flexR">
@@ -197,7 +192,6 @@ const WalletManage: React.FC = () => {
         </div>
         <div
           onClick={handleCreateBtnClick}
-          style={{ display: accountType === Tabs.FIRST ? 'flex' : 'none' }}
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">

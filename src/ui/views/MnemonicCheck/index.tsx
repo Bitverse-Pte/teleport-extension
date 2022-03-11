@@ -43,8 +43,12 @@ const BackupCheck = () => {
   };
 
   const getPrivateKey = async () => {
-    const privateKey = await wallet.getPrivateKeyByHdWalletId(state.hdWalletId);
-    if (privateKey) setPrivateKey(privateKey);
+    const pk = await wallet.getPrivateKeyByHdWalletId(state.hdWalletId);
+    if (pk) {
+      if (pk.startsWith('0x')) {
+        setPrivateKey(pk.replace('0x', ''));
+      }
+    }
   };
 
   const checksumPsd = async () => {

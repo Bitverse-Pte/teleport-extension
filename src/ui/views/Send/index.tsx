@@ -222,7 +222,7 @@ const Send = () => {
       onClick={() => {
         if (showToList) {
           /**
-           * Clicks in the whole container will close 
+           * Clicks in the whole container will close
            * `to` selection list
            * for other onClick, use `e.stopPropagation()` to avoid this execution
            */
