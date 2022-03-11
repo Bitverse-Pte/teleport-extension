@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { Modal, Tooltip } from 'antd';
 import clsx from 'clsx';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -52,7 +52,9 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
       })}
       onClick={() => selectProvider(network)}
     >
-      <span className="network-name">{network.nickname}</span>
+      <Tooltip title={network.nickname}>
+        <span className="network-name">{network.nickname}</span>
+      </Tooltip>
       <NetworkActions network={network} />
     </div>
   );
