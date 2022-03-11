@@ -26,8 +26,8 @@ class ContactBook {
   };
   addContactByDefaultName = (address: string) => {
     const len = this.listContacts().length;
-    const name = `addr-${len}`
-    this.addContact({ name, address, })
+    const name = `addr-${len}`;
+    this.addContact({ name, address });
   };
 
   removeContact = (address: string) => {
