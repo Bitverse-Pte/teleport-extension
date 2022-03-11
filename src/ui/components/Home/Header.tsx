@@ -20,7 +20,7 @@ export function HomeHeader({
       <button
         type="button"
         onClick={networkOnClick}
-        className="network-select-bar relative truncate bg-white pl-3 pr-10 py-2 text-center cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        className="network-select-bar relative truncate bg-white pl-3 pr-10 py-2 text-center cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         aria-haspopup="listbox"
         aria-expanded="true"
         aria-labelledby="listbox-label"
