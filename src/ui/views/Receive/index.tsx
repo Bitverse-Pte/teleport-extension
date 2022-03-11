@@ -36,7 +36,11 @@ const SendToken = () => {
 
         <div className="account-and-qrcode">
           <div className="account-box">{fromAccount?.accountName}</div>
-          <QrCodeView data={fromAccount?.address || ''} />
+          <QrCodeView
+            data={fromAccount?.address || ''}
+            color="#364361"
+            margin={0}
+          />
         </div>
 
         <div className="address-box">

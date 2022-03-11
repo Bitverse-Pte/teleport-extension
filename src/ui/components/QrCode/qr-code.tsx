@@ -5,9 +5,11 @@ import { toChecksumHexAddress } from 'ui/utils';
 
 interface QRCodeViewProps {
   data: string;
+  color?: string;
+  margin?: number;
 }
 
-function QrCodeView({ data }: QRCodeViewProps) {
+function QrCodeView({ data, color = '#000000', margin }: QRCodeViewProps) {
   const address = `${
     isHexPrefixed(data) ? 'ethereum:' : ''
   }${toChecksumHexAddress(data)}`;
@@ -20,7 +22,12 @@ function QrCodeView({ data }: QRCodeViewProps) {
       <div
         className="qr-code__wrapper"
         dangerouslySetInnerHTML={{
-          __html: qrImage.createTableTag(4),
+          __html: qrImage
+            .createTableTag(4, margin)
+            .replaceAll(
+              'background-color: #000000;',
+              `background-color: ${color}`
+            ),
         }}
       />
     </div>
