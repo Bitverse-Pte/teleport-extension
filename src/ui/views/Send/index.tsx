@@ -218,7 +218,19 @@ const Send = () => {
   });
 
   return (
-    <div className="send flexCol">
+    <div
+      className="send flexCol"
+      onClick={() => {
+        if (showToList) {
+          /**
+           * Clicks in the whole container will close 
+           * `to` selection list
+           * for other onClick, use `e.stopPropagation()` to avoid this execution
+           */
+          setShowToList(false);
+        }
+      }}
+    >
       <GeneralHeader title={t('Send')} hideLogo />
       <div className="send-container">
         <div className="from-container flexCol">
@@ -271,6 +283,7 @@ const Send = () => {
           value={toAddress}
           className="customInputStyle"
           onFocus={() => setShowToList(true)}
+          onClick={(e) => e.stopPropagation()}
           onChange={(e) => setToAddress(e.target.value)}
         />
         {showToList && (
