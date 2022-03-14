@@ -62,7 +62,7 @@ export function IdToChainLogoSVG(id: PresetNetworkId | string) {
  * @param chainId the hexstring of this chain
  */
 export function ChainIdToChainLogoSVG(_chainId: string) {
-  const chainId = BigNumber.from(_chainId).toHexString();
+  const chainId = '0x' + parseInt(_chainId).toString(16);
   switch (chainId) {
     case '0x1':
     case '0x2':
