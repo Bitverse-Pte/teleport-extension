@@ -304,7 +304,7 @@ const Send = () => {
           </Card>
         )}
         <span className="tbmy" onClick={myAccountsSelect}>
-          {t('Transfer between my accounts >')}
+          {t('Transfer between my accounts')}
         </span>
         <AccountSelect
           currentSelect={selected}
