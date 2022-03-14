@@ -213,7 +213,7 @@ const SignTx = ({ params, origin }) => {
     if (tx.data) {
       return (
         <div className="tx-details-tab-container flex content-wrap-padding">
-          <Tabs defaultActiveKey="1">
+          <Tabs defaultActiveKey="1" style={{ width: '100% '}}>
             <TabPane tab={t('DETAILS')} key="1">
               <TxDetailComponent
                 tx={tx}
