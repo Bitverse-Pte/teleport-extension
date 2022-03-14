@@ -95,7 +95,7 @@ export function ChainIdToChainLogoSVG(_chainId: string) {
     case '0xfa':
     case '0xfa2':
       return FTMIconB; // FTM
-    case "0xa":
+    case '0xa':
       return OPIconB; // OP
 
     // @todo: is there a better icon other than this?
