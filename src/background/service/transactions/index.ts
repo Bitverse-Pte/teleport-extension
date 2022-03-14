@@ -1095,7 +1095,8 @@ export default class TransactionController extends EventEmitter {
             this._failTransaction(txMeta.id, error);
           });
       });
-
+    // todo - fix frequency load networkStore bug issue, will be refine later
+    /** 
     this.txStateManager
       .getTransactions({
         searchCriteria: {
@@ -1108,6 +1109,7 @@ export default class TransactionController extends EventEmitter {
         );
         this._failTransaction(txMeta.id, txSignError);
       });
+    */
   }
 
   /**
