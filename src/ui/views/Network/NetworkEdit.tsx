@@ -304,7 +304,7 @@ const NetworkEdit = () => {
             />
           </Form.Item>
         </div>
-        <Form.Item>
+        <Form.Item style={{ marginBottom: 0 }}>
           <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
             {t('Next')}
           </Button>
