@@ -5,6 +5,7 @@ import SushiIconB from 'assets/chain/with-border/sushi.svg';
 import BTCIconB from 'assets/chain/with-border/btc.svg';
 import AVAXIconB from 'assets/chain/with-border/avax.svg';
 import FTMIconB from 'assets/chain/with-border/ftm.svg';
+import OPIconB from 'assets/chain/with-border/op.svg';
 import ArbitrumIcon from 'assets/chain/arbitrum.svg';
 import MaticIcon from 'assets/tokens/matic.svg';
 import DefaulutIcon from 'assets/tokens/default.svg';
@@ -55,8 +56,8 @@ export function IdToChainLogoSVG(id: PresetNetworkId | string) {
       return AVAXIconB; // AVAX
     case PresetNetworkId.FTM:
       return FTMIconB; // FTM
-    // case PresetNetworkId.OP:
-    //   return OPIconB; // OP
+    case PresetNetworkId.OP:
+      return OPIconB; // OP
     // @todo: add new case here
 
     // @todo: is there a better icon other than this?
@@ -94,8 +95,8 @@ export function ChainIdToChainLogoSVG(_chainId: string) {
     case '0xfa':
     case '0xfa2':
       return FTMIconB; // FTM
-    // case "0xa":
-    //   return OPIconB; // OP
+    case "0xa":
+      return OPIconB; // OP
 
     // @todo: is there a better icon other than this?
     default:
