@@ -213,7 +213,7 @@ const SignTx = ({ params, origin }) => {
     if (tx.data) {
       return (
         <div className="tx-details-tab-container flex content-wrap-padding">
-          <Tabs defaultActiveKey="1">
+          <Tabs defaultActiveKey="1" style={{ width: '100% ' }}>
             <TabPane tab={t('DETAILS')} key="1">
               <TxDetailComponent
                 tx={tx}
@@ -262,6 +262,7 @@ const SignTx = ({ params, origin }) => {
           token={txToken}
           origin={origin}
         />
+        <Divider style={{ marginTop: 16, marginBottom: 0 }} />
       </div>
       {renderContent()}
       <FeeSelector visible={visible} onClose={() => setVisible(false)} />
@@ -335,7 +336,6 @@ const TxDetailComponent = ({
   const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
   return (
     <div className="transaction-detail">
-      <Divider style={{ marginTop: 0, marginBottom: 16 }} />
       {supportsEIP1559 && (
         <div
           className="gas-edit-button flex ml-auto"
