@@ -293,7 +293,7 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
           loading={props.loading}
           onClick={handleConfirmBtnClick}
           block
-          cls="popup-container-top popup-add-btn"
+          cls="popup-container-top theme"
           disabled={_.isEmpty(value)}
         >
           Add

@@ -251,7 +251,7 @@ const Home = () => {
         />
       </div>
       <div className="assets-container flexCol">
-        {tabType === Tabs.FIRST && displayTokenList.length > 0 ? (
+        {tabType === Tabs.FIRST ? (
           <div className="search-container flexR content-wrap-padding">
             <div className="wrap">
               <SearchInput onChange={handleInputChange} placeholder="Search" />
