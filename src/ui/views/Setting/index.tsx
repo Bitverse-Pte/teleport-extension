@@ -142,7 +142,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           onChange={handleDefaultWalletChange}
         />
       </div>
-      {SettingFeat.map((setting: ISettingFeat) => (
+      {SettingFeat.map((setting: ISettingFeat, i) => (
         <div
           className="setting-item flexR cursor"
           key={setting.title}
@@ -155,7 +155,9 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           >
             {setting?.opts?.tag}
           </span>
-          <IconComponent name="chevron-right" cls="base-text-color" />
+          {i === 3 ? (
+            <IconComponent name="chevron-right" cls="base-text-color" />
+          ) : null}
         </div>
       ))}
     </div>
