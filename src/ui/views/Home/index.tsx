@@ -384,7 +384,7 @@ const Home = () => {
         onClose={() => {
           setSettingPopupVisible(false);
         }}
-        height="516px"
+        height="540px"
         bodyStyle={{
           padding: 0,
         }}
