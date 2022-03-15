@@ -52,6 +52,11 @@ import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
 import { useMethodData } from 'ui/hooks/metamask/useMethodData';
 import { HeaderWithFlex } from 'ui/components/Header';
+import { GAS_ESTIMATE_TYPES } from 'constants/gas';
+import {
+  getGasPriceInHexWei,
+  getRoundedGasPrice,
+} from 'ui/reducer/gas.reducer';
 
 const { TabPane } = Tabs;
 
@@ -118,35 +123,49 @@ const SignTx = ({ params, origin }) => {
   const [totalGasfee, setTotalGasFee] = useState<string>('0x0');
   const [currency, setCurrency] = useState('ETH');
 
-  useAsyncEffect(async () => {
+  const initState = async () => {
     const gas = await wallet.fetchGasFeeEstimates();
     const { gasFeeEstimates, gasEstimateType } = gas;
-    const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
-      gasFeeEstimates[gasState.gasType];
-    setMaxFeePerGas(
-      addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
-    );
-    setMaxPriorityFeePerGas(
-      addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
-    );
-  }, [gasState]);
-
-  useAsyncEffect(async () => {
-    const currency = await wallet.getCurrentCurrency();
-    setCurrency(currency);
-  });
-
-  useEffect(() => {
     const MIN_GAS_LIMIT_DEC = '21000';
     if (tx.type === '0x0') {
-      const total = multipyHexes(tx.gas, MIN_GAS_LIMIT_DEC).toString();
+      let gasPrice = '0x1';
+      if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
+        gasPrice = getGasPriceInHexWei(gasFeeEstimates.medium);
+      } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
+        gasPrice = getRoundedGasPrice(gasFeeEstimates.gasPrice);
+      } else {
+        gasPrice = gasFeeEstimates.gasPrice
+          ? getRoundedGasPrice(gasFeeEstimates.gasPrice)
+          : '0x0';
+      }
+      const total = multipyHexes(
+        tx.gas || gasPrice,
+        MIN_GAS_LIMIT_DEC
+      ).toString();
       setTotalGasFee(addHexPrefix(total));
     } else {
+      const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
+        gasFeeEstimates[gasState.gasType];
+      setMaxFeePerGas(
+        addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
+      );
+      setMaxPriorityFeePerGas(
+        addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
+      );
       const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
       const total = multipyHexes(a, MIN_GAS_LIMIT_DEC).toString();
       setTotalGasFee(addHexPrefix(total));
     }
-  }, [maxFeePerGas, maxPriorityFeePerGas, gas]);
+    const currency = await wallet.getCurrentCurrency();
+    setCurrency(currency);
+  };
+
+  useAsyncEffect(initState, [
+    gasState,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    gas,
+  ]);
 
   const handleAllow = async () => {
     dispatch(showLoadingIndicator());
