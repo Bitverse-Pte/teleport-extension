@@ -4,6 +4,7 @@ import walletLogo from 'assets/walletLogo.svg';
 import './style.less';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { IconComponent } from '../IconComponents';
+import clsx from 'clsx';
 export function HomeHeader({
   menuOnClick,
   networkOnClick,
@@ -20,7 +21,10 @@ export function HomeHeader({
       <button
         type="button"
         onClick={networkOnClick}
-        className="network-select-bar relative truncate bg-white pl-3 pr-10 py-2 text-center cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        className={clsx(
+          'network-select-bar relative truncate bg-white text-center cursor-pointer sm:text-sm',
+          'flex justify-center items-center'
+        )}
         aria-haspopup="listbox"
         aria-expanded="true"
         aria-labelledby="listbox-label"
@@ -28,12 +32,7 @@ export function HomeHeader({
         <span className="block truncate network-nickname">
           {networkContext?.currentNetworkController?.provider.nickname}
         </span>
-        <span className="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <IconComponent
-            name="chevron-down"
-            cls="expand-list base-text-color"
-          />
-        </span>
+        <IconComponent name="chevron-down" cls="expand-list base-text-color" />
       </button>
       <Button type="text" className="expand-menu-btn" onClick={menuOnClick}>
         <IconComponent
