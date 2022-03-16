@@ -37,6 +37,8 @@ const NetworkEdit = () => {
 
   const customNetworks = useSelector((s) => s.customNetworks);
 
+  const [fetchedChainId, setFetchedChainId] = useState<string | undefined>();
+
   const fieldsPresetValues = useMemo(() => {
     const emptyResult = {
       chainId: '',
@@ -86,8 +88,7 @@ const NetworkEdit = () => {
         if (isNaN(Number(data.result))) {
           return t('Bad_RPC_URL');
         }
-        // form.setFieldsValue({ chainId: Number(data.result) });
-        setErrorMessage('rpcUrl');
+        setFetchedChainId(data.result);
       } catch (error: any | Error | AxiosError) {
         console.error('checkRpcUrlAndSetChainId::error: ', error);
         let uiErrorMsg = '';
@@ -184,57 +185,54 @@ const NetworkEdit = () => {
     [customNetworks]
   );
 
-  const [errorMsg, setErrorMsg] = useState<Record<string, string | undefined>>(
-    {}
+  const validateFields = useCallback(
+    async (values: typeof fieldsPresetValues) => {
+      const errors: any = {};
+      const requiredFields = ['networkName', 'rpcUrl', 'chainId'];
+      requiredFields.forEach((fName) => {
+        if (!values[fName]) {
+          errors[fName] = `${fName} is Required`;
+        }
+      });
+      const mustTrimmedFields = [...requiredFields, 'explorerUrl'];
+      mustTrimmedFields.forEach((fName) => {
+        try {
+          checkIsTrimmed(values[fName]);
+        } catch (error: any) {
+          errors[fName] = error.message;
+        }
+      });
+      ['explorerUrl', 'rpcUrl'].forEach((fName) => {
+        try {
+          // skip if empty
+          if (!values[fName]) return;
+          checkIsLegitURL(values[fName]);
+        } catch (error: any) {
+          errors[fName] = error.message;
+        }
+      });
+      errors.networkName = checkNetworkNickname(values.networkName);
+      errors.rpcUrl = await checkRpcUrlAndSetChainId(values.rpcUrl);
+      try {
+        const chainIdBN = BigNumber.from(values.chainId);
+        if (fetchedChainId && !chainIdBN.eq(fetchedChainId)) {
+          errors.chainId = t('mismatched_chain_id', {
+            replace: {
+              expected: values.chainId,
+              got: Number(fetchedChainId),
+            },
+          });
+        }
+      } catch (_) {
+        errors.chainId = t('bad_chain_id');
+      }
+      Object.keys(errors).forEach((field) => {
+        if (!errors[field]) delete errors[field];
+      });
+      return errors;
+    },
+    [fetchedChainId]
   );
-
-  const setErrorMessage = (fieldName: string, message?: string) => {
-    // form.setFields([
-    //   {
-    //     name: fieldName,
-    //     errors: [message].filter(isString),
-    //   },
-    // ]);
-    setErrorMsg((prevS) => ({ ...prevS, [fieldName]: message }));
-  };
-
-  const validateFields = async (values: typeof fieldsPresetValues) => {
-    const errors: any = {};
-    const requiredFields = ['networkName', 'rpcUrl', 'chainId'];
-    requiredFields.forEach((fName) => {
-      if (!values[fName]) {
-        errors[fName] = `${fName} is Required`;
-      }
-    });
-    const mustTrimmedFields = [...requiredFields, 'explorerUrl'];
-    mustTrimmedFields.forEach((fName) => {
-      try {
-        checkIsTrimmed(values[fName]);
-      } catch (error: any) {
-        errors[fName] = error.message;
-      }
-    });
-    ['explorerUrl', 'rpcUrl'].forEach((fName) => {
-      try {
-        // skip if empty
-        if (!values[fName]) return;
-        checkIsLegitURL(values[fName]);
-      } catch (error: any) {
-        errors[fName] = error.message;
-      }
-    });
-    errors.networkName = checkNetworkNickname(values.networkName);
-    errors.rpcUrl = await checkRpcUrlAndSetChainId(values.rpcUrl);
-    try {
-      BigNumber.from(values.chainId);
-    } catch (_) {
-      errors.chainId = t('bad_chain_id');
-    }
-    Object.keys(errors).forEach((field) => {
-      if (!errors[field]) delete errors[field];
-    })
-    return errors;
-  };
 
   return (
     <div className="flexCol network-page-container network-edit">
@@ -258,8 +256,15 @@ const NetworkEdit = () => {
               <Field name="rpcUrl" placeholder="Enter RPC URL" />
               <ErrorMessage name="rpcUrl" component="div" />
               <h1 className="required">{t('Chain ID')}</h1>
-              <Field name="chainId" placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')} />
-              <ErrorMessage name="chainId" component="div" className="input-error" />
+              <Field
+                name="chainId"
+                placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
+              />
+              <ErrorMessage
+                name="chainId"
+                component="div"
+                className="input-error"
+              />
               <h1>{t('Currency Symbol')}</h1>
               <Field name="symbol" placeholder={t('Optional')} />
               <ErrorMessage name="symbol" component="div" />
@@ -270,7 +275,7 @@ const NetworkEdit = () => {
             <Button
               type="primary"
               htmlType="submit"
-              style={{ margin: '24px', width: "312px" }}
+              style={{ margin: '24px', width: '312px' }}
               disabled={Object.keys(formilk.errors).length > 0}
             >
               {t('Next')}
