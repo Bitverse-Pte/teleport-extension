@@ -14,7 +14,7 @@ import BitError from 'error';
 import { providerFromEngine } from 'eth-json-rpc-middleware';
 import { ethers } from 'ethers';
 import Eth from 'ethjs';
-import { sessionService } from '../index';
+import { sessionService, TokenService } from '../index';
 import { ObservableStorage } from '../../utils/obsStorage';
 import EventEmitter from 'events';
 import log from 'loglevel';
@@ -108,11 +108,13 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore = new ObservableStore<Record<number, Network>>({
       0: {
         id: nanoid(),
-        nickname: 'localhost:8545',
-        rpcUrl: 'http://localhost:8545',
-        rpcPrefs: {},
-        chainId: '0x539',
-        ticker: 'ETH',
+        nickname: 'Teleport Testnet',
+        rpcUrl: 'https://evm-rpc.testnet.teleport.network',
+        rpcPrefs: {
+          blockExplorerUrl: 'https://evm-explorer.testnet.teleport.network',
+        },
+        chainId: '0x1f41',
+        ticker: 'TELE',
         chainName: 'ETH',
         coinType: CoinType.ETH,
         ecosystem: Ecosystem.EVM,
@@ -155,20 +157,43 @@ class NetworkPreferenceService extends EventEmitter {
    * @todo: remove this in next release
    */
   private _customNetworkStoreMigration() {
-    console.info('_customNetworkStoreMigration start');
+    console.debug('_customNetworkStoreMigration start');
     const { customNetworks } = this._store.getState();
+    let isLocalhostNetworkFound = false;
     Object.keys(customNetworks).forEach((key) => {
-      if (!customNetworks[key].Ecosystem) {
-        delete customNetworks[key]['category'];
-        delete customNetworks[key]['isEthereumCompatible'];
-        customNetworks[key].Ecosystem = Ecosystem.EVM;
-        customNetworks[key].prefix = '0x';
+      if (customNetworks[key].nickname === 'localhost:8545') {
+        isLocalhostNetworkFound = true;
+        customNetworks[key] = {
+          id: nanoid(),
+          nickname: 'Teleport Testnet',
+          rpcUrl: 'https://evm-rpc.testnet.teleport.network',
+          rpcPrefs: {
+            blockExplorerUrl: 'https://evm-explorer.testnet.teleport.network',
+          },
+          chainId: '0x1f41',
+          ticker: 'TELE',
+          chainName: 'ETH',
+          coinType: CoinType.ETH,
+          ecosystem: Ecosystem.EVM,
+          prefix: '0x',
+        };
+        TokenService.addCustomToken({
+          symbol: 'TELE',
+          name: 'TELE',
+          decimal: 18,
+          chainCustomId: customNetworks[key].id,
+          isNative: true,
+        });
       }
     });
-    this._store.updateState({
-      customNetworks,
-    });
-    console.info('_customNetworkStoreMigration end', customNetworks);
+    if (isLocalhostNetworkFound) {
+      this._store.updateState({
+        customNetworks,
+      });
+      console.debug('_customNetworkStoreMigration end', customNetworks);
+    } else {
+      console.debug('No more migration');
+    }
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
