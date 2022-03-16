@@ -136,6 +136,13 @@ export class WalletController extends BaseController {
     chainName = 'ETH'
   ) => {
     const state = networkPreferenceService.getCustomNetworks();
+    const isSymbolChanged = ticker != state[matchedIdx].ticker;
+    if (isSymbolChanged) {
+      // change symbol of custom token
+      TokenService.changeCustomTokenProfile(state[matchedIdx].id, {
+        symbol: ticker,
+      });
+    }
     state[matchedIdx] = {
       ...state[matchedIdx],
       nickname: newNickname,
