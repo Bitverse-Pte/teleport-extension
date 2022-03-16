@@ -546,6 +546,9 @@
   "speedUp": {
     "message": "Speed Up"
   },
+  "mismatched_chain_id": {
+    "message": "Chain ID doesn’t match with the server, expect: {{expected}} got: {{got}}"
+  },
   "gasCostTitle": {
     "message": "Est. gas cost"
   },
