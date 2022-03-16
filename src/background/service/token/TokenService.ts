@@ -303,6 +303,30 @@ class TokenService {
     }
     return Promise.resolve(token);
   }
+
+  changeCustomTokenProfile(chainCustomId: string, data: Partial<Token>) {
+    const state = this.store.getState();
+    const tokenAtIdx = cloneDeep(state.tokens || []).findIndex(
+      (t: Token) => t.chainCustomId === chainCustomId && t.isNative == true
+    );
+    if (tokenAtIdx === -1) {
+      throw new BitError(ErrorCode.CUSTOM_TOKEN_MISSING);
+    }
+    /**
+     * filter the new token data
+     */
+    Object.keys(data).forEach((k) => {
+      // no undefined nor null
+      if (data[k] === undefined || data[k] === null) {
+        delete data[k];
+      }
+    });
+    state.tokens[tokenAtIdx] = {
+      ...state.tokens[tokenAtIdx],
+      // override with new data
+      ...data,
+    };
+  }
 }
 
 export default new TokenService();
