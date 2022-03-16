@@ -151,6 +151,7 @@ const Send = () => {
     } else {
       delete params.maxFeePerGas;
       delete params.maxPriorityFeePerGas;
+      params.gasPrice = draftTransaction.gasPrice;
       params.gas = draftTransaction.gas;
     }
     params.txParam = {

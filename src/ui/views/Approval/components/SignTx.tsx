@@ -57,6 +57,7 @@ import {
   getGasPriceInHexWei,
   getRoundedGasPrice,
 } from 'ui/reducer/gas.reducer';
+import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
 
 const { TabPane } = Tabs;
 
@@ -118,7 +119,7 @@ const SignTx = ({ params, origin }) => {
     tx.maxPriorityFeePerGas
   );
   // for non-1559 tx
-  const [gas, setGas] = useState<string>(tx.gas);
+  const [gasPrice, setGasPrice] = useState<string>(tx.gasPrice);
 
   const [totalGasfee, setTotalGasFee] = useState<string>('0x0');
   const [currency, setCurrency] = useState('ETH');
@@ -126,7 +127,7 @@ const SignTx = ({ params, origin }) => {
   const initState = async () => {
     const gas = await wallet.fetchGasFeeEstimates();
     const { gasFeeEstimates, gasEstimateType } = gas;
-    const MIN_GAS_LIMIT_DEC = '21000';
+    //const MIN_GAS_LIMIT_HEX = '0x5208';
     if (tx.type === '0x0') {
       let gasPrice = '0x1';
       if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
@@ -138,10 +139,8 @@ const SignTx = ({ params, origin }) => {
           ? getRoundedGasPrice(gasFeeEstimates.gasPrice)
           : '0x0';
       }
-      const total = multipyHexes(
-        tx.gas || gasPrice,
-        MIN_GAS_LIMIT_DEC
-      ).toString();
+      setGasPrice(tx.gasPrice || gasPrice);
+      const total = multipyHexes(gasPrice, MIN_GAS_LIMIT_HEX).toString();
       setTotalGasFee(addHexPrefix(total));
     } else {
       const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
@@ -153,19 +152,14 @@ const SignTx = ({ params, origin }) => {
         addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
       );
       const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
-      const total = multipyHexes(a, MIN_GAS_LIMIT_DEC).toString();
+      const total = multipyHexes(a, MIN_GAS_LIMIT_HEX).toString();
       setTotalGasFee(addHexPrefix(total));
     }
     const currency = await wallet.getCurrentCurrency();
     setCurrency(currency);
   };
 
-  useAsyncEffect(initState, [
-    gasState,
-    maxFeePerGas,
-    maxPriorityFeePerGas,
-    gas,
-  ]);
+  useAsyncEffect(initState, [gasState, maxFeePerGas, maxPriorityFeePerGas]);
 
   const handleAllow = async () => {
     dispatch(showLoadingIndicator());
@@ -180,7 +174,7 @@ const SignTx = ({ params, origin }) => {
     } else {
       resolveApproval({
         ...tx,
-        gasPrice: '0xd31db1',
+        gasPrice: gasPrice,
       })
         .then(() => delay(1000))
         .then(() => dispatch(hideLoadingIndicator()));
