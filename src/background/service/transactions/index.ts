@@ -49,6 +49,7 @@ import { EVENTS } from 'constants/index';
 import preferenceService from '../preference';
 import { NetworkController } from 'types/network';
 import { CustomGasSettings } from 'types/tx';
+import ns from '../network';
 
 const hstInterface = new ethers.utils.Interface(abi);
 
@@ -173,7 +174,8 @@ export default class TransactionController extends EventEmitter {
     this.pendingTxTracker = new PendingTransactionTracker({
       provider: this.provider,
       nonceTracker: this.nonceTracker,
-      publishTransaction: (rawTx) => this.query.sendRawTransaction(rawTx),
+      publishTransaction: (rawTx) =>
+        ns.getCurrentEth().sendRawTransaction(rawTx),
       getPendingTransactions: () => {
         const pending = this.txStateManager.getPendingTransactions();
         const approved = this.txStateManager.getApprovedTransactions();
@@ -559,7 +561,7 @@ export default class TransactionController extends EventEmitter {
       console.error(e);
     }
 
-    const gasPrice = await this.query.gasPrice();
+    const gasPrice = await ns.getCurrentEth().gasPrice();
 
     return { gasPrice: gasPrice && addHexPrefix(gasPrice.toString(16)) };
   }
@@ -912,10 +914,11 @@ export default class TransactionController extends EventEmitter {
     @param rawTx - the hex string of the serialized signed transaction
   */
   async publishTransaction(txId: string, rawTx: string) {
+    const ethQuery = ns.getCurrentEth();
     const txMeta = this.txStateManager.getTransaction(txId);
     txMeta.rawTx = rawTx;
     if (txMeta.type === TRANSACTION_TYPES.SWAP) {
-      const preTxBalance = await this.query.getBalance(txMeta.txParams.from);
+      const preTxBalance = await ethQuery.getBalance(txMeta.txParams.from);
       txMeta.preTxBalance = preTxBalance.toString(16);
     }
     this.txStateManager.updateTransaction(
@@ -924,7 +927,7 @@ export default class TransactionController extends EventEmitter {
     );
     let txHash;
     try {
-      txHash = await this.query.sendRawTransaction(rawTx);
+      txHash = await ns.getCurrentEth().sendRawTransaction(rawTx);
     } catch (error: any) {
       if (error.message.toLowerCase().includes('known transaction')) {
         // txHash = keccak(toBuffer(addHexPrefix(rawTx), 'hex')).toString('hex');
@@ -1206,7 +1209,7 @@ export default class TransactionController extends EventEmitter {
     let code;
     if (!result) {
       try {
-        code = await this.query.getCode(to);
+        code = await ns.getCurrentEth().getCode(to);
       } catch (e) {
         code = null;
         log.warn(e);

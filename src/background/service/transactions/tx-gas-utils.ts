@@ -4,6 +4,7 @@ import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util';
 import { cloneDeep } from 'lodash';
 import { hexToBn, BnMultiplyByFraction, bnToHex } from './lib/lib-util';
 import { TransactionMeta } from './typing';
+import ns from '../network';
 interface GasAnalysisResult {
   blockGasLimit: string;
   estimatedGasHex: string;
@@ -20,7 +21,7 @@ and used to do things like calculate gas of a tx.
 export default class TxGasUtil {
   query!: any;
   constructor(provider) {
-    this.query = new EthQuery(provider);
+    this.query = ns.getCurrentEth();
   }
 
   /**
@@ -28,7 +29,7 @@ export default class TxGasUtil {
     @returns {GasAnalysisResult} The result of the gas analysis
   */
   async analyzeGasUsage(txMeta: TransactionMeta): Promise<GasAnalysisResult> {
-    const block = await this.query.getBlockByNumber('latest', false);
+    const block = await ns.getCurrentEth().getBlockByNumber('latest', false);
 
     // fallback to block gasLimit
     const blockGasLimitBN = hexToBn(block.gasLimit);
@@ -67,7 +68,7 @@ export default class TxGasUtil {
     delete txParams.maxPriorityFeePerGas;
 
     // estimate tx gas requirements
-    return await this.query.estimateGas(txParams);
+    return await ns.getCurrentEth().estimateGas(txParams);
   }
 
   /**

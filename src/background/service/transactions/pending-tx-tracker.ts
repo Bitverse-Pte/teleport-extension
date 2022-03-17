@@ -7,6 +7,8 @@ import {
   Transaction,
   TransactionStatuses as TRANSACTION_STATUSES,
 } from './typing';
+import ns from '../network';
+
 // import { TRANSACTION_STATUSES } from '../../../../shared/constants/transaction';
 
 // import { TRANSACTION_STATUSES } from 'constants/transaction';
@@ -202,12 +204,13 @@ export default class PendingTransactionTracker extends EventEmitter {
     }
 
     try {
-      const transactionReceipt = await this.query.getTransactionReceipt(txHash);
+      const transactionReceipt = await ns
+        .getCurrentEth()
+        .getTransactionReceipt(txHash);
       if (transactionReceipt?.blockNumber) {
-        const { baseFeePerGas } = await this.query.getBlockByHash(
-          transactionReceipt?.blockHash,
-          false
-        );
+        const { baseFeePerGas } = await ns
+          .getCurrentEth()
+          .getBlockByHash(transactionReceipt?.blockHash, false);
         this.emit('tx:confirmed', txId, transactionReceipt, baseFeePerGas);
         return;
       }
@@ -237,7 +240,7 @@ export default class PendingTransactionTracker extends EventEmitter {
       hash: txHash,
       txParams: { nonce, from },
     } = txMeta;
-    const networkNextNonce = await this.query.getTransactionCount(from);
+    const networkNextNonce = await ns.getCurrentEth().getTransactionCount(from);
 
     if (parseInt(nonce, 16) >= networkNextNonce.toNumber()) {
       return false;
