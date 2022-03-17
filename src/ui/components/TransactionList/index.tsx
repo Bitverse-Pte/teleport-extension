@@ -190,6 +190,11 @@ function TransactionItem({
   }, [displayedStatusKey]);
 
   const isEvenStyle = idx % 2 == 0 ? 'is-even' : '';
+  /**
+   * Usually the amount of approval is so big and irrelavnt.
+   * so we just hide the amount in the list like MetaMask did.
+   */
+  const isHidingAmount = category !== TransactionGroupCategories.APPROVAL;
   return (
     <div
       className={clsx(
@@ -212,9 +217,11 @@ function TransactionItem({
         id={`tx-${idx}`}
       >
         <p className="tx-title capitalize">{title}</p>
-        <p className="tx-value ml-auto" title={primaryCurrency}>
-          {addEllipsisToEachWordsInTheEnd(primaryCurrency, 19)}
-        </p>
+        {isHidingAmount && (
+          <p className="tx-value ml-auto" title={primaryCurrency}>
+            {addEllipsisToEachWordsInTheEnd(primaryCurrency, 19)}
+          </p>
+        )}
         {/* hide if recipientAddress not exist e.g contract deploy */}
         {recipientAddress && (
           <div className="grey-02 from-and-to flex items-center mr-auto">
