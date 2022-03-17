@@ -2,14 +2,14 @@ import React, { useMemo } from 'react';
 import { TransactionGroup, TransactionStatuses } from 'constants/transaction';
 import { utils, BigNumber } from 'ethers';
 import { useTransactionDisplayData } from 'ui/hooks/metamask/useTxDisplayData';
+import { useSelector } from 'react-redux';
 
 interface Params {
   transaction: TransactionGroup;
 }
 
 export function TransactionFee({ transaction }: Params) {
-  const { primaryCurrency, displayedStatusKey } =
-    useTransactionDisplayData(transaction);
+  const { displayedStatusKey } = useTransactionDisplayData(transaction);
 
   const isTxSigned = useMemo(() => {
     return (
@@ -17,6 +17,10 @@ export function TransactionFee({ transaction }: Params) {
       TransactionStatuses.UNAPPROVED.toLowerCase()
     );
   }, []);
+
+  const currentProviderSymbol = useSelector(
+    (s) => s.network.provider.ticker || 'ETH'
+  );
 
   const isTxFeeDataExist = useMemo(() => {
     const { maxFeePerGas, gasPrice, gas } =
@@ -39,7 +43,7 @@ export function TransactionFee({ transaction }: Params) {
               transaction.primaryTransaction.txParams.gasPrice
           ).mul(transaction.primaryTransaction.txParams.gas!)
         )}{' '}
-        {primaryCurrency.split(' ')[1]}
+        {currentProviderSymbol}
       </div>
     </div>
   );
