@@ -537,6 +537,12 @@
   "Action": {
     "message": "Action"
   },
+  "contractDeployment": {
+    "message": "Contract Deployment"
+  },
+  "contractInteraction": {
+    "message": "Contract Interaction"
+  },
   "Unknown__Action": {
     "message": "Unknown Action"
   },
