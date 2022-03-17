@@ -23,10 +23,10 @@ function Address({ checksummedAddress, name }) {
     >
       <div className="sender-icon-and-name flex">
         <Jazzicon
-            seed={Number(checksummedAddress?.substr(0, 8) || 0)}
-            diameter={24}
-          />
-          <div className="name">{name}</div>
+          seed={Number(checksummedAddress?.substr(0, 8) || 0)}
+          diameter={24}
+        />
+        <div className="name">{name}</div>
       </div>
       <CopyToClipboard text={checksummedAddress} onCopy={onCopy}>
         <div className="address">
