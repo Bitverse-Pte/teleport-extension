@@ -15,7 +15,7 @@ export default function UserPreferencedCurrencyDisplay({ value, token }) {
   return token ? (
     <div className="flexR items-end">
       <TokenIcon token={token} radius={30} />
-      <span className="dec">
+      <span className="dec" title={decimalNumber}>
         {addEllipsisToEachWordsInTheEnd(decimalNumber, 8)}{' '}
       </span>
       <span className="symbol">{token.symbol} </span>
