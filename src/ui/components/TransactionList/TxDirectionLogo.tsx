@@ -61,12 +61,12 @@ export function TxDirectionLogo({ status, type, size = 48 }: TxLogoParams) {
   return (
     <div className="logo-container">
       <div className="tx-stat-logo" style={{ backgroundColor }}>
-      {type === 'send' ? (
-        <IconSent style={iconStyle} width={12} height={12} />
-      ) : (
-        <IconReceive style={iconStyle} width={12} height={12} />
-      )}
-    </div>
+        {type === 'send' ? (
+          <IconSent style={iconStyle} width={12} height={12} />
+        ) : (
+          <IconReceive style={iconStyle} width={12} height={12} />
+        )}
+      </div>
     </div>
   );
 }
