@@ -311,6 +311,7 @@ const TxDetailComponent = ({
   const { t } = useTranslation();
 
   const renderTotalMaxAmount = () => {
+    // @todo: need to handle ERC20 Token + ETH fee
     const totalHex = addHexPrefix(
       addHexes(valueToDisplay(tx), totalGasfee).toString()
     );
