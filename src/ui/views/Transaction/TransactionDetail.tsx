@@ -147,7 +147,7 @@ export function _ActivityDetail({
       </div>
       <div className="txdetail-values flex flex-wrap justify-center">
         <div className="txdetail-value-display">
-          <p className="txdetail-value items-baseline">
+          <p className="txdetail-value items-baseline flex-wrap">
             {displayPrimaryCurrency.amount}
             <span className="unit">{displayPrimaryCurrency.unit}</span>
           </p>

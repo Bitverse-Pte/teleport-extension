@@ -28,6 +28,7 @@ import CancelButton from './CancelButton';
 import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
+import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 
 dayjs.extend(relativeTime);
 
@@ -211,7 +212,9 @@ function TransactionItem({
         id={`tx-${idx}`}
       >
         <p className="tx-title capitalize">{title}</p>
-        <p className="tx-value ml-auto">{primaryCurrency}</p>
+        <p className="tx-value ml-auto" title={primaryCurrency}>
+          {addEllipsisToEachWordsInTheEnd(primaryCurrency, 19)}
+        </p>
         {/* hide if recipientAddress not exist e.g contract deploy */}
         {recipientAddress && (
           <div className="grey-02 from-and-to flex items-center mr-auto">
