@@ -13,6 +13,7 @@ interface ISettingFeat {
   title: string;
   link?: string;
   opts?: any;
+  showChevronRight?: boolean;
 }
 
 const SettingFeat: ISettingFeat[] = [
@@ -37,10 +38,12 @@ const SettingFeat: ISettingFeat[] = [
      * since it's not in the extension's context
      */
     link: 'https://forms.gle/6ZLWmHXZGnioE1uQ6',
+    showChevronRight: true,
   },
   {
     title: 'About',
     link: '/about',
+    showChevronRight: true,
   },
 ];
 
@@ -155,7 +158,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           >
             {setting?.opts?.tag}
           </span>
-          {i === 3 ? (
+          {setting.showChevronRight ? (
             <IconComponent name="chevron-right" cls="base-text-color" />
           ) : null}
         </div>

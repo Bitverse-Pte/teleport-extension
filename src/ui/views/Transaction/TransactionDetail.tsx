@@ -143,11 +143,13 @@ export function _ActivityDetail({
       <Header title={t(title)} />
       <div className="txdetail-direction-logo flex justify-center">
         {/* workaround as hook treat native token as undefined */}
-        <TokenIcon token={token || matchedNativeToken} radius={48} />
+        <div>
+          <TokenIcon token={token || matchedNativeToken} radius={48} />
+        </div>
       </div>
       <div className="txdetail-values flex flex-wrap justify-center">
         <div className="txdetail-value-display">
-          <p className="txdetail-value items-baseline">
+          <p className="txdetail-value items-baseline flex-wrap">
             {displayPrimaryCurrency.amount}
             <span className="unit">{displayPrimaryCurrency.unit}</span>
           </p>

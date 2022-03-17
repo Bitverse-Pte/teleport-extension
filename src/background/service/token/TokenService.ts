@@ -265,7 +265,9 @@ class TokenService {
   }
 
   async queryToken(address, rpc, contractAddress): Promise<ERC20Struct> {
-    const account = networkPreferenceService.getCurrentEth().getCode(address);
+    const account = await networkPreferenceService
+      .getCurrentEth()
+      .getCode(address);
     if (account !== '0x') {
       return Promise.reject(new BitError(ErrorCode.INVALID_CONTRACT_ADDRESS));
     }

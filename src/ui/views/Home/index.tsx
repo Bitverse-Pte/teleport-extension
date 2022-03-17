@@ -43,6 +43,7 @@ const { sensors } = skynet;
 
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
+import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 
 const onCopy = () => {
   ClickToCloseMessage.success('Copied');
@@ -276,8 +277,14 @@ const Home = () => {
                     <div className="left flexR">
                       <TokenIcon token={t} radius={32} />
                       <div className="balance-container flexCol">
-                        <span className="balance">
-                          {denom2SymbolRatio(t.amount || 0, t.decimal)}{' '}
+                        <span
+                          className="balance"
+                          title={denom2SymbolRatio(t.amount || 0, t.decimal)}
+                        >
+                          {addEllipsisToEachWordsInTheEnd(
+                            denom2SymbolRatio(t.amount || 0, t.decimal),
+                            16
+                          )}{' '}
                           {t.symbol?.toUpperCase()}
                         </span>
                         <span className="estimate">
