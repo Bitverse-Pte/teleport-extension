@@ -137,7 +137,7 @@ const SingleToken = () => {
       <div className="token-tx-list">
         <h2 className="title">{t('Activity')}</h2>
         <TransactionsList
-          listContiannerHeight={300}
+          listContiannerHeight={240}
           tokenAddress={token?.contractAddress}
           // hideTokenTransactions is true = show native token transfer
           hideTokenTransactions={token?.isNative}
