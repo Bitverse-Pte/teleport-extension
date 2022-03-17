@@ -224,7 +224,7 @@ function TransactionItem({
         )}
         {/* hide if recipientAddress not exist e.g contract deploy */}
         {recipientAddress && (
-          <div className="grey-02 from-and-to flex items-center mr-auto">
+          <div className="grey-02 from-and-to flex items-center mr-auto mb-8">
             <span className="from cursor-default">
               <Tooltip placement="top" title={senderAddress}>
                 {t('from')}: {shortenedStr(senderAddress, 3)}
