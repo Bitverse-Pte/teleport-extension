@@ -21,13 +21,13 @@ function Address({ checksummedAddress, name }) {
         // alert('from address copied');
       }}
     >
-      <Space>
+      <div className="sender-icon-and-name flex">
         <Jazzicon
-          seed={Number(checksummedAddress?.substr(0, 8) || 0)}
-          diameter={24}
-        />
-        <div className="name">{name}</div>
-      </Space>
+            seed={Number(checksummedAddress?.substr(0, 8) || 0)}
+            diameter={24}
+          />
+          <div className="name">{name}</div>
+      </div>
       <CopyToClipboard text={checksummedAddress} onCopy={onCopy}>
         <div className="address">
           <span>{transferAddress2Display(checksummedAddress)}</span>
