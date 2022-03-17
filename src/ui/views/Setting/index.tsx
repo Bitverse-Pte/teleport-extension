@@ -36,7 +36,7 @@ const SettingFeat: ISettingFeat[] = [
      * link start with http(s) will be open in a new page
      * since it's not in the extension's context
      */
-    // link: 'https://doc.google.com',
+    link: 'https://forms.gle/6ZLWmHXZGnioE1uQ6',
   },
   {
     title: 'About',
