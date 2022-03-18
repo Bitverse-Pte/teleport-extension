@@ -71,8 +71,8 @@ const SingleToken = () => {
       const clonedToken = cloneDeep(token);
       if (clonedToken.symbol.toUpperCase() in prices) {
         clonedToken.price = prices[clonedToken.symbol.toUpperCase()];
-        return clonedToken;
       }
+      return clonedToken;
     } else {
       return token;
     }
