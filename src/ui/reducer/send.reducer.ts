@@ -264,9 +264,11 @@ async function estimateGasLimitForSend({
       // address. If this returns 0x, 0x0 or a nullish value then the address
       // is an externally owned account (NOT a contract account). For these
       // types of transactions the gasLimit will always be 21,000 or 0x5208
-      const { isContractAddress } = to
-        ? await readAddressAsContract(global.eth, to)
-        : { isContractAddress: undefined };
+      // const { isContractAddress } = to
+      //   ? await readAddressAsContract(global.eth, to)
+      //   : { isContractAddress: undefined };
+      // TODO: need to get isContractAddress
+      const isContractAddress = false;
       if (!isContractAddress && !isNonStandardEthChain) {
         return GAS_LIMITS.SIMPLE;
       } else if (!isContractAddress && isNonStandardEthChain) {

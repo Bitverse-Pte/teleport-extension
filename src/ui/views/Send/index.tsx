@@ -37,6 +37,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentChainId } from 'ui/selectors/selectors';
 import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
 import { shortenAddress } from 'ui/utils/utils';
+import { UnlockModal } from 'ui/components/UnlockModal';
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -62,12 +63,14 @@ const Send = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [selectedToken, setSelectedToken] = useState<Token>();
   const [recentAddressList, setRecentAddressList] = useState<string[]>();
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
 
   const chainId = useSelector(getCurrentChainId);
   const draftTransaction = useSelector(
     (state) => state.send.draftTransaction.txParams
   );
   const isSupport1559 = useSelector((state) => state.send.eip1559support);
+  console.log('isSupport1559: ', isSupport1559);
 
   const cleanup = useCallback(() => {
     dispatch(resetSendState());
@@ -117,6 +120,10 @@ const Send = () => {
   }, [balance]);
 
   const next = async () => {
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
     const userInputAmount = addHexPrefix(
       getWeiHexFromDecimalValue({
         value: amount,
@@ -231,6 +238,14 @@ const Send = () => {
         }
       }}
     >
+      <UnlockModal
+        title="Unlock Wallet"
+        visible={unlockPopupVisible}
+        setVisible={(visible: boolean) => {
+          setUnlockPopupVisible(visible);
+        }}
+        unlocked={() => next()}
+      />
       <GeneralHeader title={t('Send')} hideLogo />
       <div className="send-container">
         <div className="from-container flexCol">

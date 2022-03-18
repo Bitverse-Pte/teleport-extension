@@ -418,16 +418,13 @@ export class WalletController extends BaseController {
   }
   estimateGas(estimateGasParams) {
     return new Promise((resolve, reject) => {
-      return txController.txGasUtil.query.estimateGas(
-        estimateGasParams,
-        (err, res) => {
-          if (err) {
-            return reject(err);
-          }
-
-          return resolve(res.toString(16));
+      const ethQuery = networkPreferenceService.getCurrentEth();
+      return ethQuery.estimateGas(estimateGasParams, (err, res) => {
+        if (err) {
+          return reject(err);
         }
-      );
+        return resolve(res.toString(16));
+      });
     });
   }
   readAddressAsContract = async (address) => {
