@@ -478,10 +478,6 @@ export const TipButton = (props: TipButtonProps) => {
 
 export const BetaIcon = () => {
   return (
-    <span
-      className="beta-icon"
-    >
-      Beta
-    </span>
+    <span className="beta-icon">Beta</span>
   );
 };
