@@ -10,7 +10,7 @@ import {
   nonceSortedCompletedTransactionsSelector,
   nonceSortedPendingTransactionsSelector,
 } from 'ui/selectors/transactions';
-import { useTransactionDisplayData } from 'ui/hooks/metamask/useTxDisplayData';
+import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
 import {
   TransactionGroup,
   TransactionGroupCategories,
