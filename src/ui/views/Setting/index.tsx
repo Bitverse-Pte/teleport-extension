@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.svg';
+import TeleportText from 'assets/teleportText.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
 import { stat } from 'fs';
+import { BetaIcon } from 'ui/components/Widgets';
 
 interface ISettingFeat {
   title: string;
@@ -58,7 +60,8 @@ export const LogoHeader: React.FC<ILogoHeader> = (props) => {
     <div className="logo-header flexR">
       <div className="logo-header-left flexR">
         <img src={walletLogo} className="logo-header-left-logo" />
-        <span className="logo-header-left-title">Teleport Wallet</span>
+        <img src={TeleportText} className="logo-header-left-title" />
+        <BetaIcon />
       </div>
       <div
         className="logo-header-right flexR"

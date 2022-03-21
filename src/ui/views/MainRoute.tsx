@@ -26,6 +26,7 @@ const ActivityDetail = lazy(
 const Send = lazy(() => import('ui/views/Send'));
 const Receive = lazy(() => import('ui/views/Receive'));
 const GasFee = lazy(() => import('ui/views/GasFee'));
+const Policy = lazy(() => import('ui/views/Policy'));
 
 const Main = () => {
   return (
@@ -90,6 +91,10 @@ const Main = () => {
 
         <LazyPrivateRoute exact path="/activity/:activityId">
           <ActivityDetail />
+        </LazyPrivateRoute>
+
+        <LazyPrivateRoute exact path="/policy">
+          <Policy />
         </LazyPrivateRoute>
 
         {/* Remove these two routes when we feel good about them  */}
