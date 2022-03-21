@@ -122,7 +122,6 @@ const SignTx = ({ params, origin }) => {
   const [gasPrice, setGasPrice] = useState<string>(tx.gasPrice);
 
   const [totalGasfee, setTotalGasFee] = useState<string>('0x0');
-  const [currency, setCurrency] = useState('ETH');
 
   const initState = async () => {
     const gas = await wallet.fetchGasFeeEstimates();
@@ -160,8 +159,6 @@ const SignTx = ({ params, origin }) => {
       const total = multipyHexes(a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
       setTotalGasFee(addHexPrefix(total));
     }
-    const currency = await wallet.getCurrentCurrency();
-    setCurrency(currency);
   };
 
   useAsyncEffect(initState, [gasState, maxFeePerGas, maxPriorityFeePerGas]);
@@ -240,7 +237,7 @@ const SignTx = ({ params, origin }) => {
                 nativeToken={nativeToken}
                 setVisible={setVisible}
                 totalGasfee={totalGasfee}
-                currency={currency}
+                currency={nativeToken?.symbol}
               />
             </TabPane>
             <TabPane tab={t('DATA')} key="2">
@@ -257,7 +254,7 @@ const SignTx = ({ params, origin }) => {
           nativeToken={nativeToken}
           setVisible={setVisible}
           totalGasfee={totalGasfee}
-          currency={currency}
+          currency={nativeToken?.symbol}
         />
       </div>
     );
