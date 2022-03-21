@@ -1,7 +1,7 @@
 import './style.less';
 import React, { useMemo, useState } from 'react';
 import { message, Drawer } from 'antd';
-import { useWallet } from 'ui/utils';
+import { useWallet, useWalletRequest } from 'ui/utils';
 import { useHistory, useLocation } from 'react-router-dom';
 import * as _ from 'lodash';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -24,8 +24,17 @@ const BackupCheck = () => {
   const wallet = useWallet();
   const history = useHistory();
 
+  const [unlock, loading] = useWalletRequest(wallet.unlock, {
+    onSuccess() {
+      checksumPsd();
+    },
+    onError(err) {
+      ClickToCloseMessage.error('Wrong password');
+    },
+  });
+
   const handleNextBtnClick = () => {
-    checksumPsd();
+    unlock(psd);
   };
 
   const resetState = () => {
