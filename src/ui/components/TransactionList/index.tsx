@@ -14,7 +14,7 @@ import {
   TransactionTypes,
 } from 'constants/transaction';
 import { useHistory } from 'react-router-dom';
-import { useTransactionDisplayData } from 'ui/hooks/metamask/useTxDisplayData';
+import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
 import { useTranslation } from 'react-i18next';
 import { getCurrentChainId } from 'ui/selectors/selectors';
 import {
@@ -22,7 +22,7 @@ import {
   nonceSortedCompletedTransactionsSelector,
 } from 'ui/selectors/transactions';
 import { isEqualCaseInsensitive, shortenAddress } from 'ui/utils/utils';
-import { useShouldShowSpeedUp } from 'ui/hooks/metamask/useShouldShowSpeedUp';
+import { useShouldShowSpeedUp } from 'ui/hooks/wallet/useShouldShowSpeedUp';
 import { Button, Tooltip } from 'antd';
 import CancelButton from './CancelButton';
 import { NoContent } from '../universal/NoContent';

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { TransactionGroup, TransactionStatuses } from 'constants/transaction';
 import { utils, BigNumber } from 'ethers';
-import { useTransactionDisplayData } from 'ui/hooks/metamask/useTxDisplayData';
+import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
 import { useSelector } from 'react-redux';
 
 interface Params {
