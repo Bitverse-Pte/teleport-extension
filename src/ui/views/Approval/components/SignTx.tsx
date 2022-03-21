@@ -161,7 +161,7 @@ const SignTx = ({ params, origin }) => {
     }
   };
 
-  useAsyncEffect(initState, [gasState, maxFeePerGas, maxPriorityFeePerGas]);
+  useAsyncEffect(initState, [gasState.gasType]);
 
   const handleAllow = async () => {
     dispatch(showLoadingIndicator());
