@@ -62,7 +62,6 @@ const WalletManage: React.FC = () => {
 
   const queryWallets = async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList(true);
-    console.log('accounts', accounts);
     if (accounts && accounts.hdAccount) {
       setHdWalletAccount(accounts.hdAccount);
     }
@@ -74,7 +73,6 @@ const WalletManage: React.FC = () => {
 
   const queryCurrentAccount = async () => {
     const account: BaseAccount = await wallet.getCurrentAccount();
-    console.log('current account', account);
     if (account) {
       setCurrentAccount(account);
     }

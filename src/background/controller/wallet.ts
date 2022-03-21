@@ -299,7 +299,6 @@ export class WalletController extends BaseController {
   }
 
   getAccountList(useCurrentChain?: boolean): Promise<DisplayWalletManage> {
-    console.log(keyringService.getAccountList());
     return Promise.resolve(keyringService.getAccountList(useCurrentChain));
   }
 
