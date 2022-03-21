@@ -9,6 +9,7 @@ export interface PreferenceStore {
   locale: string;
   isDefaultWallet: boolean;
   currentCurrency: string;
+  manualLocked: boolean;
 }
 
 const SUPPORT_LOCALES = ['en', 'zh_CN'];
@@ -23,6 +24,7 @@ class PreferenceService {
       locale: 'en',
       isDefaultWallet: false,
       currentCurrency: 'ETH',
+      manualLocked: false,
     });
   }
 
@@ -125,6 +127,16 @@ class PreferenceService {
     // this.storeState.currentCurrency = currentCurrency;
     this.store.updateState({
       currentCurrency,
+    });
+  };
+
+  getManualLocked = () => {
+    return this.storeState.manualLocked;
+  };
+
+  setManualLocked = (manualLocked: boolean) => {
+    this.store.updateState({
+      manualLocked,
     });
   };
 }

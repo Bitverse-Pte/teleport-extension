@@ -98,6 +98,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
 
   const handleLockClick = () => {
     history.replace('/unlock');
+    wallet.setManualLocked(true);
     wallet.lockWallet();
   };
 
