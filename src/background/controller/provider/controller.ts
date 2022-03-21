@@ -208,7 +208,7 @@ class ProviderController extends BaseController {
       txParams.gasPrice = approvalRes.gasPrice;
     }
     console.log(
-      '--------------txController.newUnapprovedTransaction ===> start: ---------------',
+      'txController.newUnapprovedTransaction ===> start:',
       txParams,
       opts
     );
@@ -217,13 +217,16 @@ class ProviderController extends BaseController {
       opts
     );
     console.log(
-      '--------------txController.newUnapprovedTransaction---------------',
+      'txController.updateAndApproveTransaction ===> initParams',
       initParams
     );
-    txController.updateAndApproveTransaction(initParams);
+    await txController.updateAndApproveTransaction(initParams);
+    //const txMeta = txController.getTransactions(initParams.id);
     console.log(
-      '--------------txController.updateAndApproveTransaction---------------'
+      'txController.updateAndApproveTransaction ===> txHash:',
+      initParams.hash
     );
+    return initParams.hash;
   };
 
   web3ClientVersion = () => {

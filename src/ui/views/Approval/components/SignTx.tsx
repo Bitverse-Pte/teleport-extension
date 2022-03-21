@@ -95,7 +95,7 @@ const normalizeTxParams = (tx) => {
 };
 
 const valueToDisplay = (tx) => {
-  if ((tx.value === '0x' || tx.value === '0x0') && tx.txParam) {
+  if ((tx.value === '0x' || tx.value === '0x0') && tx.txParam.value) {
     return tx.txParam.value;
   }
   return tx.value;
@@ -140,8 +140,12 @@ const SignTx = ({ params, origin }) => {
           ? getRoundedGasPrice(gasFeeEstimates.gasPrice)
           : '0x0';
       }
+      console.log('======gasPrice=====', gasPrice);
       setGasPrice(tx.gasPrice || gasPrice);
-      const total = multipyHexes(gasPrice, MIN_GAS_LIMIT_HEX).toString();
+      const total = multipyHexes(
+        gasPrice,
+        tx.gas || MIN_GAS_LIMIT_HEX
+      ).toString();
       setTotalGasFee(addHexPrefix(total));
     } else {
       const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
@@ -153,7 +157,7 @@ const SignTx = ({ params, origin }) => {
         addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
       );
       const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
-      const total = multipyHexes(a, MIN_GAS_LIMIT_HEX).toString();
+      const total = multipyHexes(a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
       setTotalGasFee(addHexPrefix(total));
     }
     const currency = await wallet.getCurrentCurrency();
@@ -208,7 +212,9 @@ const SignTx = ({ params, origin }) => {
   }, [tokens, prices]);
 
   const txToken = useMemo(() => {
-    const txToken = tokens.find((t: Token) => t.symbol === tx.txParam.symbol);
+    const txToken = tx.txParam.symbol
+      ? tokens.find((t: Token) => t.symbol === tx.txParam.symbol)
+      : nativeToken;
     return txToken;
   }, [tokens, prices]);
 
@@ -407,9 +413,6 @@ const TxSummaryComponent = ({ action, value, token, origin }) => {
       <div className="tx-summary-origin">
         {origin === 'https://teleport.network' ? null : <div>{origin}</div>}
       </div>
-      {/* <div className="tx-summary-action">
-        {action === 'eth_sendTransaction' ? 'Transfer' : action}
-      </div> */}
       <div className="tx-summary-currency">
         <UserPreferencedCurrencyDisplay value={value} token={token} />
       </div>

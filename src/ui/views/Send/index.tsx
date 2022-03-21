@@ -136,7 +136,7 @@ const Send = () => {
       : TransactionEnvelopeTypes.LEGACY;
     const params: Record<string, any> = {
       from: fromAccount?.address,
-      value: '0x0',
+      value: TransactionEnvelopeTypes.LEGACY,
       isSend: true,
       type: type,
     };
