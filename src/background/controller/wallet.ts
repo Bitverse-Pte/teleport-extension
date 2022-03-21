@@ -484,6 +484,11 @@ export class WalletController extends BaseController {
   listContact = () => contactBookService.listContacts();
   getContactByAddress = (address: string) =>
     contactBookService.getContactByAddress(address);
+
+  getManualLocked = () => preferenceService.getManualLocked();
+
+  setManualLocked = (locked: boolean) =>
+    preferenceService.setManualLocked(locked);
 }
 
 export default new WalletController();
