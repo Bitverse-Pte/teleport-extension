@@ -4,6 +4,7 @@ import TeleportLogoURI from 'assets/walletLogo.svg';
 import './style.less';
 import { useTranslation } from 'react-i18next';
 import { IconComponent } from 'ui/components/IconComponents';
+import { BetaIcon } from 'ui/components/Widgets';
 
 export default function AboutSoftware() {
   const version = process.env.version;
@@ -22,7 +23,10 @@ export default function AboutSoftware() {
           alt="Teleport Network Logo"
           className="logo"
         />
-        <p className="software-version">V {version}</p>
+        <p className="software-version flexR">
+          V {version}
+          <BetaIcon />
+        </p>
         <p className="software-introductions">
           {t('about_software_introductions', {
             replace: {

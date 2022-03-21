@@ -144,7 +144,14 @@ const AccountCreate = () => {
             }}
           />
           <span className="policy-title">I have read and agree to&nbsp;</span>
-          <span className="policy-link cursor">the privacy & terms</span>
+          <span
+            className="policy-link cursor"
+            onClick={() => {
+              history.push('/policy');
+            }}
+          >
+            the privacy & terms
+          </span>
         </div>
       </div>
       <div className="button content-wrap-padding">

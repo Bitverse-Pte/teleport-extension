@@ -97,7 +97,7 @@ const flowContext = flow
     if (approvalType && (!condition || !condition(ctx.request))) {
       ctx.request.requestedApproval = true;
       // fix the request param from dapp, should compatiable with send from app.
-      if (!params[0].txParam) {
+      if (approvalType === 'SignTx' && !params[0].txParam) {
         params[0].txParam = {
           from: params.from,
           to: params.to,

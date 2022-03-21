@@ -21,6 +21,7 @@ import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
+import { UnlockModal } from 'ui/components/UnlockModal';
 
 export interface WalletHeaderProps {
   title: string;
@@ -57,6 +58,7 @@ const WalletManage: React.FC = () => {
   const [renamePopupVisible, setRenamePopupVisible] = useState(false);
   const [currentWalletName, setCurrentWalletName] = useState('');
   const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
 
   const queryWallets = async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList(true);
@@ -156,8 +158,28 @@ const WalletManage: React.FC = () => {
     setCurrentHdWalletId(hdWalletId);
   };
 
+  const handleUnlock = () => {
+    setIsEdit(!isEdit);
+  };
+
+  const handleEdit = async () => {
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
+    setIsEdit(!isEdit);
+  };
+
   return (
     <div className="wallet-manage flexCol">
+      <UnlockModal
+        title="Unlock Wallet"
+        visible={unlockPopupVisible}
+        setVisible={(visible: boolean) => {
+          setUnlockPopupVisible(visible);
+        }}
+        unlocked={() => handleUnlock()}
+      />
       {isEdit ? (
         <WalletHeader
           title="Wallet"
@@ -174,7 +196,7 @@ const WalletManage: React.FC = () => {
       >
         <div
           className="wallet-manage-button-item cursor flexCol _edit"
-          onClick={() => setIsEdit(!isEdit)}
+          onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
             <img src={editImg} alt="" className="wallet-manage-img" />

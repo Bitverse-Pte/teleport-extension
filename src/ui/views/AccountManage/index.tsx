@@ -20,6 +20,7 @@ import editImg from 'assets/editImg.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import AccountManageWidget from 'ui/components/AccountManageWidget';
 import { ErrorCode } from 'constants/code';
+import { UnlockModal } from 'ui/components/UnlockModal';
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -31,6 +32,8 @@ const AccountManage: React.FC = () => {
   const [currentAccountIndex, setCurrentAccountIndex] = useState(0);
   const wallet = useWallet();
   const accountManageWidgetRef = useRef();
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+  const [isAdd, setIsAdd] = useState(false);
 
   const { state } = useLocation<{
     hdWalletId: string;
@@ -101,9 +104,42 @@ const AccountManage: React.FC = () => {
     setDeletePopupVisible(false);
     queryAccounts();
   };
+  const handleUnlock = () => {
+    if (isAdd) {
+      setAddPopupVisible(true);
+    } else {
+      setIsEdit(!isEdit);
+    }
+  };
+
+  const handleEdit = async () => {
+    setIsAdd(false);
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
+    setIsEdit(!isEdit);
+  };
+
+  const handleAdd = async () => {
+    setIsAdd(true);
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
+    setAddPopupVisible(true);
+  };
 
   return (
     <div className="account-manage flexCol">
+      <UnlockModal
+        title="Unlock Wallet"
+        visible={unlockPopupVisible}
+        setVisible={(visible: boolean) => {
+          setUnlockPopupVisible(visible);
+        }}
+        unlocked={() => handleUnlock()}
+      />
       {isEdit ? (
         <WalletHeader
           title="Accounts"
@@ -125,7 +161,7 @@ const AccountManage: React.FC = () => {
       >
         <div
           className="wallet-manage-button-item cursor flexCol _edit"
-          onClick={() => setIsEdit(!isEdit)}
+          onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
             <img src={editImg} alt="" className="wallet-manage-img" />
@@ -134,7 +170,7 @@ const AccountManage: React.FC = () => {
         </div>
 
         <div
-          onClick={() => setAddPopupVisible(true)}
+          onClick={() => handleAdd()}
           style={
             accountCreateType === AccountCreateType.PRIVATE_KEY
               ? { display: 'none' }

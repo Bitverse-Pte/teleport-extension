@@ -1,0 +1,126 @@
+@import '../../../style/index';
+
+.approval-sign {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .sign-title {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 100%;
+      color: #364361;
+    }
+    .top-part-container {
+      background: url(../../../../assets/confirm-mask.png) no-repeat 0 0;
+      backdrop-filter: blur(24px);
+      margin-top: 0;
+      .network {
+        margin-top: 15px;
+        margin-bottom: 15px
+      }
+      .from-container {
+        width: 80%;
+        background: #F8FAFC;
+        border-radius: 8px;
+        padding-left: 16px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-bottom: 16px;
+        margin-left: 10px;
+        margin-right: 10px;
+        .account-name{
+            margin:0 6px;
+            font-family: MontserratBold;
+            font-style: normal;
+            font-size: 14px;
+            line-height: 100%;
+            align-items: flex-end;
+            color: #364361;
+          }
+        .account-address {
+            margin-top: 6px;
+            font-family: Montserrat;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 14px;
+            line-height: 100%;
+            color: #798CAD;
+            cursor:pointer;
+        }
+      }
+      .site-container {
+        width: 80%;
+        background: #F8FAFC;
+        border-radius: 8px;
+        padding-left: 16px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-bottom: 16px;
+        margin-left: 10px;
+        margin-right: 10px;
+        .site-info__icon {
+          margin-left: 6px;
+          margin-right: 12px;
+          margin-bottom: 10px;
+          flex-shrink: 0;
+        }
+        .site-info__text {
+          font-family: MontserratBold;
+          font-style: normal;
+          font-weight: 700;
+          font-size: 14px;
+          .site-info__subtext {
+            font-family: 'Montserrat';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 12px;
+            color: #A3B4CC;
+          }
+        }
+    }
+  }
+
+  .sign-body {
+    padding-top: 5px;
+    width: 100%;
+    .sign-data-title {
+      padding-left: 10px;
+      margin-top: 10px;
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 100%;
+      color: #364361;
+    }
+    .sign-data {
+      height: 160px;
+      margin-left: 10px;
+      margin-right: 10px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      background: rgba(0, 0, 0, 0.03);
+      font-weight: 500;
+      font-size: 12px;
+      line-height: 17px;
+      color: #9EA2A9;
+      overflow-y: auto;
+    }
+  }
+}
+.button-container {
+    height: 80px;
+    flex: 0 0 80px;
+    margin-bottom: 20px;
+    .btn-container-top {
+        margin-bottom: 14px;
+    }
+}
