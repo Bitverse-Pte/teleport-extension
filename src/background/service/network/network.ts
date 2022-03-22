@@ -641,7 +641,7 @@ class NetworkPreferenceService extends EventEmitter {
         }
       }
     } catch (err) {
-      log.warn('MetaMask - Infura availability check failed', err);
+      log.warn('TeleportWallet - Infura availability check failed', err);
     }
   }
 

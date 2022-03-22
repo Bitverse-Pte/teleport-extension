@@ -308,7 +308,9 @@ export default class TransactionController extends EventEmitter {
    */
   async newUnapprovedTransaction(txParams, opts: any = {}) {
     log.debug(
-      `MetaMaskController newUnapprovedTransaction ${JSON.stringify(txParams)}`
+      `TeleportWalletController newUnapprovedTransaction ${JSON.stringify(
+        txParams
+      )}`
     );
 
     const initialTxMeta = await this.addUnapprovedTransaction(

@@ -14,8 +14,6 @@ export default async (req) => {
     data: { method },
   } = req;
   //TODO for debug use, remove later...
-  console.log('------------background provider controller:-------------', req);
-
   if (internalMethod[method]) {
     return internalMethod[method](req);
   }

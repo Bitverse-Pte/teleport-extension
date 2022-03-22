@@ -23,6 +23,11 @@ const Unlock = () => {
     },
   });
 
+  const handleUnlockClick = async () => {
+    await wallet.setManualLocked(false);
+    unlock(psd);
+  };
+
   return (
     <div className="unlock-container">
       <LogoHeader hideClosIcon />
@@ -41,7 +46,7 @@ const Unlock = () => {
           onChange={(e) => {
             setPsd(e.target.value);
           }}
-          onPressEnter={() => unlock(psd)}
+          onPressEnter={() => handleUnlockClick()}
         />
         <CustomButton
           size="large"
@@ -50,7 +55,7 @@ const Unlock = () => {
           cls="theme"
           disabled={!psd}
           loading={loading}
-          onClick={() => unlock(psd)}
+          onClick={() => handleUnlockClick()}
         >
           Unlock
         </CustomButton>

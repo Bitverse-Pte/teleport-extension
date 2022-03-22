@@ -5,14 +5,11 @@ import {
   notificationService,
   permissionService,
   preferenceService,
-  txController,
 } from 'background/service';
 import { PromiseFlow, underline2Camelcase } from 'background/utils';
 import { EVENTS } from 'constants/index';
 import providerController from './controller';
 import eventBus from 'eventBus';
-import { cloneDeep } from 'lodash';
-import { getCurrentSelectedAccount } from 'ui/selectors/selectors';
 import { TransactionEnvelopeTypes } from 'constants/transaction';
 
 const isSignApproval = (type: string) => {

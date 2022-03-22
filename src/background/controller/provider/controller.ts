@@ -97,11 +97,9 @@ class ProviderController extends BaseController {
     }
 
     const request = { id: 1, jsonrpc: '2.0', method: method, params: params };
-    console.log('========req:=========', request);
     const provider =
       networkPreferenceService.getProviderAndBlockTracker().provider;
     const res = await provider.sendAsync(request);
-    console.log('========res:======', res);
     return res.result;
   };
 
@@ -207,7 +205,7 @@ class ProviderController extends BaseController {
     } else {
       txParams.gasPrice = approvalRes.gasPrice;
     }
-    console.log(
+    console.debug(
       'txController.newUnapprovedTransaction ===> start:',
       txParams,
       opts
@@ -216,13 +214,13 @@ class ProviderController extends BaseController {
       txParams,
       opts
     );
-    console.log(
+    console.debug(
       'txController.updateAndApproveTransaction ===> initParams',
       initParams
     );
     await txController.updateAndApproveTransaction(initParams);
     //const txMeta = txController.getTransactions(initParams.id);
-    console.log(
+    console.debug(
       'txController.updateAndApproveTransaction ===> txHash:',
       initParams.hash
     );
