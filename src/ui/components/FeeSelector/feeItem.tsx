@@ -14,8 +14,12 @@ function FeeItem(props) {
   const { type, time, gasPrice, symbol, gasLimit, price } = params;
   const gas = useMemo(() => {
     const gas: number = Math.floor(Number(gasPrice) * Number(gasLimit));
-    // gwei to wei
-    return Number(utils.formatUnits(BigNumber.from(gas), 'gwei'));
+    if (isNaN(gas)) {
+      return 0;
+    } else {
+      // gwei to wei
+      return Number(utils.formatUnits(BigNumber.from(gas), 'gwei'));
+    }
   }, [gasPrice, gasLimit]);
   return (
     <li
