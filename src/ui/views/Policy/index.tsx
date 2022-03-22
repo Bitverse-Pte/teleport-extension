@@ -374,7 +374,7 @@ const Policy = () => {
         </p>
         <p className="policy-level-one">6.WARRANTIES AND REPRESENTATIONS</p>
         <p className="policy-level-two">
-          6.1. 6.1.By using the Services, you represent and warrant that:
+          6.1. By using the Services, you represent and warrant that:
         </p>
         <p className="policy-level-three">
           6.1.1. You have the legal capacity to accept and enter into these
