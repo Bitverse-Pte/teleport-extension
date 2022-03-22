@@ -179,7 +179,7 @@ class TokenService {
   async queryTokenPrices(target = 'usd') {
     const currentChain = networkPreferenceService.getProviderConfig().type;
     //TODO(Jayce) needs to be uncommented；
-    //if (currentChain !== 'mainnet') return Promise.resolve(null);
+    //if (currentChain !== 'ethereum') return Promise.resolve(null);
     const tokensStr = this.store
       .getState()
       .tokens.map((t: Token) => t.symbol)
@@ -265,6 +265,12 @@ class TokenService {
   }
 
   async queryToken(address, rpc, contractAddress): Promise<ERC20Struct> {
+    const account = await networkPreferenceService
+      .getCurrentEth()
+      .getCode(address);
+    if (account !== '0x') {
+      return Promise.reject(new BitError(ErrorCode.INVALID_CONTRACT_ADDRESS));
+    }
     const token: ERC20Struct = {
       name: '',
       symbol: '',
@@ -298,6 +304,30 @@ class TokenService {
       }
     }
     return Promise.resolve(token);
+  }
+
+  changeCustomTokenProfile(chainCustomId: string, data: Partial<Token>) {
+    const state = this.store.getState();
+    const tokenAtIdx = cloneDeep(state.tokens || []).findIndex(
+      (t: Token) => t.chainCustomId === chainCustomId && t.isNative == true
+    );
+    if (tokenAtIdx === -1) {
+      throw new BitError(ErrorCode.CUSTOM_TOKEN_MISSING);
+    }
+    /**
+     * filter the new token data
+     */
+    Object.keys(data).forEach((k) => {
+      // no undefined nor null
+      if (data[k] === undefined || data[k] === null) {
+        delete data[k];
+      }
+    });
+    state.tokens[tokenAtIdx] = {
+      ...state.tokens[tokenAtIdx],
+      // override with new data
+      ...data,
+    };
   }
 }
 

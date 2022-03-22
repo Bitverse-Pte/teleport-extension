@@ -18,10 +18,12 @@ import { Tx } from 'types/tx';
 import Wallet from '../wallet';
 import { SAFE_RPC_METHODS } from 'constants/index';
 import BaseController from '../base';
-import { CoinType } from 'types/network';
+import { CoinType, Ecosystem } from 'types/network';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { chainIdToCategory } from 'utils/chain';
+import { TransactionEnvelopeTypes } from 'constants/transaction';
+import { MESSAGE_TYPE } from 'constants/app';
 
 interface ApprovalRes extends Tx {
   type?: string;
@@ -63,6 +65,23 @@ const signTypedDataVlidation = ({
     throw ethErrors.rpc.invalidParams('from should be same as current address');
 };
 
+const switchChainValidation = ({
+  data: {
+    params: [chainParams],
+  },
+}) => {
+  const providers = networkPreferenceService.getAllProviders();
+  const matchedProvider = providers.find((p) => {
+    return BigNumber.from(p.chainId).eq(chainParams.chainId);
+  });
+  if (!matchedProvider) {
+    throw ethErrors.provider.custom({
+      code: 4902, // To-be-standardized "unrecognized chain ID" error
+      message: `Unrecognized chain ID "${chainParams.chainId}". Try adding the chain using ${MESSAGE_TYPE.ADD_ETHEREUM_CHAIN} first.`,
+    });
+  }
+};
+
 class ProviderController extends BaseController {
   ethRpc = async (req) => {
     const {
@@ -78,11 +97,9 @@ class ProviderController extends BaseController {
     }
 
     const request = { id: 1, jsonrpc: '2.0', method: method, params: params };
-    console.log('========req:=========', request);
     const provider =
       networkPreferenceService.getProviderAndBlockTracker().provider;
     const res = await provider.sendAsync(request);
-    console.log('========res:======', res);
     return res.result;
   };
 
@@ -182,10 +199,14 @@ class ProviderController extends BaseController {
     };
     delete txParams.txParam;
     txParams.gas = approvalRes.gas;
-    txParams.maxFeePerGas = approvalRes.maxFeePerGas;
-    txParams.maxPriorityFeePerGas = approvalRes.maxPriorityFeePerGas;
-    console.log(
-      '--------------txController.newUnapprovedTransaction ===> start: ---------------',
+    if (txParams.type === TransactionEnvelopeTypes.FEE_MARKET) {
+      txParams.maxFeePerGas = approvalRes.maxFeePerGas;
+      txParams.maxPriorityFeePerGas = approvalRes.maxPriorityFeePerGas;
+    } else {
+      txParams.gasPrice = approvalRes.gasPrice;
+    }
+    console.debug(
+      'txController.newUnapprovedTransaction ===> start:',
       txParams,
       opts
     );
@@ -193,14 +214,17 @@ class ProviderController extends BaseController {
       txParams,
       opts
     );
-    console.log(
-      '--------------txController.newUnapprovedTransaction---------------',
+    console.debug(
+      'txController.updateAndApproveTransaction ===> initParams',
       initParams
     );
-    txController.updateAndApproveTransaction(initParams);
-    console.log(
-      '--------------txController.updateAndApproveTransaction---------------'
+    await txController.updateAndApproveTransaction(initParams);
+    //const txMeta = txController.getTransactions(initParams.id);
+    console.debug(
+      'txController.updateAndApproveTransaction ===> txHash:',
+      initParams.hash
     );
+    return initParams.hash;
   };
 
   web3ClientVersion = () => {
@@ -342,11 +366,12 @@ class ProviderController extends BaseController {
       chainParams.chainName,
       chainParams.rpcUrls[0],
       chainParams.chainId,
-      chainIdToCategory(chainParams.chainId),
       chainParams.nativeCurrency.symbol,
       chainParams.blockExplorerUrls[0],
-      true,
-      CoinType.ETH
+      CoinType.ETH,
+      'ETH',
+      Ecosystem.EVM,
+      '0x'
     );
     networkPreferenceService.setProviderConfig({
       ...network,
@@ -367,14 +392,7 @@ class ProviderController extends BaseController {
 
   @Reflect.metadata('APPROVAL', [
     'AddChain',
-    ({
-      data: {
-        params: [chainParams],
-      },
-      session: { origin },
-    }) => {
-      return null;
-    },
+    switchChainValidation,
     { height: 390 },
   ])
   walletSwitchEthereumChain = async ({
@@ -390,7 +408,10 @@ class ProviderController extends BaseController {
         return BigNumber.from(p.chainId).eq(chainParams.chainId);
       });
       if (!matchedProvider) {
-        throw new BitError(ErrorCode.NOT_EXISTED_CHAIN_TO_SWITCH);
+        throw ethErrors.provider.custom({
+          code: 4902, // To-be-standardized "unrecognized chain ID" error
+          message: `Unrecognized chain ID "${chainParams.chainId}". Try adding the chain using ${MESSAGE_TYPE.ADD_ETHEREUM_CHAIN} first.`,
+        });
       }
       networkPreferenceService.setProviderConfig(matchedProvider);
 

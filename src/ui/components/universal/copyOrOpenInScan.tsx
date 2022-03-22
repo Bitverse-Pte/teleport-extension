@@ -3,6 +3,8 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';
 import { IconComponent } from 'ui/components/IconComponents';
 import clsx from 'clsx';
+import { ClickToCloseMessage } from './ClickToCloseMessage';
+import { useTranslation } from 'react-i18next';
 
 interface CopyOrOpenInScanParameter extends HTMLAttributes<HTMLDivElement> {
   handleExplorerClick: (...args: any[]) => void;
@@ -15,6 +17,7 @@ export default function CopyOrOpenInScan({
   className,
   ...otherDivProps
 }: CopyOrOpenInScanParameter) {
+  const { t } = useTranslation();
   return (
     <div
       className={clsx(
@@ -26,7 +29,7 @@ export default function CopyOrOpenInScan({
       <CopyToClipboard
         text={textToBeCopy}
         onCopy={() => {
-          message.success('copied to clipboard');
+          ClickToCloseMessage.success(t('copied_to_clipboard'));
         }}
       >
         <IconComponent

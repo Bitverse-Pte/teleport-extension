@@ -246,9 +246,9 @@ export function deprecatedGetCurrentNetworkId(state: RootState) {
   return state.network.network;
 }
 
-// export const getMetaMaskAccounts = createSelector(
-//   getMetaMaskAccountsRaw,
-//   getMetaMaskCachedBalances,
+// export const getWalletAccounts = createSelector(
+//   getWalletAccountsRaw,
+//   getTeleportWalletCachedBalances,
 //   (currentAccounts, cachedBalances) =>
 //     Object.entries(currentAccounts).reduce(
 //       (selectedAccounts, [accountID, account]) => {
@@ -286,11 +286,11 @@ export function deprecatedGetCurrentNetworkId(state: RootState) {
 //   return tokens ? tokens.length : 0;
 // }
 
-// export function getMetaMaskKeyrings(state: RootState) {
+// export function getTeleportWalletKeyrings(state: RootState) {
 //   return state.network.keyrings;
 // }
 
-// export function getMetaMaskIdentities(state: RootState) {
+// export function getTeleportWalletIdentities(state: RootState) {
 //   return state.network.identities;
 // }
 
@@ -299,11 +299,11 @@ export const getCurrentSelectedAccount = (state: RootState) =>
 export const getSelectedAddress = (state: RootState) =>
   state.preference.currentAccount?.address;
 
-// export function getMetaMaskAccountsRaw(state: RootState) {
+// export function getWalletAccountsRaw(state: RootState) {
 //   return state.network.accounts;
 // }
 
-// export function getMetaMaskCachedBalances(state: RootState) {
+// export function getTeleportWalletCachedBalances(state: RootState) {
 //   const chainId = getCurrentChainId(state);
 
 //   return (
@@ -314,10 +314,10 @@ export const getSelectedAddress = (state: RootState) =>
 // /**
 //  * Get ordered (by keyrings) accounts with identity and balance
 //  */
-// export const getMetaMaskAccountsOrdered = createSelector(
-//   getMetaMaskKeyrings,
-//   getMetaMaskIdentities,
-//   getMetaMaskAccounts,
+// export const getWalletAccountsOrdered = createSelector(
+//   getTeleportWalletKeyrings,
+//   getTeleportWalletIdentities,
+//   getWalletAccounts,
 //   (keyrings, identities, accounts) =>
 //     keyrings
 //       .reduce((list, keyring) => list.concat(keyring.accounts), [])
@@ -325,8 +325,8 @@ export const getSelectedAddress = (state: RootState) =>
 //       .map((address) => ({ ...identities[address], ...accounts[address] })),
 // );
 
-// export const getMetaMaskAccountsConnected = createSelector(
-//   getMetaMaskAccountsOrdered,
+// export const getWalletAccountsConnected = createSelector(
+//   getWalletAccountsOrdered,
 //   (connectedAccounts) =>
 //     connectedAccounts.map(({ address }) => address.toLowerCase()),
 // );
@@ -340,21 +340,21 @@ export const getSelectedAddress = (state: RootState) =>
 // }
 
 // export function getSelectedAccountCachedBalance(state: RootState) {
-//   const cachedBalances = getMetaMaskCachedBalances(state);
+//   const cachedBalances = getTeleportWalletCachedBalances(state);
 //   const selectedAddress = getSelectedAddress(state);
 
 //   return cachedBalances && cachedBalances[selectedAddress];
 // }
 
 // export function getSelectedAccount(state: RootState) {
-//   const accounts = getMetaMaskAccounts(state);
+//   const accounts = getWalletAccounts(state);
 //   const selectedAddress = getSelectedAddress(state);
 
 //   return accounts[selectedAddress];
 // }
 
 // export function getTargetAccount(state: RootState, targetAddress: string) {
-//   const accounts = getMetaMaskAccounts(state);
+//   const accounts = getWalletAccounts(state);
 //   return accounts[targetAddress];
 // }
 
@@ -387,8 +387,8 @@ export const getSelectedAddress = (state: RootState) =>
 // }
 
 // export function accountsWithSendEtherInfoSelector(state: RootState) {
-//   const accounts = getMetaMaskAccounts(state);
-//   const identities = getMetaMaskIdentities(state);
+//   const accounts = getWalletAccounts(state);
+//   const identities = getTeleportWalletIdentities(state);
 
 //   const accountsWithSendEtherInfo = Object.entries(identities).map(
 //     ([key, identity]) => {
@@ -400,7 +400,7 @@ export const getSelectedAddress = (state: RootState) =>
 // }
 
 // export function getAccountsWithLabels(state: RootState) {
-//   return getMetaMaskAccountsOrdered(state).map(
+//   return getWalletAccountsOrdered(state).map(
 //     ({ address, name, balance }) => ({
 //       address,
 //       addressLabel: `${
@@ -484,6 +484,10 @@ export function getCurrentCurrency(state: RootState) {
 //   const { suggestedAssets = [] } = state.network;
 //   return suggestedAssets.length;
 // }
+
+export function getIsNonStandardEthChain(state) {
+  return !(getIsMainnet(state) || getIsTestnet(state) || process.env.IN_TEST);
+}
 
 export function getIsMainnet(state: RootState) {
   const chainId = getCurrentChainId(state);

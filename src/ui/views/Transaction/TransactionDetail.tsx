@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { BigNumber, utils } from 'ethers';
-import { useParams } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useHistory, useParams } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
 import Header from 'ui/components/Header';
 import { TxDirectionLogo } from 'ui/components/TransactionList/TxDirectionLogo';
 import './activity-detail.less';
@@ -10,7 +10,7 @@ import {
   nonceSortedCompletedTransactionsSelector,
   nonceSortedPendingTransactionsSelector,
 } from 'ui/selectors/transactions';
-import { useTransactionDisplayData } from 'ui/hooks/metamask/useTxDisplayData';
+import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
 import {
   TransactionGroup,
   TransactionGroupCategories,
@@ -21,6 +21,10 @@ import { AddressCard } from 'ui/components/universal/AddressCard';
 import { IconComponent } from 'ui/components/IconComponents';
 import { TokenIcon } from 'ui/components/Widgets';
 import { Tooltip } from 'antd';
+import { TransactionFee } from './TransactionFee';
+import { cancelTxs } from 'ui/state/actions';
+import { useWallet } from 'ui/utils';
+import { useTranslation } from 'react-i18next';
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -83,6 +87,10 @@ export function _ActivityDetail({
     token,
   } = useTransactionDisplayData(transaction);
 
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const { t } = useTranslation();
+
   const {
     provider: { rpcPrefs },
   } = useSelector((state) => state.network);
@@ -107,6 +115,13 @@ export function _ActivityDetail({
     }
   }, [displayedStatusKey]);
 
+  const walletController = useWallet();
+
+  const cancelTx = useCallback(() => {
+    dispatch(cancelTxs(transaction.transactions, walletController));
+    history.goBack();
+  }, [dispatch, history]);
+
   /**
    * This fn is only build for UI
    */
@@ -116,20 +131,25 @@ export function _ActivityDetail({
     return { amount, unit };
   }, [primaryCurrency]);
 
+  const matchedNativeToken = useSelector((s) => {
+    const currentProviderId = s.network.provider.id;
+    return s.tokens.tokens.find(
+      (t) => t.isNative && t.chainCustomId === currentProviderId
+    );
+  });
+
   return (
     <div className={'activity-detail ' + statusBackground}>
-      <Header title={title} />
+      <Header title={t(title)} />
       <div className="txdetail-direction-logo flex justify-center">
         {/* workaround as hook treat native token as undefined */}
-        <TokenIcon
-          token={token || ({ isNative: true } as any)}
-          useThemeBg
-          radius={48}
-        />
+        <div>
+          <TokenIcon token={token || matchedNativeToken} radius={48} />
+        </div>
       </div>
       <div className="txdetail-values flex flex-wrap justify-center">
         <div className="txdetail-value-display">
-          <p className="txdetail-value items-baseline">
+          <p className="txdetail-value items-baseline flex-wrap">
             {displayPrimaryCurrency.amount}
             <span className="unit">{displayPrimaryCurrency.unit}</span>
           </p>
@@ -169,21 +189,7 @@ export function _ActivityDetail({
             </div>
           </div>
         )}
-        {
-          <div className="row">
-            <div className="field-name">Transaction Fee</div>
-            <div className="field-value">
-              {utils.formatEther(
-                BigNumber.from(
-                  // use gasPrice (legacy) or maxFeePerGas(1559 network)
-                  transaction.primaryTransaction.txParams.maxFeePerGas ||
-                    transaction.primaryTransaction.txParams.gasPrice
-                ).mul(transaction.primaryTransaction.txParams.gas)
-              )}{' '}
-              {primaryCurrency.split(' ')[1]}
-            </div>
-          </div>
-        }
+        <TransactionFee transaction={transaction} />
         {!isPending && (
           <div className="row">
             <div className="field-name">Time</div>
@@ -196,21 +202,16 @@ export function _ActivityDetail({
         )}
         {isPending && (
           <div className="row pending-tx-actions">
-            <button
+            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
+            {/* <button
               className="editGasBtn"
               type="button"
               onClick={() => alert('Gas Edit to be implemented')}
             >
-              <IconComponent name="rocket" />
-              Gas
-            </button>
-            <button
-              className="cancelBtn"
-              type="button"
-              onClick={() => alert('Cancel Tx to be implemented')}
-            >
-              <IconComponent name="cancel" />
-              Cancel
+              {t('speedUp')}
+            </button> */}
+            <button className="cancelBtn" type="button" onClick={cancelTx}>
+              {t('cancel')}
             </button>
           </div>
         )}

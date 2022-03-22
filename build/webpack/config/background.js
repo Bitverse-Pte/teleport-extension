@@ -49,8 +49,9 @@ const backgroundConfig = {
     }),
     new webpack.DefinePlugin({
       'process.env.version': JSON.stringify(
-        `version: ${version} / ${new Date().toISOString()}`
+        `version: ${version}`
       ),
+      window: 'globalThis',
     }),
   ],
   resolve: {

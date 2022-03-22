@@ -21,6 +21,7 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { Tabs } from 'constants/wallet';
 import { useSeedPhraseValidation } from 'ui/hooks/validation/useSeedPhraseValidation';
 import { usePrivateKeyValidation } from 'ui/hooks/validation/usePrivateKeyValidation';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const { TextArea } = Input;
 
@@ -40,7 +41,7 @@ export const AccountHeader = (props: AccountHeaderProps) => {
   };
 
   return (
-    <div className="account-header-container flex">
+    <div className="account-header-container flexR">
       <span className="account-header-title">{props.title}</span>
       <IconComponent
         name="close"
@@ -83,19 +84,19 @@ const AccountRecover = () => {
 
     switch (e?.code) {
       case ErrorCode.ADDRESS_REPEAT:
-        message.error('this address is exist already');
+        ClickToCloseMessage.error('Account already exists');
         break;
       case ErrorCode.INVALID_MNEMONIC:
-        message.error('invalid mnemonic');
+        ClickToCloseMessage.error('Invalid mnemonic');
         break;
       case ErrorCode.INVALID_PRIVATE_KEY:
-        message.error('invalid private key');
+        ClickToCloseMessage.error('Invalid private key');
         break;
       default:
         if (importType === Tabs.FIRST) {
-          message.error('invalid mnemonic');
+          ClickToCloseMessage.error('Invalid mnemonic');
         } else {
-          message.error('invalid private key');
+          ClickToCloseMessage.error('Invalid private key');
         }
     }
   };
@@ -124,12 +125,12 @@ const AccountRecover = () => {
             (importType === Tabs.SECOND && !privateKey) ||
             !psd ||
             !confirmPsd ||
-            !name ||
+            !name.trim() ||
             !passwordCheckPassed)) ||
         (!policyShow &&
           ((importType === Tabs.FIRST && !mnemonic) ||
             (importType === Tabs.SECOND && !privateKey) ||
-            !name));
+            !name.trim()));
       return Boolean(str);
     },
     policyShow
@@ -146,21 +147,13 @@ const AccountRecover = () => {
   );
 
   const submit = () => {
-    if (!name.trim()) {
-      message.error('name is necessary ');
-      return;
-    }
-    if (name.length > 20) {
-      message.error('the length of name should less than 20');
+    if (name.trim().length > 20) {
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     if (policyShow) {
-      if (!psd.trim() || psd.trim().length < MIN_PASSWORD_LENGTH) {
-        message.error('password need more than 8 words');
-        return;
-      }
       if (psd.trim() !== confirmPsd.trim()) {
-        message.error('two password is different');
+        ClickToCloseMessage.error("Password don't match");
         return;
       }
     }
@@ -171,7 +164,7 @@ const AccountRecover = () => {
      */
     if (importType === Tabs.FIRST) {
       const importAccountOpts: CreateAccountOpts = {
-        name,
+        name: name.trim(),
         mnemonic: mnemonic.trim(),
       };
       if (policyShow) {
@@ -180,9 +173,11 @@ const AccountRecover = () => {
       recover(importAccountOpts);
     } else {
       const importAccountOpts: ImportAccountOpts = {
-        name,
+        name: name.trim(),
         coinType,
-        privateKey: privateKey.trim(),
+        privateKey: privateKey.startsWith('0x')
+          ? privateKey.trim()
+          : `0x${privateKey.trim()}`,
       };
       if (policyShow) {
         importAccountOpts.password = psd;
@@ -198,6 +193,7 @@ const AccountRecover = () => {
         <CustomTab
           tab1="Mnemonic"
           tab2="Private Key"
+          currentTab={importType}
           handleTabClick={(tab: Tabs) => {
             setImportType(tab);
           }}
@@ -242,7 +238,8 @@ const AccountRecover = () => {
           )} */}
         </div>
 
-        <p
+        {/* @todo: enable below when cosmos supported */}
+        {/* <p
           className="account-recover-title"
           style={{
             display: importType === Tabs.SECOND ? 'block' : 'none',
@@ -257,7 +254,7 @@ const AccountRecover = () => {
           handleChainSelect={(chain: Provider) => {
             setCoinType(chain.coinType);
           }}
-        />
+        /> */}
 
         <p className="account-recover-title">Wallet name</p>
         <CustomInput
@@ -275,8 +272,7 @@ const AccountRecover = () => {
         >
           <p className="account-recover-title">Password</p>
           <p className="account-create-notice">
-            We will use this password to encrypt your data. You will need this
-            password to unlock you wallet.
+            Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
             onChange={(e) => {
@@ -295,6 +291,15 @@ const AccountRecover = () => {
             onChange={(e) => {
               setConfirmPsd(e.target.value);
             }}
+            onBlur={(e) => {
+              if (
+                psd.trim() &&
+                e.target.value?.trim() &&
+                psd.trim() !== e.target.value?.trim()
+              ) {
+                ClickToCloseMessage.error("Password don't match");
+              }
+            }}
             placeholder="Enter password again"
           />
         </div>
@@ -308,7 +313,14 @@ const AccountRecover = () => {
             }}
           />
           <span className="policy-title">I have read and agree to&nbsp;</span>
-          <span className="policy-link cursor">the provision</span>
+          <span
+            className="policy-link cursor"
+            onClick={() => {
+              history.push('/policy');
+            }}
+          >
+            the privacy & terms
+          </span>
         </div>
       </div>
       <div className="button content-wrap-padding">

@@ -38,6 +38,7 @@ import { useCurrencyDisplay } from './useCurrencyDisplay';
 import { getKnownMethodData } from 'ui/selectors/selectors';
 import { get } from 'lodash';
 import { Token } from 'types/token';
+import { useMethodData } from './useMethodData';
 export function camelCaseToCapitalize(str = '') {
   return str.replace(/([A-Z])/gu, ' $1').replace(/^./u, (s) => s.toUpperCase());
 }
@@ -124,9 +125,7 @@ export function useTransactionDisplayData(
   const { from: senderAddress, to } = initialTransaction.txParams || {};
 
   // for smart contract interactions, methodData can be used to derive the name of the action being taken
-  const methodData = useSelector((state) =>
-    getKnownMethodData(state, initialTransaction?.txParams?.data as string)
-  );
+  const methodData = useMethodData(initialTransaction.txParams.data);
 
   const displayedStatusKey = getStatusKey(primaryTransaction);
   const isPending = displayedStatusKey in PENDING_STATUS_HASH;

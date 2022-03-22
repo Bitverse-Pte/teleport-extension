@@ -7,6 +7,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { AccountCreateType } from 'types/extend';
 import { CustomButton, CustomPasswordInput } from '../Widgets';
 import { IconComponent } from '../IconComponents';
+import { ClickToCloseMessage } from '../universal/ClickToCloseMessage';
 
 export interface IBackupProps {
   visible: boolean;
@@ -53,7 +54,7 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
 
   const checksumPsd = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      message.error('wrong password');
+      ClickToCloseMessage.error('Wrong password');
       console.error(e.code);
     });
     if (checksumPassed) {
@@ -195,7 +196,7 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
                 ? mnemonic
                 : privateKey
             }
-            onCopy={() => message.success('Copied')}
+            onCopy={() => ClickToCloseMessage.success('Copied')}
           >
             <CustomButton
               type="primary"

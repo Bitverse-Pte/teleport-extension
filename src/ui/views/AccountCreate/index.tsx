@@ -14,6 +14,7 @@ import {
   PasswordCheckPassed,
 } from 'ui/components/Widgets';
 import { AccountHeader } from '../AccountRecover';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const AccountCreate = () => {
   const { t } = useTranslation();
@@ -38,7 +39,7 @@ const AccountCreate = () => {
     },
     onError(err) {
       console.error(err);
-      message.error(t('Not a valid mnemonic'));
+      ClickToCloseMessage.error('Unknown error, please try again later');
     },
   });
 
@@ -46,38 +47,30 @@ const AccountCreate = () => {
     () => {
       const str =
         (policyShow &&
-          (!name || !agreed || !psd || !confirmPsd || !passwordCheckPassed)) ||
-        (!policyShow && !name);
+          (!name.trim() ||
+            !agreed ||
+            !psd ||
+            !confirmPsd ||
+            !passwordCheckPassed)) ||
+        (!policyShow && !name.trim());
       return Boolean(str);
     },
     policyShow ? [agreed, name, psd, confirmPsd, passwordCheckPassed] : [name]
   );
 
-  const handleBackClick = () => {
-    history.go(-1);
-  };
-
   const submit = () => {
-    if (!name) {
-      message.error('name is necessary');
-      return;
-    }
-    if (name.length > 20) {
-      message.error('the length of name should less than 20');
+    if (name.trim().length > 20) {
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     if (policyShow) {
-      if (!psd.trim() || psd.trim().length < MIN_PASSWORD_LENGTH) {
-        message.error('password need more than 8 words');
-        return;
-      }
       if (psd.trim() !== confirmPsd.trim()) {
-        message.error('two password is different');
+        ClickToCloseMessage.error("Passwords don't match");
         return;
       }
     }
     const createOpts: CreateAccountOpts = {
-      name,
+      name: name.trim(),
     };
     if (policyShow) {
       createOpts.password = psd;
@@ -104,8 +97,7 @@ const AccountCreate = () => {
         >
           <p className="account-create-title">Password</p>
           <p className="account-create-notice">
-            We will use this password to encrypt your data. You will need this
-            password to unlock you wallet.
+            Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
             cls="custom-password-input"
@@ -125,6 +117,15 @@ const AccountCreate = () => {
             onChange={(e) => {
               setConfirmPsd(e.target.value);
             }}
+            onBlur={(e) => {
+              if (
+                psd.trim() &&
+                e.target.value?.trim() &&
+                psd.trim() !== e.target.value?.trim()
+              ) {
+                ClickToCloseMessage.error("Passwords don't match");
+              }
+            }}
             placeholder="Enter password again"
           />
         </div>
@@ -143,7 +144,14 @@ const AccountCreate = () => {
             }}
           />
           <span className="policy-title">I have read and agree to&nbsp;</span>
-          <span className="policy-link cursor">the privacy & terms</span>
+          <span
+            className="policy-link cursor"
+            onClick={() => {
+              history.push('/policy');
+            }}
+          >
+            the privacy & terms
+          </span>
         </div>
       </div>
       <div className="button content-wrap-padding">

@@ -1,19 +1,17 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
-import clsx from 'clsx';
 import Jazzicon from 'react-jazzicon';
 import { message, Drawer } from 'antd';
 import {
   useWallet,
-  useWalletRequest,
   useAsyncEffect,
   transferAddress2Display,
   denom2SymbolRatio,
   getTotalPricesByAmountAndPrice,
 } from 'ui/utils';
 import AccountSwitch from 'ui/components/AccountSwitch';
-import Setting, { LogoHeader } from 'ui/views/Setting';
+import Setting from 'ui/views/Setting';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { HomeHeader } from 'ui/components/Home/Header';
 import {
@@ -21,7 +19,6 @@ import {
   BaseAccount,
   DisplayWalletManage,
   HdAccountStruct,
-  HomeTabType,
 } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Token } from 'types/token';
@@ -36,12 +33,20 @@ import {
 import { Provider } from 'types/network';
 import { TransactionsList } from 'ui/components/TransactionList';
 import './style.less';
-import { Tabs, TipButtonEnum, WALLET_THEME_COLOR } from 'constants/wallet';
+import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
+import WalletManageNewIcon from '../../../assets/walletManageNew.svg';
+import skynet from 'utils/skynet';
+
+const { sensors } = skynet;
+
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
+import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 
 const onCopy = () => {
-  message.success('Copied');
+  ClickToCloseMessage.success('Copied');
 };
 const Home = () => {
   const history = useHistory();
@@ -52,9 +57,10 @@ const Home = () => {
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
   const [tabType, setTabType] = useState(Tabs.FIRST);
   const [tokens, setTokens] = useState<Token[]>([]);
-  const [isEdit, setIsEdit] = useState(false);
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
+  const start = new Date().getTime();
+  (window as any).wallet = wallet;
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -62,6 +68,11 @@ const Home = () => {
     });
     if (balances && balances.length) setTokens(balances);
   };
+
+  useEffect(() => {
+    const timer = setInterval(getTokenBalancesAsync, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   const queryTokenPrices = async () => {
     const prices = await wallet.queryTokenPrices().catch((e) => {
@@ -87,16 +98,6 @@ const Home = () => {
     setAccountList(accounts);
   };
 
-  const walletIndex = useMemo(() => {
-    if (accountList && accountList.hdAccount && account) {
-      const index = accountList.hdAccount.findIndex((hd: HdAccountStruct) =>
-        hd.accounts.some((a: BaseAccount) => a.address === account.address)
-      );
-      return index > -1 ? index : 0;
-    }
-    return 0;
-  }, [account, accountList]);
-
   useAsyncEffect(getAccountList, []);
   useAsyncEffect(updateAccount, []);
   useAsyncEffect(getTokenBalancesAsync, []);
@@ -120,6 +121,9 @@ const Home = () => {
 
   const handleSendBtnClick = () => {
     history.push('/send');
+    sensors.track('teleport_send_click', {
+      page: 'home',
+    });
   };
   const handleAccountClick = async (account: BaseAccount) => {
     await wallet.changeAccount(account);
@@ -141,19 +145,7 @@ const Home = () => {
     setFilterCondition(e.target.value);
   };
 
-  const handleTokenDeleteClick = async (t: Token) => {
-    const updated = await wallet
-      .setTokenDisplay(t.tokenId, !t.display)
-      .catch((e) => {
-        console.error(e);
-      });
-    if (updated) {
-      getTokenBalancesSync();
-    }
-  };
-
   const handleTokenClick = (t: Token) => {
-    if (isEdit) return;
     history.push({
       pathname: `/single-token/${t.tokenId}`,
     });
@@ -173,17 +165,6 @@ const Home = () => {
     return tokenList.filter((t: Token) => t.display);
   }, [tokenList]);
 
-  const handleExplorerClick = async () => {
-    const provider: Provider = await wallet.getCurrentChain().catch((e) => {
-      console.error(e);
-    });
-    if (provider?.rpcPrefs?.blockExplorerUrl && account?.address) {
-      window.open(
-        `${provider.rpcPrefs.blockExplorerUrl}/address/${account.address}`
-      );
-    }
-  };
-
   return (
     <div className="home flexCol">
       <HomeHeader
@@ -199,12 +180,12 @@ const Home = () => {
         </WalletName>
         <div className="home-preview-container flexCol content-wrap-padding">
           <div
-            className="home-preview-top-container flex"
+            className="home-preview-top-container flexR"
             onClick={() => {
               setPopupVisible(true);
             }}
           >
-            <div className="home-preview-top-left flex cursor">
+            <div className="home-preview-top-left flexR cursor">
               <Jazzicon
                 diameter={16}
                 seed={Number(account?.address?.substr(0, 8) || 0)}
@@ -217,22 +198,17 @@ const Home = () => {
             </div>
             <IconComponent name="chevron-down" cls="chevron-down" />
           </div>
-          <div className="home-preview-address-container flex">
+          <div className="home-preview-address-container flexR">
             <span className="home-preview-address">
               ({transferAddress2Display(account?.address)})
             </span>
-            <div className="home-preview-icon-container flex">
-              <IconComponent
-                name="external-link"
-                cls="explorer"
-                onClick={handleExplorerClick}
-              />
+            <div className="home-preview-icon-container flexR">
               <CopyToClipboard text={account?.address} onCopy={onCopy}>
                 <IconComponent name="copy" cls="copy" />
               </CopyToClipboard>
             </div>
           </div>
-          <div className="home-preview-balance flex">
+          <div className="home-preview-balance flexR">
             <span className="home-preview-balance-amount">
               {denom2SymbolRatio(
                 nativeToken?.amount || 0,
@@ -251,7 +227,7 @@ const Home = () => {
               nativeToken?.price || 0
             )}
           </div>
-          <div className="home-preview-button-container flex">
+          <div className="home-preview-button-container flexR">
             <TipButton
               title="Send"
               type={TipButtonEnum.SEND}
@@ -269,35 +245,23 @@ const Home = () => {
         <CustomTab
           tab1="Assets"
           tab2="Activity"
+          currentTab={tabType}
           handleTabClick={(tab: Tabs) => {
             setTabType(tab);
           }}
         />
       </div>
       <div className="assets-container flexCol">
-        {tabType === Tabs.FIRST && displayTokenList.length > 0 ? (
+        {tabType === Tabs.FIRST ? (
           <div className="search-container flexR content-wrap-padding">
             <div className="wrap">
               <SearchInput onChange={handleInputChange} placeholder="Search" />
             </div>
-            {isEdit ? (
-              <span className="done cursor" onClick={() => setIsEdit(false)}>
-                Done
-              </span>
-            ) : (
-              <div className="home-search-icon-container flex">
-                <IconComponent
-                  name="edit"
-                  cls="edit-icon cursor"
-                  onClick={() => setIsEdit(true)}
-                />
-                <img
-                  onClick={handleAddTokenBtnClick}
-                  src={AddTokenImg}
-                  className="home-search-add-icon cursor"
-                />
-              </div>
-            )}
+            <img
+              onClick={handleAddTokenBtnClick}
+              src={AddTokenImg}
+              className="home-search-add-icon cursor"
+            />
           </div>
         ) : null}
         {tabType === Tabs.FIRST && (
@@ -311,10 +275,16 @@ const Home = () => {
                     onClick={() => handleTokenClick(t)}
                   >
                     <div className="left flexR">
-                      <TokenIcon token={t} useThemeBg />
+                      <TokenIcon token={t} radius={32} />
                       <div className="balance-container flexCol">
-                        <span className="balance">
-                          {denom2SymbolRatio(t.amount || 0, t.decimal)}{' '}
+                        <span
+                          className="balance"
+                          title={denom2SymbolRatio(t.amount || 0, t.decimal)}
+                        >
+                          {addEllipsisToEachWordsInTheEnd(
+                            denom2SymbolRatio(t.amount || 0, t.decimal),
+                            16
+                          )}{' '}
                           {t.symbol?.toUpperCase()}
                         </span>
                         <span className="estimate">
@@ -328,18 +298,7 @@ const Home = () => {
                         </span>
                       </div>
                     </div>
-                    {isEdit ? (
-                      <IconComponent
-                        name="trash"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTokenDeleteClick(t);
-                        }}
-                        cls="right-icon"
-                      />
-                    ) : (
-                      <IconComponent name="chevron-right" cls="right-icon" />
-                    )}
+                    <IconComponent name="chevron-right" cls="right-icon" />
                   </div>
                 );
               })
@@ -366,7 +325,7 @@ const Home = () => {
         {tabType === Tabs.SECOND && (
           <div className="transaction-list">
             <TransactionsList
-              listContiannerHeight={250}
+              listContiannerHeight={206}
               txData={filterCondition}
             />
           </div>
@@ -393,7 +352,7 @@ const Home = () => {
           style={{ width: '100%', height: '100%' }}
           className="account-switch-drawer flexCol"
         >
-          <div className="account-switch-header flex content-wrap-padding">
+          <div className="account-switch-header flexR content-wrap-padding">
             <IconComponent
               name="close"
               cls="icon icon-close"
@@ -402,23 +361,25 @@ const Home = () => {
               }}
             />
           </div>
-          <div className="account-switch-accounts flex content-wrap-padding">
+          <div className="account-switch-accounts flexR content-wrap-padding">
             <span className="account-switch-accounts-title">Accounts</span>
-            <div
-              className="account-switch-accounts-manage-wallet-container flex cursor"
-              onClick={() => history.push('/wallet-manage')}
-            >
-              <span className="account-switch-accounts-manage-wallet">
-                Manage Wallet
-              </span>
-              <IconComponent
-                name="chevron-right"
-                cls="base-text-color account-switch-link"
-              />
-            </div>
+            <img
+              onClick={() => {
+                history.push({
+                  pathname: '/account-manage',
+                  state: {
+                    hdWalletId: account?.hdWalletId,
+                    hdWalletName: account?.hdWalletName,
+                    accountCreateType: account?.accountCreateType,
+                  },
+                });
+              }}
+              src={WalletManageNewIcon}
+              className="account-switch-accounts-manage-wallet-container cursor"
+            />
           </div>
 
-          <AccountSwitch
+          <CurrentWalletAccountSwitch
             visible={accountPopupVisible}
             handleAccountClick={handleAccountClick}
           />
@@ -430,7 +391,7 @@ const Home = () => {
         onClose={() => {
           setSettingPopupVisible(false);
         }}
-        height="516px"
+        height="540px"
         bodyStyle={{
           padding: 0,
         }}

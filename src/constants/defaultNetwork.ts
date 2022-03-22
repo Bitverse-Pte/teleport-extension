@@ -1,12 +1,22 @@
-import { CoinType, Provider } from 'types/network';
+import { CoinType, Ecosystem, Provider } from 'types/network';
 import { CHAINS } from './chain';
 
 export enum PresetNetworkId {
-  MAINNET = 'mainnet',
+  ETHEREUM = 'ethereum',
   POLYGON = 'polygon',
   ARBITRUM = 'arbitrum',
   BSC = 'bsc',
+  FTM = 'ftm',
+  AVAX = 'avax',
+  OP = 'op',
 }
+
+const EVMProviderSharedProperties = {
+  chainName: 'ETH',
+  coinType: CoinType.ETH,
+  ecosystem: Ecosystem.EVM,
+  prefix: '0x',
+};
 
 export const defaultNetworks: {
   [key in CHAINS]?: Provider;
@@ -19,122 +29,80 @@ export const defaultNetworks: {
     rpcPrefs: {
       blockExplorerUrl: 'https://etherscan.io',
     },
-    id: PresetNetworkId.MAINNET,
-    type: 'mainnet',
-    category: 'ETH',
-    chainName: 'ETH',
-    isEthereumCompatible: true,
-    coinType: CoinType.ETH,
+    id: PresetNetworkId.ETHEREUM,
+    type: 'ethereum',
+    ...EVMProviderSharedProperties,
   },
-  // [CHAINS.ROPSTEN]: {
-  //     rpcUrl: `https://ropsten.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-  //     chainId: '0x3',
-  //     ticker: 'ETH',
-  //     nickname: 'Ropsten Testnet',
-  //     rpcPrefs: {
-  //         blockExplorerUrl: 'https://ropsten.etherscan.io'
-  //     },
-  //     id: 'ropsten',
-  //     type: 'ropsten',
-  //     category: 'ETH',
-  //     chainName: 'ETH',
-  //     isEthereumCompatible: true,
-  //     coinType: CoinType.ETH,
-  // },
-  // [CHAINS.RINKEBY]: {
-  //     rpcUrl: `https://rinkeby.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-  //     chainId: '0x4',
-  //     ticker: 'ETH',
-  //     nickname: 'Rinkeby Testnet',
-  //     category: 'ETH',
-  //     id: 'rinkeby',
-  //     type: 'rinkeby',
-  //     rpcPrefs: {
-  //         blockExplorerUrl: 'https://rinkeby.etherscan.io'
-  //     },
-  //     chainName: 'ETH',
-  //     isEthereumCompatible: true,
-  //     coinType: CoinType.ETH,
-  // },
-  // [CHAINS.KOVAN]: {
-  //     rpcUrl: `https://kovan.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-  //     chainId: '0x2a',
-  //     ticker: 'ETH',
-  //     nickname: 'Kovan Testnet',
-  //     category: 'ETH',
-  //     id: 'kovan',
-  //     type: 'kovan',
-  //     rpcPrefs: {
-  //         blockExplorerUrl: 'https://kovan.etherscan.io'
-  //     },
-  //     chainName: 'ETH',
-  //     isEthereumCompatible: true,
-  //     coinType: CoinType.ETH,
-  // },
-  // [CHAINS.GOERLI]: {
-  //     rpcUrl: `https://goerli.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-  //     chainId: '0x5',
-  //     ticker: 'ETH',
-  //     category: 'ETH',
-  //     id: 'goerli',
-  //     type: 'goerli',
-  //     nickname: 'Goerli Testnet',
-  //     rpcPrefs: {
-  //         blockExplorerUrl: 'https://goerli.etherscan.io'
-  //     },
-  //     chainName: 'ETH',
-  //     isEthereumCompatible: true,
-  //     coinType: CoinType.ETH,
-  // },
   [CHAINS.BSC]: {
     id: PresetNetworkId.BSC,
     type: CHAINS.BSC,
     rpcUrl: 'https://bsc-dataseed.binance.org/',
     chainId: '0x38',
     ticker: 'BNB',
-    category: 'BSC',
-    nickname: 'Binance SmartChain',
+    nickname: 'BNB Smart Chain',
     rpcPrefs: {
       blockExplorerUrl: 'https://bscscan.com',
     },
-    chainName: 'ETH',
-    isEthereumCompatible: true,
-    coinType: CoinType.ETH,
+    ...EVMProviderSharedProperties,
   },
   [CHAINS.ARBITRUM]: {
     id: PresetNetworkId.ARBITRUM,
     type: CHAINS.ARBITRUM,
-    // rpcUrl: 'https://arb1.arbitrum.io/rpc',
-    // chainId: '0xa4b1',
-    rpcUrl: `https://ropsten.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-    chainId: '0x3',
+    rpcUrl: 'https://arb1.arbitrum.io/rpc',
+    chainId: '0xa4b1',
     ticker: 'ETH',
-    category: 'ARBITRUM',
-    nickname: 'Arbitrum',
+    nickname: 'Arbitrum One',
     rpcPrefs: {
-      // blockExplorerUrl: 'https://arbiscan.io/'
-      blockExplorerUrl: 'https://ropsten.etherscan.io',
+      blockExplorerUrl: 'https://arbiscan.io/',
     },
-    chainName: 'ETH',
-    isEthereumCompatible: true,
-    coinType: CoinType.ETH,
+    ...EVMProviderSharedProperties,
   },
   [CHAINS.POLYGON]: {
     id: PresetNetworkId.POLYGON,
     type: CHAINS.POLYGON,
-    // rpcUrl: 'https://rpc-mainnet.maticvigil.com',
-    // chainId: '0x89',
-    rpcUrl: `https://rinkeby.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-    chainId: '0x4',
+    rpcUrl: 'https://rpc-mainnet.maticvigil.com',
+    chainId: '0x89',
     ticker: 'MATIC',
-    category: 'POLYGON',
     nickname: 'Polygon Mainnet',
     rpcPrefs: {
-      // blockExplorerUrl: 'https://polygonscan.com'
-      blockExplorerUrl: 'https://rinkeby.etherscan.io',
+      blockExplorerUrl: 'https://polygonscan.com',
     },
-    chainName: 'ETH',
-    isEthereumCompatible: true,
-    coinType: CoinType.ETH,
+    ...EVMProviderSharedProperties,
+  },
+  [CHAINS.FTM]: {
+    id: PresetNetworkId.FTM,
+    type: CHAINS.FTM,
+    rpcUrl: 'https://rpc.ftm.tools/',
+    chainId: '0xfa',
+    ticker: 'FTM',
+    nickname: 'Fantom Opera',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://ftmscan.com',
+    },
+    ...EVMProviderSharedProperties,
+  },
+  [CHAINS.AVAX]: {
+    id: PresetNetworkId.AVAX,
+    type: CHAINS.AVAX,
+    rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
+    chainId: '0xa86a',
+    ticker: 'AVAX',
+    nickname: 'Avalanche Network',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://snowtrace.io',
+    },
+    ...EVMProviderSharedProperties,
+  },
+  [CHAINS.OP]: {
+    id: PresetNetworkId.OP,
+    type: CHAINS.OP,
+    rpcUrl: 'https://mainnet.optimism.io',
+    chainId: '0xa',
+    ticker: 'ETH',
+    nickname: 'Optimistic Ethereum',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://optimistic.ethereum.io',
+    },
+    ...EVMProviderSharedProperties,
   },
 };

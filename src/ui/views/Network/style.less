@@ -7,7 +7,7 @@
   // width: 100%;
   // cursor: pointer;
   white-space: nowrap;
-  max-width: 60%;
+  max-width: 70%;
   text-overflow: ellipsis;
   // font-weight: 400;
   // font-size: 16px;
@@ -24,9 +24,25 @@
   font-family: Montserrat;
   height: 100%;
   // padding: 0 12px;
-  padding: 0 12px 0 24px;
   overflow: hidden;
+
+  .network-list-header {
+    padding: 0 24px;
+    .closeWindowBtn {
+      // padding: 0;
+      margin-right: -15px;
+      // height: 20px;
+    }
+  }
+
+  .category-tag {
+    padding: 16px 24px;
+  }
 }
+
+// .network-list-padding {
+//   padding: 0 12px 0 24px;
+// }
 
 .colorful_dot {
   margin-right: 0.25rem;
@@ -34,8 +50,7 @@
 }
 
 .network-item {
-    // padding-left: 46px;
-    padding: 16px 0px 16px 36px;
+    padding: 16px 24px 16px 60px;
     cursor: pointer;
     .actions {
       margin-left: auto;
@@ -58,17 +73,14 @@
       }
     }
 }
+.network-item.network-item-active {
+  background-color: #D6EFFF;
+}
 .hover-to-highlight:hover {
   background-color: #FAFCFE;
 }
 
 h2.category-name {
-  // color: #364361;
-  // font-size: 14px;
-  // font-style: normal;
-  // font-weight: 500;
-  // line-height: 20px;
-  //styleName: Common/Body;
   font-family: Montserrat;
   font-size: 14px;
   font-style: normal;
@@ -78,7 +90,8 @@ h2.category-name {
 }
 
 .networkList {
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
   max-height: 70%;
 }
 
@@ -87,36 +100,36 @@ h2.category-name {
   border-radius: 8px;
   padding: 0 9px;
   padding-left: 16px;
-  margin: 40px 12px 20px 0px;
-}
-
-.category-tag {
-  padding: 16px 0;
+  margin: 24px;
+  margin-top: 40px;
 }
 
 /** network edit page **/
 .network-edit {
   padding: 0;
-  .ant-form-item-required {
-    font-family: MontserratBold;
+  .input-error {
+    color: #E05651;
+    margin-top: -12px;
+    margin-bottom: 24px;
   }
-  .ant-form-item-required::before {
-    content: '' !important;
-  }
-  .ant-form-item-label {
-    padding: 0 0 12px;
-    .label {
+  h1 {
+      margin-bottom: 12px;
       font-size: 16px;
       color: #364361;
-    }
+  }
+  h1.required {
+    font-family: MontserratBold;
   }
 
-  .ant-form-item-control-input {
+  // .ant-form-item-control-input {
     input {
       background-color: #F8FAFC;
       height: 36px;
       border-radius: 8px !important;
       border-color: #F8FAFC;
+      margin-bottom: 24px;
+      width: 100%;
+      padding: 11px 16px;
     }
     input::placeholder {
       color: #A3B4CC !important;
@@ -124,16 +137,20 @@ h2.category-name {
     input::-webkit-input-placeholder {
       color: #A3B4CC !important;
     }
-  }
+    input:last-child {
+      margin-bottom: 0;
+    }
+  // }
   .ant-select-selector {
     background: #F8FAFC !important;
     border-radius: 8px !important;
     border: 0px !important;
   }
-  form .form-body {
-    overflow: scroll;
-    height: 478px;
-    margin-bottom: 24px;
+  .form-body {
+    padding: 0 4px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 455px;
   }
 }
 

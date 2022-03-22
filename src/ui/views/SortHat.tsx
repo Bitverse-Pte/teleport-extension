@@ -25,7 +25,12 @@ const SortHat = () => {
       return;
     }
 
-    if (!(await wallet.isUnlocked())) {
+    if (await wallet.getManualLocked()) {
+      setTo('/unlock');
+      return;
+    }
+
+    if (!(await wallet.isUnlocked()) && isInNotification) {
       setTo('/unlock');
       return;
     }

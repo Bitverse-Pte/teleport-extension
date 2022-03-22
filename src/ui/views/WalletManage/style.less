@@ -26,7 +26,8 @@
     .wallet-manage-button-wrap {
       background: #F0F9FF;
     }
-    .wallet-manage-button-item-title{
+
+    .wallet-manage-button-item-title {
       color: #1484F5;
     }
   }
@@ -35,19 +36,23 @@
     .wallet-manage-button-wrap {
       background: #F0FFF0;
     }
-    .wallet-manage-button-item-title{
+
+    .wallet-manage-button-item-title {
       color: #42B856;
     }
   }
 
   .wallet-manage-button-item {
     align-items: center;
-    &:first-child{
+
+    &:first-child {
       margin-left: 12px;
     }
-    &:last-child{
+
+    &:last-child {
       margin-right: 12px;
     }
+
     .wallet-manage-button-wrap {
       width: 48px;
       height: 48px;
@@ -79,7 +84,7 @@
     line-height: 1;
   }
 
-  
+
 
   .content {
     flex: 1;
@@ -87,6 +92,7 @@
     overflow-y: auto;
     box-sizing: border-box;
     padding-bottom: 16px;
+
     .wallet-manage-button-container {
       justify-content: space-between;
       align-items: center;
@@ -157,15 +163,20 @@
           justify-content: space-between;
           align-items: center;
           width: 100%;
-          height: 64px;
-          flex: 0 0 64px;
-          padding: 0 @pagePaddingLeft;
+          height: 56px;
+          flex: 0 0 56px;
+          padding: 0 0 0 @pagePaddingLeft;
           box-sizing: border-box;
           cursor: pointer;
 
           &:hover {
-            background: #FAFCFE;
+            background: #F8FAFC;
+
+            .name-account-key-container {
+              display: flex !important;
+            }
           }
+
 
           .circle {
             width: 32px;
@@ -178,6 +189,25 @@
             font-size: 14px;
             color: #ffffff;
             font-family: MontserratBold;
+            position: relative;
+
+            .circle-wrap {
+              position: absolute;
+              width: 16px;
+              height: 16px;
+              right: -4px;
+              top: -4px;
+              align-items: center;
+              justify-content: center;
+              background: #ffffff;
+              border-radius: 50%;
+
+              .circle-ecosystem-icon {
+                width: 12px;
+                height: 12px;
+              }
+            }
+
           }
 
           .right {
@@ -185,12 +215,43 @@
             justify-content: space-between;
             align-items: center;
 
-            .name {
+            .name-account-name {
               font-family: MontserratBold;
               font-size: 14px;
             }
 
-            .name-account {
+            .normal-container {
+              justify-content: center;
+              align-items: center;
+              width: 72px;
+              height:56px;
+              &:hover{
+                background: #F0F9FF;
+              }
+              .key-default-icon {
+                display: block;
+              }
+
+              .key-active-icon {
+                display: none;
+              }
+
+              &:hover {
+
+                .key-default-icon {
+                  display: none;
+                }
+
+                .key-active-icon {
+                  display: block;
+                }
+              }
+
+            }
+
+
+
+            /* .name-account {
               .name-account-name {
                 font-family: MontserratBold;
                 font-size: 14px;
@@ -200,32 +261,22 @@
                 font-size: 12px;
                 color: #A3B4CC;
               }
-            }
+            } */
 
-            .normal-container {
-              justify-content: flex-end;
-              align-items: center;
 
-              .account-count {
-                text-align: right;
-                font-size: 14px;
-                color: #798CAD;
-              }
-
-              .svg-icon {
-                margin-left: 24px;
-                fill: #A3B4CC;
-              }
-            }
 
             .icons-container {
-              width: 104px;
-              flex: 0 0 104px;
+              width: 50px;
+              flex: 0 0 50px;
               justify-content: space-between;
               align-items: center;
             }
 
           }
+        }
+
+        ._active {
+          background: #D6EFFF !important;
         }
       }
 
@@ -264,53 +315,18 @@
   display: none;
 }
 
-.menu-node {
-  height: 99px;
-  width: 140px;
-  box-sizing: border-box;
-
-  .menu-item {
-    height: 33px;
-    width: 100%;
-    justify-content: flex-start;
-    align-items: center;
-    padding-left: 14px;
-    box-sizing: border-box;
-
-    .item {
-      font-style: normal;
-      font-weight: normal;
-      font-size: 11px;
-      font-size: 11px;
-      color: #9EA2A9;
-    }
-
-    &:hover {
-      background: #FAFCFE;
-
-      .item {
-        font-weight: 500;
-        color: @baseTextColor;
-      }
-    }
-
-    .icon {
-      margin-right: 10px;
-    }
-
-  }
-}
-
-.wallet-header-container{
+.wallet-header-container {
   justify-content: space-between;
   align-items: center;
   height: 64px;
-  flex:0 0 64px;
-  .wallet-header-title{
-    font-size:18px;
+  flex: 0 0 64px;
+
+  .wallet-header-title {
+    font-size: 18px;
     font-family: MontserratBold;
   }
-  .wallet-header-done{
+
+  .wallet-header-done {
     width: 72px;
     height: 30px;
     font-size: 14px;

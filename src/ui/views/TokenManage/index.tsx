@@ -27,6 +27,8 @@ import './style.less';
 import { NoContent } from 'ui/components/universal/NoContent';
 import tokenHide from '../../../assets/tokenHide.svg';
 import tokenShow from '../../../assets/tokenShow.svg';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import { isValidAddress } from 'ethereumjs-util';
 
 const TokenManage = () => {
   const history = useHistory();
@@ -95,11 +97,19 @@ const TokenManage = () => {
     },
     onError(err) {
       console.error(err);
-      message.error('no token found');
+      if (err?.code === ErrorCode.INVALID_CONTRACT_ADDRESS) {
+        ClickToCloseMessage.error('Invalid contract address');
+      } else {
+        ClickToCloseMessage.error('Token not found');
+      }
     },
   });
 
   const handleNextBtnClick = async () => {
+    if (!isValidAddress(contractAddress)) {
+      ClickToCloseMessage.error('Invalid contract address');
+      return;
+    }
     if (!contractAddress) return;
     queryToken(currentChain?.rpcUrl, contractAddress);
   };
@@ -111,6 +121,7 @@ const TokenManage = () => {
         <CustomTab
           tab1="Search"
           tab2="Customize"
+          currentTab={tokenManageTab}
           handleTabClick={(tab: Tabs) => {
             setTokenManageTab(tab);
           }}
@@ -139,7 +150,7 @@ const TokenManage = () => {
                 onClick={() => handleTokenClick(t)}
               >
                 <div className="left flexR">
-                  <TokenIcon token={t} useThemeBg />
+                  <TokenIcon token={t} />
                   <div className="token-info flexCol">
                     <span className="balance">
                       {denom2SymbolRatio(t.amount || 0, t.decimal)} {t.symbol}

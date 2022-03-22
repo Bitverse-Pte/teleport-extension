@@ -5,6 +5,7 @@ import './style.less';
 import { useHistory } from 'react-router';
 import { Space } from 'antd';
 import { IconComponent } from '../IconComponents';
+import clsx from 'clsx';
 
 /**
  *
@@ -15,26 +16,32 @@ const GeneralHeader = ({
   onXButtonClick,
   hideLogo = false,
   title = '',
+  extCls,
 }: {
   onXButtonClick?: React.MouseEventHandler;
   hideLogo?: boolean;
-  title?: string;
+  title?: React.ReactNode;
+  extCls?: string;
 }) => {
   const history = useHistory();
   const defaultAction = () => history.goBack();
 
   return (
-    <div className="flex headerOfMenu justify-end items-center">
+    <div className={clsx('flex headerOfMenu justify-end items-center', extCls)}>
       {!hideLogo && <img src={walletLogo} className="header-logo" />}
-      <span className={hideLogo ? 'nologo-title' : 'title'}>{title}</span>
+      {typeof title === 'string' ? (
+        <span className={hideLogo ? 'nologo-title' : 'title'}>{title}</span>
+      ) : (
+        title
+      )}
       <Button
         type="text"
         className="closeWindowBtn"
         onClick={onXButtonClick || defaultAction}
       >
-        <Space>
-          <IconComponent name="close" cls="closeIcon base-text-color" />
-        </Space>
+        {/* <Space> */}
+        <IconComponent name="close" cls="closeIcon base-text-color" />
+        {/* </Space> */}
       </Button>
     </div>
   );

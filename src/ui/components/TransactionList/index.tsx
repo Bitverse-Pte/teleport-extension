@@ -14,7 +14,7 @@ import {
   TransactionTypes,
 } from 'constants/transaction';
 import { useHistory } from 'react-router-dom';
-import { useTransactionDisplayData } from 'ui/hooks/metamask/useTxDisplayData';
+import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
 import { useTranslation } from 'react-i18next';
 import { getCurrentChainId } from 'ui/selectors/selectors';
 import {
@@ -22,12 +22,13 @@ import {
   nonceSortedCompletedTransactionsSelector,
 } from 'ui/selectors/transactions';
 import { isEqualCaseInsensitive, shortenAddress } from 'ui/utils/utils';
-import { useShouldShowSpeedUp } from 'ui/hooks/metamask/useShouldShowSpeedUp';
+import { useShouldShowSpeedUp } from 'ui/hooks/wallet/useShouldShowSpeedUp';
 import { Button, Tooltip } from 'antd';
 import CancelButton from './CancelButton';
 import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
+import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 
 dayjs.extend(relativeTime);
 
@@ -162,7 +163,7 @@ function TransactionItem({
         onClick={hasCancelled ? cancelTransaction : retryTransaction}
         style={hasCancelled ? { width: 'auto' } : {}}
       >
-        {t('gas')}
+        {t('speedUp')}
       </button>
     );
   }, [
@@ -189,6 +190,11 @@ function TransactionItem({
   }, [displayedStatusKey]);
 
   const isEvenStyle = idx % 2 == 0 ? 'is-even' : '';
+  /**
+   * Usually the amount of approval is so big and irrelavnt.
+   * so we just hide the amount in the list like MetaMask did.
+   */
+  const isHidingAmount = category !== TransactionGroupCategories.APPROVAL;
   return (
     <div
       className={clsx(
@@ -211,25 +217,29 @@ function TransactionItem({
         id={`tx-${idx}`}
       >
         <p className="tx-title capitalize">{title}</p>
-        <p className="tx-value ml-auto">{primaryCurrency}</p>
+        {isHidingAmount && (
+          <p className="tx-value ml-auto" title={primaryCurrency}>
+            {addEllipsisToEachWordsInTheEnd(primaryCurrency, 19)}
+          </p>
+        )}
         {/* hide if recipientAddress not exist e.g contract deploy */}
         {recipientAddress && (
-          <div className="grey-02 from-and-to flex items-center mr-auto">
+          <div className="grey-02 from-and-to flex items-center mr-auto mb-8">
             <span className="from cursor-default">
               <Tooltip placement="top" title={senderAddress}>
-                From: {shortenedStr(senderAddress, 3)}
+                {t('from')}: {shortenedStr(senderAddress, 3)}
               </Tooltip>
             </span>
             <IconComponent name="chevron-right" cls="grey-05" />
             <span className="to cursor-default">
               <Tooltip placement="top" title={recipientAddress}>
-                To: {shortenedStr(recipientAddress, 3)}
+                {t('to')}: {shortenedStr(recipientAddress, 3)}
               </Tooltip>
             </span>
           </div>
         )}
         <span className={clsx('status capitalize', colorByStatus)}>
-          {displayedStatusKey}
+          {t(displayedStatusKey)}
         </span>
         {!isPending && (
           <span className="date">
@@ -240,7 +250,8 @@ function TransactionItem({
         )}
         {isPending && (
           <div className="pending-tx-actions ml-auto">
-            {speedUpButton}
+            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
+            {/* {speedUpButton} */}
             {/* {!hasCancelled && !isUnapproved && (
               <CancelButton
                 transaction={transactionGroup.primaryTransaction}

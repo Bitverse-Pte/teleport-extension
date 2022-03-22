@@ -1,4 +1,10 @@
-import React, { useState, createContext, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  createContext,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +20,11 @@ import { useWallet, useAsyncEffect, denom2SymbolRatio } from 'ui/utils';
 import { transferAddress2Display } from 'ui/utils';
 import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
 import AccountSelect from 'ui/components/AccountSelect';
-import { ETH, Transaction } from 'constants/transaction';
+import {
+  ETH,
+  Transaction,
+  TransactionEnvelopeTypes,
+} from 'constants/transaction';
 import { BaseAccount } from 'types/extend';
 import { Token } from 'types/token';
 import { generateTokenTransferData } from 'ui/context/send.utils';
@@ -22,6 +32,12 @@ import { CustomButton, TokenIcon, WalletName } from 'ui/components/Widgets';
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import './style.less';
 import BigNumber from 'bignumber.js';
+import { utils } from 'ethers';
+import { useDispatch, useSelector } from 'react-redux';
+import { getCurrentChainId } from 'ui/selectors/selectors';
+import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
+import { shortenAddress } from 'ui/utils/utils';
+import { UnlockModal } from 'ui/components/UnlockModal';
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -32,6 +48,7 @@ const { Option } = Select;
 
 const Send = () => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const wallet = useWallet();
   const [selected, setSelected] = useState<BaseAccount | undefined>();
   const { t } = useTranslation();
@@ -46,6 +63,30 @@ const Send = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [selectedToken, setSelectedToken] = useState<Token>();
   const [recentAddressList, setRecentAddressList] = useState<string[]>();
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+
+  const chainId = useSelector(getCurrentChainId);
+  const draftTransaction = useSelector(
+    (state) => state.send.draftTransaction.txParams
+  );
+  const isSupport1559 = useSelector((state) => state.send.eip1559support);
+  console.debug('isSupport1559: ', isSupport1559);
+
+  const cleanup = useCallback(() => {
+    dispatch(resetSendState());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (chainId !== undefined) {
+      dispatch(initializeSendState());
+    }
+  }, [chainId, dispatch, cleanup]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetSendState());
+    };
+  }, [dispatch, cleanup]);
 
   useAsyncEffect(async () => {
     const current: BaseAccount | undefined = await wallet.getCurrentAccount();
@@ -66,12 +107,10 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const txHistory: Record<string, Transaction> = await wallet.getTxHistory();
-    const recentAddress = Object.values(txHistory)
-      .filter((tx) => tx.txParams.to)
-      .map((tx) => tx.txParams.to as string)
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .slice(0, 5);
+    const list = await wallet.listContact();
+    const recentAddress = list.map((item) => {
+      return item.address;
+    });
     setRecentAddressList(recentAddress);
   }, []);
 
@@ -80,6 +119,10 @@ const Send = () => {
   }, [balance]);
 
   const next = async () => {
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
     const userInputAmount = addHexPrefix(
       getWeiHexFromDecimalValue({
         value: amount,
@@ -87,12 +130,14 @@ const Send = () => {
         fromDenomination: EthDenomination.ETH,
       }).toString()
     );
+    const type = isSupport1559
+      ? TransactionEnvelopeTypes.FEE_MARKET
+      : TransactionEnvelopeTypes.LEGACY;
     const params: Record<string, any> = {
       from: fromAccount?.address,
-      value: '0x0',
+      value: TransactionEnvelopeTypes.LEGACY,
       isSend: true,
-      type: '0x2',
-      gas: '0x11359',
+      type: type,
     };
     if (selectedToken?.isNative) {
       params.to = toAddress;
@@ -105,13 +150,24 @@ const Send = () => {
         amount: userInputAmount,
       });
     }
+    if (isSupport1559) {
+      delete params.gasPrice;
+      params.maxFeePerGas = draftTransaction.maxFeePerGas;
+      params.maxPriorityFeePerGas = draftTransaction.maxPriorityFeePerGas;
+    } else {
+      delete params.maxFeePerGas;
+      delete params.maxPriorityFeePerGas;
+      params.gasPrice = draftTransaction.gasPrice;
+      params.gas = draftTransaction.gas;
+    }
     params.txParam = {
       from: fromAccount?.address,
       to: toAddress,
       value: userInputAmount,
-      type: '0x2',
+      type: type,
       symbol: selectedToken?.symbol,
     };
+    await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({
       method: 'eth_sendTransaction',
       params: [params],
@@ -145,7 +201,7 @@ const Send = () => {
       label: (
         <div className="assets-option flexR">
           <div className="assets-option-left flexR">
-            <TokenIcon token={t} scale={0.8} useThemeBg />
+            <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
           </div>
           <span className="assets-option-right">
@@ -158,9 +214,8 @@ const Send = () => {
       selected: (
         <div className="assets-option flexR">
           <div className="assets-option-left flexR">
-            <TokenIcon token={t} scale={0.8} useThemeBg />
+            <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
-            <span className="assets-option-symbol-name">{`(${t.name})`}</span>
           </div>
         </div>
       ),
@@ -169,7 +224,27 @@ const Send = () => {
   });
 
   return (
-    <div className="send flexCol">
+    <div
+      className="send flexCol"
+      onClick={() => {
+        if (showToList) {
+          /**
+           * Clicks in the whole container will close
+           * `to` selection list
+           * for other onClick, use `e.stopPropagation()` to avoid this execution
+           */
+          setShowToList(false);
+        }
+      }}
+    >
+      <UnlockModal
+        title="Unlock Wallet"
+        visible={unlockPopupVisible}
+        setVisible={(visible: boolean) => {
+          setUnlockPopupVisible(visible);
+        }}
+        unlocked={() => next()}
+      />
       <GeneralHeader title={t('Send')} hideLogo />
       <div className="send-container">
         <div className="from-container flexCol">
@@ -203,7 +278,8 @@ const Send = () => {
           controls={false}
           addonAfter={addonSymbol}
           value={amount}
-          onChange={(v) => {
+          stringMode
+          onChange={(v: string) => {
             setAmount(v);
           }}
         />
@@ -220,41 +296,30 @@ const Send = () => {
         <Input
           placeholder={t('Enter Address')}
           value={toAddress}
+          className="customInputStyle"
           onFocus={() => setShowToList(true)}
+          onClick={(e) => e.stopPropagation()}
           onChange={(e) => setToAddress(e.target.value)}
         />
         {showToList && (
-          <Card
-            title={
-              <span className="card-title" onClick={myAccountsSelect}>
-                {t('Transfer between my accounts >')}
-              </span>
-            }
-            extra={
-              <svg
-                className="icon"
-                aria-hidden="true"
-                onClick={myAccountsSelect}
-              >
-                <use xlinkHref="#icon-chevron-right"></use>
-              </svg>
-            }
-            size="small"
-          >
-            <p className="recent-title">{t('Recent Address')}</p>
-            {recentAddressList?.map((a) => (
+          <Card title={t('Recent Address')} size="small">
+            {recentAddressList?.map((addr) => (
               <p
                 onClick={() => {
-                  setToAddress(a);
+                  setToAddress(addr);
                   setShowToList(false);
                 }}
                 className="recent"
+                key={addr}
               >
-                {a}
+                {transferAddress2Display(addr)}
               </p>
             ))}
           </Card>
         )}
+        <span className="tbmy" onClick={myAccountsSelect}>
+          {t('Transfer between my accounts')}
+        </span>
         <AccountSelect
           currentSelect={selected}
           visible={accountSelectPopupVisible}
@@ -277,10 +342,7 @@ const Send = () => {
             !selectedToken ||
             (selectedToken.amount &&
               new BigNumber(
-                denom2SymbolRatio(
-                  selectedToken?.amount || 0,
-                  selectedToken?.decimal || 0
-                )
+                utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
               ).lessThan(amount))
           }
           onClick={next}

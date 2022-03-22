@@ -12,7 +12,7 @@ import {
 import { BaseAccount } from 'types/extend';
 import { Token } from 'types/token';
 import Header from 'ui/components/Header';
-// import teleportLogo from 'assets/teleport.svg';
+import teleportLogo from 'assets/teleportBg.svg';
 import { TipButton, TokenIcon, WalletName } from 'ui/components/Widgets';
 import { TransactionsList } from 'ui/components/TransactionList';
 import './style.less';
@@ -51,7 +51,6 @@ const SingleToken = () => {
   const updateAccount = async () => {
     const account: BaseAccount | undefined = await wallet.getCurrentAccount();
     if (account) setAccount(account);
-    console.log('account', account);
   };
   useAsyncEffect(updateAccount, []);
   useAsyncEffect(getTokenBalanceAsync, []);
@@ -71,15 +70,15 @@ const SingleToken = () => {
       const clonedToken = cloneDeep(token);
       if (clonedToken.symbol.toUpperCase() in prices) {
         clonedToken.price = prices[clonedToken.symbol.toUpperCase()];
-        return clonedToken;
       }
+      return clonedToken;
     } else {
       return token;
     }
   }, [token, prices]);
 
   const title = (
-    <div className="title-container flex">
+    <div className="title-container flexR">
       <WalletName cls="wallet-name" width={50}>
         {account?.hdWalletName}
       </WalletName>
@@ -92,26 +91,19 @@ const SingleToken = () => {
     <div className="single-token flexCol">
       <Header title={title} />
       <div className="summary flexCol content-wrap-padding">
-        <div
-          className="top"
-          style={
-            updatedToken?.themeColor
-              ? { background: updatedToken?.themeColor }
-              : {}
-          }
-        >
-          <TokenIcon token={updatedToken} />
+        <div className="top">
+          <TokenIcon token={updatedToken} radius={42} />
           {/* <img src={teleportLogo} className="logo" /> */}
         </div>
         <div className="bottom flexCol">
-          <div className="balance-container flex">
+          <div className="balance-container flexR">
             <span className="balance">
               {denom2SymbolRatio(
                 updatedToken?.amount || 0,
                 updatedToken?.decimal || 0
               )}
             </span>
-            <span className="symbol">{updatedToken?.symbol}</span>
+            <span className="single-symbol">{updatedToken?.symbol}</span>
           </div>
           <span className="estimate">
             ≈{' '}
@@ -124,7 +116,7 @@ const SingleToken = () => {
           </span>
         </div>
       </div>
-      <div className="send-container content-wrap-padding flex">
+      <div className="send-container content-wrap-padding flexR">
         <TipButton
           title="Send"
           type={TipButtonEnum.SEND}
@@ -144,7 +136,7 @@ const SingleToken = () => {
       <div className="token-tx-list">
         <h2 className="title">{t('Activity')}</h2>
         <TransactionsList
-          listContiannerHeight={300}
+          listContiannerHeight={240}
           tokenAddress={token?.contractAddress}
           // hideTokenTransactions is true = show native token transfer
           hideTokenTransactions={token?.isNative}

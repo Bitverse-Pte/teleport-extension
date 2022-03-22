@@ -6,8 +6,15 @@ import type { PresetNetworkId } from 'constants/defaultNetwork';
 export enum CoinType {
   ETH = 60, // 0
   COSMOS = 118, // 1
+  POLKADOT = 354,
   // SOME_OTHER_CHAIN_COIN // 2 etc...
   // You can add as you like
+}
+
+export enum Ecosystem {
+  EVM = 'EVM',
+  COSMOS = 'COSMOS',
+  POLKADOT = 'POLKADOT',
 }
 
 export interface Network {
@@ -19,11 +26,9 @@ export interface Network {
   };
   rpcUrl: string;
   ticker?: string;
-  category: string;
 
   // leaving this field for future support of non-EVM based chains
   coinType: CoinType;
-  isEthereumCompatible: boolean;
 
   // for further question please contact lsc
   chainName: string;
@@ -34,10 +39,18 @@ export interface Network {
    * for `rpc` provider, used `nanoid` for type
    */
   id: PresetNetworkId | string;
+
+  /**
+   * Future-proof design
+   */
+  ecosystem: Ecosystem;
+
+  // mainly for cosmos / polkadot
+  prefix: string;
 }
 export interface Provider extends Network {
   type:
-    | 'mainnet'
+    | 'ethereum'
     | 'goerli'
     | 'rinkeby'
     | 'ropsten'
@@ -45,6 +58,9 @@ export interface Provider extends Network {
     | 'BSC'
     | 'POLYGON'
     | 'ARBITRUM'
+    | 'FANTOM'
+    | 'AVAX'
+    | 'OP'
     | 'rpc';
 }
 

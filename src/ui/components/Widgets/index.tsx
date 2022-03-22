@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Input } from 'antd';
+import { Button, Input, Tooltip } from 'antd';
 import { IconComponent } from '../IconComponents';
 import eth from 'assets/tokens/eth.svg';
 import passwordChecked from 'assets/passwordChecked.svg';
@@ -14,6 +14,7 @@ import SendImg from '../../../assets/send.svg';
 import ReceiveImg from '../../../assets/receive.svg';
 import LockImg from '../../../assets/lock.svg';
 import WalletManageImg from '../../../assets/walletManage.svg';
+import { PresetNetworkId } from 'constants/defaultNetwork';
 
 export interface SearchInputProps {
   onChange: (value) => void;
@@ -32,10 +33,9 @@ export interface TokenIconProps {
   token:
     | Pick<
         Token,
-        'symbol' | 'decimal' | 'contractAddress' | 'isNative' | 'themeColor'
+        'symbol' | 'decimal' | 'contractAddress' | 'isNative' | 'chainCustomId'
       >
     | undefined;
-  useThemeBg?: boolean;
   radius?: number;
   scale?: number;
 }
@@ -43,19 +43,15 @@ export interface TokenIconProps {
 function _getDefaultIcon(
   token: Partial<Token>,
   radius?: number,
-  useThemeBg?: boolean,
   scale?: number
 ) {
   const [loadError, setLoadError] = useState(false);
-
-  const style: any = {};
-  if (useThemeBg) {
-    style.background = token!.themeColor;
-  }
+  const style: Record<string, any> = {};
   if (radius) {
-    style.width = radius;
-    style.height = radius;
-    style.borderRadius = radius;
+    style.width = `${radius}px`;
+    style.height = `${radius}px`;
+    style.lineHeight = `${radius}px`;
+    style.borderRadius = `${radius}px`;
   }
   if (scale) {
     style.transform = `scale(${scale})`;
@@ -65,10 +61,87 @@ function _getDefaultIcon(
       {token?.symbol?.substr(0, 1)?.toUpperCase()}
     </span>
   );
-  if (!token.contractAddress) return defaultIcon;
-  const contractAddress = utils.getAddress(token.contractAddress);
-  const src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
-  return loadError ? (
+  if (!token.isNative && !token.contractAddress) return defaultIcon;
+  let contractAddress = '';
+  try {
+    contractAddress = (token as any).contractAddress
+      ? utils.getAddress((token as any).contractAddress)
+      : '';
+  } catch {
+    setLoadError(true);
+  }
+  /* const contractAddress = (token as any).contractAddress
+    ? utils.getAddress((token as any).contractAddress)
+    : ''; */
+
+  const src = useMemo(() => {
+    let _src: string | undefined;
+    if (token.icon) {
+      _src = token.icon;
+    } else {
+      switch (token.chainCustomId) {
+        case PresetNetworkId.ETHEREUM:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.BSC:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
+          } else {
+            _src = token.icon;
+          }
+          break;
+        case PresetNetworkId.POLYGON:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.ARBITRUM:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.FTM:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.AVAX:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/assets/${contractAddress}/logo.png`;
+          }
+          break;
+        case PresetNetworkId.OP:
+          if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png';
+          } else {
+            _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/assets/${contractAddress}/logo.png`;
+          }
+          break;
+      }
+    }
+    return _src;
+  }, [token]);
+
+  return loadError || !src ? (
     defaultIcon
   ) : (
     <img
@@ -86,19 +159,9 @@ function _getDefaultIcon(
 // if you want to use a different size, pls use the scale property to set transform style
 // calc scale newSize = scale*30
 export const TokenIcon = (props: TokenIconProps) => {
-  const { token, useThemeBg, radius, scale } = props;
+  const { token, radius, scale } = props;
   if (!token) return null;
-  if (token!.isNative) {
-    const style: any = radius ? { width: radius, height: radius } : {};
-    if (scale) {
-      style.transform = `scale(${scale})`;
-    }
-    return (
-      <img src={eth} className="token-icon token-icon-logo" style={style} />
-    );
-  } else {
-    return _getDefaultIcon(token, radius, useThemeBg, scale);
-  }
+  return _getDefaultIcon(token, radius, scale);
 };
 
 type DeletedProps = 'className';
@@ -325,37 +388,57 @@ export interface TabInterface {
   tab1: string;
   tab2: string;
   handleTabClick: (Tabs) => void;
-  defaultTab?: Tabs;
+  currentTab: Tabs;
+  showToolTips?: boolean;
+  tip1?: string;
+  tip2?: string;
 }
 
 export const CustomTab = (props: TabInterface) => {
-  const [active, setActive] = useState(
-    props.defaultTab ? props.defaultTab : Tabs.FIRST
-  );
+  const [tooltip, setTooltip] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
 
   return (
     <div className="widgets-tab-container flexR">
       <span
         className={classnames('tab-item', 'cursor', {
-          'tab-item-active': active === Tabs.FIRST,
+          'tab-item-active': props.currentTab === Tabs.FIRST,
         })}
         onClick={() => {
-          setActive(Tabs.FIRST);
           props.handleTabClick(Tabs.FIRST);
         }}
+        onMouseOver={() => {
+          if (props.showToolTips && props.tip1) {
+            setTooltip(props.tip1);
+            setShowTooltip(true);
+          }
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
       >
         {props.tab1}
       </span>
       <span
         className={classnames('tab-item', 'cursor', {
-          'tab-item-active': active === Tabs.SECOND,
+          'tab-item-active': props.currentTab === Tabs.SECOND,
         })}
         onClick={() => {
-          setActive(Tabs.SECOND);
           props.handleTabClick(Tabs.SECOND);
         }}
+        onMouseOver={() => {
+          if (props.showToolTips && props.tip2) {
+            setTooltip(props.tip2);
+            setShowTooltip(true);
+          }
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
       >
         {props.tab2}
+      </span>
+      <span
+        className="custom-tab-tooltip"
+        style={props.showToolTips && showTooltip ? {} : { display: 'none' }}
+      >
+        {tooltip}
       </span>
     </div>
   );
@@ -391,4 +474,8 @@ export const TipButton = (props: TipButtonProps) => {
       <span className="tip-button-send-title">{props.title}</span>
     </div>
   );
+};
+
+export const BetaIcon = () => {
+  return <span className="beta-icon">Beta</span>;
 };

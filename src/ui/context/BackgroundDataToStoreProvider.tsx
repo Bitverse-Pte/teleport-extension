@@ -13,6 +13,10 @@ import { PreferenceStore } from 'background/service/preference';
 import { Network, NetworkController } from 'types/network';
 import { updateNetworkController } from 'ui/reducer/network.reducer';
 import { setCustomNetworks } from 'ui/reducer/customNetwork.reducer';
+import {
+  setCurrentGasLimit,
+  setGasFeeEstimates,
+} from 'ui/reducer/block.reducer';
 
 /**
  * BackgroundDataSyncMiddleware
@@ -25,6 +29,14 @@ export function BackgroundDataSyncMiddleware() {
     eventBus.emit(EVENTS.broadcastToBackground, {
       method: `dataSyncService.fetch.${storageName}`,
     });
+
+  const onPageUnloadDisablePollingBlocks = (e: BeforeUnloadEvent) => {
+    // push UI closed event if clean up
+    eventBus.emit(EVENTS.broadcastToBackground, {
+      method: 'UI_STATUS',
+      data: false,
+    });
+  };
 
   useEffect(() => {
     // only for the beginning of this hook
@@ -53,6 +65,14 @@ export function BackgroundDataSyncMiddleware() {
         )
       );
     };
+    const onCurrentBlockStore = (s: {
+      currentBlockGasLimit: string;
+      gasFeeEstimates: any;
+      isBaseFeePerGasExist: boolean;
+    }) => {
+      dispatch(setCurrentGasLimit(s.currentBlockGasLimit));
+      dispatch(setGasFeeEstimates(s.gasFeeEstimates));
+    };
     eventBus.addEventListener(
       'dataSyncService.transactionHistory',
       onTxServiceBackgroundMessage
@@ -71,6 +91,10 @@ export function BackgroundDataSyncMiddleware() {
       'dataSyncService.customNetworksStore',
       onCustomNetworksStore
     );
+    eventBus.addEventListener(
+      'dataSyncService.latestBlockData',
+      onCurrentBlockStore
+    );
 
     fetchStorageDataFromBackground('transactionHistory');
     fetchStorageDataFromBackground('tokenStore');
@@ -78,6 +102,17 @@ export function BackgroundDataSyncMiddleware() {
     fetchStorageDataFromBackground('preference');
     fetchStorageDataFromBackground('networkStore');
     fetchStorageDataFromBackground('customNetworksStore');
+    fetchStorageDataFromBackground('latestBlockData');
+
+    /**
+     * For Lastest Block Datahub Service use
+     * not fetching data if page are closed
+     */
+    eventBus.emit(EVENTS.broadcastToBackground, {
+      method: 'UI_STATUS',
+      data: true,
+    });
+    window.addEventListener('beforeunload', onPageUnloadDisablePollingBlocks);
 
     return () => {
       eventBus.removeEventListener(
@@ -103,6 +138,15 @@ export function BackgroundDataSyncMiddleware() {
       eventBus.removeEventListener(
         'dataSyncService.customNetworksStore',
         onCustomNetworksStore
+      );
+      eventBus.removeEventListener(
+        'dataSyncService.latestBlockData',
+        onCurrentBlockStore
+      );
+
+      window.removeEventListener(
+        'beforeunload',
+        onPageUnloadDisablePollingBlocks
       );
     };
   }, []);

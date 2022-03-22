@@ -3,6 +3,7 @@ import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
 import { BigNumber } from 'ethers';
 import {
   CoinType,
+  Ecosystem,
   Network,
   NetworkBg2UIMessage,
   NetworkController,
@@ -13,7 +14,7 @@ import BitError from 'error';
 import { providerFromEngine } from 'eth-json-rpc-middleware';
 import { ethers } from 'ethers';
 import Eth from 'ethjs';
-import { sessionService } from '../index';
+import { sessionService, TokenService } from '../index';
 import { ObservableStorage } from '../../utils/obsStorage';
 import EventEmitter from 'events';
 import log from 'loglevel';
@@ -50,7 +51,7 @@ import { ComposedStore, ObservableStore } from '@metamask/obs-store';
 import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
 
-let defaultProviderConfigOpts = defaultNetworks['mainnet'] as Provider;
+let defaultProviderConfigOpts = defaultNetworks['ethereum'] as Provider;
 if (process.env.IN_TEST === 'true') {
   defaultProviderConfigOpts = defaultNetworks['rinkeby'] as Provider;
 }
@@ -107,15 +108,17 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore = new ObservableStore<Record<number, Network>>({
       0: {
         id: nanoid(),
-        nickname: 'localhost:8545',
-        rpcUrl: 'http://localhost:8545',
-        rpcPrefs: {},
-        chainId: '0x539',
-        ticker: 'ETH',
-        category: 'ETH',
-        isEthereumCompatible: true,
+        nickname: 'Teleport Testnet',
+        rpcUrl: 'https://evm-rpc.testnet.teleport.network',
+        rpcPrefs: {
+          blockExplorerUrl: 'https://evm-explorer.testnet.teleport.network',
+        },
+        chainId: '0x1f41',
+        ticker: 'TELE',
         chainName: 'ETH',
         coinType: CoinType.ETH,
+        ecosystem: Ecosystem.EVM,
+        prefix: '0x',
       },
     });
     this.networkStore = new ObservableStore<NetworkController>({
@@ -146,6 +149,51 @@ class NetworkPreferenceService extends EventEmitter {
       );
     });
     this.on(NETWORK_EVENTS.NETWORK_DID_CHANGE, this.lookupNetwork);
+
+    setTimeout(this._customNetworkStoreMigration.bind(this), 5 * 1000);
+  }
+
+  /**
+   * @todo: remove this in next release
+   */
+  private _customNetworkStoreMigration() {
+    console.debug('_customNetworkStoreMigration start');
+    const { customNetworks } = this._store.getState();
+    let isLocalhostNetworkFound = false;
+    Object.keys(customNetworks).forEach((key) => {
+      if (customNetworks[key].nickname === 'localhost:8545') {
+        isLocalhostNetworkFound = true;
+        customNetworks[key] = {
+          id: nanoid(),
+          nickname: 'Teleport Testnet',
+          rpcUrl: 'https://evm-rpc.testnet.teleport.network',
+          rpcPrefs: {
+            blockExplorerUrl: 'https://evm-explorer.testnet.teleport.network',
+          },
+          chainId: '0x1f41',
+          ticker: 'TELE',
+          chainName: 'ETH',
+          coinType: CoinType.ETH,
+          ecosystem: Ecosystem.EVM,
+          prefix: '0x',
+        };
+        TokenService.addCustomToken({
+          symbol: 'TELE',
+          name: 'TELE',
+          decimal: 18,
+          chainCustomId: customNetworks[key].id,
+          isNative: true,
+        });
+      }
+    });
+    if (isLocalhostNetworkFound) {
+      this._store.updateState({
+        customNetworks,
+      });
+      console.debug('_customNetworkStoreMigration end', customNetworks);
+    } else {
+      console.debug('No more migration');
+    }
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
@@ -159,12 +207,12 @@ class NetworkPreferenceService extends EventEmitter {
     nickname: string,
     rpcUrl: string,
     chainId: string,
-    category: string,
     ticker?: string,
     blockExplorerUrl?: string,
-    isEthereumCompatible = true,
     coinType = CoinType.ETH,
-    chainName = 'ETH'
+    chainName = 'ETH',
+    ecosystem = Ecosystem.EVM,
+    prefix = '0x'
   ) {
     this.checkIsCustomNetworkNameLegit(nickname);
     const network: Network = {
@@ -175,12 +223,11 @@ class NetworkPreferenceService extends EventEmitter {
       },
       rpcUrl,
       chainId: BigNumber.from(chainId).toHexString(),
-      category,
-      // @todo: make this customizable in the future
-      isEthereumCompatible,
       coinType,
       chainName,
       ticker,
+      ecosystem,
+      prefix,
     };
     this.customNetworksStore.updateState([
       ...this.getCustomNetworks(),
@@ -235,45 +282,17 @@ class NetworkPreferenceService extends EventEmitter {
 
   async markCurrentNetworkEIPStatus(name: string, isEnabled: boolean) {
     const { networkDetails } = this.networkStore.getState();
+    if (networkDetails.EIPS[name] === isEnabled) {
+      /**
+       * avoid useless data push of `ObservableStore`
+       * only change the state if they are not equal
+       */
+      return;
+    }
     networkDetails.EIPS[name] = isEnabled;
     this.networkStore.updateState({
       networkDetails,
     });
-  }
-
-  async update1559ImplForCurrentProvider() {
-    // current provider's chainId
-    const { chainId } = this.getProviderConfig();
-
-    // first we query the cache and see
-    if (this.isChainEnable1559(chainId)) {
-      // hit cache, just set and end
-      // this.store.networkController.networkDetails.EIPS['1559'] = true;
-      this.markCurrentNetworkEIPStatus('1559', true);
-      return;
-    }
-
-    const { rpcUrl } = this.networkStore.getState().provider;
-    const isNowEIP1559Impled = await this.checkNetworkIs1559Impled(rpcUrl);
-    // we only cache enabled networks
-    if (isNowEIP1559Impled) this.cacheChainEnable1559(chainId);
-
-    // we re-check to avoid race condition
-    const { chainId: chainIdNow } = this.getProviderConfig();
-    if (chainIdNow !== chainId) {
-      // if not match, that means provider was changed when we fetching the block
-      // in this case that we will rerun the query
-      console.debug('another chainId detected, rerunning');
-      return this.update1559ImplForCurrentProvider();
-    }
-    const { EIPS } = this.networkStore.getState().networkDetails;
-    /**
-     * Avoid unnecessary update, only update if value updated
-     */
-    if (isNowEIP1559Impled !== EIPS[1559]) {
-      // if it changed, then update
-      this.markCurrentNetworkEIPStatus('1559', isNowEIP1559Impled);
-    }
   }
 
   /**
@@ -421,7 +440,8 @@ class NetworkPreferenceService extends EventEmitter {
     const isInfura = INFURA_PROVIDER_TYPES.includes(type);
 
     if (isInfura) {
-      this._checkInfuraAvailability(type);
+      const _tmpInfuraType = type === 'ethereum' ? 'mainnet' : type;
+      this._checkInfuraAvailability(_tmpInfuraType);
     } else {
       this.emit(NETWORK_EVENTS.INFURA_IS_UNBLOCKED);
     }
@@ -448,71 +468,68 @@ class NetworkPreferenceService extends EventEmitter {
     return NETWORK_TYPE_TO_ID_MAP[type]?.chainId || configChainId;
   }
 
-  /**
-   * @deprecated, use setProviderConfig will do
-   * @param id
-   * @param rpcUrl
-   * @param chainId
-   * @param ticker
-   * @param nickname
-   * @param rpcPrefs
-   */
-  setRpcTarget(
-    id: string,
-    rpcUrl: string,
-    chainId: string,
-    ticker = 'ETH',
-    nickname = '',
-    rpcPrefs: { blockExplorerUrl?: string } = {}
-  ) {
-    assert.ok(
-      isPrefixedFormattedHexString(chainId),
-      `Invalid chain ID "${chainId}": invalid hex string.`
-    );
-    assert.ok(
-      isSafeChainId(parseInt(chainId, 16)),
-      `Invalid chain ID "${chainId}": numerical value greater than max safe value.`
-    );
-    this.setProviderConfig({
-      id,
-      type: NETWORK_TYPE_RPC,
-      rpcUrl,
-      chainId,
-      ticker,
-      nickname,
-      rpcPrefs,
-      category: 'OTHERS',
-      coinType: CoinType.ETH,
-      isEthereumCompatible: false,
-      chainName: 'ETH',
-    });
-  }
+  // /**
+  //  * @deprecated, use setProviderConfig will do
+  //  * @param id
+  //  * @param rpcUrl
+  //  * @param chainId
+  //  * @param ticker
+  //  * @param nickname
+  //  * @param rpcPrefs
+  //  */
+  // setRpcTarget(
+  //   id: string,
+  //   rpcUrl: string,
+  //   chainId: string,
+  //   ticker = 'ETH',
+  //   nickname = '',
+  //   rpcPrefs: { blockExplorerUrl?: string } = {}
+  // ) {
+  //   assert.ok(
+  //     isPrefixedFormattedHexString(chainId),
+  //     `Invalid chain ID "${chainId}": invalid hex string.`
+  //   );
+  //   assert.ok(
+  //     isSafeChainId(parseInt(chainId, 16)),
+  //     `Invalid chain ID "${chainId}": numerical value greater than max safe value.`
+  //   );
+  //   this.setProviderConfig({
+  //     id,
+  //     type: NETWORK_TYPE_RPC,
+  //     rpcUrl,
+  //     chainId,
+  //     ticker,
+  //     nickname,
+  //     rpcPrefs,
+  //     coinType: CoinType.ETH,
+  //     chainName: 'ETH',
+  //   });
+  // }
 
-  async setProviderType(type: Provider['type']) {
-    assert.notStrictEqual(
-      type,
-      NETWORK_TYPE_RPC,
-      `NetworkController - cannot call "setProviderType" with type "${NETWORK_TYPE_RPC}". Use "setRpcTarget"`
-    );
-    assert.ok(
-      INFURA_PROVIDER_TYPES.includes(type),
-      `Unknown Infura provider type "${type}".`
-    );
-    const { chainId } = NETWORK_TYPE_TO_ID_MAP[type];
-    this.setProviderConfig({
-      type,
-      id: type,
-      rpcUrl: '',
-      chainId,
-      ticker: 'ETH',
-      nickname: '',
-      rpcPrefs: {},
-      category: 'OTHERS',
-      coinType: CoinType.ETH,
-      isEthereumCompatible: false,
-      chainName: 'ETH',
-    });
-  }
+  // async setProviderType(type: Provider['type']) {
+  //   assert.notStrictEqual(
+  //     type,
+  //     NETWORK_TYPE_RPC,
+  //     `NetworkController - cannot call "setProviderType" with type "${NETWORK_TYPE_RPC}". Use "setRpcTarget"`
+  //   );
+  //   assert.ok(
+  //     INFURA_PROVIDER_TYPES.includes(type),
+  //     `Unknown Infura provider type "${type}".`
+  //   );
+  //   const { chainId } = NETWORK_TYPE_TO_ID_MAP[type];
+  //   this.setProviderConfig({
+  //     type,
+  //     id: type,
+  //     rpcUrl: '',
+  //     chainId,
+  //     ticker: 'ETH',
+  //     nickname: '',
+  //     rpcPrefs: {},
+  //     category: 'OTHERS',
+  //     coinType: CoinType.ETH,
+  //     chainName: 'ETH',
+  //   });
+  // }
 
   resetConnection() {
     this.setProviderConfig(this.getProviderConfig());
@@ -624,7 +641,7 @@ class NetworkPreferenceService extends EventEmitter {
         }
       }
     } catch (err) {
-      log.warn('MetaMask - Infura availability check failed', err);
+      log.warn('TeleportWallet - Infura availability check failed', err);
     }
   }
 
@@ -647,11 +664,6 @@ class NetworkPreferenceService extends EventEmitter {
       chain: opts.chainId,
       networkVersion: opts.chainId,
     });
-
-    /**
-     * After provider was changed, we must check it is 1559 implemented.
-     */
-    this.update1559ImplForCurrentProvider();
   }
 
   private _configureProvider({
@@ -675,8 +687,9 @@ class NetworkPreferenceService extends EventEmitter {
 
   private _configureInfuraProvider(type, projectId: string) {
     log.info('NetworkController - configureInfuraProvider', type);
+    const _tmpInfuraType = type === 'ethereum' ? 'mainnet' : type;
     const networkClient = createInfuraClient({
-      network: type,
+      network: _tmpInfuraType,
       projectId,
     });
     this._setNetworkClient(networkClient);

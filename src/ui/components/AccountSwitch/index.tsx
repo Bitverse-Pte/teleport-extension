@@ -131,10 +131,11 @@ const AccountSwitch: React.FC<AccountSwitchProps> = (
         <CustomTab
           tab1="ID Wallet"
           tab2="Normal Wallet"
+          currentTab={accountCreateType}
           handleTabClick={handleTabClick}
         />
       </div>
-      <div className="content flex">
+      <div className="content flexR">
         <div
           className="side-bar flexCol"
           style={{
@@ -145,7 +146,7 @@ const AccountSwitch: React.FC<AccountSwitchProps> = (
             (a: Object.Merge<HdAccountStruct, { selected?: boolean }>, i) => {
               return (
                 <span
-                  className={clsx('flex id-item', {
+                  className={clsx('flexR id-item', {
                     'active-item': a.selected,
                   })}
                   style={{ background: WALLET_THEME_COLOR[i % 5] }}
@@ -186,7 +187,7 @@ const AccountSwitch: React.FC<AccountSwitchProps> = (
                 (a: Object.Merge<BaseAccount, { selected?: boolean }>) => {
                   return (
                     <div
-                      className="account-item flex"
+                      className="account-item flexR"
                       onClick={() => {
                         if (props.handleAccountClick) {
                           props.handleAccountClick(a);
@@ -194,7 +195,7 @@ const AccountSwitch: React.FC<AccountSwitchProps> = (
                       }}
                       key={a.address}
                     >
-                      <div className="account-left flex">
+                      <div className="account-left flexR">
                         <Jazzicon
                           diameter={30}
                           seed={Number(a?.address?.substr(0, 8) || 0)}

@@ -1,9 +1,13 @@
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { CoinType, NetworkController, Provider } from 'types/network';
 import React, { useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useInterval } from 'react-use';
 import { useWallet } from '../utils';
+import {
+  hideLoadingIndicator,
+  showLoadingIndicator,
+} from 'ui/reducer/appState.reducer';
 
 /**
  * Design was based on MetaMask
@@ -39,7 +43,6 @@ export const NetworkProviderContext = React.createContext<{
     nickname: string,
     rpcUrl: string,
     chainId: string,
-    category: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => Promise<any>;
@@ -48,7 +51,6 @@ export const NetworkProviderContext = React.createContext<{
     newNickname: string,
     rpcUrl: string,
     chainId: string,
-    category: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => Promise<any>;
@@ -68,17 +70,11 @@ export function NetworkStoreProvider({
 }) {
   const wallet = useWallet();
 
+  const dispatch = useDispatch();
+
   const currentNetworkController = useSelector((state) => state.network);
 
   const customProviders = useSelector((state) => state.customNetworks);
-
-  useInterval(() => {
-    fetch1559ImplFromBackground();
-  }, 1000 * 60);
-
-  const fetch1559ImplFromBackground = useCallback(async () => {
-    await wallet._update1559ImplForCurrentProvider();
-  }, [wallet]);
 
   const getCustomProvider = useCallback(
     (matchedIdx: number) => {
@@ -89,7 +85,15 @@ export function NetworkStoreProvider({
 
   const useCustomProvider = useCallback(
     async (matchedIdx: number) => {
-      await wallet.useCustomNetwork(matchedIdx);
+      dispatch(showLoadingIndicator());
+      try {
+        await wallet.useCustomNetwork(matchedIdx);
+        await wallet.fetchLatestBlockDataNow();
+      } catch (error) {
+        console.error('useCustomProvider::error', error);
+      } finally {
+        dispatch(hideLoadingIndicator());
+      }
     },
     [wallet, customProviders]
   );
@@ -100,10 +104,8 @@ export function NetworkStoreProvider({
       newNickname: string,
       rpcUrl: string,
       chainId: string,
-      category: string,
       ticker?: string,
       blockExplorerUrl?: string,
-      isEthereumCompatible = true,
       coinType = CoinType.ETH
     ) => {
       await wallet.editCustomNetwork(
@@ -111,10 +113,8 @@ export function NetworkStoreProvider({
         newNickname,
         rpcUrl,
         chainId,
-        category,
         ticker,
         blockExplorerUrl,
-        isEthereumCompatible,
         coinType
       );
     },
@@ -123,7 +123,15 @@ export function NetworkStoreProvider({
 
   const usePresetProvider = useCallback(
     async (chain: string) => {
-      await wallet.useDefaultNetwork(chain);
+      dispatch(showLoadingIndicator());
+      try {
+        await wallet.useDefaultNetwork(chain);
+        await wallet.fetchLatestBlockDataNow();
+      } catch (error) {
+        console.error('usePresetProvider::error:', error);
+      } finally {
+        dispatch(hideLoadingIndicator());
+      }
     },
     [wallet]
   );
@@ -137,20 +145,16 @@ export function NetworkStoreProvider({
       nickname: string,
       rpcUrl: string,
       chainId: string,
-      category: string,
       ticker?: string,
       blockExplorerUrl?: string,
-      isEthereumCompatible = true,
       coinType = CoinType.ETH
     ) => {
       await wallet.addCustomNetwork(
         nickname,
         rpcUrl,
         chainId,
-        category,
         ticker,
         blockExplorerUrl,
-        isEthereumCompatible,
         coinType
       );
     },

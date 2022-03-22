@@ -63,7 +63,7 @@ export function denom2SymbolRatio(
   decimal: number | string
 ) {
   return new BigNumber(
-    new BigNumber(utils.formatUnits(number, decimal)).toFixed(2, 1)
+    new BigNumber(utils.formatUnits(number, decimal)).toFixed(4, 1)
   ).toFormat();
 }
 

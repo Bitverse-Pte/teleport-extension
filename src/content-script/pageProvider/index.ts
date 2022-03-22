@@ -7,13 +7,11 @@ import { domReadyCall, $ } from './utils';
 import ReadyPromise from './readyPromise';
 import DedupePromise from './dedupePromise';
 
-declare const channelName;
-
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
     console.log(
-      `%c [bit-os] (${new Date().toTimeString().substr(0, 8)}) ${event}`,
-      'font-weight: bold; background-color: #238520; color: white;',
+      `%c [teleport] (${new Date().toTimeString().substr(0, 8)}) ${event}`,
+      'font-weight: bold; background-color: #6AB5FF; color: white;',
       ...args
     );
   }
@@ -69,10 +67,11 @@ export class EthereumProvider extends EventEmitter {
     'eth_signTypedData_v3',
     'eth_signTypedData_v4',
   ]);
-  private _bcm = new BroadcastChannelMessage(channelName);
+  private _bcm: BroadcastChannelMessage;
 
-  constructor({ maxListeners = 100 } = {}) {
+  constructor({ channelName = '', maxListeners = 100 } = {}) {
     super();
+    this._bcm = new BroadcastChannelMessage(channelName);
     this.setMaxListeners(maxListeners);
     this.initialize();
     this.shimLegacy();
@@ -134,6 +133,7 @@ export class EthereumProvider extends EventEmitter {
   private _requestPromiseCheckVisibility = () => {
     if (document.visibilityState === 'visible') {
       this._requestPromise.check(1);
+      this._requestPromise.check(2);
     } else {
       this._requestPromise.uncheck(1);
     }
@@ -174,8 +174,8 @@ export class EthereumProvider extends EventEmitter {
           return res;
         })
         .catch((err) => {
-          log('[response: error]', data.method, serializeError(err));
-          throw serializeError(err);
+          log('[response: error]', data.method, err);
+          throw err;
         });
     });
   };
@@ -251,30 +251,40 @@ declare global {
   }
 }
 
-const provider = new EthereumProvider();
+// add INIT_PROVIDER event listener for init ethereum provider and inject to window
+window.addEventListener('message', function (event) {
+  // We only accept messages from ourselves
+  if (event.source != window) return;
 
-provider
-  .request({
-    method: 'isDefaultWallet',
-    params: [],
-  })
-  .then((isDefaultWallet) => {
-    if (isDefaultWallet) {
-      Object.defineProperty(window, 'ethereum', {
-        value: new Proxy(provider, {
-          deleteProperty: () => true,
-        }),
-        writable: false,
+  if (event.data.type && event.data.type == 'INIT_TELEPORT_PROVIDER') {
+    const channelName = event.data.channelName;
+    const provider = new EthereumProvider({ channelName });
+    provider
+      .request({
+        method: 'isDefaultWallet',
+        params: [],
+      })
+      .then((isDefaultWallet) => {
+        if (isDefaultWallet) {
+          Object.defineProperty(window, 'ethereum', {
+            value: new Proxy(provider, {
+              deleteProperty: () => true,
+            }),
+            writable: false,
+          });
+        }
       });
+
+    if (!window.ethereum) {
+      window.ethereum = new Proxy(provider, {
+        deleteProperty: () => true,
+      });
+
+      window.web3 = {
+        currentProvider: window.ethereum,
+      };
     }
-  });
 
-window.ethereum = new Proxy(provider, {
-  deleteProperty: () => true,
+    window.dispatchEvent(new Event('ethereum#initialized'));
+  }
 });
-
-window.web3 = {
-  currentProvider: window.ethereum,
-};
-
-window.dispatchEvent(new Event('ethereum#initialized'));

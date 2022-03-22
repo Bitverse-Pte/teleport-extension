@@ -10,6 +10,7 @@ import { CustomButton } from 'ui/components/Widgets';
 import './style.less';
 import { AccountHeader } from '../AccountRecover';
 import classnames from 'classnames';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 const MnemonicBackup = () => {
   const { t } = useTranslation();
@@ -55,6 +56,7 @@ const MnemonicBackup = () => {
   }, []);
 
   const handleSkinClick = () => {
+    if (checkDisabled) return;
     setSecond(0);
   };
   const handleCopyClick = () => {
@@ -138,7 +140,7 @@ const MnemonicBackup = () => {
         <CopyToClipboard
           text={mnemonic}
           onCopy={() => {
-            message.success('Copied');
+            ClickToCloseMessage.success('Copied');
           }}
         >
           <CustomButton

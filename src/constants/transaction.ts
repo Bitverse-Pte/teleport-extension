@@ -147,7 +147,7 @@ export interface TxParams {
 
   data?: HexString;
   from: HexString;
-  gas: HexString;
+  gas?: HexString;
   gasPrice?: HexString;
   estimateSuggested?: string;
   estimateUsed?: string;
@@ -192,7 +192,7 @@ export interface Transaction {
   hash: HexString;
   history: any[];
   // maybe nanoid?
-  id: string | number;
+  id: string;
   loadingDefaults: boolean;
   metamaskNetworkId: string;
   nonceDetails: {
@@ -284,8 +284,8 @@ interface IncomingTransactionsController {
 
 // Store these two items, one is Outgoing (initiated by the user), and the other is incoming (initiated by others, such as ETH transfer)
 export interface TransactionHistoryStore {
-  outgoingTransactions: TransactionController;
-  incomingTransactionsController: IncomingTransactionsController;
+  // outgoingTransactions: TransactionController;
+  // incomingTransactionsController: IncomingTransactionsController;
   transactions: Record<string, Transaction>;
 }
 
