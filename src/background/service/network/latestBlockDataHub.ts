@@ -6,7 +6,7 @@ import {
 } from '@metamask/controllers';
 import { ObservableStore } from '@metamask/obs-store';
 import { PollingBlockTracker } from 'eth-block-tracker';
-import { ethers } from 'ethers';
+import { BigNumber, BigNumberish, ethers } from 'ethers';
 import eventBus from 'eventBus';
 
 type BlockData = {
@@ -26,6 +26,11 @@ type BlockData = {
    * Indicate a EVM chain is implemented EIP1559 or not
    */
   isBaseFeePerGasExist: boolean;
+
+  /**
+   * In order to diff
+   */
+  currentChainId?: number;
 };
 
 type NetworkProviderStore = ObservableStore<{
@@ -54,6 +59,7 @@ export class LatestBlockDataHubService {
       currentBlockGasLimit: '',
       gasFeeEstimates: {},
       isBaseFeePerGasExist: false,
+      currentChainId: undefined,
     });
 
     this._blockTracker = opts.blockTracker;
@@ -85,6 +91,10 @@ export class LatestBlockDataHubService {
     }
   }
 
+  fetchLatestBlockNow() {
+    return this.updateForBlock('latest');
+  }
+
   /**
    * Given a block, updates this AccountTracker's currentBlockGasLimit
    *
@@ -101,7 +111,12 @@ export class LatestBlockDataHubService {
     }
     this.currentBlockNumber = blockNumber;
     const p = new ethers.providers.JsonRpcProvider(this.rpcUrl);
-    const currentBlock = await p.getBlock(blockNumber);
+    // const currentBlock = await p.getBlock(blockNumber);
+    // const { chainId } = await p.getNetwork();
+    const [currentBlock, { chainId }] = await Promise.all([
+      p.getBlock(blockNumber),
+      p.getNetwork(),
+    ]);
     /**
      * not update if block are null
      */
@@ -119,6 +134,7 @@ export class LatestBlockDataHubService {
       currentBlockGasLimit,
       gasFeeEstimates,
       isBaseFeePerGasExist,
+      currentChainId: chainId,
     });
     console.debug(
       `LatestBlockDataHubService::updateForBlock: executed for block ${blockNumber} for RPC ${this.rpcUrl}`
