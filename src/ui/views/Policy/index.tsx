@@ -351,7 +351,7 @@ const Policy = () => {
           liability whatsoever under the following circumstances:
         </p>
         <p className="policy-level-three">
-          5.4.1. your death or becoming legally incapacitated;
+          5.4.1.your death or becoming legally incapacitated;
         </p>
         <p className="policy-level-three">
           5.4.2. if you steal others’ wallets information or mobile devices,
@@ -374,7 +374,7 @@ const Policy = () => {
         </p>
         <p className="policy-level-one">6.WARRANTIES AND REPRESENTATIONS</p>
         <p className="policy-level-two">
-          6.1. By using the Services, you represent and warrant that:
+          6.1. 6.1.By using the Services, you represent and warrant that:
         </p>
         <p className="policy-level-three">
           6.1.1. You have the legal capacity to accept and enter into these
@@ -676,7 +676,7 @@ const Policy = () => {
           investment loss, data loss etc. during your access of the Site and use
           of the Services.
         </p>
-        <p className="policy-level-one">10.LIMITATION OF LIABILITY</p>
+        <p className="policy-level-one">10. LIMITATION OF LIABILITY</p>
         <p className="policy-level-two">
           10.1. TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
           COMPANY (OR OUR SUPPLIERS) BE LIABLE TO YOU OR ANY THIRD PARTY FOR ANY
@@ -704,7 +704,7 @@ const Policy = () => {
           LIABILITY FOR INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THE ABOVE
           LIMITATION OR EXCLUSION MAY NOT APPLY TO YOU.
         </p>
-        <p className="policy-level-one">11.INDEMNIFICATION</p>
+        <p className="policy-level-one">11. INDEMNIFICATION</p>
         <p className="policy-level-two">
           11.1. If we discover or receive a report or complains from another
           person that you have violated the terms of this Agreement, we reserve
@@ -740,17 +740,9 @@ const Policy = () => {
         </p>
         <p className="policy-level-two">
           12.2. Governing Law and Dispute Resolution. These Terms shall be
-          governed by and construed in accordance with the laws of Hong Kong.
-          Any dispute, controversy, difference or claim arising out of or
-          relating to this Agreement, including the existence, validity,
-          interpretation, performance, breach or termination thereof or any
-          dispute regarding non- contractual obligations arising out of or
-          relating to it shall be referred to and finally resolved by
-          arbitration administered by the Hong Kong International Arbitration
-          Centre (HKIAC) under the HKIAC Administered Arbitration Rules in force
-          when the Notice of Arbitration is submitted. The seat of arbitration
-          shall be Hong Kong, and the number of arbitrators shall be one. The
-          arbitration proceedings shall be conducted in English.
+          governed by and construed in accordance with the laws of St. Vincent
+          and the Grenadines. The parties agree to submit to the exclusive
+          jurisdiction of the courts of St. Vincent and the Grenadines.
         </p>
         <p className="policy-level-two">
           12.3. Electronic Communications. The communications between you and
@@ -1092,7 +1084,7 @@ const Policy = () => {
           3.7. You can generally activate or later deactivate the use of cookies
           through a functionality built into your web browser or mobile device.
         </p>
-        <p className="policy-level-one">4.Local Storage</p>
+        <p className="policy-level-one">4. Local Storage</p>
         <p className="policy-level-two">
           4.1. Local storage, including Javascript-enabled localStorage, is a
           typical way for a website to store a small file of letters and numbers
@@ -1105,7 +1097,7 @@ const Policy = () => {
         <p className="policy-level-two">
           4.2. You can clear local storage files from your browser.
         </p>
-        <p className="policy-level-one">5.General Processing</p>
+        <p className="policy-level-one">5. General Processing</p>
         <p className="policy-level-two">
           5.1. Our processing means any operation or set of operations which is
           performed on personal information, such as collection, recording,
