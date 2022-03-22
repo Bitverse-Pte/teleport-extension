@@ -396,7 +396,9 @@ export const initializeSendState = createAsyncThunk(
       });
       gasLimit = estimatedGasLimit;
     } catch (error) {
-      console.error('estimateGasLimitForSend failed, this tx will probably not success');
+      console.error(
+        'estimateGasLimitForSend failed, this tx will probably not success'
+      );
     }
     return {
       address: null,
