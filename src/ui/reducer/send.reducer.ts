@@ -381,18 +381,23 @@ export const initializeSendState = createAsyncThunk(
     }
     console.log('===========[gasPrice]=============', gasPrice);
     // Set a basic gasLimit in the event that other estimation fails
-    const estimatedGasLimit = await estimateGasLimitForSend({
-      gasPrice,
-      blockGasLimit: getCurrentBlockGasLimit(state),
-      selectedAddress: preference.currentAccount?.address,
-      sendToken: asset.details,
-      to: '0x8920df9c52b63d81efb8edea8173481b73a6d66c',
-      value: amount.value,
-      data: draftTransaction.userInputHexData,
-      isNonStandardEthChain,
-      chainId,
-    });
-    const gasLimit = estimatedGasLimit || GAS_LIMITS.SIMPLE;
+    let gasLimit = GAS_LIMITS.SIMPLE;
+    try {
+      const estimatedGasLimit = await estimateGasLimitForSend({
+        gasPrice,
+        blockGasLimit: getCurrentBlockGasLimit(state),
+        selectedAddress: preference.currentAccount?.address,
+        sendToken: asset.details,
+        to: '0x8920df9c52b63d81efb8edea8173481b73a6d66c',
+        value: amount.value,
+        data: draftTransaction.userInputHexData,
+        isNonStandardEthChain,
+        chainId,
+      });
+      gasLimit = estimatedGasLimit;
+    } catch (error) {
+      console.error('estimateGasLimitForSend failed, this tx will probably not success');
+    }
     return {
       address: null,
       nativeBalance: '0x0',
