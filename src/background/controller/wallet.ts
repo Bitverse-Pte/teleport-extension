@@ -11,6 +11,7 @@ import {
   gasFeeController,
   knownMethodService,
   contactBookService,
+  latestBlockDataHub,
 } from 'background/service';
 import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
@@ -30,6 +31,7 @@ import { CoinType, Provider } from 'types/network';
 import { AddTokenOpts, Token } from 'types/token';
 import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
+import { BigNumberish } from 'ethers';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -471,6 +473,9 @@ export class WalletController extends BaseController {
   addContact = (data: ContactBookItem) => {
     contactBookService.addContact(data);
   };
+  fetchLatestBlockDataNow() {
+    return latestBlockDataHub.fetchLatestBlockNow();
+  }
   addContactByDefaultName = (address) => {
     contactBookService.addContactByDefaultName(address);
   };

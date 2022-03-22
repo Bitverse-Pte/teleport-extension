@@ -20,7 +20,7 @@ const GeneralHeader = ({
 }: {
   onXButtonClick?: React.MouseEventHandler;
   hideLogo?: boolean;
-  title?: string;
+  title?: React.ReactNode;
   extCls?: string;
 }) => {
   const history = useHistory();
@@ -29,7 +29,11 @@ const GeneralHeader = ({
   return (
     <div className={clsx('flex headerOfMenu justify-end items-center', extCls)}>
       {!hideLogo && <img src={walletLogo} className="header-logo" />}
-      <span className={hideLogo ? 'nologo-title' : 'title'}>{title}</span>
+      {typeof title === 'string' ? (
+        <span className={hideLogo ? 'nologo-title' : 'title'}>{title}</span>
+      ) : (
+        title
+      )}
       <Button
         type="text"
         className="closeWindowBtn"

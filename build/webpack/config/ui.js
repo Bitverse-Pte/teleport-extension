@@ -17,10 +17,10 @@ const isProduction = !(process.env.NODE_ENV === 'DEV');
  * For better software version control
  * Feel free to disable if you do not have git
  */
-const theLatestCommitHash = require('child_process')
- .execSync('git rev-parse --short HEAD')
- .toString()
- .trim();
+// const theLatestCommitHash = require('child_process')
+//  .execSync('git rev-parse --short HEAD')
+//  .toString()
+//  .trim();
 
 const config = {
   watchOptions: {
@@ -250,7 +250,7 @@ const config = {
       }),
       new webpack.DefinePlugin({
         'process.env.version': JSON.stringify(
-          `${version} - ${theLatestCommitHash}`
+          `${version}`
         ),
       }),
     ]

@@ -18,6 +18,8 @@ import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
 import { IconComponent } from 'ui/components/IconComponents';
 import { NetworkSelectionItem } from 'ui/components/Network/NetworkSelection/NetworkSelectionItem.component';
+import { BetaIcon } from 'ui/components/Widgets';
+import { ReactComponent as TLPText } from 'assets/teleportText.svg';
 
 const ChainCategoryIcon = ({ src = DefaulutIcon }: { src?: string }) => (
   <img
@@ -103,7 +105,15 @@ const NetworksSelectionContainer = () => {
 
   return (
     <div className="flexCol network-page-container">
-      <GeneralHeader title="Teleport Wallet" extCls="network-list-header" />
+      <GeneralHeader
+        title={
+          <span className="title flex">
+            <TLPText style={{ marginRight: 4 }} />
+            <BetaIcon />
+          </span>
+        }
+        extCls="network-list-header"
+      />
       <div className="networkList">
         {Object.keys(networkList).map((key) => {
           const currentCategory = networkList[key];
