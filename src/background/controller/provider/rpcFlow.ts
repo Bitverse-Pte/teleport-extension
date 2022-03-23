@@ -1,17 +1,16 @@
 import { ethErrors } from 'eth-rpc-errors';
 import {
   keyringService,
+  networkPreferenceService,
   notificationService,
   permissionService,
   preferenceService,
-  txController,
 } from 'background/service';
 import { PromiseFlow, underline2Camelcase } from 'background/utils';
 import { EVENTS } from 'constants/index';
 import providerController from './controller';
 import eventBus from 'eventBus';
-import { cloneDeep } from 'lodash';
-import { getCurrentSelectedAccount } from 'ui/selectors/selectors';
+import { TransactionEnvelopeTypes } from 'constants/transaction';
 
 const isSignApproval = (type: string) => {
   const SIGN_APPROVALS = ['SignText', 'SignTypedData', 'SignTx'];
@@ -99,11 +98,17 @@ const flowContext = flow
       // fix the request param from dapp, should compatiable with send from app.
       if (approvalType === 'SignTx' && !params[0].txParam) {
         params[0].txParam = {
-          from: params.from,
-          to: params.to,
-          value: params.value,
-          type: params.type,
+          from: params[0].from,
+          to: params[0].to,
+          value: params[0].value,
+          type: params[0].type,
         };
+        if (!params[0].type) {
+          params[0].type =
+            (await networkPreferenceService.getEIP1559Compatibility())
+              ? TransactionEnvelopeTypes.FEE_MARKET
+              : TransactionEnvelopeTypes.LEGACY;
+        }
       }
       ctx.approvalRes = await notificationService.requestApproval({
         approvalComponent: approvalType,

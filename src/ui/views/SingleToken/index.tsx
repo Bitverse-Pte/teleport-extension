@@ -51,7 +51,6 @@ const SingleToken = () => {
   const updateAccount = async () => {
     const account: BaseAccount | undefined = await wallet.getCurrentAccount();
     if (account) setAccount(account);
-    console.log('account', account);
   };
   useAsyncEffect(updateAccount, []);
   useAsyncEffect(getTokenBalanceAsync, []);

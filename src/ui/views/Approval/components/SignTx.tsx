@@ -95,7 +95,7 @@ const normalizeTxParams = (tx) => {
 };
 
 const valueToDisplay = (tx) => {
-  if ((tx.value === '0x' || tx.value === '0x0') && tx.txParam) {
+  if ((tx.value === '0x' || tx.value === '0x0') && tx.txParam.value) {
     return tx.txParam.value;
   }
   return tx.value;
@@ -122,11 +122,10 @@ const SignTx = ({ params, origin }) => {
   const [gasPrice, setGasPrice] = useState<string>(tx.gasPrice);
 
   const [totalGasfee, setTotalGasFee] = useState<string>('0x0');
-  const [currency, setCurrency] = useState('ETH');
 
   const initState = async () => {
     const gas = await wallet.fetchGasFeeEstimates();
-    console.log('signTx fetchGasFeeEstimates: ', gas);
+    console.debug('signTx fetchGasFeeEstimates: ', gas);
     const { gasFeeEstimates, gasEstimateType } = gas;
     //const MIN_GAS_LIMIT_HEX = '0x5208';
     if (tx.type === '0x0') {
@@ -141,7 +140,10 @@ const SignTx = ({ params, origin }) => {
           : '0x0';
       }
       setGasPrice(tx.gasPrice || gasPrice);
-      const total = multipyHexes(gasPrice, MIN_GAS_LIMIT_HEX).toString();
+      const total = multipyHexes(
+        gasPrice,
+        tx.gas || MIN_GAS_LIMIT_HEX
+      ).toString();
       setTotalGasFee(addHexPrefix(total));
     } else {
       const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
@@ -153,14 +155,12 @@ const SignTx = ({ params, origin }) => {
         addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
       );
       const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
-      const total = multipyHexes(a, MIN_GAS_LIMIT_HEX).toString();
+      const total = multipyHexes(a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
       setTotalGasFee(addHexPrefix(total));
     }
-    const currency = await wallet.getCurrentCurrency();
-    setCurrency(currency);
   };
 
-  useAsyncEffect(initState, [gasState, maxFeePerGas, maxPriorityFeePerGas]);
+  useAsyncEffect(initState, [gasState.gasType]);
 
   const handleAllow = async () => {
     dispatch(showLoadingIndicator());
@@ -208,7 +208,9 @@ const SignTx = ({ params, origin }) => {
   }, [tokens, prices]);
 
   const txToken = useMemo(() => {
-    const txToken = tokens.find((t: Token) => t.symbol === tx.txParam.symbol);
+    const txToken = tx.txParam.symbol
+      ? tokens.find((t: Token) => t.symbol === tx.txParam.symbol)
+      : nativeToken;
     return txToken;
   }, [tokens, prices]);
 
@@ -234,7 +236,7 @@ const SignTx = ({ params, origin }) => {
                 nativeToken={nativeToken}
                 setVisible={setVisible}
                 totalGasfee={totalGasfee}
-                currency={currency}
+                currency={nativeToken?.symbol}
               />
             </TabPane>
             <TabPane tab={t('DATA')} key="2">
@@ -251,7 +253,7 @@ const SignTx = ({ params, origin }) => {
           nativeToken={nativeToken}
           setVisible={setVisible}
           totalGasfee={totalGasfee}
-          currency={currency}
+          currency={nativeToken?.symbol}
         />
       </div>
     );
@@ -407,9 +409,6 @@ const TxSummaryComponent = ({ action, value, token, origin }) => {
       <div className="tx-summary-origin">
         {origin === 'https://teleport.network' ? null : <div>{origin}</div>}
       </div>
-      {/* <div className="tx-summary-action">
-        {action === 'eth_sendTransaction' ? 'Transfer' : action}
-      </div> */}
       <div className="tx-summary-currency">
         <UserPreferencedCurrencyDisplay value={value} token={token} />
       </div>

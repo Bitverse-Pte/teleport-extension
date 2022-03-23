@@ -70,7 +70,7 @@ const Send = () => {
     (state) => state.send.draftTransaction.txParams
   );
   const isSupport1559 = useSelector((state) => state.send.eip1559support);
-  console.log('isSupport1559: ', isSupport1559);
+  console.debug('isSupport1559: ', isSupport1559);
 
   const cleanup = useCallback(() => {
     dispatch(resetSendState());
@@ -108,7 +108,6 @@ const Send = () => {
 
   useAsyncEffect(async () => {
     const list = await wallet.listContact();
-    console.log(list);
     const recentAddress = list.map((item) => {
       return item.address;
     });
@@ -136,7 +135,7 @@ const Send = () => {
       : TransactionEnvelopeTypes.LEGACY;
     const params: Record<string, any> = {
       from: fromAccount?.address,
-      value: '0x0',
+      value: TransactionEnvelopeTypes.LEGACY,
       isSend: true,
       type: type,
     };
@@ -281,7 +280,6 @@ const Send = () => {
           value={amount}
           stringMode
           onChange={(v: string) => {
-            console.log(selectedToken?.decimal);
             setAmount(v);
           }}
         />

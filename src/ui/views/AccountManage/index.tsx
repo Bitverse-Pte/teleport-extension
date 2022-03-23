@@ -64,7 +64,6 @@ const AccountManage: React.FC = () => {
       onSuccess: () => {
         setAddPopupVisible(false);
         queryAccounts();
-        console.log(accountManageWidgetRef.current);
         (accountManageWidgetRef.current as any).queryAccounts();
       },
       onError: (e) => {
