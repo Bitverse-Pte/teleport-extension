@@ -254,21 +254,6 @@ class NetworkPreferenceService extends EventEmitter {
     return networks;
   }
 
-  async checkNetworkIs1559Impled(rpcUrl: string): Promise<boolean> {
-    try {
-      const p = new ethers.providers.JsonRpcProvider(rpcUrl);
-      const data = await p.getBlock('latest');
-      // even it's 0, it's a BigNumber '0', so just use boolean
-      // null / undefined will be false
-      const isBaseFeePerGasExist = Boolean(data.baseFeePerGas);
-      return isBaseFeePerGasExist;
-    } catch (error) {
-      console.error('Error happened when fetchBlockAndSeeIf1559Impled:', error);
-      // set it to false by default (legacy mode) if request failed
-      return false;
-    }
-  }
-
   isChainEnable1559(chainId: string): boolean {
     const cache = this.impl1559Status.getState();
     return cache[chainId] === true;
@@ -358,14 +343,14 @@ class NetworkPreferenceService extends EventEmitter {
    */
   async getEIP1559Compatibility(): Promise<boolean> {
     const { EIPS } = this.networkStore.getState().networkDetails;
-    if (EIPS[1559]) {
+    if (EIPS[1559] !== undefined) {
       // only return directly if true, otherwise query
       return EIPS[1559];
     }
 
-    const supportsEIP1559 = await this.checkNetworkIs1559Impled(
-      this.networkStore.getState().provider.rpcUrl
-    );
+    const latestBlock = await this.getLatestBlock();
+    const supportsEIP1559 =
+      latestBlock && latestBlock.baseFeePerGas !== undefined;
     this.setNetworkEIPSupport(1559, supportsEIP1559);
     return supportsEIP1559;
   }
