@@ -6,7 +6,8 @@ import {
 } from '@metamask/controllers';
 import { ObservableStore } from '@metamask/obs-store';
 import { PollingBlockTracker } from 'eth-block-tracker';
-import { BigNumber, BigNumberish, ethers } from 'ethers';
+import EthQuery from 'eth-query';
+import pify from 'pify';
 import eventBus from 'eventBus';
 
 type BlockData = {
@@ -26,11 +27,6 @@ type BlockData = {
    * Indicate a EVM chain is implemented EIP1559 or not
    */
   isBaseFeePerGasExist: boolean;
-
-  /**
-   * In order to diff
-   */
-  currentChainId?: number;
 };
 
 type NetworkProviderStore = ObservableStore<{
@@ -40,6 +36,7 @@ type NetworkProviderStore = ObservableStore<{
 }>;
 
 interface LatestBlockDataHubConstructorParams {
+  provider: any;
   blockTracker: PollingBlockTracker;
   gasFeeTracker: GasFeeController;
   networkProviderStore: NetworkProviderStore;
@@ -51,6 +48,8 @@ export class LatestBlockDataHubService {
   store: ObservableStore<BlockData>;
   private _blockTracker: PollingBlockTracker;
   private _gasFeeTracker: GasFeeController;
+  private _provider: any;
+  private _query: any;
   private rpcUrl: string;
   private isUiOpened = false;
 
@@ -59,8 +58,10 @@ export class LatestBlockDataHubService {
       currentBlockGasLimit: '',
       gasFeeEstimates: {},
       isBaseFeePerGasExist: false,
-      currentChainId: undefined,
     });
+
+    this._provider = opts.provider;
+    this._query = pify(new EthQuery(this._provider));
 
     this._blockTracker = opts.blockTracker;
     // blockTracker.currentBlock may be null
@@ -110,23 +111,21 @@ export class LatestBlockDataHubService {
       return;
     }
     this.currentBlockNumber = blockNumber;
-    const p = new ethers.providers.JsonRpcProvider(this.rpcUrl);
-    // const currentBlock = await p.getBlock(blockNumber);
-    // const { chainId } = await p.getNetwork();
-    const [currentBlock, { chainId }] = await Promise.all([
-      p.getBlock(blockNumber),
-      p.getNetwork(),
-    ]);
+    const currentBlock = await this._query.getBlockByNumber(blockNumber, false);
+    if (!currentBlock) {
+      return;
+    }
+    console.debug('LatestBlockDataHubService::currentBlock:', currentBlock);
+    const currentBlockGasLimit = currentBlock.gasLimit;
     /**
      * not update if block are null
      */
     if (!currentBlock) {
       return;
     }
-    const currentBlockGasLimit = currentBlock.gasLimit.toHexString();
     // even it's 0, it's a BigNumber '0', so just use boolean
     // null / undefined will be false
-    const isBaseFeePerGasExist = Boolean(currentBlock.baseFeePerGas);
+    const isBaseFeePerGasExist = currentBlock.baseFeePerGas !== undefined;
 
     const gasFeeState = await this._gasFeeTracker.fetchGasFeeEstimates();
     const gasFeeEstimates = gasFeeState.gasFeeEstimates;
@@ -134,7 +133,6 @@ export class LatestBlockDataHubService {
       currentBlockGasLimit,
       gasFeeEstimates,
       isBaseFeePerGasExist,
-      currentChainId: chainId,
     });
     console.debug(
       `LatestBlockDataHubService::updateForBlock: executed for block ${blockNumber} for RPC ${this.rpcUrl}`
