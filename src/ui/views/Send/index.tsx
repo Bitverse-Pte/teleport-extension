@@ -107,6 +107,17 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
+    const balances = await wallet.getTokenBalancesSync(true).catch((e) => {
+      console.error(e);
+    });
+    if (balances && balances.length) {
+      setTokens(balances);
+      const native = balances.find((t: Token) => t.isNative);
+      native ? setSelectedToken(native) : setSelectedToken(balances[0]);
+    }
+  }, []);
+
+  useAsyncEffect(async () => {
     const list = await wallet.listContact();
     const recentAddress = list.map((item) => {
       return item.address;
