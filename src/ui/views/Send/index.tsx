@@ -301,7 +301,9 @@ const Send = () => {
             selectedToken?.decimal || 0
           )}{' '}
           {selectedToken?.symbol?.toUpperCase()}{' '}
-          <button className="max-icon">MAX</button>
+          <button onClick={handleMaxClick} className="max-icon">
+            MAX
+          </button>
         </div>
         <p className="send-form-title">{t('To')}</p>
         <Input
