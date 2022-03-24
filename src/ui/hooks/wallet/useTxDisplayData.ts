@@ -120,12 +120,14 @@ export function useTransactionDisplayData(
   const { t } = useTranslation();
   const { initialTransaction, primaryTransaction } = transactionGroup;
   // initialTransaction contains the data we need to derive the primary purpose of this transaction group
-  const { type } = initialTransaction;
+  // const { type } = initialTransaction;
+  const { type } = primaryTransaction;
 
-  const { from: senderAddress, to } = initialTransaction.txParams || {};
+  const { from: senderAddress, to } = primaryTransaction.txParams || {};
 
   // for smart contract interactions, methodData can be used to derive the name of the action being taken
-  const methodData = useMethodData(initialTransaction.txParams.data);
+  // const methodData = useMethodData(initialTransaction.txParams.data);
+  const methodData = useMethodData(primaryTransaction.txParams.data);
 
   const displayedStatusKey = getStatusKey(primaryTransaction);
   const isPending = displayedStatusKey in PENDING_STATUS_HASH;
@@ -137,7 +139,8 @@ export function useTransactionDisplayData(
    * As requested, will be formatted to relative time
    * if tx is happened in 7 days
    */
-  const date = formatDateWithWeekContext(initialTransaction.time);
+  // const date = formatDateWithWeekContext(initialTransaction.time);
+  const date = formatDateWithWeekContext(primaryTransaction.time);
   let subtitle = '';
   let subtitleContainsOrigin = false;
   let recipientAddress = to;
@@ -158,11 +161,13 @@ export function useTransactionDisplayData(
       )
     : undefined;
   const tokenData = useTokenData(
-    initialTransaction?.txParams?.data,
+    // initialTransaction?.txParams?.data,
+    primaryTransaction?.txParams?.data,
     isTokenCategory
   );
   const tokenDisplayValue = useTokenDisplayValue(
-    initialTransaction?.txParams?.data,
+    // initialTransaction?.txParams?.data,
+    primaryTransaction?.txParams?.data,
     token,
     isTokenCategory
   );
