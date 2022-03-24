@@ -16,6 +16,7 @@ const Unlock = () => {
 
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
+      wallet.setManualLocked(false);
       resolveApproval();
     },
     onError(err) {
@@ -24,7 +25,6 @@ const Unlock = () => {
   });
 
   const handleUnlockClick = async () => {
-    await wallet.setManualLocked(false);
     unlock(psd);
   };
 
