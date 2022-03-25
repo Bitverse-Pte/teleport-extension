@@ -248,6 +248,7 @@ declare global {
     web3: {
       currentProvider: EthereumProvider;
     };
+    teleport: EthereumProvider;
   }
 }
 
@@ -284,6 +285,9 @@ window.addEventListener('message', function (event) {
         currentProvider: window.ethereum,
       };
     }
+    window.teleport = new Proxy(provider, {
+      deleteProperty: () => true,
+    });
 
     window.dispatchEvent(new Event('ethereum#initialized'));
   }

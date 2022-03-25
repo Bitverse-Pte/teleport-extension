@@ -69,11 +69,7 @@ const SignText = ({ params }) => {
       </div>
       <div className="sign-body flexCol">
         <div className="sign-data-title">{`${t('Message')}:`}</div>
-        <div className="sign-data">
-          <div>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
-          </div>
-        </div>
+        <div className="sign-data">{JSON.stringify(data, null, 2)}</div>
       </div>
       <footer className="connect-footer">
         <div className={clsx(['action-buttons mt-4'])}>

@@ -191,11 +191,24 @@ const SignTx = ({ params, origin }) => {
   };
 
   const fetchNativePrice = async () => {
+    dispatch(showLoadingIndicator());
     const tokens = await wallet.getTokenBalancesAsync(true);
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
+    dispatch(hideLoadingIndicator());
   };
+
+  useAsyncEffect(fetchNativePrice, []);
+
+  useAsyncEffect(async () => {
+    const session = params.session;
+    const site = await wallet.getConnectedSite(session.origin);
+    const from: BaseAccount = await wallet.getAccountByAddress(tx.txParam.from);
+    const to: BaseAccount = await wallet.getAccountByAddress(tx.txParam.to);
+    setSenderName(from?.accountName);
+    setRecipientName(to?.accountName);
+  }, []);
 
   const nativeToken = useMemo(() => {
     const nativeToken = tokens.find((t: Token) => t.isNative);
@@ -213,17 +226,6 @@ const SignTx = ({ params, origin }) => {
       : nativeToken;
     return txToken;
   }, [tokens, prices]);
-
-  useAsyncEffect(fetchNativePrice, []);
-
-  useAsyncEffect(async () => {
-    const session = params.session;
-    const site = await wallet.getConnectedSite(session.origin);
-    const from: BaseAccount = await wallet.getAccountByAddress(tx.txParam.from);
-    const to: BaseAccount = await wallet.getAccountByAddress(tx.txParam.to);
-    setSenderName(from?.accountName);
-    setRecipientName(to?.accountName);
-  }, []);
 
   const renderContent = () => {
     if (tx.data) {
@@ -319,7 +321,7 @@ const TxDetailComponent = ({
       addHexes(valueToDisplay(tx), totalGasfee).toString()
     );
     const total = getValueFromWeiHex({ value: totalHex, numberOfDecimals: 10 });
-    return `${total} ${currency}`;
+    return `${total} ${currency || ''}`;
   };
 
   const renderTotalGasFeeAmount = () => {
@@ -327,7 +329,7 @@ const TxDetailComponent = ({
       value: totalGasfee,
       numberOfDecimals: 10,
     });
-    return `${totalDec} ${currency}`;
+    return `${totalDec} ${currency || ''}`;
   };
 
   const renderTotalGasFeeFiat = () => {
