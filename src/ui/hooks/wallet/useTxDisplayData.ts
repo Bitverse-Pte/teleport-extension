@@ -44,7 +44,8 @@ export function camelCaseToCapitalize(str = '') {
 }
 // import { getTokenAddressParam } from '../helpers/utils/token-util';
 export function getTokenAddressParam(tokenData: any = {}): string {
-  const value = tokenData?.args?._to || tokenData?.args?.[0];
+  const value =
+    tokenData?.args?._to || tokenData?.args?.to || tokenData?.args?.[0];
   return value?.toString().toLowerCase() || '';
 }
 
@@ -120,12 +121,14 @@ export function useTransactionDisplayData(
   const { t } = useTranslation();
   const { initialTransaction, primaryTransaction } = transactionGroup;
   // initialTransaction contains the data we need to derive the primary purpose of this transaction group
-  const { type } = initialTransaction;
+  // const { type } = initialTransaction;
+  const { type } = primaryTransaction;
 
-  const { from: senderAddress, to } = initialTransaction.txParams || {};
+  const { from: senderAddress, to } = primaryTransaction.txParams || {};
 
   // for smart contract interactions, methodData can be used to derive the name of the action being taken
-  const methodData = useMethodData(initialTransaction.txParams.data);
+  // const methodData = useMethodData(initialTransaction.txParams.data);
+  const methodData = useMethodData(primaryTransaction.txParams.data);
 
   const displayedStatusKey = getStatusKey(primaryTransaction);
   const isPending = displayedStatusKey in PENDING_STATUS_HASH;
@@ -137,7 +140,8 @@ export function useTransactionDisplayData(
    * As requested, will be formatted to relative time
    * if tx is happened in 7 days
    */
-  const date = formatDateWithWeekContext(initialTransaction.time);
+  // const date = formatDateWithWeekContext(initialTransaction.time);
+  const date = formatDateWithWeekContext(primaryTransaction.time);
   let subtitle = '';
   let subtitleContainsOrigin = false;
   let recipientAddress = to;
@@ -158,11 +162,13 @@ export function useTransactionDisplayData(
       )
     : undefined;
   const tokenData = useTokenData(
-    initialTransaction?.txParams?.data,
+    // initialTransaction?.txParams?.data,
+    primaryTransaction?.txParams?.data,
     isTokenCategory
   );
   const tokenDisplayValue = useTokenDisplayValue(
-    initialTransaction?.txParams?.data,
+    // initialTransaction?.txParams?.data,
+    primaryTransaction?.txParams?.data,
     token,
     isTokenCategory
   );
@@ -263,6 +269,24 @@ export function useTransactionDisplayData(
     subtitle = origin;
     subtitleContainsOrigin = true;
   } else if (
+    type === TransactionTypes.TOKEN_METHOD_TRANSFER_FROM ||
+    type === TransactionTypes.TOKEN_METHOD_TRANSFER ||
+    /**
+     * judge by methodData too, in order to support NFT
+     */
+    ['safeTransferFrom', 'transferFrom', 'transfer'].includes(
+      methodData?.name as string
+    )
+  ) {
+    category = TransactionGroupCategories.SEND;
+    title = t('sendSpecifiedTokens', {
+      replace: { $1: token?.symbol || t('token') },
+    });
+    recipientAddress = getTokenAddressParam(tokenData);
+    subtitle = t('toAddress', {
+      replace: { $1: shortenAddress(recipientAddress) },
+    });
+  } else if (
     type === TransactionTypes.DEPLOY_CONTRACT ||
     type === TransactionTypes.CONTRACT_INTERACTION
   ) {
@@ -279,18 +303,6 @@ export function useTransactionDisplayData(
     prefix = '';
     subtitle = t('fromAddress', {
       replace: { $1: shortenAddress(senderAddress) },
-    });
-  } else if (
-    type === TransactionTypes.TOKEN_METHOD_TRANSFER_FROM ||
-    type === TransactionTypes.TOKEN_METHOD_TRANSFER
-  ) {
-    category = TransactionGroupCategories.SEND;
-    title = t('sendSpecifiedTokens', {
-      replace: { $1: token?.symbol || t('token') },
-    });
-    recipientAddress = getTokenAddressParam(tokenData);
-    subtitle = t('toAddress', {
-      replace: { $1: shortenAddress(recipientAddress) },
     });
   } else if (type === TransactionTypes.SIMPLE_SEND) {
     category = TransactionGroupCategories.SEND;
