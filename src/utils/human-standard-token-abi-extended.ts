@@ -73,6 +73,91 @@ export const HumanStandardTokenABI = [
     payable: false,
     type: 'function',
   },
+  // ERC20 / ERC721 safeTransfer
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'from',
+        type: 'address',
+      },
+      {
+        name: 'to',
+        type: 'address',
+      },
+      {
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'safeTransferFrom',
+    outputs: [
+      {
+        name: 'success',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    type: 'function',
+  },
+  /**
+   * ERC721 safeTransferFrom with data
+   */
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'from',
+        type: 'address',
+      },
+      {
+        name: 'to',
+        type: 'address',
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    name: 'safeTransferFrom',
+    payable: true,
+    type: 'function',
+  },
+  /**
+   * ERC1155 safeTransferFrom
+   */
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'from',
+        type: 'address',
+      },
+      {
+        name: 'to',
+        type: 'address',
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        name: 'value',
+        type: 'uint256',
+      },
+      {
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    name: 'safeTransferFrom',
+    payable: false,
+    type: 'function',
+  },
   {
     constant: true,
     inputs: [],
