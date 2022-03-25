@@ -44,7 +44,8 @@ export function camelCaseToCapitalize(str = '') {
 }
 // import { getTokenAddressParam } from '../helpers/utils/token-util';
 export function getTokenAddressParam(tokenData: any = {}): string {
-  const value = tokenData?.args?._to || tokenData?.args?.[0];
+  const value =
+    tokenData?.args?._to || tokenData?.args?.to || tokenData?.args?.[0];
   return value?.toString().toLowerCase() || '';
 }
 
@@ -268,6 +269,24 @@ export function useTransactionDisplayData(
     subtitle = origin;
     subtitleContainsOrigin = true;
   } else if (
+    type === TransactionTypes.TOKEN_METHOD_TRANSFER_FROM ||
+    type === TransactionTypes.TOKEN_METHOD_TRANSFER ||
+    /**
+     * judge by methodData too, in order to support NFT
+     */
+    ['safeTransferFrom', 'transferFrom', 'transfer'].includes(
+      methodData?.name as string
+    )
+  ) {
+    category = TransactionGroupCategories.SEND;
+    title = t('sendSpecifiedTokens', {
+      replace: { $1: token?.symbol || t('token') },
+    });
+    recipientAddress = getTokenAddressParam(tokenData);
+    subtitle = t('toAddress', {
+      replace: { $1: shortenAddress(recipientAddress) },
+    });
+  } else if (
     type === TransactionTypes.DEPLOY_CONTRACT ||
     type === TransactionTypes.CONTRACT_INTERACTION
   ) {
@@ -284,18 +303,6 @@ export function useTransactionDisplayData(
     prefix = '';
     subtitle = t('fromAddress', {
       replace: { $1: shortenAddress(senderAddress) },
-    });
-  } else if (
-    type === TransactionTypes.TOKEN_METHOD_TRANSFER_FROM ||
-    type === TransactionTypes.TOKEN_METHOD_TRANSFER
-  ) {
-    category = TransactionGroupCategories.SEND;
-    title = t('sendSpecifiedTokens', {
-      replace: { $1: token?.symbol || t('token') },
-    });
-    recipientAddress = getTokenAddressParam(tokenData);
-    subtitle = t('toAddress', {
-      replace: { $1: shortenAddress(recipientAddress) },
     });
   } else if (type === TransactionTypes.SIMPLE_SEND) {
     category = TransactionGroupCategories.SEND;
