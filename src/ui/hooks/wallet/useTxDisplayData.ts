@@ -270,13 +270,21 @@ export function useTransactionDisplayData(
     subtitleContainsOrigin = true;
   } else if (
     type === TransactionTypes.TOKEN_METHOD_TRANSFER_FROM ||
-    type === TransactionTypes.TOKEN_METHOD_TRANSFER ||
+    type === TransactionTypes.TOKEN_METHOD_TRANSFER
+  ) {
+    category = TransactionGroupCategories.SEND;
+    title = t('sendSpecifiedTokens', {
+      replace: { $1: token?.symbol || t('token') },
+    });
+    recipientAddress = getTokenAddressParam(tokenData);
+    subtitle = t('toAddress', {
+      replace: { $1: shortenAddress(recipientAddress) },
+    });
+  } else if (
     /**
      * judge by methodData too, in order to support NFT
      */
-    ['safeTransferFrom', 'transferFrom', 'transfer'].includes(
-      methodData?.name as string
-    )
+    ['Safe Transfer From', 'transferFrom'].includes(methodData?.name || '')
   ) {
     category = TransactionGroupCategories.SEND;
     title = t('sendSpecifiedTokens', {
