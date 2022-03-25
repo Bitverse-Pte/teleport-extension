@@ -1,5 +1,5 @@
 import { MethodRegistry } from 'eth-method-registry';
-import abi from 'human-standard-token-abi';
+// import abi from 'utils/human-standard-token-abi-extended';
 import StreamProvider from 'web3-stream-provider';
 import { ethers } from 'ethers';
 import log from 'loglevel';
@@ -15,6 +15,7 @@ import {
 import { TOKEN_TRANSFER_FUNCTION_SIGNATURE } from 'ui/context/send.constants';
 import { multiplyCurrencies } from './conversion';
 import { conversionGreaterThan, conversionLessThan } from 'utils/conversion';
+import abi from 'utils/human-standard-token-abi-extended';
 
 const hstInterface = new ethers.utils.Interface(abi);
 
@@ -268,8 +269,9 @@ export function generateERC20TransferData({
     TOKEN_TRANSFER_FUNCTION_SIGNATURE +
     Array.prototype.map
       .call(
-        abi.rawEncode(
-          ['address', 'uint256'],
+        hstInterface.encodeFunctionData(
+          // ['address', 'uint256'],
+          hstInterface.getFunction('transfer'),
           [toAddress, addHexPrefix(amount)]
         ),
         (x) => `00${x.toString(16)}`.slice(-2)
