@@ -1,5 +1,5 @@
 import punycode from 'punycode/punycode';
-import abi from 'human-standard-token-abi';
+import abi from 'utils/human-standard-token-abi-extended';
 import BigNumber from 'bignumber.js';
 import * as ethUtil from 'ethereumjs-util';
 // import { DateTime } from 'luxon';

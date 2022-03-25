@@ -4,7 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { DEFAULT_TOKEN_CONFIG } from 'constants/token';
 import { nanoid } from 'nanoid';
 import { networkPreferenceService } from 'background/service';
-import abi from 'human-standard-token-abi';
+import abi from 'utils/human-standard-token-abi-extended';
 import { TOKEN_THEME_COLOR } from 'constants/wallet';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
