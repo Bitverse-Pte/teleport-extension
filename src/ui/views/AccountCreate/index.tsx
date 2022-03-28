@@ -60,7 +60,7 @@ const AccountCreate = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 characters');
+      ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
     }
     if (policyShow) {
