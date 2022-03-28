@@ -98,6 +98,15 @@ const AccountCreate = () => {
           onChange={(e) => {
             setName(e.target.value);
           }}
+          onBlur={() => {
+            if (name.trim().length > 20) {
+              ClickToCloseMessage.error({
+                content: 'Name length should be 1-20 characters',
+                key: 'Name length should be 1-20 characters',
+              });
+              return;
+            }
+          }}
         />
 
         <div
