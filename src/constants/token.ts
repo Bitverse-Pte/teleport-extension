@@ -641,4 +641,18 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     display: true,
     themeColor: '#FFA800',
   },
+  {
+    symbol: 'Tele',
+    decimal: 18,
+    name: 'Tele',
+    demon: '',
+    icon: '',
+    chainCustomId: PresetNetworkId.TELE_TEST,
+    isNative: true,
+    isCustom: false,
+    contractAddress: '',
+    track: '',
+    display: true,
+    themeColor: '#000000',
+  },
 ];
