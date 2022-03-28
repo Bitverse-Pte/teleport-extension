@@ -20,7 +20,10 @@ const Unlock = () => {
       resolveApproval();
     },
     onError(err) {
-      ClickToCloseMessage.error('Wrong password');
+      ClickToCloseMessage.error({
+        content: 'Wrong password',
+        key: 'Wrong password',
+      });
     },
   });
 

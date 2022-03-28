@@ -40,7 +40,10 @@ const TokenAdd = () => {
         err.code &&
         err.code === ErrorCode.CUSTOM_ERC20_TOKEN_DUPLICATED
       ) {
-        ClickToCloseMessage.error('Token already added');
+        ClickToCloseMessage.error({
+          content: 'Token already added',
+          key: 'Token already added',
+        });
       }
     },
   });

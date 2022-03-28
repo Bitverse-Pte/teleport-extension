@@ -98,16 +98,25 @@ const TokenManage = () => {
     onError(err) {
       console.error(err);
       if (err?.code === ErrorCode.INVALID_CONTRACT_ADDRESS) {
-        ClickToCloseMessage.error('Invalid contract address');
+        ClickToCloseMessage.error({
+          content: 'Invalid contract address',
+          key: 'Invalid contract address',
+        });
       } else {
-        ClickToCloseMessage.error('Token not found');
+        ClickToCloseMessage.error({
+          content: 'Token not found',
+          key: 'Token not found',
+        });
       }
     },
   });
 
   const handleNextBtnClick = async () => {
     if (!isValidAddress(contractAddress)) {
-      ClickToCloseMessage.error('Invalid contract address');
+      ClickToCloseMessage.error({
+        content: 'Invalid contract address',
+        key: 'Invalid contract address',
+      });
       return;
     }
     if (!contractAddress) return;
