@@ -212,8 +212,10 @@ const NetworkEdit = () => {
           errors[fName] = error.message;
         }
       });
-      errors.networkName = checkNetworkNickname(values.networkName);
-      errors.rpcUrl = await checkRpcUrlAndSetChainId(values.rpcUrl);
+      if (values.networkName)
+        errors.networkName = checkNetworkNickname(values.networkName);
+      if (values.rpcUrl)
+        errors.rpcUrl = await checkRpcUrlAndSetChainId(values.rpcUrl);
       try {
         const chainIdBN = BigNumber.from(values.chainId);
         if (fetchedChainId && !chainIdBN.eq(fetchedChainId)) {
