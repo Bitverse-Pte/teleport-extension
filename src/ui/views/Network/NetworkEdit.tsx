@@ -162,7 +162,7 @@ const NetworkEdit = () => {
     (value: string) => {
       const maxCharsInNickname = 20;
       if (value.length > maxCharsInNickname) {
-        return `The length of ${'nickname'} is no longer than ${maxCharsInNickname} chars.`;
+        return `The length of ${'nickname'} is no longer than ${maxCharsInNickname} characters.`;
       }
 
       const sameNameWithDefaultNet =

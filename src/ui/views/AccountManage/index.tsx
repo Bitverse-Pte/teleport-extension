@@ -81,7 +81,7 @@ const AccountManage: React.FC = () => {
 
   const onRenameConfirm = async (accountName) => {
     if (accountName.length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error('Name length should be 1-20 characters');
       return;
     }
     const renamed = await wallet
@@ -281,7 +281,7 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
 
   const handleConfirmBtnClick = () => {
     if (value.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error('Name length should be 1-20 characters');
       return;
     }
     if (props.add && props.add instanceof Function) {
@@ -386,7 +386,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
       return;
     }
     if (value.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error('Name length should be 1-20 characters');
       return;
     }
     if (props.onConfirm && props.onConfirm instanceof Function) {

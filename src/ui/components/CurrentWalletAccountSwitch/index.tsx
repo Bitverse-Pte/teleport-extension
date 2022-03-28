@@ -43,11 +43,17 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
   return (
     <div className="current-wallet-account-switch flexCol">
       <p
-        className="account-switch-wallet-name content-wrap-padding"
+        className=" content-wrap-padding"
         style={walletName ? {} : { display: 'none' }}
+      ></p>
+      <WalletName
+        cls={`account-switch-wallet-name account-name content-wrap-padding ${
+          walletName ? '' : 'hide'
+        }`}
+        width={250}
       >
         {walletName}
-      </p>
+      </WalletName>
       <div className="accounts flexCol">
         {accountList?.map(
           (a: Object.Merge<BaseAccount, { selected?: boolean }>) => {
