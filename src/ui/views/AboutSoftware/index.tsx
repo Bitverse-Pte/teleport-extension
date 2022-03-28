@@ -24,7 +24,7 @@ export default function AboutSoftware() {
           className="logo"
         />
         <p className="software-version flexR">
-          V 0.1.3
+          V 0.1.4
           <BetaIcon />
         </p>
         <p className="software-introductions">

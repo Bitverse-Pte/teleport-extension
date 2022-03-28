@@ -107,6 +107,17 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
+    const balances = await wallet.getTokenBalancesSync(true).catch((e) => {
+      console.error(e);
+    });
+    if (balances && balances.length) {
+      setTokens(balances);
+      const native = balances.find((t: Token) => t.isNative);
+      native ? setSelectedToken(native) : setSelectedToken(balances[0]);
+    }
+  }, []);
+
+  useAsyncEffect(async () => {
     const list = await wallet.listContact();
     const recentAddress = list.map((item) => {
       return item.address;
@@ -205,9 +216,7 @@ const Send = () => {
             <span className="assets-option-symbol">{t.symbol}</span>
           </div>
           <span className="assets-option-right">
-            {`${denom2SymbolRatio(t?.amount || 0, t?.decimal || 0)} ${
-              t.symbol
-            }`}
+            {`${denom2SymbolRatio(t?.amount || 0, t?.decimal || 0)}  `}
           </span>
         </div>
       ),
@@ -290,7 +299,9 @@ const Send = () => {
             selectedToken?.decimal || 0
           )}{' '}
           {selectedToken?.symbol?.toUpperCase()}{' '}
-          <button className="max-icon">MAX</button>
+          <button onClick={handleMaxClick} className="max-icon">
+            MAX
+          </button>
         </div>
         <p className="send-form-title">{t('To')}</p>
         <Input

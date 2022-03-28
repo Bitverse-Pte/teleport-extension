@@ -107,7 +107,7 @@ class NetworkPreferenceService extends EventEmitter {
 
     this.customNetworksStore = new ObservableStore<Record<number, Network>>({
       0: {
-        id: nanoid(),
+        id: PresetNetworkId.TELE_TEST,
         nickname: 'Teleport Testnet',
         rpcUrl: 'https://evm-rpc.testnet.teleport.network',
         rpcPrefs: {

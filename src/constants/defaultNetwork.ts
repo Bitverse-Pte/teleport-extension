@@ -9,6 +9,7 @@ export enum PresetNetworkId {
   FTM = 'ftm',
   AVAX = 'avax',
   OP = 'op',
+  TELE_TEST = 'teleport_testnet',
 }
 
 const EVMProviderSharedProperties = {

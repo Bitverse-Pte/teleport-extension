@@ -59,6 +59,7 @@ const WalletManage: React.FC = () => {
   const [currentWalletName, setCurrentWalletName] = useState('');
   const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+  const [unlockType, setUnlockType] = useState('edit');
 
   const queryWallets = async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList(true);
@@ -101,10 +102,20 @@ const WalletManage: React.FC = () => {
     }
   }, [hdWalletAccounts, simpleWalletAccounts, currentAccount]);
 
-  const handleCreateBtnClick = () => {
+  const handleCreateBtnClick = async () => {
+    setUnlockType('create');
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
     history.push('/create');
   };
-  const handleImportBtnClick = () => {
+  const handleImportBtnClick = async () => {
+    setUnlockType('import');
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
     history.push('/recover');
   };
 
@@ -127,7 +138,10 @@ const WalletManage: React.FC = () => {
 
   const onRenameConfirm = async (walletName) => {
     if (walletName.length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     const renamed: boolean = await wallet
@@ -135,9 +149,15 @@ const WalletManage: React.FC = () => {
       .catch((e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error('Name already exists');
+          ClickToCloseMessage.error({
+            content: 'Name already exists',
+            key: 'Name already exists',
+          });
         } else {
-          ClickToCloseMessage.error('Unknown error, please try again later');
+          ClickToCloseMessage.error({
+            content: 'Unknown error, please try again later',
+            key: 'Unknown error, please try again later',
+          });
         }
       });
     if (renamed) {
@@ -157,10 +177,19 @@ const WalletManage: React.FC = () => {
   };
 
   const handleUnlock = () => {
-    setIsEdit(!isEdit);
+    if (unlockType === 'edit') {
+      setIsEdit(!isEdit);
+    }
+    if (unlockType === 'create') {
+      history.push('/create');
+    }
+    if (unlockType === 'import') {
+      history.push('/recover');
+    }
   };
 
   const handleEdit = async () => {
+    setUnlockType('edit');
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);
       return;
