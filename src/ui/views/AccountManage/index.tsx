@@ -448,7 +448,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
           type="primary"
           onClick={handleConfirmBtnClick}
           block
-          cls="popup-container-top"
+          cls="popup-container-top popup-add-btn"
           disabled={_.isEmpty(value.trim())}
         >
           Rename
