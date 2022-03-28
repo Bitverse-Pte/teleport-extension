@@ -92,6 +92,9 @@ const AccountRecover = () => {
       case ErrorCode.INVALID_PRIVATE_KEY:
         ClickToCloseMessage.error('Invalid private key');
         break;
+      case ErrorCode.WALLET_NAME_REPEAT:
+        ClickToCloseMessage.error('Name already exists');
+        break;
       default:
         if (importType === Tabs.FIRST) {
           ClickToCloseMessage.error('Invalid mnemonic');
@@ -148,7 +151,7 @@ const AccountRecover = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error('Name length should be 1-20 characters');
       return;
     }
     if (policyShow) {

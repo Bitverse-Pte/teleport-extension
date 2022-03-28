@@ -185,14 +185,14 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
         })}
       </div>
       <div className="account-manage-widget-content flexCol">
-        <p className="account-manage-widget-account-name">
+        <WalletName cls="account-manage-widget-account-name" width={250}>
           {(() => {
             const account = tempAccounts?.find(
               (a: IDisplayAccountManage) => a.selected
             )?.ecosystems[0]?.accounts[0];
             return account?.accountName || account?.hdWalletName;
           })()}
-        </p>
+        </WalletName>
         <Collapse
           expandIconPosition="right"
           bordered={false}
