@@ -39,7 +39,10 @@ const AccountCreate = () => {
     },
     onError(err) {
       console.error(err);
-      ClickToCloseMessage.error('Unknown error, please try again later');
+      ClickToCloseMessage.error({
+        content: 'Unknown error, please try again later',
+        key: 'Unknown error, please try again later',
+      });
     },
   });
 
@@ -60,12 +63,18 @@ const AccountCreate = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 characters');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error("Passwords don't match");
+        ClickToCloseMessage.error({
+          content: "Passwords don't match",
+          key: "Passwords don't match",
+        });
         return;
       }
     }
@@ -123,7 +132,10 @@ const AccountCreate = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error("Passwords don't match");
+                ClickToCloseMessage.error({
+                  content: "Passwords don't match",
+                  key: "Passwords don't match",
+                });
               }
             }}
             placeholder="Enter password again"

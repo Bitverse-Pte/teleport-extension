@@ -47,7 +47,10 @@ export const UnlockModal: React.FC<PropsInterface> = (
       }
     },
     onError(err) {
-      ClickToCloseMessage.error('Wrong password');
+      ClickToCloseMessage.error({
+        content: 'Wrong password',
+        key: 'Wrong password',
+      });
     },
   });
 

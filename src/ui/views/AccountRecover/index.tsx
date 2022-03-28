@@ -84,22 +84,40 @@ const AccountRecover = () => {
 
     switch (e?.code) {
       case ErrorCode.ADDRESS_REPEAT:
-        ClickToCloseMessage.error('Account already exists');
+        ClickToCloseMessage.error({
+          content: 'Account already exists',
+          key: 'Account already exists',
+        });
         break;
       case ErrorCode.INVALID_MNEMONIC:
-        ClickToCloseMessage.error('Invalid mnemonic');
+        ClickToCloseMessage.error({
+          content: 'Invalid mnemonic',
+          key: 'Invalid mnemonic',
+        });
         break;
       case ErrorCode.INVALID_PRIVATE_KEY:
-        ClickToCloseMessage.error('Invalid private key');
+        ClickToCloseMessage.error({
+          content: 'IInvalid private key',
+          key: 'Invalid private key',
+        });
         break;
       case ErrorCode.WALLET_NAME_REPEAT:
-        ClickToCloseMessage.error('Name already exists');
+        ClickToCloseMessage.error({
+          content: 'Name already exists',
+          key: 'Name already exists',
+        });
         break;
       default:
         if (importType === Tabs.FIRST) {
-          ClickToCloseMessage.error('Invalid mnemonic');
+          ClickToCloseMessage.error({
+            content: 'Invalid mnemonic',
+            key: 'Invalid mnemonic',
+          });
         } else {
-          ClickToCloseMessage.error('Invalid private key');
+          ClickToCloseMessage.error({
+            content: 'Invalid private key',
+            key: 'Invalid private key',
+          });
         }
     }
   };
@@ -151,12 +169,18 @@ const AccountRecover = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 characters');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error("Password don't match");
+        ClickToCloseMessage.error({
+          content: "Password don't match",
+          key: "Password don't match",
+        });
         return;
       }
     }
@@ -300,7 +324,10 @@ const AccountRecover = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error("Password don't match");
+                ClickToCloseMessage.error({
+                  content: "Password don't match",
+                  key: "Password don't match",
+                });
               }
             }}
             placeholder="Enter password again"
