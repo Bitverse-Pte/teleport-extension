@@ -243,7 +243,7 @@ function TransactionItem({
         </span>
         {!isPending && (
           <span className="date">
-            {dayjs(transactionGroup.initialTransaction.time).format(
+            {dayjs(transactionGroup.primaryTransaction.time).format(
               'YYYY-MM-DD HH:mm:ss'
             )}
           </span>

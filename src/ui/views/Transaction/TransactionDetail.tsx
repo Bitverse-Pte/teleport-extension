@@ -194,7 +194,7 @@ export function _ActivityDetail({
           <div className="row">
             <div className="field-name">Time</div>
             <div className="field-value" title={date}>
-              {dayjs(transaction.initialTransaction.time).format(
+              {dayjs(transaction.primaryTransaction.time).format(
                 'YYYY-MM-DD HH:mm:ss'
               )}
             </div>
