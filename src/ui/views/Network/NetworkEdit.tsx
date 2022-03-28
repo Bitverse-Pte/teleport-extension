@@ -21,6 +21,7 @@ import { BigNumber } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import clsx from 'clsx';
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
 
@@ -211,8 +212,10 @@ const NetworkEdit = () => {
           errors[fName] = error.message;
         }
       });
-      errors.networkName = checkNetworkNickname(values.networkName);
-      errors.rpcUrl = await checkRpcUrlAndSetChainId(values.rpcUrl);
+      if (values.networkName)
+        errors.networkName = checkNetworkNickname(values.networkName);
+      if (values.rpcUrl)
+        errors.rpcUrl = await checkRpcUrlAndSetChainId(values.rpcUrl);
       try {
         const chainIdBN = BigNumber.from(values.chainId);
         if (fetchedChainId && !chainIdBN.eq(fetchedChainId)) {
@@ -245,43 +248,64 @@ const NetworkEdit = () => {
           setSubmitting(false);
         }}
       >
-        {({ isSubmitting, ...formilk }) => (
-          <Form>
-            <div className="form-body content-wrap-padding">
-              {/* <Form.Item label={t('Network Name')} name="networkName" required> */}
-              <h1 className="required">{t('Network Name')}</h1>
-              <Field name="networkName" placeholder="Enter Network Name" />
-              <ErrorMessage name="networkName" component="div" />
-              <h1 className="required">{t('RPC URL')}</h1>
-              <Field name="rpcUrl" placeholder="Enter RPC URL" />
-              <ErrorMessage name="rpcUrl" component="div" />
-              <h1 className="required">{t('Chain ID')}</h1>
-              <Field
-                name="chainId"
-                placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
-              />
-              <ErrorMessage
-                name="chainId"
-                component="div"
-                className="input-error"
-              />
-              <h1>{t('Currency Symbol')}</h1>
-              <Field name="symbol" placeholder={t('Optional')} />
-              <ErrorMessage name="symbol" component="div" />
-              <h1>{t('Block Explorer URL')}</h1>
-              <Field name="explorerUrl" placeholder={t('Optional')} />
-              <ErrorMessage name="explorerUrl" component="div" />
-            </div>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ margin: '24px', width: '312px' }}
-              disabled={Object.keys(formilk.errors).length > 0}
-            >
-              {t('Next')}
-            </Button>
-          </Form>
-        )}
+        {({ isSubmitting, ...formilk }) => {
+          const isFormNotFinished = Object.keys(formilk.errors).length > 0;
+          return (
+            <Form>
+              <div className="form-body content-wrap-padding">
+                <h1 className="required">{t('Network Name')}</h1>
+                <Field name="networkName" placeholder="Enter Network Name" />
+                <ErrorMessage
+                  name="networkName"
+                  component="div"
+                  className="input-error"
+                />
+                <h1 className="required">{t('RPC URL')}</h1>
+                <Field name="rpcUrl" placeholder="Enter RPC URL" />
+                <ErrorMessage
+                  name="rpcUrl"
+                  component="div"
+                  className="input-error"
+                />
+                <h1 className="required">{t('Chain ID')}</h1>
+                <Field
+                  name="chainId"
+                  placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
+                />
+                <ErrorMessage
+                  name="chainId"
+                  component="div"
+                  className="input-error"
+                />
+                <h1>{t('Currency Symbol')}</h1>
+                <Field name="symbol" placeholder={t('Optional')} />
+                <ErrorMessage
+                  name="symbol"
+                  component="div"
+                  className="input-error"
+                />
+                <h1>{t('Block Explorer URL')}</h1>
+                <Field name="explorerUrl" placeholder={t('Optional')} />
+                <ErrorMessage
+                  name="explorerUrl"
+                  component="div"
+                  className="input-error"
+                />
+              </div>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className={clsx({
+                  disabled_button: isFormNotFinished,
+                })}
+                style={{ margin: '24px', width: '312px' }}
+                disabled={isFormNotFinished}
+              >
+                {t('Next')}
+              </Button>
+            </Form>
+          );
+        }}
       </Formik>
     </div>
   );
