@@ -8,6 +8,8 @@ import { BetaIcon } from 'ui/components/Widgets';
 
 import './style.less';
 import { CustomButton } from 'ui/components/Widgets';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const Welcome = () => {
   const { t } = useTranslation();
@@ -18,6 +20,9 @@ const Welcome = () => {
   ) => {
     history.push({
       pathname: type === ACCOUNT_CREATE_TYPE.CREATE ? '/create' : '/recover',
+    });
+    sensors.track('teleport_welcome' + type.toString(), {
+      page: 'welcome',
     });
   };
   return (

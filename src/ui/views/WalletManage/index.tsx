@@ -1,6 +1,6 @@
 import './style.less';
 import React, { useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import Header from 'ui/components/Header';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import {
@@ -22,7 +22,8 @@ import keyActiveIcon from 'assets/keyActive.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
-
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 export interface WalletHeaderProps {
   title: string;
   handleDoneClick: () => void;
@@ -44,6 +45,7 @@ export const WalletHeader = (props: WalletHeaderProps) => {
 
 const WalletManage: React.FC = () => {
   const history = useHistory();
+  const location = useLocation();
   const wallet = useWallet();
   const [hdWalletAccounts, setHdWalletAccount] = useState<any>([]);
   const [simpleWalletAccounts, setSimpleWalletAccount] = useState<
@@ -103,6 +105,7 @@ const WalletManage: React.FC = () => {
   }, [hdWalletAccounts, simpleWalletAccounts, currentAccount]);
 
   const handleCreateBtnClick = async () => {
+    sensors.track('teleport_wallet_manage_create', { page: location.pathname });
     setUnlockType('create');
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);
@@ -111,6 +114,7 @@ const WalletManage: React.FC = () => {
     history.push('/create');
   };
   const handleImportBtnClick = async () => {
+    sensors.track('teleport_wallet_manage_import', { page: location.pathname });
     setUnlockType('import');
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);
@@ -120,6 +124,9 @@ const WalletManage: React.FC = () => {
   };
 
   const onDeleteConfirm = async () => {
+    sensors.track('teleport_wallet_manage_delete_comfirm', {
+      page: location.pathname,
+    });
     await wallet.removeHdWalletsByHdWalletId(currentHdWalletId).catch((e) => {
       console.error(e);
     });
@@ -128,6 +135,10 @@ const WalletManage: React.FC = () => {
   };
 
   const handleWalletClick = async (w: any) => {
+    //todo
+    sensors.track('teleport_wallet_manage_wallet_click', {
+      page: location.pathname,
+    });
     await wallet.changeAccount(w?.accounts ? w?.accounts[0] : w);
     history.goBack();
   };
@@ -137,6 +148,9 @@ const WalletManage: React.FC = () => {
   };
 
   const onRenameConfirm = async (walletName) => {
+    sensors.track('teleport_wallet_manage_rename_confirm', {
+      page: location.pathname,
+    });
     if (walletName.length > 20) {
       ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
@@ -158,6 +172,7 @@ const WalletManage: React.FC = () => {
   };
 
   const handleDeleteBtnClick = (e, hdWalletId) => {
+    sensors.track('teleport_wallet_manage_delete', { page: location.pathname });
     if (hdWalletAccounts.length + simpleWalletAccounts.length === 1) {
       ClickToCloseMessage.warning('Please keep alive at least one account');
       return;
@@ -180,6 +195,7 @@ const WalletManage: React.FC = () => {
   };
 
   const handleEdit = async () => {
+    sensors.track('teleport_wallet_manage_edit', { page: location.pathname });
     setUnlockType('edit');
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);
@@ -341,6 +357,9 @@ const WalletManage: React.FC = () => {
                           setCurrentWalletName(w.hdWalletName);
                           setCurrentHdWalletId(w.hdWalletId);
                           setRenamePopupVisible(true);
+                          sensors.track('teleport_wallet_manage_rename', {
+                            page: location.pathname,
+                          });
                         }}
                         style={{
                           display: isEdit ? 'block' : 'none',

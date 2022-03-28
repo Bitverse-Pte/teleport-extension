@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { message } from 'antd';
 import {
   useWallet,
@@ -29,9 +29,12 @@ import tokenHide from '../../../assets/tokenHide.svg';
 import tokenShow from '../../../assets/tokenShow.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { isValidAddress } from 'ethereumjs-util';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const TokenManage = () => {
   const history = useHistory();
+  const location = useLocation();
   const [tokenManageTab, setTokenManageTab] = useState(Tabs.FIRST);
   const [filterCondition, setFilterCondition] = useState('');
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -65,9 +68,14 @@ const TokenManage = () => {
 
   const handleInputChange = (e) => {
     setFilterCondition(e.target.value);
+    sensors.track('teleport_token_manage_search', { page: location.pathname });
   };
 
   const handleTokenClick = async (token: Token) => {
+    sensors.track('teleport_token_manage_token_click', {
+      page: location.pathname,
+      params: token,
+    });
     const updated = await wallet
       .setTokenDisplay(token.tokenId, !token.display)
       .catch((e) => {
@@ -79,6 +87,10 @@ const TokenManage = () => {
   };
   const [queryToken, loading] = useWalletRequest(wallet.queryToken, {
     onSuccess(token) {
+      sensors.track('teleport_token_manage_next', {
+        page: location.pathname,
+        params: { token: token },
+      });
       console.log(token);
       if (token) {
         history.push({
@@ -123,6 +135,9 @@ const TokenManage = () => {
           tab2="Customize"
           currentTab={tokenManageTab}
           handleTabClick={(tab: Tabs) => {
+            sensors.track('teleport_token_manage_' + tab.toString(), {
+              page: location.pathname,
+            });
             setTokenManageTab(tab);
           }}
         />
@@ -181,6 +196,10 @@ const TokenManage = () => {
           <p className="token-custom-title">Networks</p>
           <ChainSelect
             handleChainSelect={(chain: Provider) => {
+              sensors.track('teleport_token_manage_network_select', {
+                page: location.pathname,
+                params: chain,
+              });
               setCurrentChain(chain);
             }}
           />

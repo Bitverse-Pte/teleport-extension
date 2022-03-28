@@ -15,6 +15,8 @@ import {
 } from 'ui/components/Widgets';
 import { AccountHeader } from '../AccountRecover';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const AccountCreate = () => {
   const { t } = useTranslation();
@@ -30,6 +32,7 @@ const AccountCreate = () => {
   const [run, loading] = useWalletRequest(wallet.createHdWallet, {
     onSuccess(mnemonic) {
       updateStoragePolicyAgreed();
+      sensors.track('teleport_account_create_step1', { page: 'create' });
       history.push({
         pathname: '/mnemonic-backup',
         state: {

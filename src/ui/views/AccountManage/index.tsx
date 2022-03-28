@@ -21,6 +21,8 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import AccountManageWidget from 'ui/components/AccountManageWidget';
 import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);

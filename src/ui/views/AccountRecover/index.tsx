@@ -1,5 +1,5 @@
 import React, { Fragment, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { ACCOUNT_IMPORT_TYPE, MIN_PASSWORD_LENGTH } from 'constants/index';
@@ -22,6 +22,8 @@ import { Tabs } from 'constants/wallet';
 import { useSeedPhraseValidation } from 'ui/hooks/validation/useSeedPhraseValidation';
 import { usePrivateKeyValidation } from 'ui/hooks/validation/usePrivateKeyValidation';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const { TextArea } = Input;
 
@@ -33,6 +35,10 @@ export interface AccountHeaderProps {
 
 export const AccountHeader = (props: AccountHeaderProps) => {
   const handleBackClick = () => {
+    sensors.track('teleport_account_manage_closed', {
+      page: location.pathname,
+      params: { title: props.title },
+    });
     if (props.handleCloseIconClick) {
       props.handleCloseIconClick();
       return;
@@ -55,6 +61,7 @@ export const AccountHeader = (props: AccountHeaderProps) => {
 
 const AccountRecover = () => {
   const history = useHistory();
+  const location = useLocation();
   const [importType, setImportType] = useState(Tabs.FIRST);
   const [agreed, setAgreed] = useState(false);
   const [textareaActive, setTextareaActive] = useState(false);
@@ -75,6 +82,12 @@ const AccountRecover = () => {
 
   const handleSuccessCallback = () => {
     updateStoragePolicyAgreed();
+    sensors.track('teleport_account_recover_imported', {
+      page: location.pathname,
+      params: {
+        type: importType,
+      },
+    });
     history.push({
       pathname: '/home',
     });

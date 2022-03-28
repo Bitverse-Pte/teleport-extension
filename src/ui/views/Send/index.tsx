@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { addHexPrefix } from 'ethereumjs-util';
@@ -38,6 +38,8 @@ import { getCurrentChainId } from 'ui/selectors/selectors';
 import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
 import { shortenAddress } from 'ui/utils/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -48,6 +50,7 @@ const { Option } = Select;
 
 const Send = () => {
   const history = useHistory();
+  const location = useLocation();
   const dispatch = useDispatch();
   const wallet = useWallet();
   const [selected, setSelected] = useState<BaseAccount | undefined>();
@@ -184,10 +187,15 @@ const Send = () => {
       params: [params],
     });
     history.push('/confirm-transaction');
+    sensors.track('teleport_send_next', {
+      page: location.pathname,
+      params: params.txParam,
+    });
   };
 
   const myAccountsSelect = () => {
     setAccountSelectPopupVisible(true);
+    sensors.track('teleport_send_tsf_my_account', { page: location.pathname });
   };
 
   const handleMaxClick = () => {
