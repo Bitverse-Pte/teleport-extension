@@ -20,6 +20,7 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { NetworkSelectionItem } from 'ui/components/Network/NetworkSelection/NetworkSelectionItem.component';
 import { BetaIcon } from 'ui/components/Widgets';
 import { ReactComponent as TLPText } from 'assets/teleportText.svg';
+import { openInBrowserNewTab } from 'ui/utils';
 
 const ChainCategoryIcon = ({ src = DefaulutIcon }: { src?: string }) => (
   <img
@@ -150,6 +151,8 @@ const NetworksSelectionContainer = () => {
       <div
         className="cursor-pointer hover-to-highlight custom-network-card flex items-center"
         onClick={() => history.push('/network/add')}
+        // @todo: enable this line below if add/edit page was redesigned
+        // onClick={() => openInBrowserNewTab('/network/add')}
       >
         <h2 className="category-name">{t('CustomizeNetwork')}</h2>
         <div className="actions" style={{ marginLeft: 'auto' }}>
