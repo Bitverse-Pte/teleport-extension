@@ -186,13 +186,13 @@ const Send = () => {
       method: 'eth_sendTransaction',
       params: [params],
     });
-    history.push('/confirm-transaction');
     sensors.track('teleport_send_next', {
       page: location.pathname,
       from: params.txParam.from,
       to: params.txParam.to,
       symbol: params.txParam.symbol,
     });
+    history.push('/confirm-transaction');
   };
 
   const myAccountsSelect = () => {

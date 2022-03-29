@@ -190,8 +190,8 @@ const BackupCheck = () => {
           type="default"
           cls="custom-button-default"
           onClick={() => {
-            history.go(-1);
             sensors.track('teleport_mnemonic_backup_done', { page: pathname });
+            history.go(-1);
           }}
           block
           style={{
