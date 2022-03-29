@@ -145,7 +145,6 @@ const NetworkEdit = () => {
         );
         sensors.track('teleport_customize_network_edit', {
           page: location.pathname,
-          formattedIdx: formattedIdx,
           networkName: networkName,
           rpcUrl: rpcUrl,
           chainId: chainId,
