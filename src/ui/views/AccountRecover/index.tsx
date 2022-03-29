@@ -37,7 +37,7 @@ export const AccountHeader = (props: AccountHeaderProps) => {
   const handleBackClick = () => {
     sensors.track('teleport_account_manage_closed', {
       page: location.pathname,
-      params: { title: props.title },
+      title: props.title,
     });
     if (props.handleCloseIconClick) {
       props.handleCloseIconClick();
@@ -84,9 +84,7 @@ const AccountRecover = () => {
     updateStoragePolicyAgreed();
     sensors.track('teleport_account_recover_imported', {
       page: location.pathname,
-      params: {
-        type: importType,
-      },
+      importType: importType,
     });
     history.push({
       pathname: '/home',

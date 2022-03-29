@@ -160,7 +160,7 @@ const Home = () => {
   const handleTokenClick = (t: Token) => {
     sensors.track('teleport_home_token_click', {
       page: location.pathname,
-      params: { token: t },
+      token: t.name,
     });
     history.push({
       pathname: `/single-token/${t.tokenId}`,
@@ -272,7 +272,7 @@ const Home = () => {
           tab2="Activity"
           currentTab={tabType}
           handleTabClick={(tab: Tabs) => {
-            sensors.track('teleport_home_' + tab.toString(), {
+            sensors.track('teleport_home_' + Tabs[tab], {
               page: location.pathname,
             });
             setTabType(tab);

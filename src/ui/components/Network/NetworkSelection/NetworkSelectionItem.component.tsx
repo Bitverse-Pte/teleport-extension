@@ -44,7 +44,8 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
       }
       sensors.track('teleport_network_selected', {
         page: location.pathname,
-        params: { network: network },
+        chainId: network.chainId,
+        chainName: network.chainName,
       });
       // jump back previous page
       history.goBack();

@@ -74,7 +74,7 @@ const TokenManage = () => {
   const handleTokenClick = async (token: Token) => {
     sensors.track('teleport_token_manage_token_click', {
       page: location.pathname,
-      params: token,
+      token: token.name,
     });
     const updated = await wallet
       .setTokenDisplay(token.tokenId, !token.display)
@@ -89,7 +89,7 @@ const TokenManage = () => {
     onSuccess(token) {
       sensors.track('teleport_token_manage_next', {
         page: location.pathname,
-        params: { token: token },
+        token: token.name,
       });
       console.log(token);
       if (token) {
@@ -198,7 +198,8 @@ const TokenManage = () => {
             handleChainSelect={(chain: Provider) => {
               sensors.track('teleport_token_manage_network_select', {
                 page: location.pathname,
-                params: chain,
+                chainId: chain.id,
+                chainName: chain.chainName,
               });
               setCurrentChain(chain);
             }}

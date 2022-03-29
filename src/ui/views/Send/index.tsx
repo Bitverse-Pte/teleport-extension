@@ -189,7 +189,9 @@ const Send = () => {
     history.push('/confirm-transaction');
     sensors.track('teleport_send_next', {
       page: location.pathname,
-      params: params.txParam,
+      from: params.txParam.from,
+      to: params.txParam.to,
+      symbol: params.txParam.symbol,
     });
   };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MIN_PASSWORD_LENGTH } from 'constants/index';
 import { Checkbox, message } from 'antd';
@@ -21,6 +21,7 @@ const { sensors } = skynet;
 const AccountCreate = () => {
   const { t } = useTranslation();
   const history = useHistory();
+  const location = useLocation();
   const [agreed, setAgreed] = useState(false);
   const [psd, setPsd] = useState('');
   const [confirmPsd, setConfirmPsd] = useState('');
@@ -32,7 +33,9 @@ const AccountCreate = () => {
   const [run, loading] = useWalletRequest(wallet.createHdWallet, {
     onSuccess(mnemonic) {
       updateStoragePolicyAgreed();
-      sensors.track('teleport_account_create_step1', { page: 'create' });
+      sensors.track('teleport_account_create_step1', {
+        page: location.pathname,
+      });
       history.push({
         pathname: '/mnemonic-backup',
         state: {

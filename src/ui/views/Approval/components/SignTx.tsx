@@ -167,7 +167,8 @@ const SignTx = ({ params, origin }) => {
     }
     sensors.track('teleport_sign_tx_confirmed', {
       page: location.pathname,
-      params: tx,
+      from: tx.from,
+      to: tx.to,
     });
   };
   const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));

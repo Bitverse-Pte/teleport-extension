@@ -21,7 +21,7 @@ const Welcome = () => {
     history.push({
       pathname: type === ACCOUNT_CREATE_TYPE.CREATE ? '/create' : '/recover',
     });
-    sensors.track('teleport_welcome' + type.toString(), {
+    sensors.track('teleport_welcome' + ACCOUNT_CREATE_TYPE[type], {
       page: 'welcome',
     });
   };

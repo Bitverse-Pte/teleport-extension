@@ -145,14 +145,12 @@ const NetworkEdit = () => {
         );
         sensors.track('teleport_customize_network_edit', {
           page: location.pathname,
-          params: {
-            formattedIdx,
-            networkName,
-            rpcUrl,
-            chainId,
-            symbol,
-            explorerUrl,
-          },
+          formattedIdx: formattedIdx,
+          networkName: networkName,
+          rpcUrl: rpcUrl,
+          chainId: chainId,
+          symbol: symbol,
+          explorerUrl: explorerUrl,
         });
       } else {
         console.debug('Adding Custom Provider');
@@ -165,13 +163,11 @@ const NetworkEdit = () => {
         );
         sensors.track('teleport_customize_network_add', {
           page: location.pathname,
-          params: {
-            networkName,
-            rpcUrl,
-            chainId,
-            symbol,
-            explorerUrl,
-          },
+          networkName: networkName,
+          rpcUrl: rpcUrl,
+          chainId: chainId,
+          symbol: symbol,
+          explorerUrl: explorerUrl,
         });
       }
 
