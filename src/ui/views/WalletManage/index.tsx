@@ -154,6 +154,7 @@ const WalletManage: React.FC = () => {
     if (renamed) {
       setRenamePopupVisible(false);
       queryWallets();
+      queryCurrentAccount();
     }
   };
 
