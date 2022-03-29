@@ -55,7 +55,7 @@ const toHumanReadableTime = (milliseconds = 1, t) => {
 interface GasTimingPropTypes {
   maxPriorityFeePerGas: string | number;
   maxFeePerGas: string | number;
-  gasWarnings: any;
+  gasWarnings?: any;
 }
 
 export default function GasTiming({
