@@ -37,7 +37,7 @@ const AccountManage: React.FC = () => {
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
 
-  const { state } = useLocation<{
+  const { state, pathname } = useLocation<{
     hdWalletId: string;
     hdWalletName: string;
     accountCreateType: AccountCreateType;
@@ -67,6 +67,7 @@ const AccountManage: React.FC = () => {
         setAddPopupVisible(false);
         queryAccounts();
         (accountManageWidgetRef.current as any).queryAccounts();
+        sensors.track('teleport_account_manage_create', { page: pathname });
       },
       onError: (e) => {
         console.error(e.code);
@@ -95,6 +96,7 @@ const AccountManage: React.FC = () => {
       setRenamePopupVisible(false);
       queryAccounts();
     }
+    sensors.track('teleport_account_manage_rename', { page: pathname });
   };
 
   const onDeleteConfirm = async () => {
@@ -104,6 +106,7 @@ const AccountManage: React.FC = () => {
     );
     setDeletePopupVisible(false);
     queryAccounts();
+    sensors.track('teleport_account_manage_delete', { page: pathname });
   };
   const handleUnlock = () => {
     if (isAdd) {
