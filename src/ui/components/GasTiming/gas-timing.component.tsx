@@ -9,7 +9,11 @@ import { usePrevious } from 'react-use';
 import { GAS_ESTIMATE_TYPES, GAS_FORM_ERRORS } from 'constants/gas';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'antd';
-import { getGasEstimateType, getGasFeeEstimates, getIsGasEstimatesLoading } from 'ui/selectors/selectors';
+import {
+  getGasEstimateType,
+  getGasFeeEstimates,
+  getIsGasEstimatesLoading,
+} from 'ui/selectors/selectors';
 import { useWallet } from 'ui/utils';
 
 // import { GAS_ESTIMATE_TYPES } from '../../../../shared/constants/gas';
@@ -92,14 +96,16 @@ export default function GasTiming({
       (fee && fee !== previousMaxFeePerGas)
     ) {
       // getGasFeeTimeEstimate requires parameters in string format
-      wallet.getGasFeeTimeEstimate(
-        new BigNumber(priority, 10).toString(10),
-        new BigNumber(fee, 10).toString(10)
-      ).then((result) => {
-        if (maxFeePerGas === fee && maxPriorityFeePerGas === priority) {
-          setCustomEstimatedTime(result);
-        }
-      });
+      wallet
+        .getGasFeeTimeEstimate(
+          new BigNumber(priority, 10).toString(10),
+          new BigNumber(fee, 10).toString(10)
+        )
+        .then((result) => {
+          if (maxFeePerGas === fee && maxPriorityFeePerGas === priority) {
+            setCustomEstimatedTime(result);
+          }
+        });
     }
 
     if (isUnknownLow !== false && previousIsUnknownLow === true) {
@@ -120,9 +126,9 @@ export default function GasTiming({
   } else {
     unknownProcessingTimeText = (
       // <>
-        <Tooltip placement="top" title={t('editGasTooLowTooltip')}>
-          {t('editGasTooLow')}
-        </Tooltip>
+      <Tooltip placement="top" title={t('editGasTooLowTooltip')}>
+        {t('editGasTooLow')}
+      </Tooltip>
       // </>
     );
   }
@@ -200,12 +206,11 @@ export default function GasTiming({
       ]);
     } else {
       text = (
-          <Tooltip
-            placement="top"
-            title={t('editGasTooLowWarningTooltip')}
-          >{t('gasTimingNegative', [
+        <Tooltip placement="top" title={t('editGasTooLowWarningTooltip')}>
+          {t('gasTimingNegative', [
             toHumanReadableTime(low.maxWaitTimeEstimate, t),
-          ])}</Tooltip>
+          ])}
+        </Tooltip>
       );
     }
   }
@@ -221,5 +226,3 @@ export default function GasTiming({
     </h6>
   );
 }
-
-

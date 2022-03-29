@@ -62,7 +62,7 @@ export class LatestBlockDataHubService {
       gasFeeEstimates: {},
       isBaseFeePerGasExist: false,
       // use Legacy as default value, the compatible way
-      gasEstimateType: GAS_ESTIMATE_TYPES.LEGACY
+      gasEstimateType: GAS_ESTIMATE_TYPES.LEGACY,
     });
 
     this._provider = opts.provider;
@@ -138,7 +138,7 @@ export class LatestBlockDataHubService {
       currentBlockGasLimit,
       gasFeeEstimates,
       isBaseFeePerGasExist,
-      gasEstimateType
+      gasEstimateType,
     });
     console.debug(
       `LatestBlockDataHubService::updateForBlock: executed for block ${blockNumber} for RPC ${this.rpcUrl}`

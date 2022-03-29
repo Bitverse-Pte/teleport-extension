@@ -75,11 +75,17 @@ export enum GAS_FORM_ERRORS {
   MAX_FEE_HIGH_WARNING = 'editGasMaxFeeHigh',
   MAX_FEE_IMBALANCE = 'editGasMaxFeeImbalance',
   GAS_PRICE_TOO_LOW = 'editGasPriceTooLow',
-};
+}
 
-export function getGasFormErrorText(type: GAS_FORM_ERRORS, t: any, { minimumGasLimit = '' }: {
-  minimumGasLimit?: string
-}) {
+export function getGasFormErrorText(
+  type: GAS_FORM_ERRORS,
+  t: any,
+  {
+    minimumGasLimit = '',
+  }: {
+    minimumGasLimit?: string;
+  }
+) {
   switch (type) {
     case GAS_FORM_ERRORS.GAS_LIMIT_OUT_OF_BOUNDS:
       return t('editGasLimitOutOfBounds', [minimumGasLimit]);
