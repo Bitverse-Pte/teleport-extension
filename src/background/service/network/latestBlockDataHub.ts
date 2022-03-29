@@ -9,8 +9,9 @@ import { PollingBlockTracker } from 'eth-block-tracker';
 import EthQuery from 'eth-query';
 import pify from 'pify';
 import eventBus from 'eventBus';
+import { GAS_ESTIMATE_TYPES } from 'constants/gas';
 
-type BlockData = {
+export type BlockData = {
   /**
    * The Current GasLimit
    */
@@ -23,6 +24,8 @@ type BlockData = {
     | GasFeeEstimates
     | LegacyGasPriceEstimate
     | Record<string, never>;
+
+  gasEstimateType: string;
   /**
    * Indicate a EVM chain is implemented EIP1559 or not
    */
@@ -58,6 +61,8 @@ export class LatestBlockDataHubService {
       currentBlockGasLimit: '',
       gasFeeEstimates: {},
       isBaseFeePerGasExist: false,
+      // use Legacy as default value, the compatible way
+      gasEstimateType: GAS_ESTIMATE_TYPES.LEGACY
     });
 
     this._provider = opts.provider;
@@ -128,11 +133,12 @@ export class LatestBlockDataHubService {
     const isBaseFeePerGasExist = currentBlock.baseFeePerGas !== undefined;
 
     const gasFeeState = await this._gasFeeTracker.fetchGasFeeEstimates();
-    const gasFeeEstimates = gasFeeState.gasFeeEstimates;
+    const { gasFeeEstimates, gasEstimateType } = gasFeeState;
     this.store.updateState({
       currentBlockGasLimit,
       gasFeeEstimates,
       isBaseFeePerGasExist,
+      gasEstimateType
     });
     console.debug(
       `LatestBlockDataHubService::updateForBlock: executed for block ${blockNumber} for RPC ${this.rpcUrl}`
