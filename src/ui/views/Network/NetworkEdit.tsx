@@ -149,7 +149,6 @@ const NetworkEdit = () => {
           rpcUrl: rpcUrl,
           chainId: chainId,
           symbol: symbol,
-          explorerUrl: explorerUrl,
         });
       } else {
         console.debug('Adding Custom Provider');
