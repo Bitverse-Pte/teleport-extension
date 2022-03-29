@@ -44,12 +44,12 @@ const SECOND_CUTOFF = 90;
 const EIP_1559_V2 = process.env.EIP_1559_V2;
 
 // Shows "seconds" as unit of time if under SECOND_CUTOFF, otherwise "minutes"
-const toHumanReadableTime = (milliseconds = 1, t) => {
+const toHumanReadableTime = (milliseconds = 1, t: any) => {
   const seconds = Math.ceil(milliseconds / 1000);
   if (seconds <= SECOND_CUTOFF) {
-    return t('gasTimingSeconds', [seconds]);
+    return t('gasTimingSeconds', { replace: { $1: seconds } });
   }
-  return t('gasTimingMinutes', [Math.ceil(seconds / 60)]);
+  return t('gasTimingMinutes', { replace: { $1: Math.ceil(seconds / 60) } });
 };
 
 interface GasTimingPropTypes {
@@ -169,14 +169,16 @@ export default function GasTiming({
       Number(maxPriorityFeePerGas) < Number(high.suggestedMaxPriorityFeePerGas)
     ) {
       // Medium
-      text = t('gasTimingPositive', [
-        toHumanReadableTime(low.maxWaitTimeEstimate, t),
-      ]);
+      text = t('gasTimingPositive', {
+        replace: { $1: toHumanReadableTime(low.maxWaitTimeEstimate, t) },
+      });
     } else {
       // High
-      text = t('gasTimingVeryPositive', [
-        toHumanReadableTime(high.minWaitTimeEstimate, t),
-      ]);
+      text = t('gasTimingVeryPositive', {
+        replace: {
+          $1: toHumanReadableTime(high.minWaitTimeEstimate, t),
+        },
+      });
     }
   } else {
     if (!EIP_1559_V2 || estimateUsed === 'low') {
@@ -194,22 +196,27 @@ export default function GasTiming({
       ) {
         text = unknownProcessingTimeText;
       } else {
-        text = t('gasTimingNegative', [
-          toHumanReadableTime(Number(customEstimatedTime?.upperTimeBound), t),
-        ]);
+        text = t('gasTimingNegative', {
+          $1: toHumanReadableTime(
+            Number(customEstimatedTime?.upperTimeBound),
+            t
+          ),
+        });
       }
     }
     // code below needs to cleaned-up once EIP_1559_V2 flag is removed
     else if (EIP_1559_V2) {
-      text = t('gasTimingNegative', [
-        toHumanReadableTime(low.maxWaitTimeEstimate, t),
-      ]);
+      text = t('gasTimingNegative', {
+        replace: { $1: toHumanReadableTime(low.maxWaitTimeEstimate, t) },
+      });
     } else {
       text = (
         <Tooltip placement="top" title={t('editGasTooLowWarningTooltip')}>
-          {t('gasTimingNegative', [
-            toHumanReadableTime(low.maxWaitTimeEstimate, t),
-          ])}
+          {t('gasTimingNegative', {
+            replace: {
+              $1: toHumanReadableTime(low.maxWaitTimeEstimate, t),
+            },
+          })}
         </Tooltip>
       );
     }
