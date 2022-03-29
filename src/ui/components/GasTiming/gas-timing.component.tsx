@@ -4,27 +4,35 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import BigNumber from 'bignumber.js';
 
-import { GAS_ESTIMATE_TYPES } from '../../../../shared/constants/gas';
+// import { GAS_ESTIMATE_TYPES } from '@metamask/controllers';
+import { usePrevious } from 'react-use';
+import { GAS_ESTIMATE_TYPES, GAS_FORM_ERRORS } from 'constants/gas';
+import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'antd';
+import { getGasEstimateType, getGasFeeEstimates, getIsGasEstimatesLoading } from 'ui/selectors/selectors';
+import { useWallet } from 'ui/utils';
 
-import { usePrevious } from '../../../hooks/usePrevious';
-import { I18nContext } from '../../../contexts/i18n';
+// import { GAS_ESTIMATE_TYPES } from '../../../../shared/constants/gas';
 
-import {
-  getGasEstimateType,
-  getGasFeeEstimates,
-  getIsGasEstimatesLoading,
-} from '../../../ducks/metamask/metamask';
+// import { usePrevious } from '../../../hooks/usePrevious';
+// import { I18nContext } from '../../../contexts/i18n';
 
-import Typography from '../../ui/typography/typography';
-import {
-  TYPOGRAPHY,
-  FONT_WEIGHT,
-} from '../../../helpers/constants/design-system';
-import InfoTooltip from '../../ui/info-tooltip/info-tooltip';
+// import {
+//   getGasEstimateType,
+//   getGasFeeEstimates,
+//   getIsGasEstimatesLoading,
+// } from '../../../ducks/metamask/metamask';
 
-import { getGasFeeTimeEstimate } from '../../../store/actions';
-import { GAS_FORM_ERRORS } from '../../../helpers/constants/gas';
-import { useGasFeeContext } from '../../../contexts/gasFee';
+// import h6 from '../../ui/h6/h6';
+// import {
+//   h6,
+//   FONT_WEIGHT,
+// } from '../../../helpers/constants/design-system';
+// import InfoTooltip from '../../ui/info-tooltip/info-tooltip';
+
+// import { getGasFeeTimeEstimate } from '../../../store/actions';
+// import { GAS_FORM_ERRORS } from '../../../helpers/constants/gas';
+// import { useGasFeeContext } from '../../../contexts/gasFee';
 
 // Once we reach this second threshold, we switch to minutes as a unit
 const SECOND_CUTOFF = 90;
@@ -39,18 +47,28 @@ const toHumanReadableTime = (milliseconds = 1, t) => {
   }
   return t('gasTimingMinutes', [Math.ceil(seconds / 60)]);
 };
+
+interface GasTimingPropTypes {
+  maxPriorityFeePerGas: string | number;
+  maxFeePerGas: string | number;
+  gasWarnings: any;
+}
+
 export default function GasTiming({
   maxFeePerGas = 0,
   maxPriorityFeePerGas = 0,
   gasWarnings,
-}) {
+}: GasTimingPropTypes) {
+  const wallet = useWallet();
   const gasEstimateType = useSelector(getGasEstimateType);
   const gasFeeEstimates = useSelector(getGasFeeEstimates);
   const isGasEstimatesLoading = useSelector(getIsGasEstimatesLoading);
 
-  const [customEstimatedTime, setCustomEstimatedTime] = useState(null);
-  const t = useContext(I18nContext);
-  const { estimateUsed } = useGasFeeContext();
+  const [customEstimatedTime, setCustomEstimatedTime] = useState<any>(null);
+  const { t } = useTranslation();
+  // @todo: useGasFeeContext()
+  // const { estimateUsed } = useGasFeeContext();
+  const estimateUsed = 'low';
 
   // If the user has chosen a value lower than the low gas fee estimate,
   // We'll need to use the useEffect hook below to make a call to calculate
@@ -74,7 +92,7 @@ export default function GasTiming({
       (fee && fee !== previousMaxFeePerGas)
     ) {
       // getGasFeeTimeEstimate requires parameters in string format
-      getGasFeeTimeEstimate(
+      wallet.getGasFeeTimeEstimate(
         new BigNumber(priority, 10).toString(10),
         new BigNumber(fee, 10).toString(10)
       ).then((result) => {
@@ -96,15 +114,16 @@ export default function GasTiming({
     previousIsUnknownLow,
   ]);
 
-  let unknownProcessingTimeText;
+  let unknownProcessingTimeText: React.ReactNode | undefined;
   if (EIP_1559_V2) {
     unknownProcessingTimeText = t('editGasTooLow');
   } else {
     unknownProcessingTimeText = (
-      <>
-        {t('editGasTooLow')}{' '}
-        <InfoTooltip position="top" contentText={t('editGasTooLowTooltip')} />
-      </>
+      // <>
+        <Tooltip placement="top" title={t('editGasTooLowTooltip')}>
+          {t('editGasTooLow')}
+        </Tooltip>
+      // </>
     );
   }
 
@@ -113,13 +132,12 @@ export default function GasTiming({
     gasWarnings?.maxFee === GAS_FORM_ERRORS.MAX_FEE_TOO_LOW
   ) {
     return (
-      <Typography
-        variant={TYPOGRAPHY.H7}
-        fontWeight={FONT_WEIGHT.BOLD}
+      <h6
+        style={{ fontWeight: 'bold' }}
         className={classNames('gas-timing', 'gas-timing--negative')}
       >
         {unknownProcessingTimeText}
-      </Typography>
+      </h6>
     );
   }
 
@@ -133,7 +151,7 @@ export default function GasTiming({
 
   const { low = {}, medium = {}, high = {} } = gasFeeEstimates;
 
-  let text = '';
+  let text: React.ReactNode = '';
   let attitude = 'positive';
 
   // Anything medium or faster is positive
@@ -182,34 +200,26 @@ export default function GasTiming({
       ]);
     } else {
       text = (
-        <>
-          {t('gasTimingNegative', [
+          <Tooltip
+            placement="top"
+            title={t('editGasTooLowWarningTooltip')}
+          >{t('gasTimingNegative', [
             toHumanReadableTime(low.maxWaitTimeEstimate, t),
-          ])}
-          <InfoTooltip
-            position="top"
-            contentText={t('editGasTooLowWarningTooltip')}
-          />
-        </>
+          ])}</Tooltip>
       );
     }
   }
 
   return (
-    <Typography
-      variant={TYPOGRAPHY.H7}
+    <h6
       className={classNames('gas-timing', {
         [`gas-timing--${attitude}`]: attitude && !EIP_1559_V2,
         [`gas-timing--${attitude}-V2`]: attitude && EIP_1559_V2,
       })}
     >
       {text}
-    </Typography>
+    </h6>
   );
 }
 
-GasTiming.propTypes = {
-  maxPriorityFeePerGas: PropTypes.string,
-  maxFeePerGas: PropTypes.string,
-  gasWarnings: PropTypes.object,
-};
+
