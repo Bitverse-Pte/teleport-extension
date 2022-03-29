@@ -148,6 +148,11 @@ const SignTx = ({ params, origin }) => {
   useAsyncEffect(initState, [gasState.gasType]);
 
   const handleAllow = async () => {
+    sensors.track('teleport_sign_tx_confirmed', {
+      page: location.pathname,
+      from: tx.from,
+      to: tx.to,
+    });
     dispatch(showLoadingIndicator());
     if (tx.type === TransactionEnvelopeTypes.FEE_MARKET) {
       resolveApproval({
@@ -165,22 +170,17 @@ const SignTx = ({ params, origin }) => {
         .then(() => delay(1000))
         .then(() => dispatch(hideLoadingIndicator()));
     }
-    sensors.track('teleport_sign_tx_confirmed', {
-      page: location.pathname,
-      from: tx.from,
-      to: tx.to,
-    });
   };
   const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));
 
   const handleCancel = () => {
+    sensors.track('teleport_sign_tx_declined', {
+      page: location.pathname,
+    });
     dispatch(showLoadingIndicator());
     rejectApproval('User rejected the request.')
       .then(() => delay(1000))
       .then(() => dispatch(hideLoadingIndicator()));
-    sensors.track('teleport_sign_tx_declined', {
-      page: location.pathname,
-    });
   };
 
   const fetchNativePrice = async () => {

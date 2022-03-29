@@ -67,7 +67,9 @@ const AccountManage: React.FC = () => {
         setAddPopupVisible(false);
         queryAccounts();
         (accountManageWidgetRef.current as any).queryAccounts();
-        sensors.track('teleport_account_manage_create', { page: pathname });
+        sensors.track('teleport_account_manage_add_confirm', {
+          page: pathname,
+        });
       },
       onError: (e) => {
         console.error(e.code);
@@ -83,6 +85,7 @@ const AccountManage: React.FC = () => {
   useAsyncEffect(queryAccounts, []);
 
   const onRenameConfirm = async (accountName) => {
+    sensors.track('teleport_account_manage_rename_confirm', { page: pathname });
     if (accountName.length > 20) {
       ClickToCloseMessage.error('Name length should be 1-20 chars');
       return;
@@ -96,17 +99,16 @@ const AccountManage: React.FC = () => {
       setRenamePopupVisible(false);
       queryAccounts();
     }
-    sensors.track('teleport_account_manage_rename', { page: pathname });
   };
 
   const onDeleteConfirm = async () => {
+    sensors.track('teleport_account_manage_delete_confirm', { page: pathname });
     await wallet.deleteDisplayAccountByExistKeyringAndIndex(
       hdWalletId,
       currentAccountIndex
     );
     setDeletePopupVisible(false);
     queryAccounts();
-    sensors.track('teleport_account_manage_delete', { page: pathname });
   };
   const handleUnlock = () => {
     if (isAdd) {
@@ -117,6 +119,7 @@ const AccountManage: React.FC = () => {
   };
 
   const handleEdit = async () => {
+    sensors.track('teleport_account_manage_edit', { page: pathname });
     setIsAdd(false);
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);
@@ -126,6 +129,7 @@ const AccountManage: React.FC = () => {
   };
 
   const handleAdd = async () => {
+    sensors.track('teleport_account_manage_add', { page: pathname });
     setIsAdd(true);
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);

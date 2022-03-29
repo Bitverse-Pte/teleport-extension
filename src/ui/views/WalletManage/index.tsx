@@ -135,7 +135,6 @@ const WalletManage: React.FC = () => {
   };
 
   const handleWalletClick = async (w: any) => {
-    //todo
     sensors.track('teleport_wallet_manage_wallet_click', {
       page: location.pathname,
     });

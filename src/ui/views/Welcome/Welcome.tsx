@@ -18,11 +18,11 @@ const Welcome = () => {
   const handleBtnClick: (type: ACCOUNT_CREATE_TYPE) => void = (
     type: ACCOUNT_CREATE_TYPE
   ) => {
-    history.push({
-      pathname: type === ACCOUNT_CREATE_TYPE.CREATE ? '/create' : '/recover',
-    });
     sensors.track('teleport_welcome' + ACCOUNT_CREATE_TYPE[type], {
       page: 'welcome',
+    });
+    history.push({
+      pathname: type === ACCOUNT_CREATE_TYPE.CREATE ? '/create' : '/recover',
     });
   };
   return (

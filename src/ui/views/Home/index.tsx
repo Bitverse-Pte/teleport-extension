@@ -120,10 +120,10 @@ const Home = () => {
   }, [tokens, filterCondition, prices]);
 
   const handleSendBtnClick = () => {
-    history.push('/send');
     sensors.track('teleport_home_send_click', {
       page: location.pathname,
     });
+    history.push('/send');
   };
   const handleAccountClick = async (account: BaseAccount) => {
     await wallet.changeAccount(account);
@@ -137,10 +137,10 @@ const Home = () => {
   };
 
   const handleReceiveBtnClick = () => {
-    history.push('/receive');
     sensors.track('teleport_home_receive_click', {
       page: location.pathname,
     });
+    history.push('/receive');
   };
   const handleAddTokenBtnClick = (e) => {
     e.stopPropagation();
