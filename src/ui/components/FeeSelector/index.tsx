@@ -15,6 +15,13 @@ interface Fee {
   gasPrice: number;
   gasLimit?: number;
 }
+
+interface FeeSelectorProps {
+  visible: boolean;
+  onClose: () => void;
+  gasLimit?: number;
+}
+
 interface DrawerHeaderProps {
   title: string;
   type?: number;
@@ -34,7 +41,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
     </div>
   );
 };
-function FeeSelector(props) {
+function FeeSelector(props: FeeSelectorProps) {
   const gasState: any = useSelector((state) => state.gas);
   const dispatch = useDispatch();
   const { visible, onClose, gasLimit = 21000 } = props;
