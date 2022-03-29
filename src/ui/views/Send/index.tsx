@@ -216,9 +216,7 @@ const Send = () => {
             <span className="assets-option-symbol">{t.symbol}</span>
           </div>
           <span className="assets-option-right">
-            {`${denom2SymbolRatio(t?.amount || 0, t?.decimal || 0)} ${
-              t.symbol
-            }`}
+            {`${denom2SymbolRatio(t?.amount || 0, t?.decimal || 0)}  `}
           </span>
         </div>
       ),

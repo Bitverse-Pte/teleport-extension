@@ -138,7 +138,10 @@ const WalletManage: React.FC = () => {
 
   const onRenameConfirm = async (walletName) => {
     if (walletName.length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     const renamed: boolean = await wallet
@@ -146,9 +149,15 @@ const WalletManage: React.FC = () => {
       .catch((e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error('Name already exists');
+          ClickToCloseMessage.error({
+            content: 'Name already exists',
+            key: 'Name already exists',
+          });
         } else {
-          ClickToCloseMessage.error('Unknown error, please try again later');
+          ClickToCloseMessage.error({
+            content: 'Unknown error, please try again later',
+            key: 'Unknown error, please try again later',
+          });
         }
       });
     if (renamed) {
