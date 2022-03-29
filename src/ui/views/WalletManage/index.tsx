@@ -50,8 +50,6 @@ const WalletManage: React.FC = () => {
     BaseAccount[]
   >([]);
   const [accountType, setAccountType] = useState(Tabs.FIRST);
-  const [backupHdWalletId, setBackupWalletId] = useState('');
-  const [popupVisible, setPopupVisible] = useState(false);
   const [deletePopupVisible, setDeletePopupVisible] = useState(false);
   const [currentHdWalletId, setCurrentHdWalletId] = useState('');
   const [isEdit, setIsEdit] = useState(false);
@@ -81,10 +79,6 @@ const WalletManage: React.FC = () => {
 
   useAsyncEffect(queryWallets, []);
   useAsyncEffect(queryCurrentAccount, []);
-
-  const isHd = useMemo(() => {
-    return accountType === Tabs.FIRST;
-  }, [accountType]);
 
   useMemo(() => {
     if (currentAccount && hdWalletAccounts && simpleWalletAccounts) {
@@ -125,15 +119,12 @@ const WalletManage: React.FC = () => {
     });
     setDeletePopupVisible(false);
     queryWallets();
+    queryCurrentAccount();
   };
 
   const handleWalletClick = async (w: any) => {
     await wallet.changeAccount(w?.accounts ? w?.accounts[0] : w);
     history.goBack();
-  };
-
-  const setBackupVisible = (visible: boolean) => {
-    setPopupVisible(visible);
   };
 
   const onRenameConfirm = async (walletName) => {
@@ -163,6 +154,7 @@ const WalletManage: React.FC = () => {
     if (renamed) {
       setRenamePopupVisible(false);
       queryWallets();
+      queryCurrentAccount();
     }
   };
 
