@@ -50,6 +50,7 @@ import {
 import { BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
+
 import { useMethodData } from 'ui/hooks/wallet/useMethodData';
 import { HeaderWithFlex } from 'ui/components/Header';
 import { GAS_ESTIMATE_TYPES } from 'constants/gas';
@@ -283,7 +284,13 @@ const SignTx = ({ params, origin }) => {
         <Divider style={{ marginTop: 16, marginBottom: 0 }} />
       </div>
       {renderContent()}
-      <FeeSelector visible={visible} onClose={() => setVisible(false)} />
+      {/* @todo: use `maxPriorityFeePerGas` and `maxFeePerGas` from hooks, since these data are not correct. */}
+      <FeeSelector
+        visible={visible}
+        onClose={() => setVisible(false)}
+        maxPriorityFeePerGas={maxPriorityFeePerGas}
+        maxFeePerGas={maxFeePerGas}
+      />
       <div className="tx-button-container flexCol content-wrap-padding">
         <CustomButton
           type="primary"

@@ -20,6 +20,9 @@ interface FeeSelectorProps {
   visible: boolean;
   onClose: () => void;
   gasLimit?: number;
+
+  maxPriorityFeePerGas: any;
+  maxFeePerGas: any;
 }
 
 interface DrawerHeaderProps {
@@ -166,6 +169,8 @@ function FeeSelector(props: FeeSelectorProps) {
               }}
               selected={item?.type === selectFee}
               onSelect={onSelect}
+              maxFeePerGas={props.maxFeePerGas}
+              maxPriorityFeePerGas={props.maxPriorityFeePerGas}
             />
           ))}
         </ul>

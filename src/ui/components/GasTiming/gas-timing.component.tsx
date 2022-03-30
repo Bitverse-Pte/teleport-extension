@@ -56,12 +56,15 @@ interface GasTimingPropTypes {
   maxPriorityFeePerGas: string | number;
   maxFeePerGas: string | number;
   gasWarnings?: any;
+
+  estimateUsed: string;
 }
 
 export default function GasTiming({
   maxFeePerGas = 0,
   maxPriorityFeePerGas = 0,
   gasWarnings,
+  estimateUsed,
 }: GasTimingPropTypes) {
   const wallet = useWallet();
   const gasEstimateType = useSelector(getGasEstimateType);
@@ -72,7 +75,7 @@ export default function GasTiming({
   const { t } = useTranslation();
   // @todo: useGasFeeContext()
   // const { estimateUsed } = useGasFeeContext();
-  const estimateUsed = 'low';
+  // const estimateUsed = 'low';
 
   // If the user has chosen a value lower than the low gas fee estimate,
   // We'll need to use the useEffect hook below to make a call to calculate
