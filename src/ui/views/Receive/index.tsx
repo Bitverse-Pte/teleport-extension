@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { PageHeader, Button, message } from 'antd';
 import { useHistory } from 'react-router-dom';
@@ -12,8 +13,11 @@ import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import { useTranslation } from 'react-i18next';
 import Jazzicon from 'react-jazzicon';
 import { ChainIdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const SendToken = () => {
+  const location = useLocation();
   const wallet = useWallet();
   const history = useHistory();
   const { t } = useTranslation();
@@ -65,7 +69,12 @@ const SendToken = () => {
         <div className="copy-box">
           <CopyToClipboard
             text={fromAccount?.address}
-            onCopy={() => ClickToCloseMessage.success('Copied')}
+            onCopy={() => {
+              ClickToCloseMessage.success('Copied');
+              sensors.track('teleport_receive_copy', {
+                page: location.pathname,
+              });
+            }}
           >
             <Button type="primary" block className="copy-btn">
               {t('copy_to_clipboard')}

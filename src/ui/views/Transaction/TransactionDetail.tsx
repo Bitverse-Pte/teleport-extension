@@ -25,6 +25,9 @@ import { TransactionFee } from './TransactionFee';
 import { cancelTxs } from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
 import { useTranslation } from 'react-i18next';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
+
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -97,6 +100,9 @@ export function _ActivityDetail({
 
   const handleExplorerClick = useCallback(
     (type: 'address' | 'tx', hash: string) => {
+      sensors.track('teleport_activity_open_' + type, {
+        page: location.pathname,
+      });
       window.open(`${rpcPrefs.blockExplorerUrl}/${type}/${hash}`);
     },
     [rpcPrefs]
@@ -119,6 +125,9 @@ export function _ActivityDetail({
 
   const cancelTx = useCallback(() => {
     dispatch(cancelTxs(transaction.transactions, walletController));
+    sensors.track('teleport_activity_cancelled', {
+      page: location.pathname,
+    });
     history.goBack();
   }, [dispatch, history]);
 

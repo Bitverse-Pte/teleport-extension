@@ -11,6 +11,8 @@ import './style.less';
 import { AccountHeader } from '../AccountRecover';
 import classnames from 'classnames';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const MnemonicBackup = () => {
   const { t } = useTranslation();
@@ -19,7 +21,7 @@ const MnemonicBackup = () => {
   const [second, setSecond] = useState(10);
 
   const countDownTimer: any = useRef();
-  const { state } = useLocation<{
+  const { state, pathname } = useLocation<{
     mnemonic: string;
   }>();
 
@@ -56,14 +58,17 @@ const MnemonicBackup = () => {
   }, []);
 
   const handleSkinClick = () => {
+    sensors.track('teleport_mnemonic_backup_skip', { page: pathname });
     if (checkDisabled) return;
     setSecond(0);
   };
   const handleCopyClick = () => {
+    sensors.track('teleport_mnemonic_backup_copy', { page: pathname });
     setSecond(0);
   };
 
   const submit = () => {
+    sensors.track('teleport_mnemonic_backup_continue', { page: pathname });
     history.push({
       pathname: '/home',
     });

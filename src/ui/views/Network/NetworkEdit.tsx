@@ -8,7 +8,7 @@ import React, {
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import './style.less';
-import { useHistory, useParams } from 'react-router';
+import { useHistory, useParams, useLocation } from 'react-router';
 import axios, { AxiosError } from 'axios';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { Button, Input, Select } from 'antd';
@@ -22,6 +22,8 @@ import { defaultNetworks } from 'constants/defaultNetwork';
 import { useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import clsx from 'clsx';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
 
@@ -29,6 +31,7 @@ const NetworkEdit = () => {
   const { t } = useTranslation();
   const networkContext = useContext(NetworkProviderContext);
   const history = useHistory();
+  const location = useLocation();
   const { idx } = useParams<{ idx: string | undefined }>();
   const formattedIdx = useMemo(() => Number(idx), [idx]);
 
@@ -140,6 +143,13 @@ const NetworkEdit = () => {
           symbol,
           explorerUrl
         );
+        sensors.track('teleport_customize_network_edit', {
+          page: location.pathname,
+          networkName: networkName,
+          rpcUrl: rpcUrl,
+          chainId: chainId,
+          symbol: symbol,
+        });
       } else {
         console.debug('Adding Custom Provider');
         await networkContext?.addCustomProvider(
@@ -149,6 +159,14 @@ const NetworkEdit = () => {
           symbol,
           explorerUrl
         );
+        sensors.track('teleport_customize_network_add', {
+          page: location.pathname,
+          networkName: networkName,
+          rpcUrl: rpcUrl,
+          chainId: chainId,
+          symbol: symbol,
+          explorerUrl: explorerUrl,
+        });
       }
 
       ClickToCloseMessage.success({

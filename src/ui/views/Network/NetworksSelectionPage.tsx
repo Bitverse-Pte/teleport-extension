@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useHistory } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { NetworksCategories } from './typing';
 import DefaulutIcon from 'assets/tokens/default.svg';
@@ -20,6 +20,8 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { NetworkSelectionItem } from 'ui/components/Network/NetworkSelection/NetworkSelectionItem.component';
 import { BetaIcon } from 'ui/components/Widgets';
 import { ReactComponent as TLPText } from 'assets/teleportText.svg';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const ChainCategoryIcon = ({ src = DefaulutIcon }: { src?: string }) => (
   <img
@@ -88,6 +90,7 @@ function useProviderList() {
 const NetworksSelectionContainer = () => {
   const { t } = useTranslation();
   const history = useHistory();
+  const location = useLocation();
   const [activeKeys, setActiveKeys] = useState<Record<string, boolean>>({});
   const providerContext = useContext(NetworkProviderContext);
   const { networkList, currentSelectedCategory } = useProviderList();
@@ -149,7 +152,12 @@ const NetworksSelectionContainer = () => {
       </div>
       <div
         className="cursor-pointer hover-to-highlight custom-network-card flex items-center"
-        onClick={() => history.push('/network/add')}
+        onClick={() => {
+          sensors.track('teleport_network_customize', {
+            page: location.pathname,
+          });
+          history.push('/network/add');
+        }}
       >
         <h2 className="category-name">{t('CustomizeNetwork')}</h2>
         <div className="actions" style={{ marginLeft: 'auto' }}>

@@ -1,24 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState, useContext, useMemo } from 'react';
-import {
-  intToHex,
-  isHexString,
-  isHexPrefixed,
-  addHexPrefix,
-  unpadHexString,
-} from 'ethereumjs-util';
-import {
-  Button,
-  Modal,
-  Tooltip,
-  Checkbox,
-  Spin,
-  Tabs,
-  Divider,
-  message,
-} from 'antd';
+import React, { useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
+import { Tabs, Divider } from 'antd';
 import { useTranslation } from 'react-i18next';
-import clsx from 'clsx';
 import {
   useWallet,
   useApproval,
@@ -28,7 +13,6 @@ import {
 import {
   NetworkDisplay,
   SenderToRecipient,
-  StrayPageWithButton,
   UserPreferencedCurrencyDisplay,
 } from 'ui/components';
 import {
@@ -37,11 +21,9 @@ import {
   multipyHexes,
   decGWEIToHexWEI,
 } from 'ui/utils/conversion';
-import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
-import { current } from '@reduxjs/toolkit';
+import { TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
 import { CustomButton } from 'ui/components/Widgets';
-import { t } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   showLoadingIndicator,
@@ -58,6 +40,8 @@ import {
   getRoundedGasPrice,
 } from 'ui/reducer/gas.reducer';
 import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const { TabPane } = Tabs;
 
@@ -102,6 +86,7 @@ const valueToDisplay = (tx) => {
 };
 
 const SignTx = ({ params, origin }) => {
+  const location = useLocation();
   const { t } = useTranslation();
   const [getApproval, resolveApproval, rejectApproval] = useApproval();
   const dispatch = useDispatch();
@@ -163,6 +148,11 @@ const SignTx = ({ params, origin }) => {
   useAsyncEffect(initState, [gasState.gasType]);
 
   const handleAllow = async () => {
+    sensors.track('teleport_sign_tx_confirmed', {
+      page: location.pathname,
+      from: tx.from,
+      to: tx.to,
+    });
     dispatch(showLoadingIndicator());
     if (tx.type === TransactionEnvelopeTypes.FEE_MARKET) {
       resolveApproval({
@@ -184,6 +174,9 @@ const SignTx = ({ params, origin }) => {
   const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));
 
   const handleCancel = () => {
+    sensors.track('teleport_sign_tx_declined', {
+      page: location.pathname,
+    });
     dispatch(showLoadingIndicator());
     rejectApproval('User rejected the request.')
       .then(() => delay(1000))
@@ -358,7 +351,12 @@ const TxDetailComponent = ({
       {supportsEIP1559 && (
         <div
           className="gas-edit-button flex ml-auto"
-          onClick={() => setVisible(true)}
+          onClick={() => {
+            setVisible(true);
+            sensors.track('teleport_sign_tx_edit_gas', {
+              page: location.pathname,
+            });
+          }}
         >
           <IconComponent name="edit" cls="edit-icon" />
           <div>{t('Edit')}</div>

@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Provider } from 'types/network';
 import { IconButton } from 'ui/components/IconButton';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
@@ -12,6 +12,8 @@ import IconTrash from 'assets/action-icon/trash.svg';
 import IconEdit from 'assets/action-icon/edit.svg';
 import { IconComponent } from 'ui/components/IconComponents';
 import './style.less';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 type NetworkProviderWithOptionalTag = Provider & { idx?: number };
 
@@ -25,6 +27,7 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
    */
   const providerContext = useContext(NetworkProviderContext);
   const history = useHistory();
+  const location = useLocation();
   const currentProviderId = useSelector((s) => s.network.provider.id);
   const isSelectedNetwork = useMemo(
     () => network.id === currentProviderId,
@@ -39,6 +42,11 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
       } else {
         providerContext?.usePresetProvider(network.type);
       }
+      sensors.track('teleport_network_selected', {
+        page: location.pathname,
+        chainId: network.chainId,
+        chainName: network.chainName,
+      });
       // jump back previous page
       history.goBack();
     },
