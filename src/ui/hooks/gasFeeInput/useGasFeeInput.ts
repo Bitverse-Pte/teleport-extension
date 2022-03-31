@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 // import { isLegacyTransaction } from '../../helpers/utils/transactions.util';
 // import { useGasFeeEstimates } from '../useGasFeeEstimates';
 
-// // import { useGasFeeErrors } from './useGasFeeErrors';
+import { useGasFeeErrors } from './useGasFeeErrors';
 // // import { useGasPriceInput } from './useGasPriceInput';
 // // import { useMaxFeePerGasInput } from './useMaxFeePerGasInput';
 // // import { useMaxPriorityFeePerGasInput } from './useMaxPriorityFeePerGasInput';

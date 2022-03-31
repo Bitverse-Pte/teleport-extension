@@ -1,34 +1,20 @@
-import { GAS_LIMITS, GAS_FORM_ERRORS, GAS_ESTIMATE_TYPES } from 'constants/gas';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import { checkNetworkAndAccountSupports1559 } from 'ui/selectors/selectors';
 import { addHexes } from 'ui/utils/conversion';
 import { bnLessThanEqualTo, bnGreaterThan, bnLessThan } from 'ui/utils/utils';
 import { conversionLessThan, conversionGreaterThan } from 'utils/conversion';
 import { isLegacyTransaction } from 'utils/transaction.utils';
-// import { GAS_ESTIMATE_TYPES, GAS_LIMITS } from '../../shared/constants/gas';
-// import {
-//   conversionLessThan,
-//   conversionGreaterThan,
-// } from '../../shared/modules/conversion.utils';
-// import {
-//   checkNetworkAndAccountSupports1559,
-//   getSelectedAccount,
-// } from '../selectors';
-// import { addHexes } from '../helpers/utils/conversions.util';
-// import { isLegacyTransaction } from '../helpers/utils/transactions.util';
-// import {
-//   bnGreaterThan,
-//   bnLessThan,
-//   bnLessThanEqualTo,
-// } from '../helpers/utils/util';
-// import { GAS_FORM_ERRORS } from '../helpers/constants/gas';
+import { GAS_LIMITS, GAS_FORM_ERRORS, GAS_ESTIMATE_TYPES } from 'constants/gas';
+import { getSelectedAddress } from 'ui/selectors/selectors';
+
+
 const HIGH_FEE_WARNING_MULTIPLIER = 1.5;
 
 const validateGasLimit = (gasLimit, minimumGasLimit) => {
   const gasLimitTooLow = conversionLessThan(
     { value: gasLimit, fromNumericBase: 'dec' },
-    { value: minimumGasLimit || GAS_LIMITS.SIMPLE, fromNumericBase: 'hex' }
+    { value: minimumGasLimit || GAS_LIMITS.SIMPLE, fromNumericBase: 'hex' },
   );
 
   if (gasLimitTooLow) {
@@ -37,26 +23,26 @@ const validateGasLimit = (gasLimit, minimumGasLimit) => {
   return undefined;
 };
 
-const validateMaxPriorityFee = (maxPriorityFeePerGasToUse, supportsEIP1559) => {
-  if (supportsEIP1559 && bnLessThanEqualTo(maxPriorityFeePerGasToUse, 0)) {
+const validateMaxPriorityFee = (maxPriorityFeePerGas, supportsEIP1559) => {
+  if (!supportsEIP1559) {
+    return undefined;
+  }
+  if (bnLessThanEqualTo(maxPriorityFeePerGas, 0)) {
     return GAS_FORM_ERRORS.MAX_PRIORITY_FEE_BELOW_MINIMUM;
   }
   return undefined;
 };
 
 const validateMaxFee = (
-  maxFeePerGasToUse,
+  maxFeePerGas,
   maxPriorityFeeError,
-  maxPriorityFeePerGasToUse,
-  supportsEIP1559
+  maxPriorityFeePerGas,
+  supportsEIP1559,
 ) => {
-  if (maxPriorityFeeError) {
+  if (maxPriorityFeeError || !supportsEIP1559) {
     return undefined;
   }
-  if (
-    supportsEIP1559 &&
-    bnGreaterThan(maxPriorityFeePerGasToUse, maxFeePerGasToUse)
-  ) {
+  if (bnGreaterThan(maxPriorityFeePerGas, maxFeePerGas)) {
     return GAS_FORM_ERRORS.MAX_FEE_IMBALANCE;
   }
   return undefined;
@@ -64,14 +50,16 @@ const validateMaxFee = (
 
 const validateGasPrice = (
   isFeeMarketGasEstimate,
-  gasPriceToUse,
+  gasPrice,
   supportsEIP1559,
-  transaction
+  transaction,
 ) => {
+  if (supportsEIP1559 && isFeeMarketGasEstimate) {
+    return undefined;
+  }
   if (
     (!supportsEIP1559 || transaction?.txParams?.gasPrice) &&
-    !isFeeMarketGasEstimate &&
-    bnLessThanEqualTo(gasPriceToUse, 0)
+    bnLessThanEqualTo(gasPrice, 0)
   ) {
     return GAS_FORM_ERRORS.GAS_PRICE_TOO_LOW;
   }
@@ -82,16 +70,16 @@ const getMaxPriorityFeeWarning = (
   gasFeeEstimates,
   isFeeMarketGasEstimate,
   isGasEstimatesLoading,
-  maxPriorityFeePerGasToUse,
-  supportsEIP1559
+  maxPriorityFeePerGas,
+  supportsEIP1559,
 ) => {
   if (!supportsEIP1559 || !isFeeMarketGasEstimate || isGasEstimatesLoading) {
     return undefined;
   }
   if (
     bnLessThan(
-      maxPriorityFeePerGasToUse,
-      gasFeeEstimates?.low?.suggestedMaxPriorityFeePerGas
+      maxPriorityFeePerGas,
+      gasFeeEstimates?.low?.suggestedMaxPriorityFeePerGas,
     )
   ) {
     return GAS_FORM_ERRORS.MAX_PRIORITY_FEE_TOO_LOW;
@@ -99,9 +87,9 @@ const getMaxPriorityFeeWarning = (
   if (
     gasFeeEstimates?.high &&
     bnGreaterThan(
-      maxPriorityFeePerGasToUse,
+      maxPriorityFeePerGas,
       gasFeeEstimates.high.suggestedMaxPriorityFeePerGas *
-        HIGH_FEE_WARNING_MULTIPLIER
+        HIGH_FEE_WARNING_MULTIPLIER,
     )
   ) {
     return GAS_FORM_ERRORS.MAX_PRIORITY_FEE_HIGH_WARNING;
@@ -115,28 +103,26 @@ const getMaxFeeWarning = (
   isFeeMarketGasEstimate,
   maxFeeError,
   maxPriorityFeeError,
-  maxFeePerGasToUse,
-  supportsEIP1559
+  maxFeePerGas,
+  supportsEIP1559,
 ) => {
   if (
     maxPriorityFeeError ||
     maxFeeError ||
     !isFeeMarketGasEstimate ||
-    !supportsEIP1559
+    !supportsEIP1559 ||
+    isGasEstimatesLoading
   ) {
     return undefined;
   }
-  if (
-    !isGasEstimatesLoading &&
-    bnLessThan(maxFeePerGasToUse, gasFeeEstimates?.low?.suggestedMaxFeePerGas)
-  ) {
+  if (bnLessThan(maxFeePerGas, gasFeeEstimates?.low?.suggestedMaxFeePerGas)) {
     return GAS_FORM_ERRORS.MAX_FEE_TOO_LOW;
   }
   if (
     gasFeeEstimates?.high &&
     bnGreaterThan(
-      maxFeePerGasToUse,
-      gasFeeEstimates.high.suggestedMaxFeePerGas * HIGH_FEE_WARNING_MULTIPLIER
+      maxFeePerGas,
+      gasFeeEstimates.high.suggestedMaxFeePerGas * HIGH_FEE_WARNING_MULTIPLIER,
     )
   ) {
     return GAS_FORM_ERRORS.MAX_FEE_HIGH_WARNING;
@@ -144,15 +130,18 @@ const getMaxFeeWarning = (
   return undefined;
 };
 
-const getBalanceError = (minimumCostInHexWei, transaction, ethBalance) => {
+const hasBalanceError = (minimumCostInHexWei, transaction, ethBalance) => {
+  if (minimumCostInHexWei === undefined || ethBalance === undefined) {
+    return false;
+  }
   const minimumTxCostInHexWei = addHexes(
     minimumCostInHexWei,
-    transaction?.txParams?.value || '0x0'
+    transaction?.txParams?.value || '0x0',
   );
 
   return conversionGreaterThan(
     { value: minimumTxCostInHexWei, fromNumericBase: 'hex' },
-    { value: ethBalance, fromNumericBase: 'hex' }
+    { value: ethBalance, fromNumericBase: 'hex' },
   );
 };
 
@@ -168,29 +157,29 @@ const getBalanceError = (minimumCostInHexWei, transaction, ethBalance) => {
 
 /**
  * @param options
- * @param options.transaction
  * @param options.gasEstimateType
  * @param options.gasFeeEstimates
- * @param options.gasLimit
- * @param options.gasPriceToUse
  * @param options.isGasEstimatesLoading
- * @param options.maxPriorityFeePerGasToUse
- * @param options.maxFeePerGasToUse
+ * @param options.gasLimit
+ * @param options.gasPrice
+ * @param options.maxPriorityFeePerGas
+ * @param options.maxFeePerGas
  * @param options.minimumCostInHexWei
  * @param options.minimumGasLimit
+ * @param options.transaction
  * @returns {GasFeeErrorsReturnType}
  */
 export function useGasFeeErrors({
-  transaction,
   gasEstimateType,
   gasFeeEstimates,
-  gasLimit,
-  gasPriceToUse,
   isGasEstimatesLoading,
-  maxPriorityFeePerGasToUse,
-  maxFeePerGasToUse,
+  gasLimit,
+  gasPrice,
+  maxPriorityFeePerGas,
+  maxFeePerGas,
   minimumCostInHexWei,
   minimumGasLimit,
+  transaction,
 }) {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
@@ -203,22 +192,22 @@ export function useGasFeeErrors({
   const gasLimitError = validateGasLimit(gasLimit, minimumGasLimit);
 
   const maxPriorityFeeError = validateMaxPriorityFee(
-    maxPriorityFeePerGasToUse,
-    supportsEIP1559
+    maxPriorityFeePerGas,
+    supportsEIP1559,
   );
 
   const maxFeeError = validateMaxFee(
-    maxFeePerGasToUse,
+    maxFeePerGas,
     maxPriorityFeeError,
-    maxPriorityFeePerGasToUse,
-    supportsEIP1559
+    maxPriorityFeePerGas,
+    supportsEIP1559,
   );
 
   const gasPriceError = validateGasPrice(
     isFeeMarketGasEstimate,
-    gasPriceToUse,
+    gasPrice,
     supportsEIP1559,
-    transaction
+    transaction,
   );
 
   // Get all warnings
@@ -226,8 +215,8 @@ export function useGasFeeErrors({
     gasFeeEstimates,
     isFeeMarketGasEstimate,
     isGasEstimatesLoading,
-    maxPriorityFeePerGasToUse,
-    supportsEIP1559
+    maxPriorityFeePerGas,
+    supportsEIP1559,
   );
 
   const maxFeeWarning = getMaxFeeWarning(
@@ -236,8 +225,8 @@ export function useGasFeeErrors({
     isFeeMarketGasEstimate,
     maxFeeError,
     maxPriorityFeeError,
-    maxFeePerGasToUse,
-    supportsEIP1559
+    maxFeePerGas,
+    supportsEIP1559,
   );
 
   // Separating errors from warnings so we can know which value problems
@@ -284,24 +273,22 @@ export function useGasFeeErrors({
       ...gasWarnings,
       ...gasErrors,
     }),
-    [gasErrors, gasWarnings]
+    [gasErrors, gasWarnings],
   );
 
-  //   const { balance: ethBalance } = useSelector(
-  const ethBalance = useSelector(
-    //   getSelectedAccount
-    (s) => {
-      const currentNetworkId = s.network.provider.id;
-      const [targetNativeToken] = s.tokens.tokens.filter((t) => {
-        return t.isNative && t.chainCustomId === currentNetworkId;
-      });
-      return targetNativeToken.amount;
-    }
-  );
-  const balanceError = getBalanceError(
+  const ethBalance = useSelector((s) => {
+      const currentProvider = s.network.provider;
+      const currentAddress = getSelectedAddress(s);
+      if (!currentAddress) return 0;
+      if (!s.tokens.balances) return 0;
+      const nativeToken = s.tokens.balances[currentAddress].find(t => t.chainCustomId === currentProvider.id);
+      return nativeToken?.amount;
+  }, shallowEqual);
+  
+  const balanceError = hasBalanceError(
     minimumCostInHexWei,
     transaction,
-    ethBalance
+    ethBalance,
   );
 
   return {
@@ -310,5 +297,6 @@ export function useGasFeeErrors({
     gasWarnings,
     balanceError,
     estimatesUnavailableWarning,
+    hasSimulationError: Boolean(transaction?.simulationFails),
   };
 }
