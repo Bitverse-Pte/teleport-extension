@@ -16,12 +16,12 @@ export const GAS_LIMITS = {
  * These are already declared in @metamask/controllers but importing them from
  * that module and re-exporting causes the UI bundle size to expand beyond 4MB
  */
-export const GAS_ESTIMATE_TYPES = {
-  FEE_MARKET: 'fee-market',
-  LEGACY: 'legacy',
-  ETH_GASPRICE: 'eth_gasPrice',
-  NONE: 'none',
-};
+export enum GAS_ESTIMATE_TYPES {
+  FEE_MARKET = 'fee-market',
+  LEGACY = 'legacy',
+  ETH_GASPRICE = 'eth_gasPrice',
+  NONE = 'none',
+}
 
 /**
  * These represent gas recommendation levels presented in the UI
@@ -76,6 +76,12 @@ export enum GAS_FORM_ERRORS {
   MAX_FEE_IMBALANCE = 'editGasMaxFeeImbalance',
   GAS_PRICE_TOO_LOW = 'editGasPriceTooLow',
 }
+
+export const NETWORK_CONGESTION_THRESHOLDS = {
+  NOT_BUSY: 0,
+  STABLE: 0.33,
+  BUSY: 0.66,
+};
 
 export function getGasFormErrorText(
   type: GAS_FORM_ERRORS,

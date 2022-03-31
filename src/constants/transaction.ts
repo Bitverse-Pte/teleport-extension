@@ -186,6 +186,10 @@ export interface Transaction {
   dappSuggestedGasFees: {
     gas?: HexString;
     gasPrice?: HexString;
+
+    // EIP-1559 related new props
+    maxPriorityFeePerGas?: HexString;
+    maxFeePerGas?: HexString;
   } | null;
   estimatedBaseFee?: HexString;
   firstRetryBlockNumber?: string;
