@@ -15,7 +15,7 @@ import { useSelector } from 'react-redux';
 // // import { useGasPriceInput } from './useGasPriceInput';
 // // import { useMaxFeePerGasInput } from './useMaxFeePerGasInput';
 // // import { useMaxPriorityFeePerGasInput } from './useMaxPriorityFeePerGasInput';
-// // import { useGasEstimates } from './useGasEstimates';
+import { useGasEstimates } from './useGasEstimates';
 import { useTransactionFunctions } from './useTransactionFunctions';
 import {
   CUSTOM_GAS_ESTIMATE,
