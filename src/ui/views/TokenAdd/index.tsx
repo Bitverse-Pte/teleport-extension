@@ -14,9 +14,11 @@ import Header from 'ui/components/Header';
 
 import './style.less';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const TokenAdd = () => {
-  const { state } = useLocation<{
+  const { state, pathname } = useLocation<{
     symbol: string;
     decimal: string;
     balance: string;
@@ -31,6 +33,7 @@ const TokenAdd = () => {
 
   const [addToken, addTokenLoading] = useWalletRequest(wallet.addCustomToken, {
     onSuccess() {
+      sensors.track('teleport_token_add_confirmed', { page: pathname });
       history.go(-2);
     },
     onError(err) {

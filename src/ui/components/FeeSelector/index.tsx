@@ -8,7 +8,9 @@ import CustomFee from 'ui/components/CustomFee';
 import { useWallet } from 'ui/utils';
 import './feeSelector.less';
 import { IconComponent } from 'ui/components/IconComponents';
-
+import { useLocation } from 'react-router-dom';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 interface Fee {
   type: string;
   time: number;
@@ -45,6 +47,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
   );
 };
 function FeeSelector(props: FeeSelectorProps) {
+  const location = useLocation();
   const gasState: any = useSelector((state) => state.gas);
   const dispatch = useDispatch();
   const { visible, onClose, gasLimit = 21000 } = props;
@@ -104,12 +107,14 @@ function FeeSelector(props: FeeSelectorProps) {
   const onSaveCustom = () => {
     setCustomVisible(false);
     setSelectFee('custom');
+    sensors.track('teleport_gas_edit_save_custom', { page: location.pathname });
   };
   const setGasType = () => {
     console.log('selectFee: ', selectFee);
     dispatch({ type: SET_GAS_TYPE, value: selectFee });
     setCustomVisible(false);
     onClose();
+    sensors.track('teleport_gas_edit_confirmed', { page: location.pathname });
   };
   useEffect(() => {
     fetchGasFeeEstimates();
@@ -174,7 +179,15 @@ function FeeSelector(props: FeeSelectorProps) {
             />
           ))}
         </ul>
-        <div className="custom-box" onClick={() => setCustomVisible(true)}>
+        <div
+          className="custom-box"
+          onClick={() => {
+            setCustomVisible(true);
+            sensors.track('teleport_gas_edit_customize', {
+              page: location.pathname,
+            });
+          }}
+        >
           <span>Custom Gas Fee</span>
           <IconComponent name="chevron-right" cls="base-text-color" />
         </div>

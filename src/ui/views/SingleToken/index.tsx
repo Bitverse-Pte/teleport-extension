@@ -121,7 +121,7 @@ const SingleToken = () => {
           title="Send"
           type={TipButtonEnum.SEND}
           handleClick={() => {
-            history.push('/send');
+            history.push({ pathname: `/send/${tokenId}` });
           }}
         />
         <TipButton

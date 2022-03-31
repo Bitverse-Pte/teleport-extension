@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { addHexPrefix } from 'ethereumjs-util';
@@ -38,6 +38,8 @@ import { getCurrentChainId } from 'ui/selectors/selectors';
 import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
 import { shortenAddress } from 'ui/utils/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -48,7 +50,11 @@ const { Option } = Select;
 
 const Send = () => {
   const history = useHistory();
+  const location = useLocation();
   const dispatch = useDispatch();
+  const { tokenId } = useParams<{
+    tokenId: string | undefined;
+  }>();
   const wallet = useWallet();
   const [selected, setSelected] = useState<BaseAccount | undefined>();
   const { t } = useTranslation();
@@ -101,8 +107,10 @@ const Send = () => {
     });
     if (balances && balances.length) {
       setTokens(balances);
-      const native = balances.find((t: Token) => t.isNative);
-      native ? setSelectedToken(native) : setSelectedToken(balances[0]);
+      const selected = tokenId
+        ? balances.find((t: Token) => tokenId === t.tokenId)
+        : balances.find((t: Token) => t.isNative);
+      selected ? setSelectedToken(selected) : setSelectedToken(balances[0]);
     }
   }, []);
 
@@ -112,8 +120,10 @@ const Send = () => {
     });
     if (balances && balances.length) {
       setTokens(balances);
-      const native = balances.find((t: Token) => t.isNative);
-      native ? setSelectedToken(native) : setSelectedToken(balances[0]);
+      const selected = tokenId
+        ? balances.find((t: Token) => tokenId === t.tokenId)
+        : balances.find((t: Token) => t.isNative);
+      selected ? setSelectedToken(selected) : setSelectedToken(balances[0]);
     }
   }, []);
 
@@ -124,10 +134,6 @@ const Send = () => {
     });
     setRecentAddressList(recentAddress);
   }, []);
-
-  const nativeToken = useMemo(() => {
-    return balance.find((t: Token) => t.isNative);
-  }, [balance]);
 
   const next = async () => {
     if (!(await wallet.isUnlocked())) {
@@ -183,11 +189,18 @@ const Send = () => {
       method: 'eth_sendTransaction',
       params: [params],
     });
+    sensors.track('teleport_send_next', {
+      page: location.pathname,
+      from: params.txParam.from,
+      to: params.txParam.to,
+      symbol: params.txParam.symbol,
+    });
     history.push('/confirm-transaction');
   };
 
   const myAccountsSelect = () => {
     setAccountSelectPopupVisible(true);
+    sensors.track('teleport_send_tsf_my_account', { page: location.pathname });
   };
 
   const handleMaxClick = () => {

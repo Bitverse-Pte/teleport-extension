@@ -135,8 +135,10 @@ const Main = () => {
             }}
           />
         </LazyPrivateRoute>
-
         <LazyPrivateRoute exact path="/send">
+          <Send />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/send/:tokenId">
           <Send />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/receive">
