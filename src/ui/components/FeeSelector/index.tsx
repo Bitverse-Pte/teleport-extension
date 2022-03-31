@@ -123,10 +123,10 @@ function FeeSelector(props: FeeSelectorProps) {
     fetchGasFeeEstimates();
     fetchNativePrice();
   }, []);
-  // const GasFeeInputsResults = useGasFeeInputs(
-  //   EDIT_GAS_MODES.MODIFY_IN_PLACE,
-  //   props.tx
-  // );
+  const GasFeeInputsResults = useGasFeeInputs(
+    EDIT_GAS_MODES.MODIFY_IN_PLACE,
+    props.tx
+  );
   useEffect(() => {
     if (gasState.customType) {
       const {
@@ -181,10 +181,8 @@ function FeeSelector(props: FeeSelectorProps) {
               }}
               selected={item?.type === selectFee}
               onSelect={onSelect}
-              maxFeePerGas={props.maxFeePerGas}
-              maxPriorityFeePerGas={props.maxPriorityFeePerGas}
-              // maxFeePerGas={GasFeeInputsResults.maxFeePerGas}
-              // maxPriorityFeePerGas={GasFeeInputsResults.maxPriorityFeePerGas}
+              maxFeePerGas={GasFeeInputsResults.maxFeePerGas}
+              maxPriorityFeePerGas={GasFeeInputsResults.maxPriorityFeePerGas}
             />
           ))}
         </ul>

@@ -13,7 +13,7 @@ import {
   checkNetworkAndAccountSupports1559,
   getShouldShowFiat,
 } from 'ui/selectors/selectors';
-import { isLegacyTransaction } from 'utils/transaction.utils';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
 
 import { useCurrencyDisplay } from '../wallet/useCurrencyDisplay';
 import { useUserPreferencedCurrency } from '../wallet/useUserPreferencedCurrency';
@@ -71,8 +71,8 @@ export function useMaxFeePerGasInput({
 }: MaxFeePerGasInputType): MaxFeePerGasInputReturnType {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    // !isLegacyTransaction(transaction?.txParams);
-    !isLegacyTransaction(transaction?.txParams as any);
+    // !isLegacyTransactionParams(transaction.txParams || transaction);
+    !isLegacyTransactionParams(transaction.txParams || (transaction as any));
 
   const { currency: fiatCurrency, numberOfDecimals: fiatNumberOfDecimals } =
     useUserPreferencedCurrency('SECONDARY');

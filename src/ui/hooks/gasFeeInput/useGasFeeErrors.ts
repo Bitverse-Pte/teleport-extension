@@ -4,7 +4,7 @@ import { checkNetworkAndAccountSupports1559 } from 'ui/selectors/selectors';
 import { addHexes } from 'ui/utils/conversion';
 import { bnLessThanEqualTo, bnGreaterThan, bnLessThan } from 'ui/utils/utils';
 import { conversionLessThan, conversionGreaterThan } from 'utils/conversion';
-import { isLegacyTransaction } from 'utils/transaction.utils';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import { GAS_LIMITS, GAS_FORM_ERRORS, GAS_ESTIMATE_TYPES } from 'constants/gas';
 import { getSelectedAddress } from 'ui/selectors/selectors';
 
@@ -182,7 +182,7 @@ export function useGasFeeErrors({
 }) {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransaction(transaction?.txParams);
+    !isLegacyTransactionParams(transaction.txParams || transaction);
 
   const isFeeMarketGasEstimate =
     gasEstimateType === GAS_ESTIMATE_TYPES.FEE_MARKET;

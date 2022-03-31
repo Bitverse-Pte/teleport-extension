@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { isEqual } from 'lodash';
 import { CUSTOM_GAS_ESTIMATE, GAS_ESTIMATE_TYPES } from 'constants/gas';
 import { hexWEIToDecGWEI } from 'utils/conversion';
-import { isLegacyTransaction } from 'utils/transaction.utils';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import { feeParamsAreCustom } from './utils';
 import { Transaction } from 'constants/transaction';
 
@@ -11,7 +11,7 @@ import { Transaction } from 'constants/transaction';
 //   CUSTOM_GAS_ESTIMATE,
 // } from '../../../shared/constants/gas';
 // import { hexWEIToDecGWEI } from '../../helpers/utils/conversions.util';
-// import { isLegacyTransaction } from '../../helpers/utils/transactions.util';
+// import { isLegacyTransactionParams } from '../../helpers/utils/transactions.util';
 
 // import { feeParamsAreCustom } from './utils';
 
@@ -68,10 +68,10 @@ export function useGasPriceInput({
     gasPrice !== null &&
     (gasPriceHasBeenManuallySet ||
       gasPriceEstimatesHaveNotChanged ||
-      // isLegacyTransaction(transaction?.txParams))
+      // isLegacyTransactionParams(transaction.txParams || transaction))
       // code from mm
       // typing is error, tried to any this
-      isLegacyTransaction(transaction?.txParams as any))
+      isLegacyTransactionParams(transaction.txParams || (transaction as any)))
       ? gasPrice
       : getGasPriceEstimate(gasFeeEstimates, gasEstimateType, estimateToUse);
 

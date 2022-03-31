@@ -7,7 +7,7 @@ import {
   checkNetworkAndAccountSupports1559,
   getShouldShowFiat,
 } from 'ui/selectors/selectors';
-import { isLegacyTransaction } from 'utils/transaction.utils';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import { hexWEIToDecGWEI, multiplyCurrencies } from 'utils/conversion';
 
 import { useCurrencyDisplay } from '../wallet/useCurrencyDisplay';
@@ -65,7 +65,7 @@ export function useMaxPriorityFeePerGasInput({
 }): MaxPriorityFeePerGasInputReturnType {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransaction(transaction?.txParams);
+    !isLegacyTransactionParams(transaction.txParams || transaction);
 
   const { currency: fiatCurrency, numberOfDecimals: fiatNumberOfDecimals } =
     useUserPreferencedCurrency('SECONDARY');

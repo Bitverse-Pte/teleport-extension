@@ -21,7 +21,7 @@ import {
 } from 'constants/gas';
 import { useGasFeeEstimates } from '../gas/useGasFeeEstimates';
 import { checkNetworkAndAccountSupports1559 } from 'ui/selectors/selectors';
-import { isLegacyTransaction } from 'utils/transaction.utils';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import { hexToDecimal } from 'ui/utils/conversion';
 import { useGasPriceInput } from './useGasPriceInput';
 import { useMaxFeePerGasInput } from './useMaxFeePerGasInput';
@@ -101,7 +101,7 @@ export function useGasFeeInputs(
   );
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransaction(transaction?.txParams);
+    !isLegacyTransactionParams(transaction.txParams || transaction);
   const supportsEIP1559V2 = supportsEIP1559 && eip1559V2Enabled;
   // We need the gas estimates from the GasFeeController in the background.
   // Calling this hooks initiates polling for new gas estimates and returns the
