@@ -14,9 +14,11 @@ import Header from 'ui/components/Header';
 
 import './style.less';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const TokenAdd = () => {
-  const { state } = useLocation<{
+  const { state, pathname } = useLocation<{
     symbol: string;
     decimal: string;
     balance: string;
@@ -31,6 +33,7 @@ const TokenAdd = () => {
 
   const [addToken, addTokenLoading] = useWalletRequest(wallet.addCustomToken, {
     onSuccess() {
+      sensors.track('teleport_token_add_confirmed', { page: pathname });
       history.go(-2);
     },
     onError(err) {
@@ -40,7 +43,10 @@ const TokenAdd = () => {
         err.code &&
         err.code === ErrorCode.CUSTOM_ERC20_TOKEN_DUPLICATED
       ) {
-        ClickToCloseMessage.error('Token already added');
+        ClickToCloseMessage.error({
+          content: 'Token already added',
+          key: 'Token already added',
+        });
       }
     },
   });
@@ -69,16 +75,14 @@ const TokenAdd = () => {
               decimal: state.decimal,
               contractAddress: state.contractAddress,
               isNative: false,
-              themeColor: '#1484F5',
+              chainCustomId: state.chainCustomId,
             }}
           />
           <div className="token-add-balance-container">
             <span className="token-add-balance-amount">
               {denom2SymbolRatio(state.balance || 0, state.decimal || 0)}
             </span>
-            <span className="token-add-balance-symbol">
-              {state.symbol?.toUpperCase()}
-            </span>
+            <span className="token-add-balance-symbol">{state.symbol}</span>
           </div>
           <p className="token-add-chain">{state.chain}</p>
           <div className="token-add-item">
@@ -90,9 +94,7 @@ const TokenAdd = () => {
 
           <div className="token-add-item">
             <p className="token-add-item-title">Token Symbol:</p>
-            <p className="token-add-item-content">
-              {state.symbol?.toUpperCase()}
-            </p>
+            <p className="token-add-item-content">{state.symbol}</p>
           </div>
           <div className="token-add-item">
             <p className="token-add-item-title">Decimals of Precision:</p>

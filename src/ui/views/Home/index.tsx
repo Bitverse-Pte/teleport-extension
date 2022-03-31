@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
 import { message, Drawer } from 'antd';
 import {
@@ -38,13 +38,14 @@ import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
 import WalletManageNewIcon from '../../../assets/walletManageNew.svg';
 import skynet from 'utils/skynet';
-
 const { sensors } = skynet;
 
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
+import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 
 const onCopy = () => {
+  sensors.track('teleport_home_copy_account', { page: location.pathname });
   ClickToCloseMessage.success('Copied');
 };
 const Home = () => {
@@ -58,6 +59,8 @@ const Home = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
+  const start = new Date().getTime();
+  (window as any).wallet = wallet;
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -117,10 +120,10 @@ const Home = () => {
   }, [tokens, filterCondition, prices]);
 
   const handleSendBtnClick = () => {
-    history.push('/send');
-    sensors.track('teleport_send_click', {
-      page: 'home',
+    sensors.track('teleport_home_send_click', {
+      page: location.pathname,
     });
+    history.push('/send');
   };
   const handleAccountClick = async (account: BaseAccount) => {
     await wallet.changeAccount(account);
@@ -128,21 +131,37 @@ const Home = () => {
     updateAccount();
     getTokenBalancesAsync();
     getTokenBalancesSync();
+    sensors.track('teleport_home_account_click', {
+      page: location.pathname,
+    });
   };
 
   const handleReceiveBtnClick = () => {
+    sensors.track('teleport_home_receive_click', {
+      page: location.pathname,
+    });
     history.push('/receive');
   };
   const handleAddTokenBtnClick = (e) => {
     e.stopPropagation();
+    sensors.track('teleport_home_add_token', {
+      page: location.pathname,
+    });
     history.push('/token-manage');
   };
 
   const handleInputChange = (e) => {
+    sensors.track('teleport_home_search', {
+      page: location.pathname,
+    });
     setFilterCondition(e.target.value);
   };
 
   const handleTokenClick = (t: Token) => {
+    sensors.track('teleport_home_token_click', {
+      page: location.pathname,
+      token: t.name,
+    });
     history.push({
       pathname: `/single-token/${t.tokenId}`,
     });
@@ -165,8 +184,14 @@ const Home = () => {
   return (
     <div className="home flexCol">
       <HomeHeader
-        menuOnClick={() => setSettingPopupVisible(true)}
-        networkOnClick={() => history.push('/network')}
+        menuOnClick={() => {
+          sensors.track('teleport_home_menus', { page: location.pathname });
+          setSettingPopupVisible(true);
+        }}
+        networkOnClick={() => {
+          sensors.track('teleport_home_networks', { page: location.pathname });
+          history.push('/network');
+        }}
       />
       <div className="home-bg"></div>
       <div className="home-content">
@@ -179,6 +204,9 @@ const Home = () => {
           <div
             className="home-preview-top-container flexR"
             onClick={() => {
+              sensors.track('teleport_home_accounts', {
+                page: location.pathname,
+              });
               setPopupVisible(true);
             }}
           >
@@ -244,12 +272,15 @@ const Home = () => {
           tab2="Activity"
           currentTab={tabType}
           handleTabClick={(tab: Tabs) => {
+            sensors.track('teleport_home_' + Tabs[tab], {
+              page: location.pathname,
+            });
             setTabType(tab);
           }}
         />
       </div>
       <div className="assets-container flexCol">
-        {tabType === Tabs.FIRST && displayTokenList.length > 0 ? (
+        {tabType === Tabs.FIRST ? (
           <div className="search-container flexR content-wrap-padding">
             <div className="wrap">
               <SearchInput onChange={handleInputChange} placeholder="Search" />
@@ -272,10 +303,16 @@ const Home = () => {
                     onClick={() => handleTokenClick(t)}
                   >
                     <div className="left flexR">
-                      <TokenIcon token={t} useThemeBg />
+                      <TokenIcon token={t} radius={32} />
                       <div className="balance-container flexCol">
-                        <span className="balance">
-                          {denom2SymbolRatio(t.amount || 0, t.decimal)}{' '}
+                        <span
+                          className="balance"
+                          title={denom2SymbolRatio(t.amount || 0, t.decimal)}
+                        >
+                          {addEllipsisToEachWordsInTheEnd(
+                            denom2SymbolRatio(t.amount || 0, t.decimal),
+                            16
+                          )}{' '}
                           {t.symbol?.toUpperCase()}
                         </span>
                         <span className="estimate">
@@ -356,6 +393,9 @@ const Home = () => {
             <span className="account-switch-accounts-title">Accounts</span>
             <img
               onClick={() => {
+                sensors.track('teleport_home_account_manage', {
+                  page: location.pathname,
+                });
                 history.push({
                   pathname: '/account-manage',
                   state: {
@@ -382,7 +422,7 @@ const Home = () => {
         onClose={() => {
           setSettingPopupVisible(false);
         }}
-        height="516px"
+        height="540px"
         bodyStyle={{
           padding: 0,
         }}

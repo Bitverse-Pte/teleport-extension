@@ -28,6 +28,11 @@ class PortMessage extends Message {
       }
     });
 
+    this.port.onDisconnect.addListener(() => {
+      console.error('service worker disconnected, reconnecting...');
+      this.connect(name);
+    });
+
     return this;
   };
 

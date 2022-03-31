@@ -9,6 +9,7 @@ export enum PresetNetworkId {
   FTM = 'ftm',
   AVAX = 'avax',
   OP = 'op',
+  TELE_TEST = 'teleport_testnet',
 }
 
 const EVMProviderSharedProperties = {
@@ -39,7 +40,7 @@ export const defaultNetworks: {
     rpcUrl: 'https://bsc-dataseed.binance.org/',
     chainId: '0x38',
     ticker: 'BNB',
-    nickname: 'Binance SmartChain',
+    nickname: 'BNB Smart Chain',
     rpcPrefs: {
       blockExplorerUrl: 'https://bscscan.com',
     },
@@ -51,7 +52,7 @@ export const defaultNetworks: {
     rpcUrl: 'https://arb1.arbitrum.io/rpc',
     chainId: '0xa4b1',
     ticker: 'ETH',
-    nickname: 'Arbitrum',
+    nickname: 'Arbitrum One',
     rpcPrefs: {
       blockExplorerUrl: 'https://arbiscan.io/',
     },

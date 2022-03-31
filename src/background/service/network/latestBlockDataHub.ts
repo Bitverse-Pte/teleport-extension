@@ -6,7 +6,8 @@ import {
 } from '@metamask/controllers';
 import { ObservableStore } from '@metamask/obs-store';
 import { PollingBlockTracker } from 'eth-block-tracker';
-import { ethers } from 'ethers';
+import EthQuery from 'eth-query';
+import pify from 'pify';
 import eventBus from 'eventBus';
 
 type BlockData = {
@@ -35,6 +36,7 @@ type NetworkProviderStore = ObservableStore<{
 }>;
 
 interface LatestBlockDataHubConstructorParams {
+  provider: any;
   blockTracker: PollingBlockTracker;
   gasFeeTracker: GasFeeController;
   networkProviderStore: NetworkProviderStore;
@@ -47,6 +49,8 @@ export class LatestBlockDataHubService {
   store: ObservableStore<BlockData>;
   private _blockTracker: PollingBlockTracker;
   private _gasFeeTracker: GasFeeController;
+  private _provider: any;
+  private _query: any;
   private rpcUrl: string;
   private getPopupOpen: () => boolean;
 
@@ -57,6 +61,9 @@ export class LatestBlockDataHubService {
       isBaseFeePerGasExist: false,
     });
     this.getPopupOpen = opts.getPopupOpen;
+
+    this._provider = opts.provider;
+    this._query = pify(new EthQuery(this._provider));
 
     this._blockTracker = opts.blockTracker;
     // blockTracker.currentBlock may be null
@@ -71,6 +78,10 @@ export class LatestBlockDataHubService {
     this.rpcUrl = opts.networkProviderStore.getState().provider.rpcUrl;
     // keep `rpcUrl` updated
     opts.networkProviderStore.subscribe(this.handleProviderChange);
+  }
+
+  fetchLatestBlockNow() {
+    return this.updateForBlock('latest');
   }
 
   /**
@@ -91,18 +102,21 @@ export class LatestBlockDataHubService {
       return;
     }
     this.currentBlockNumber = blockNumber;
-    const p = new ethers.providers.JsonRpcProvider(this.rpcUrl);
-    const currentBlock = await p.getBlock(blockNumber);
+    const currentBlock = await this._query.getBlockByNumber(blockNumber, false);
+    if (!currentBlock) {
+      return;
+    }
+    console.debug('LatestBlockDataHubService::currentBlock:', currentBlock);
+    const currentBlockGasLimit = currentBlock.gasLimit;
     /**
      * not update if block are null
      */
     if (!currentBlock) {
       return;
     }
-    const currentBlockGasLimit = currentBlock.gasLimit.toHexString();
     // even it's 0, it's a BigNumber '0', so just use boolean
     // null / undefined will be false
-    const isBaseFeePerGasExist = Boolean(currentBlock.baseFeePerGas);
+    const isBaseFeePerGasExist = currentBlock.baseFeePerGas !== undefined;
 
     const gasFeeState = await this._gasFeeTracker.fetchGasFeeEstimates();
     const gasFeeEstimates = gasFeeState.gasFeeEstimates;

@@ -5,7 +5,7 @@ import { ObservableStore } from '@metamask/obs-store';
 import { bufferToHex, keccak, toBuffer, isHexString } from 'ethereumjs-util';
 import EthQuery from 'ethjs-query';
 import { ethErrors } from 'eth-rpc-errors';
-import abi from 'human-standard-token-abi';
+import abi from 'utils/human-standard-token-abi-extended';
 import Common from '@ethereumjs/common';
 import { TransactionFactory } from '@ethereumjs/tx';
 import { ethers } from 'ethers';
@@ -49,6 +49,7 @@ import { EVENTS } from 'constants/index';
 import preferenceService from '../preference';
 import { NetworkController } from 'types/network';
 import { CustomGasSettings } from 'types/tx';
+import ns from '../network';
 
 const hstInterface = new ethers.utils.Interface(abi);
 
@@ -173,7 +174,8 @@ export default class TransactionController extends EventEmitter {
     this.pendingTxTracker = new PendingTransactionTracker({
       provider: this.provider,
       nonceTracker: this.nonceTracker,
-      publishTransaction: (rawTx) => this.query.sendRawTransaction(rawTx),
+      publishTransaction: (rawTx) =>
+        ns.getCurrentEth().sendRawTransaction(rawTx),
       getPendingTransactions: () => {
         const pending = this.txStateManager.getPendingTransactions();
         const approved = this.txStateManager.getApprovedTransactions();
@@ -275,7 +277,6 @@ export default class TransactionController extends EventEmitter {
     // return Common.forCustomChain(MAINNET, customChainParams, hardfork);
     // deprecated, replaced with the following:
     return Common.custom(customChainParams, {
-      baseChain: chainId,
       hardfork,
     });
   }
@@ -307,7 +308,9 @@ export default class TransactionController extends EventEmitter {
    */
   async newUnapprovedTransaction(txParams, opts: any = {}) {
     log.debug(
-      `MetaMaskController newUnapprovedTransaction ${JSON.stringify(txParams)}`
+      `TeleportWalletController newUnapprovedTransaction ${JSON.stringify(
+        txParams
+      )}`
     );
 
     const initialTxMeta = await this.addUnapprovedTransaction(
@@ -560,7 +563,7 @@ export default class TransactionController extends EventEmitter {
       console.error(e);
     }
 
-    const gasPrice = await this.query.gasPrice();
+    const gasPrice = await ns.getCurrentEth().gasPrice();
 
     return { gasPrice: gasPrice && addHexPrefix(gasPrice.toString(16)) };
   }
@@ -913,10 +916,11 @@ export default class TransactionController extends EventEmitter {
     @param rawTx - the hex string of the serialized signed transaction
   */
   async publishTransaction(txId: string, rawTx: string) {
+    const ethQuery = ns.getCurrentEth();
     const txMeta = this.txStateManager.getTransaction(txId);
     txMeta.rawTx = rawTx;
     if (txMeta.type === TRANSACTION_TYPES.SWAP) {
-      const preTxBalance = await this.query.getBalance(txMeta.txParams.from);
+      const preTxBalance = await ethQuery.getBalance(txMeta.txParams.from);
       txMeta.preTxBalance = preTxBalance.toString(16);
     }
     this.txStateManager.updateTransaction(
@@ -925,7 +929,7 @@ export default class TransactionController extends EventEmitter {
     );
     let txHash;
     try {
-      txHash = await this.query.sendRawTransaction(rawTx);
+      txHash = await ns.getCurrentEth().sendRawTransaction(rawTx);
     } catch (error: any) {
       if (error.message.toLowerCase().includes('known transaction')) {
         // txHash = keccak(toBuffer(addHexPrefix(rawTx), 'hex')).toString('hex');
@@ -1096,7 +1100,8 @@ export default class TransactionController extends EventEmitter {
             this._failTransaction(txMeta.id, error);
           });
       });
-
+    // todo - fix frequency load networkStore bug issue, will be refine later
+    /** 
     this.txStateManager
       .getTransactions({
         searchCriteria: {
@@ -1109,6 +1114,7 @@ export default class TransactionController extends EventEmitter {
         );
         this._failTransaction(txMeta.id, txSignError);
       });
+    */
   }
 
   /**
@@ -1205,7 +1211,7 @@ export default class TransactionController extends EventEmitter {
     let code;
     if (!result) {
       try {
-        code = await this.query.getCode(to);
+        code = await ns.getCurrentEth().getCode(to);
       } catch (e) {
         code = null;
         log.warn(e);

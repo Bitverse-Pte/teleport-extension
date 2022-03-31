@@ -1,9 +1,13 @@
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { CoinType, NetworkController, Provider } from 'types/network';
 import React, { useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useInterval } from 'react-use';
 import { useWallet } from '../utils';
+import {
+  hideLoadingIndicator,
+  showLoadingIndicator,
+} from 'ui/reducer/appState.reducer';
 
 /**
  * Design was based on MetaMask
@@ -66,6 +70,8 @@ export function NetworkStoreProvider({
 }) {
   const wallet = useWallet();
 
+  const dispatch = useDispatch();
+
   const currentNetworkController = useSelector((state) => state.network);
 
   const customProviders = useSelector((state) => state.customNetworks);
@@ -79,7 +85,15 @@ export function NetworkStoreProvider({
 
   const useCustomProvider = useCallback(
     async (matchedIdx: number) => {
-      await wallet.useCustomNetwork(matchedIdx);
+      dispatch(showLoadingIndicator());
+      try {
+        await wallet.useCustomNetwork(matchedIdx);
+        await wallet.fetchLatestBlockDataNow();
+      } catch (error) {
+        console.error('useCustomProvider::error', error);
+      } finally {
+        dispatch(hideLoadingIndicator());
+      }
     },
     [wallet, customProviders]
   );
@@ -109,7 +123,15 @@ export function NetworkStoreProvider({
 
   const usePresetProvider = useCallback(
     async (chain: string) => {
-      await wallet.useDefaultNetwork(chain);
+      dispatch(showLoadingIndicator());
+      try {
+        await wallet.useDefaultNetwork(chain);
+        await wallet.fetchLatestBlockDataNow();
+      } catch (error) {
+        console.error('usePresetProvider::error:', error);
+      } finally {
+        dispatch(hideLoadingIndicator());
+      }
     },
     [wallet]
   );

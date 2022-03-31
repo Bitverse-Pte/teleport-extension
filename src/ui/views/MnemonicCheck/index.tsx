@@ -1,7 +1,7 @@
 import './style.less';
 import React, { useMemo, useState } from 'react';
 import { message, Drawer } from 'antd';
-import { useWallet } from 'ui/utils';
+import { useWallet, useWalletRequest } from 'ui/utils';
 import { useHistory, useLocation } from 'react-router-dom';
 import * as _ from 'lodash';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -10,9 +10,11 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { AccountHeader } from '../AccountRecover';
 import { Tabs } from 'constants/wallet';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const BackupCheck = () => {
-  const { state } = useLocation<{
+  const { state, pathname } = useLocation<{
     hdWalletId: string;
     accountType: Tabs;
   }>();
@@ -24,8 +26,21 @@ const BackupCheck = () => {
   const wallet = useWallet();
   const history = useHistory();
 
+  const [unlock, loading] = useWalletRequest(wallet.unlock, {
+    onSuccess() {
+      checksumPsd();
+      sensors.track('teleport_mnemonic_backup_next', { page: pathname });
+    },
+    onError(err) {
+      ClickToCloseMessage.error({
+        content: 'Wrong password',
+        key: 'Wrong password',
+      });
+    },
+  });
+
   const handleNextBtnClick = () => {
-    checksumPsd();
+    unlock(psd);
   };
 
   const resetState = () => {
@@ -43,13 +58,20 @@ const BackupCheck = () => {
   };
 
   const getPrivateKey = async () => {
-    const privateKey = await wallet.getPrivateKeyByHdWalletId(state.hdWalletId);
-    if (privateKey) setPrivateKey(privateKey);
+    const pk = await wallet.getPrivateKeyByHdWalletId(state.hdWalletId);
+    if (pk) {
+      if (pk.startsWith('0x')) {
+        setPrivateKey(pk.replace('0x', ''));
+      }
+    }
   };
 
   const checksumPsd = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error('Wrong password');
+      ClickToCloseMessage.error({
+        content: 'Wrong password',
+        key: 'Wrong password',
+      });
       console.error(e.code);
     });
     if (checksumPassed) {
@@ -153,7 +175,10 @@ const BackupCheck = () => {
         </CustomButton>
         <CopyToClipboard
           text={state.accountType === Tabs.FIRST ? mnemonic : privateKey}
-          onCopy={() => ClickToCloseMessage.success('Copied')}
+          onCopy={() => {
+            ClickToCloseMessage.success('Copied');
+            sensors.track('teleport_mnemonic_backup_copy', { page: pathname });
+          }}
         >
           <CustomButton
             type="primary"
@@ -171,6 +196,7 @@ const BackupCheck = () => {
           type="default"
           cls="custom-button-default"
           onClick={() => {
+            sensors.track('teleport_mnemonic_backup_done', { page: pathname });
             history.go(-1);
           }}
           block

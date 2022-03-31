@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MIN_PASSWORD_LENGTH } from 'constants/index';
 import { Checkbox, message } from 'antd';
@@ -15,10 +15,13 @@ import {
 } from 'ui/components/Widgets';
 import { AccountHeader } from '../AccountRecover';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const AccountCreate = () => {
   const { t } = useTranslation();
   const history = useHistory();
+  const location = useLocation();
   const [agreed, setAgreed] = useState(false);
   const [psd, setPsd] = useState('');
   const [confirmPsd, setConfirmPsd] = useState('');
@@ -30,6 +33,9 @@ const AccountCreate = () => {
   const [run, loading] = useWalletRequest(wallet.createHdWallet, {
     onSuccess(mnemonic) {
       updateStoragePolicyAgreed();
+      sensors.track('teleport_account_create_step1', {
+        page: location.pathname,
+      });
       history.push({
         pathname: '/mnemonic-backup',
         state: {
@@ -39,7 +45,10 @@ const AccountCreate = () => {
     },
     onError(err) {
       console.error(err);
-      ClickToCloseMessage.error('Unknown error, please try again later');
+      ClickToCloseMessage.error({
+        content: 'Unknown error, please try again later',
+        key: 'Unknown error, please try again later',
+      });
     },
   });
 
@@ -60,12 +69,18 @@ const AccountCreate = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error("Passwords don't match");
+        ClickToCloseMessage.error({
+          content: "Passwords don't match",
+          key: "Passwords don't match",
+        });
         return;
       }
     }
@@ -89,6 +104,15 @@ const AccountCreate = () => {
           onChange={(e) => {
             setName(e.target.value);
           }}
+          onBlur={() => {
+            if (name.trim().length > 20) {
+              ClickToCloseMessage.error({
+                content: 'Name length should be 1-20 characters',
+                key: 'Name length should be 1-20 characters',
+              });
+              return;
+            }
+          }}
         />
 
         <div
@@ -97,8 +121,7 @@ const AccountCreate = () => {
         >
           <p className="account-create-title">Password</p>
           <p className="account-create-notice">
-            We will use this password to encrypt your data. You will need this
-            password to unlock you wallet.
+            Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
             cls="custom-password-input"
@@ -124,7 +147,10 @@ const AccountCreate = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error("Passwords don't match");
+                ClickToCloseMessage.error({
+                  content: "Passwords don't match",
+                  key: "Passwords don't match",
+                });
               }
             }}
             placeholder="Enter password again"
@@ -145,7 +171,14 @@ const AccountCreate = () => {
             }}
           />
           <span className="policy-title">I have read and agree to&nbsp;</span>
-          <span className="policy-link cursor">the privacy & terms</span>
+          <span
+            className="policy-link cursor"
+            onClick={() => {
+              history.push('/policy');
+            }}
+          >
+            the privacy & terms
+          </span>
         </div>
       </div>
       <div className="button content-wrap-padding">

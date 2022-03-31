@@ -566,6 +566,12 @@
   "Action": {
     "message": "Action"
   },
+  "contractDeployment": {
+    "message": "Contract Deployment"
+  },
+  "contractInteraction": {
+    "message": "Contract Interaction"
+  },
   "Unknown__Action": {
     "message": "Unknown Action"
   },
@@ -574,6 +580,9 @@
   },
   "speedUp": {
     "message": "Speed Up"
+  },
+  "mismatched_chain_id": {
+    "message": "Chain ID doesn’t match with the server, expect: {{expected}} got: {{got}}"
   },
   "gasCostTitle": {
     "message": "Est. gas cost"
@@ -733,6 +742,9 @@
   },
   "Notice__Third": {
     "message": "Do not use screenshots or network transmission to backup and save"
+  },
+  "about_software_introductions": {
+    "message": "{{software_name}} is a secured multi-chain & multi-Identity browser extension wallet for crypto transfers, enabling decentralized applications(dApps) interaction on Ethereum, Cosmos, Polkadot, Solana and so on."
   },
   "copy__successfully": {
     "message": "Copy successfully"

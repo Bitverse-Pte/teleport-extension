@@ -1,31 +1,8 @@
 import type { Chain } from 'types/chain';
 import IconEthLogo from 'assets/create.svg';
 import IconEthWhiteLogo from 'assets/create.svg';
-
-/*import IconHecoLogo from 'assets/chain-logos/heco.svg';
-import IconHecoWhiteLogo from 'assets/chain-logos/heco-white.svg';
-import IconBscLogo from 'assets/chain-logos/bsc.svg';
-import IconBscWhiteLogo from 'assets/chain-logos/bsc-white.svg';
-import IconDaiLogo from 'assets/chain-logos/dai.svg';
-import IconDaiWhiteLogo from 'assets/chain-logos/dai-white.svg';
-import IconPolygonLogo from 'assets/chain-logos/polygon.svg';
-import IconPolygonWhiteLogo from 'assets/chain-logos/polygon-white.svg';
-import IconFantom from 'assets/chain-logos/fantom.svg';
-import IconFantomWhiteLogo from 'assets/chain-logos/fantom-white.svg';
-import IconOKTLogo from 'assets/chain-logos/okex.svg';
-import IconOKTWhiteLogo from 'assets/chain-logos/okex-white.svg';
-import IconArbitrumLogo from 'assets/chain-logos/arbitrum.svg';
-import IconArbitrumWhiteLogo from 'assets/chain-logos/arbitrum-white.svg';
-import IconOPLogo from 'assets/chain-logos/op.svg';
-import IconOPWhiteLogo from 'assets/chain-logos/op-white.svg';
-import IconAvaxLogo from 'assets/chain-logos/avax.svg';
-import IconAvaxWhiteLogo from 'assets/chain-logos/avax-white.svg';
-import IconCeloLogo from 'assets/chain-logos/celo.svg';
-import IconCeloWhiteLogo from 'assets/chain-logos/celo-white.svg';*/
 import IconEN from 'assets/create.svg';
 import IconZH from 'assets/create.svg';
-
-//TODO (Jayce) use temp icon
 
 export enum CHAINS_ENUM {
   ETH = 'ETH',

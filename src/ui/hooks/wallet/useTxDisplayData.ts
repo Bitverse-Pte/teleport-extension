@@ -38,12 +38,14 @@ import { useCurrencyDisplay } from './useCurrencyDisplay';
 import { getKnownMethodData } from 'ui/selectors/selectors';
 import { get } from 'lodash';
 import { Token } from 'types/token';
+import { useMethodData } from './useMethodData';
 export function camelCaseToCapitalize(str = '') {
   return str.replace(/([A-Z])/gu, ' $1').replace(/^./u, (s) => s.toUpperCase());
 }
 // import { getTokenAddressParam } from '../helpers/utils/token-util';
 export function getTokenAddressParam(tokenData: any = {}): string {
-  const value = tokenData?.args?._to || tokenData?.args?.[0];
+  const value =
+    tokenData?.args?._to || tokenData?.args?.to || tokenData?.args?.[0];
   return value?.toString().toLowerCase() || '';
 }
 
@@ -119,14 +121,14 @@ export function useTransactionDisplayData(
   const { t } = useTranslation();
   const { initialTransaction, primaryTransaction } = transactionGroup;
   // initialTransaction contains the data we need to derive the primary purpose of this transaction group
-  const { type } = initialTransaction;
+  // const { type } = initialTransaction;
+  const { type } = primaryTransaction;
 
-  const { from: senderAddress, to } = initialTransaction.txParams || {};
+  const { from: senderAddress, to } = primaryTransaction.txParams || {};
 
   // for smart contract interactions, methodData can be used to derive the name of the action being taken
-  const methodData = useSelector((state) =>
-    getKnownMethodData(state, initialTransaction?.txParams?.data as string)
-  );
+  // const methodData = useMethodData(initialTransaction.txParams.data);
+  const methodData = useMethodData(primaryTransaction.txParams.data);
 
   const displayedStatusKey = getStatusKey(primaryTransaction);
   const isPending = displayedStatusKey in PENDING_STATUS_HASH;
@@ -138,7 +140,8 @@ export function useTransactionDisplayData(
    * As requested, will be formatted to relative time
    * if tx is happened in 7 days
    */
-  const date = formatDateWithWeekContext(initialTransaction.time);
+  // const date = formatDateWithWeekContext(initialTransaction.time);
+  const date = formatDateWithWeekContext(primaryTransaction.time);
   let subtitle = '';
   let subtitleContainsOrigin = false;
   let recipientAddress = to;
@@ -159,11 +162,13 @@ export function useTransactionDisplayData(
       )
     : undefined;
   const tokenData = useTokenData(
-    initialTransaction?.txParams?.data,
+    // initialTransaction?.txParams?.data,
+    primaryTransaction?.txParams?.data,
     isTokenCategory
   );
   const tokenDisplayValue = useTokenDisplayValue(
-    initialTransaction?.txParams?.data,
+    // initialTransaction?.txParams?.data,
+    primaryTransaction?.txParams?.data,
     token,
     isTokenCategory
   );
@@ -264,6 +269,32 @@ export function useTransactionDisplayData(
     subtitle = origin;
     subtitleContainsOrigin = true;
   } else if (
+    type === TransactionTypes.TOKEN_METHOD_TRANSFER_FROM ||
+    type === TransactionTypes.TOKEN_METHOD_TRANSFER
+  ) {
+    category = TransactionGroupCategories.SEND;
+    title = t('sendSpecifiedTokens', {
+      replace: { $1: token?.symbol || t('token') },
+    });
+    recipientAddress = getTokenAddressParam(tokenData);
+    subtitle = t('toAddress', {
+      replace: { $1: shortenAddress(recipientAddress) },
+    });
+  } else if (
+    /**
+     * judge by methodData too, in order to support NFT
+     */
+    ['Safe Transfer From', 'transferFrom'].includes(methodData?.name || '')
+  ) {
+    category = TransactionGroupCategories.SEND;
+    title = t('sendSpecifiedTokens', {
+      replace: { $1: token?.symbol || t('token') },
+    });
+    recipientAddress = getTokenAddressParam(tokenData);
+    subtitle = t('toAddress', {
+      replace: { $1: shortenAddress(recipientAddress) },
+    });
+  } else if (
     type === TransactionTypes.DEPLOY_CONTRACT ||
     type === TransactionTypes.CONTRACT_INTERACTION
   ) {
@@ -280,18 +311,6 @@ export function useTransactionDisplayData(
     prefix = '';
     subtitle = t('fromAddress', {
       replace: { $1: shortenAddress(senderAddress) },
-    });
-  } else if (
-    type === TransactionTypes.TOKEN_METHOD_TRANSFER_FROM ||
-    type === TransactionTypes.TOKEN_METHOD_TRANSFER
-  ) {
-    category = TransactionGroupCategories.SEND;
-    title = t('sendSpecifiedTokens', {
-      replace: { $1: token?.symbol || t('token') },
-    });
-    recipientAddress = getTokenAddressParam(tokenData);
-    subtitle = t('toAddress', {
-      replace: { $1: shortenAddress(recipientAddress) },
     });
   } else if (type === TransactionTypes.SIMPLE_SEND) {
     category = TransactionGroupCategories.SEND;

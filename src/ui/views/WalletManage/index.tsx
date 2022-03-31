@@ -1,6 +1,6 @@
 import './style.less';
 import React, { useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import Header from 'ui/components/Header';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import {
@@ -21,7 +21,9 @@ import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
-
+import { UnlockModal } from 'ui/components/UnlockModal';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 export interface WalletHeaderProps {
   title: string;
   handleDoneClick: () => void;
@@ -43,24 +45,24 @@ export const WalletHeader = (props: WalletHeaderProps) => {
 
 const WalletManage: React.FC = () => {
   const history = useHistory();
+  const location = useLocation();
   const wallet = useWallet();
   const [hdWalletAccounts, setHdWalletAccount] = useState<any>([]);
   const [simpleWalletAccounts, setSimpleWalletAccount] = useState<
     BaseAccount[]
   >([]);
   const [accountType, setAccountType] = useState(Tabs.FIRST);
-  const [backupHdWalletId, setBackupWalletId] = useState('');
-  const [popupVisible, setPopupVisible] = useState(false);
   const [deletePopupVisible, setDeletePopupVisible] = useState(false);
   const [currentHdWalletId, setCurrentHdWalletId] = useState('');
   const [isEdit, setIsEdit] = useState(false);
   const [renamePopupVisible, setRenamePopupVisible] = useState(false);
   const [currentWalletName, setCurrentWalletName] = useState('');
   const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+  const [unlockType, setUnlockType] = useState('edit');
 
   const queryWallets = async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList(true);
-    console.log('accounts', accounts);
     if (accounts && accounts.hdAccount) {
       setHdWalletAccount(accounts.hdAccount);
     }
@@ -72,7 +74,6 @@ const WalletManage: React.FC = () => {
 
   const queryCurrentAccount = async () => {
     const account: BaseAccount = await wallet.getCurrentAccount();
-    console.log('current account', account);
     if (account) {
       setCurrentAccount(account);
     }
@@ -80,10 +81,6 @@ const WalletManage: React.FC = () => {
 
   useAsyncEffect(queryWallets, []);
   useAsyncEffect(queryCurrentAccount, []);
-
-  const isHd = useMemo(() => {
-    return accountType === Tabs.FIRST;
-  }, [accountType]);
 
   useMemo(() => {
     if (currentAccount && hdWalletAccounts && simpleWalletAccounts) {
@@ -101,33 +98,54 @@ const WalletManage: React.FC = () => {
     }
   }, [hdWalletAccounts, simpleWalletAccounts, currentAccount]);
 
-  const handleCreateBtnClick = () => {
+  const handleCreateBtnClick = async () => {
+    sensors.track('teleport_wallet_manage_create', { page: location.pathname });
+    setUnlockType('create');
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
     history.push('/create');
   };
-  const handleImportBtnClick = () => {
+  const handleImportBtnClick = async () => {
+    sensors.track('teleport_wallet_manage_import', { page: location.pathname });
+    setUnlockType('import');
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
     history.push('/recover');
   };
 
   const onDeleteConfirm = async () => {
+    sensors.track('teleport_wallet_manage_delete_comfirm', {
+      page: location.pathname,
+    });
     await wallet.removeHdWalletsByHdWalletId(currentHdWalletId).catch((e) => {
       console.error(e);
     });
     setDeletePopupVisible(false);
     queryWallets();
+    queryCurrentAccount();
   };
 
   const handleWalletClick = async (w: any) => {
+    sensors.track('teleport_wallet_manage_wallet_click', {
+      page: location.pathname,
+    });
     await wallet.changeAccount(w?.accounts ? w?.accounts[0] : w);
     history.goBack();
   };
 
-  const setBackupVisible = (visible: boolean) => {
-    setPopupVisible(visible);
-  };
-
   const onRenameConfirm = async (walletName) => {
+    sensors.track('teleport_wallet_manage_rename_confirm', {
+      page: location.pathname,
+    });
     if (walletName.length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     const renamed: boolean = await wallet
@@ -135,16 +153,26 @@ const WalletManage: React.FC = () => {
       .catch((e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error('Name already exists');
+          ClickToCloseMessage.error({
+            content: 'Name already exists',
+            key: 'Name already exists',
+          });
+        } else {
+          ClickToCloseMessage.error({
+            content: 'Unknown error, please try again later',
+            key: 'Unknown error, please try again later',
+          });
         }
       });
     if (renamed) {
       setRenamePopupVisible(false);
       queryWallets();
+      queryCurrentAccount();
     }
   };
 
   const handleDeleteBtnClick = (e, hdWalletId) => {
+    sensors.track('teleport_wallet_manage_delete', { page: location.pathname });
     if (hdWalletAccounts.length + simpleWalletAccounts.length === 1) {
       ClickToCloseMessage.warning('Please keep alive at least one account');
       return;
@@ -154,8 +182,38 @@ const WalletManage: React.FC = () => {
     setCurrentHdWalletId(hdWalletId);
   };
 
+  const handleUnlock = () => {
+    if (unlockType === 'edit') {
+      setIsEdit(!isEdit);
+    }
+    if (unlockType === 'create') {
+      history.push('/create');
+    }
+    if (unlockType === 'import') {
+      history.push('/recover');
+    }
+  };
+
+  const handleEdit = async () => {
+    sensors.track('teleport_wallet_manage_edit', { page: location.pathname });
+    setUnlockType('edit');
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
+    setIsEdit(!isEdit);
+  };
+
   return (
     <div className="wallet-manage flexCol">
+      <UnlockModal
+        title="Unlock Wallet"
+        visible={unlockPopupVisible}
+        setVisible={(visible: boolean) => {
+          setUnlockPopupVisible(visible);
+        }}
+        unlocked={() => handleUnlock()}
+      />
       {isEdit ? (
         <WalletHeader
           title="Wallet"
@@ -168,16 +226,11 @@ const WalletManage: React.FC = () => {
         className="wallet-manage-button-container flexR content-wrap-padding"
         style={{
           display: isEdit ? 'none' : 'flex',
-          justifyContent:
-            accountType === Tabs.FIRST ? 'space-between' : 'center',
         }}
       >
         <div
           className="wallet-manage-button-item cursor flexCol _edit"
-          style={{
-            marginRight: accountType === Tabs.FIRST ? '0px' : '132px',
-          }}
-          onClick={() => setIsEdit(!isEdit)}
+          onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
             <img src={editImg} alt="" className="wallet-manage-img" />
@@ -195,7 +248,6 @@ const WalletManage: React.FC = () => {
         </div>
         <div
           onClick={handleCreateBtnClick}
-          style={{ display: accountType === Tabs.FIRST ? 'flex' : 'none' }}
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">
@@ -305,6 +357,9 @@ const WalletManage: React.FC = () => {
                           setCurrentWalletName(w.hdWalletName);
                           setCurrentHdWalletId(w.hdWalletId);
                           setRenamePopupVisible(true);
+                          sensors.track('teleport_wallet_manage_rename', {
+                            page: location.pathname,
+                          });
                         }}
                         style={{
                           display: isEdit ? 'block' : 'none',

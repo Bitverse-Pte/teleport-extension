@@ -107,26 +107,33 @@ h2.category-name {
 /** network edit page **/
 .network-edit {
   padding: 0;
-  .ant-form-item-required {
-    font-family: MontserratBold;
+  .input-error {
+    color: #E05651;
+    margin-top: -12px;
+    margin-bottom: 24px;
   }
-  .ant-form-item-required::before {
-    content: '' !important;
-  }
-  .ant-form-item-label {
-    padding: 0 0 12px;
-    .label {
+  h1 {
+      margin-bottom: 12px;
       font-size: 16px;
       color: #364361;
-    }
+  }
+  h1.required {
+    font-family: MontserratBold;
+  }
+  .disabled_button {
+    // override disabled button font color to avoid full blank
+    color: black !important;
   }
 
-  .ant-form-item-control-input {
+  // .ant-form-item-control-input {
     input {
       background-color: #F8FAFC;
       height: 36px;
       border-radius: 8px !important;
       border-color: #F8FAFC;
+      margin-bottom: 24px;
+      width: 100%;
+      padding: 11px 16px;
     }
     input::placeholder {
       color: #A3B4CC !important;
@@ -134,18 +141,20 @@ h2.category-name {
     input::-webkit-input-placeholder {
       color: #A3B4CC !important;
     }
-  }
+    input:last-child {
+      margin-bottom: 0;
+    }
+  // }
   .ant-select-selector {
     background: #F8FAFC !important;
     border-radius: 8px !important;
     border: 0px !important;
   }
-  form .form-body {
+  .form-body {
     padding: 0 4px;
     overflow-y: scroll;
     overflow-x: hidden;
-    height: 478px;
-    margin-bottom: 24px;
+    height: 455px;
   }
 }
 

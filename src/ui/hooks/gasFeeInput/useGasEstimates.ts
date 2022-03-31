@@ -1,21 +1,27 @@
 import { useSelector } from 'react-redux';
 
 import { EDIT_GAS_MODES, GAS_ESTIMATE_TYPES } from 'constants/gas';
-import { getMaximumGasTotalInHexWei, getMinimumGasTotalInHexWei } from 'utils/gas';
-import { checkNetworkAndAccountSupports1559, getShouldShowFiat } from 'ui/selectors/selectors';
+import {
+  getMaximumGasTotalInHexWei,
+  getMinimumGasTotalInHexWei,
+} from 'utils/gas';
+import {
+  checkNetworkAndAccountSupports1559,
+  getShouldShowFiat,
+} from 'ui/selectors/selectors';
 import { decimalToHex, decGWEIToHexWEI } from 'ui/utils/conversion';
 import { isLegacyTransaction } from 'utils/transaction.utils';
-import { useCurrencyDisplay } from '../metamask/useCurrencyDisplay';
-import { useUserPreferencedCurrency } from '../metamask/useUserPreferencedCurrency';
+import { useCurrencyDisplay } from '../wallet/useCurrencyDisplay';
+import { useUserPreferencedCurrency } from '../wallet/useUserPreferencedCurrency';
 
 interface GasEstimatesReturnType {
-    estimatedMinimumFiat: string; // - The amount estimated to be paid based on current network conditions. Expressed in user's preferred currency.
-    estimatedMaximumFiat: string; // - the maximum amount estimated to be paid if current network transaction volume increases. Expressed in user's preferred currency.
-    estimatedMaximumNative: string; // - the maximum amount estimated to be paid if the current network transaction volume increases. Expressed in the network's native currency.
-    estimatedMinimumNative: string; // - the maximum amount estimated to be paid if the current network transaction volume increases. Expressed in the network's native currency.
-    estimatedBaseFee: string; // - estimatedBaseFee from fee-market gasFeeEstimates in HexWei.
-    minimumCostInHexWei: string; // - the minimum amount this transaction will cost.
-    maximumCostInHexWei: string; // - the maximum amount this transaction will cost.
+  estimatedMinimumFiat: string; // - The amount estimated to be paid based on current network conditions. Expressed in user's preferred currency.
+  estimatedMaximumFiat: string; // - the maximum amount estimated to be paid if current network transaction volume increases. Expressed in user's preferred currency.
+  estimatedMaximumNative: string; // - the maximum amount estimated to be paid if the current network transaction volume increases. Expressed in the network's native currency.
+  estimatedMinimumNative: string; // - the maximum amount estimated to be paid if the current network transaction volume increases. Expressed in the network's native currency.
+  estimatedBaseFee: string; // - estimatedBaseFee from fee-market gasFeeEstimates in HexWei.
+  minimumCostInHexWei: string; // - the minimum amount this transaction will cost.
+  maximumCostInHexWei: string; // - the maximum amount this transaction will cost.
 }
 
 export function useGasEstimates({
@@ -33,10 +39,8 @@ export function useGasEstimates({
     useSelector(checkNetworkAndAccountSupports1559) &&
     !isLegacyTransaction(transaction?.txParams);
 
-  const {
-    currency: fiatCurrency,
-    numberOfDecimals: fiatNumberOfDecimals,
-  } = useUserPreferencedCurrency('SECONDARY');
+  const { currency: fiatCurrency, numberOfDecimals: fiatNumberOfDecimals } =
+    useUserPreferencedCurrency('SECONDARY');
 
   const showFiat = useSelector(getShouldShowFiat);
 
@@ -58,7 +62,7 @@ export function useGasEstimates({
       ...gasSettings,
       maxFeePerGas: decGWEIToHexWEI(maxFeePerGas || gasPrice || '0'),
       maxPriorityFeePerGas: decGWEIToHexWEI(
-        maxPriorityFeePerGas || maxFeePerGas || gasPrice || '0',
+        maxPriorityFeePerGas || maxFeePerGas || gasPrice || '0'
       ),
       baseFeePerGas: decGWEIToHexWEI(gasFeeEstimates.estimatedBaseFee ?? '0'),
     };
@@ -96,7 +100,7 @@ export function useGasEstimates({
     {
       numberOfDecimals: fiatNumberOfDecimals,
       currency: fiatCurrency,
-    },
+    }
   );
 
   const [estimatedMinimumNative] = useCurrencyDisplay(minimumCostInHexWei, {
@@ -111,7 +115,7 @@ export function useGasEstimates({
     {
       numberOfDecimals: fiatNumberOfDecimals,
       currency: fiatCurrency,
-    },
+    }
   );
 
   return {

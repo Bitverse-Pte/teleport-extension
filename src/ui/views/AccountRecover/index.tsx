@@ -1,5 +1,5 @@
 import React, { Fragment, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { ACCOUNT_IMPORT_TYPE, MIN_PASSWORD_LENGTH } from 'constants/index';
@@ -22,6 +22,8 @@ import { Tabs } from 'constants/wallet';
 import { useSeedPhraseValidation } from 'ui/hooks/validation/useSeedPhraseValidation';
 import { usePrivateKeyValidation } from 'ui/hooks/validation/usePrivateKeyValidation';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const { TextArea } = Input;
 
@@ -33,6 +35,10 @@ export interface AccountHeaderProps {
 
 export const AccountHeader = (props: AccountHeaderProps) => {
   const handleBackClick = () => {
+    sensors.track('teleport_account_manage_closed', {
+      page: location.pathname,
+      title: props.title,
+    });
     if (props.handleCloseIconClick) {
       props.handleCloseIconClick();
       return;
@@ -55,6 +61,7 @@ export const AccountHeader = (props: AccountHeaderProps) => {
 
 const AccountRecover = () => {
   const history = useHistory();
+  const location = useLocation();
   const [importType, setImportType] = useState(Tabs.FIRST);
   const [agreed, setAgreed] = useState(false);
   const [textareaActive, setTextareaActive] = useState(false);
@@ -75,6 +82,10 @@ const AccountRecover = () => {
 
   const handleSuccessCallback = () => {
     updateStoragePolicyAgreed();
+    sensors.track('teleport_account_recover_imported', {
+      page: location.pathname,
+      importType: importType,
+    });
     history.push({
       pathname: '/home',
     });
@@ -84,19 +95,40 @@ const AccountRecover = () => {
 
     switch (e?.code) {
       case ErrorCode.ADDRESS_REPEAT:
-        ClickToCloseMessage.error('Account already exists');
+        ClickToCloseMessage.error({
+          content: 'Account already exists',
+          key: 'Account already exists',
+        });
         break;
       case ErrorCode.INVALID_MNEMONIC:
-        ClickToCloseMessage.error('Invalid mnemonic');
+        ClickToCloseMessage.error({
+          content: 'Invalid mnemonic',
+          key: 'Invalid mnemonic',
+        });
         break;
       case ErrorCode.INVALID_PRIVATE_KEY:
-        ClickToCloseMessage.error('Invalid private key');
+        ClickToCloseMessage.error({
+          content: 'IInvalid private key',
+          key: 'Invalid private key',
+        });
+        break;
+      case ErrorCode.WALLET_NAME_REPEAT:
+        ClickToCloseMessage.error({
+          content: 'Name already exists',
+          key: 'Name already exists',
+        });
         break;
       default:
         if (importType === Tabs.FIRST) {
-          ClickToCloseMessage.error('Invalid mnemonic');
+          ClickToCloseMessage.error({
+            content: 'Invalid mnemonic',
+            key: 'Invalid mnemonic',
+          });
         } else {
-          ClickToCloseMessage.error('Invalid private key');
+          ClickToCloseMessage.error({
+            content: 'Invalid private key',
+            key: 'Invalid private key',
+          });
         }
     }
   };
@@ -148,12 +180,18 @@ const AccountRecover = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error("Password don't match");
+        ClickToCloseMessage.error({
+          content: "Password don't match",
+          key: "Password don't match",
+        });
         return;
       }
     }
@@ -238,7 +276,8 @@ const AccountRecover = () => {
           )} */}
         </div>
 
-        <p
+        {/* @todo: enable below when cosmos supported */}
+        {/* <p
           className="account-recover-title"
           style={{
             display: importType === Tabs.SECOND ? 'block' : 'none',
@@ -253,7 +292,7 @@ const AccountRecover = () => {
           handleChainSelect={(chain: Provider) => {
             setCoinType(chain.coinType);
           }}
-        />
+        /> */}
 
         <p className="account-recover-title">Wallet name</p>
         <CustomInput
@@ -264,6 +303,15 @@ const AccountRecover = () => {
              */
             setName(e.target.value.trim());
           }}
+          onBlur={() => {
+            if (name.trim().length > 20) {
+              ClickToCloseMessage.error({
+                content: 'Name length should be 1-20 characters',
+                key: 'Name length should be 1-20 characters',
+              });
+              return;
+            }
+          }}
         />
         <div
           className="password-container"
@@ -271,8 +319,7 @@ const AccountRecover = () => {
         >
           <p className="account-recover-title">Password</p>
           <p className="account-create-notice">
-            We will use this password to encrypt your data. You will need this
-            password to unlock you wallet.
+            Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
             onChange={(e) => {
@@ -297,7 +344,10 @@ const AccountRecover = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error("Password don't match");
+                ClickToCloseMessage.error({
+                  content: "Password don't match",
+                  key: "Password don't match",
+                });
               }
             }}
             placeholder="Enter password again"
@@ -313,7 +363,14 @@ const AccountRecover = () => {
             }}
           />
           <span className="policy-title">I have read and agree to&nbsp;</span>
-          <span className="policy-link cursor">the provision</span>
+          <span
+            className="policy-link cursor"
+            onClick={() => {
+              history.push('/policy');
+            }}
+          >
+            the privacy & terms
+          </span>
         </div>
       </div>
       <div className="button content-wrap-padding">

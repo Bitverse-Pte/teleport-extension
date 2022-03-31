@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useHistory } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { NetworksCategories } from './typing';
 import DefaulutIcon from 'assets/tokens/default.svg';
@@ -18,6 +18,10 @@ import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
 import { IconComponent } from 'ui/components/IconComponents';
 import { NetworkSelectionItem } from 'ui/components/Network/NetworkSelection/NetworkSelectionItem.component';
+import { BetaIcon } from 'ui/components/Widgets';
+import { ReactComponent as TLPText } from 'assets/teleportText.svg';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const ChainCategoryIcon = ({ src = DefaulutIcon }: { src?: string }) => (
   <img
@@ -66,11 +70,18 @@ function useProviderList() {
   }, [customProviders]);
 
   const currentProviderId = useSelector((s) => s.network.provider.id);
-  const currentSelectedCategory = useMemo(() => {
-    const [name] = Object.entries(networkList).filter(([_, { networks }]) => {
-      return networks.filter((n) => n.id === currentProviderId).length > 0;
-    })[0];
-    return name;
+  const currentSelectedCategory: string | undefined = useMemo(() => {
+    const foundedInNetworks = Object.entries(networkList).filter(
+      ([_, { networks }]) => {
+        return networks.filter((n) => n.id === currentProviderId).length > 0;
+      }
+    );
+    if (foundedInNetworks.length > 0) {
+      const [name] = foundedInNetworks[0];
+      return name;
+    } else {
+      return undefined;
+    }
   }, [currentProviderId]);
 
   return { networkList, currentSelectedCategory };
@@ -79,14 +90,16 @@ function useProviderList() {
 const NetworksSelectionContainer = () => {
   const { t } = useTranslation();
   const history = useHistory();
+  const location = useLocation();
   const [activeKeys, setActiveKeys] = useState<Record<string, boolean>>({});
   const providerContext = useContext(NetworkProviderContext);
   const { networkList, currentSelectedCategory } = useProviderList();
 
   useEffect(() => {
-    setActiveKeys({
-      [currentSelectedCategory]: true,
-    });
+    if (currentSelectedCategory)
+      setActiveKeys({
+        [currentSelectedCategory]: true,
+      });
   }, []);
 
   if (!providerContext) {
@@ -95,7 +108,15 @@ const NetworksSelectionContainer = () => {
 
   return (
     <div className="flexCol network-page-container">
-      <GeneralHeader title="Teleport Wallet" extCls="network-list-header" />
+      <GeneralHeader
+        title={
+          <span className="title flex">
+            <TLPText style={{ marginRight: 4 }} />
+            <BetaIcon />
+          </span>
+        }
+        extCls="network-list-header"
+      />
       <div className="networkList">
         {Object.keys(networkList).map((key) => {
           const currentCategory = networkList[key];
@@ -131,7 +152,12 @@ const NetworksSelectionContainer = () => {
       </div>
       <div
         className="cursor-pointer hover-to-highlight custom-network-card flex items-center"
-        onClick={() => history.push('/network/add')}
+        onClick={() => {
+          sensors.track('teleport_network_customize', {
+            page: location.pathname,
+          });
+          history.push('/network/add');
+        }}
       >
         <h2 className="category-name">{t('CustomizeNetwork')}</h2>
         <div className="actions" style={{ marginLeft: 'auto' }}>

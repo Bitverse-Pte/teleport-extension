@@ -1,46 +1,52 @@
 import './style.less';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.svg';
+import TeleportText from 'assets/teleportText.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
 import { stat } from 'fs';
-
+import { BetaIcon } from 'ui/components/Widgets';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 interface ISettingFeat {
   title: string;
-  link: string;
+  link?: string;
   opts?: any;
+  showChevronRight?: boolean;
 }
 
 const SettingFeat: ISettingFeat[] = [
   {
-    title: 'Exchange',
-    link: '/exchange',
+    title: 'Currency',
+    // link: '/exchange',
     opts: {
       tag: 'USD',
     },
   },
   {
     title: 'Language',
-    link: '/language',
+    // link: '/language',
     opts: {
       tag: 'English',
     },
   },
   {
-    title: 'Address Book',
-    link: '/address-book',
+    title: 'Support',
+    /**
+     * link start with http(s) will be open in a new page
+     * since it's not in the extension's context
+     */
+    link: 'https://forms.gle/6ZLWmHXZGnioE1uQ6',
+    showChevronRight: true,
   },
   {
-    title: 'Safety Setting',
-    link: '/safety setting',
-  },
-  {
-    title: 'About Me',
+    title: 'About',
     link: '/about',
+    showChevronRight: true,
   },
 ];
 
@@ -55,7 +61,8 @@ export const LogoHeader: React.FC<ILogoHeader> = (props) => {
     <div className="logo-header flexR">
       <div className="logo-header-left flexR">
         <img src={walletLogo} className="logo-header-left-logo" />
-        <span className="logo-header-left-title">Teleport Wallet</span>
+        <img src={TeleportText} className="logo-header-left-title" />
+        <BetaIcon />
       </div>
       <div
         className="logo-header-right flexR"
@@ -74,6 +81,7 @@ export interface ISettingProps {
 
 const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   const history = useHistory();
+  const location = useLocation();
   const wallet = useWallet();
   const [isDefaultWallet, setIsDefaultWallet] = useState(false);
 
@@ -87,17 +95,39 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   }, []);
 
   const handleWalletManageClick = () => {
+    sensors.track('teleport_setting_manage_wallet', {
+      page: location.pathname,
+    });
     history.push('/wallet-manage');
   };
 
   const handleLockClick = () => {
+    sensors.track('teleport_setting_lock', {
+      page: location.pathname,
+    });
     history.replace('/unlock');
+    wallet.setManualLocked(true);
     wallet.lockWallet();
   };
 
   const handleDefaultWalletChange = (checked: boolean) => {
+    sensors.track('teleport_setting_default', {
+      page: location.pathname,
+      params: { default: checked },
+    });
     wallet.setIsDefaultWallet(checked);
     setIsDefaultWallet(checked);
+  };
+
+  const jumpToPage = (setting: ISettingFeat) => {
+    console.debug('jumpToPage', setting);
+    if (setting.link) {
+      if (setting.link.slice(0, 4) !== 'http') history.push(setting.link);
+      else window.open(setting.link);
+    } else
+      console.warn(
+        `'link' for ${setting.title} is undefined, click will be ignored. Please edit in ui/views/Setting/index.tsx about the 'SettingFeat'`
+      );
   };
 
   return (
@@ -131,8 +161,12 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           onChange={handleDefaultWalletChange}
         />
       </div>
-      {SettingFeat.map((setting: ISettingFeat) => (
-        <div className="setting-item flexR cursor" key={setting.title}>
+      {SettingFeat.map((setting: ISettingFeat, i) => (
+        <div
+          className="setting-item flexR cursor"
+          key={setting.title}
+          onClick={() => jumpToPage(setting)}
+        >
           <span className="title">{setting.title}</span>
           <span
             className="tag"
@@ -140,7 +174,9 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           >
             {setting?.opts?.tag}
           </span>
-          <IconComponent name="chevron-right" cls="base-text-color" />
+          {setting.showChevronRight ? (
+            <IconComponent name="chevron-right" cls="base-text-color" />
+          ) : null}
         </div>
       ))}
     </div>

@@ -18,6 +18,7 @@ const TestTxList = lazy(() => import('./TestTxList'));
 const TokenManage = lazy(() => import('ui/views/TokenManage'));
 const SingleToken = lazy(() => import('ui/views/SingleToken'));
 const TokenAdd = lazy(() => import('ui/views/TokenAdd'));
+const AboutSoftware = lazy(() => import('ui/views/AboutSoftware'));
 const MnemonicCheck = lazy(() => import('ui/views/MnemonicCheck'));
 const ActivityDetail = lazy(
   () => import('ui/views/Transaction/TransactionDetail')
@@ -25,6 +26,7 @@ const ActivityDetail = lazy(
 const Send = lazy(() => import('ui/views/Send'));
 const Receive = lazy(() => import('ui/views/Receive'));
 const GasFee = lazy(() => import('ui/views/GasFee'));
+const Policy = lazy(() => import('ui/views/Policy'));
 
 const Main = () => {
   return (
@@ -57,6 +59,9 @@ const Main = () => {
         <LazyPrivateRoute exact path="/home">
           <Home />
         </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/about">
+          <AboutSoftware />
+        </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/receive">
           <Receive />
         </LazyPrivateRoute>
@@ -86,6 +91,10 @@ const Main = () => {
 
         <LazyPrivateRoute exact path="/activity/:activityId">
           <ActivityDetail />
+        </LazyPrivateRoute>
+
+        <LazyPrivateRoute exact path="/policy">
+          <Policy />
         </LazyPrivateRoute>
 
         {/* Remove these two routes when we feel good about them  */}

@@ -3,6 +3,7 @@ import './index.less';
 import { getValueFromWeiHex } from 'ui/utils/conversion';
 import { ETH } from 'constants/transaction';
 import { TokenIcon } from '../Widgets';
+import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 
 export default function UserPreferencedCurrencyDisplay({ value, token }) {
   const decimalNumber = getValueFromWeiHex({
@@ -12,9 +13,11 @@ export default function UserPreferencedCurrencyDisplay({ value, token }) {
   });
 
   return token ? (
-    <div className="flexR">
-      <TokenIcon token={token} radius={30} useThemeBg />
-      <span className="dec">{decimalNumber} </span>
+    <div className="flexR items-end">
+      <TokenIcon token={token} radius={30} />
+      <span className="dec" title={decimalNumber}>
+        {addEllipsisToEachWordsInTheEnd(decimalNumber, 8)}{' '}
+      </span>
       <span className="symbol">{token.symbol} </span>
     </div>
   ) : (

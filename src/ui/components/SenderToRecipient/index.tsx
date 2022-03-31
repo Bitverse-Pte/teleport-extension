@@ -4,9 +4,9 @@ import { message, Space } from 'antd';
 import { transferAddress2Display, toChecksumHexAddress } from 'ui/utils';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import IconArrowRight from 'assets/to.png';
 import './index.less';
 import { ClickToCloseMessage } from '../universal/ClickToCloseMessage';
+import { IconComponent } from '../IconComponents';
 
 const onCopy = () => {
   ClickToCloseMessage.success('Copied');
@@ -21,26 +21,18 @@ function Address({ checksummedAddress, name }) {
         // alert('from address copied');
       }}
     >
-      <Space>
+      <div className="sender-icon-and-name flex">
         <Jazzicon
           seed={Number(checksummedAddress?.substr(0, 8) || 0)}
-          diameter={24}
+          diameter={16}
         />
         <div className="name">{name}</div>
-      </Space>
+      </div>
       <CopyToClipboard text={checksummedAddress} onCopy={onCopy}>
         <div className="address">
           <span>{transferAddress2Display(checksummedAddress)}</span>
         </div>
       </CopyToClipboard>
-    </div>
-  );
-}
-
-function Arrow() {
-  return (
-    <div className="arrow-circle">
-      <img src={IconArrowRight} alt="" />
     </div>
   );
 }
@@ -60,7 +52,7 @@ const SenderToRecipient = ({
         checksummedAddress={checksummedSenderAddress}
         name={senderName}
       />
-      <Arrow />
+      <IconComponent name="arrow-right" cls="to-icon" />
       <Address
         checksummedAddress={checksummedRecipientAddress}
         name={recipientName}

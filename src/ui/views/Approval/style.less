@@ -28,12 +28,12 @@
       backdrop-filter: blur(24px);
       width: 100%;
       .tx-summary {
-        width: 300px;
+        width: 360px;
         justify-content: space-between;
         align-items: center;
         box-sizing: border-box;
-        margin-bottom: 4px;
-        padding: 10px;
+        // margin-bottom: 4px;
+        padding: 24px;
         .tx-summary-origin {
           font-weight: 500;
           font-size: 14px;
@@ -58,27 +58,27 @@
     }
 
     .transaction-detail {
-      padding-top: 20px;
       width: 100%;
       .gas-edit-button {
         cursor: pointer;
-        justify-content: flex-end;
+        justify-content: center;
         align-items: center;
-        padding-right: 16px;
+        width: 72px;
+        height: 24px;
+        background: #F0F9FF;
+        border-radius: 8px;
         fill: #1484F5;
         color:  #1484F5;
+        margin: 16px 0;
       }
       .transaction-detail-item {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        padding-right: 10px;
-        padding-left: 10px;
-        white-space:nowrap;
+        white-space: pre-line;
         display: flex;
         justify-content: space-between;
         .transaction-detail-item-key {
           display: inline-block;
           .transaction-detail-title {
+            font-family: "MontserratBold";
             font-weight: 500;
             font-size: 14px;
             line-height: 20px;
@@ -93,7 +93,7 @@
           }
         }
         .transaction-detail-item-values {
-          display:inline-block;
+          display: inline-block;
           font-style: normal;
           font-weight: 500;
           font-size: 12px;
@@ -103,21 +103,23 @@
           .transaction-detail-detailText {
             font-family: MontserratBold;
             font-style: normal;
-            font-size: 12px;
+            font-size: 14px;
             color: #364361;
+            margin-bottom: 8px;
           }
           .transaction-detail-detailSubText {
             font-family: Montserrat;
             font-style: normal;
             font-weight: normal;
-            font-size: 10px;
+            font-size: 12px;
             color: #798CAD;
+            margin-bottom: 12px;
           }
           .transaction-detail-detailMax {
             font-family: Montserrat;
             font-style: normal;
             font-weight: normal;
-            font-size: 10px;
+            font-size: 12px;
             color: #798CAD;
           }
         }

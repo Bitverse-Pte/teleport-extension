@@ -50,7 +50,7 @@ export default (props: ChainSelectProps) => {
           {currentChain && (
             <img src={IdToChainLogoSVG(currentChain.id)} className="icon" />
           )}
-          <span className="token">{currentChain?.chainName}</span>
+          <span className="token">{currentChain?.type}</span>
           <span className="chain-select-network">
             ({currentChain?.nickname})
           </span>

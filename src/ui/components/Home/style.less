@@ -39,7 +39,9 @@
   // flex:0 0 64px;
   padding: 0 24px;
   .logo-container {
-    // background: #42B856;
+    background: white;
+    box-sizing: border-box;
+    border: solid 2px #42B856;
     border-radius: 100%;
     width: 32px;
     height: 32px;
@@ -47,17 +49,21 @@
     align-items: center;
     justify-content: center;
     img {
-      height: 28px;
+      height: 32px;
+      width: 32px;
       border-radius: 100%;
     }
   }
   .network-select-bar {
-    width: 137px;
+    min-width: 137px;
+    max-width: 250px;
     height: 20px;
-    padding: 12px 4px;
+    padding: 12px 12px;
     border-radius: 12px;
     span.network-nickname {
+      font-family: MontserratBold;
       font-size: 12px;
+      margin-right: 6px;
     }
   }
   .expand-menu-btn {

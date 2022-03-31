@@ -264,9 +264,11 @@ async function estimateGasLimitForSend({
       // address. If this returns 0x, 0x0 or a nullish value then the address
       // is an externally owned account (NOT a contract account). For these
       // types of transactions the gasLimit will always be 21,000 or 0x5208
-      const { isContractAddress } = to
-        ? await readAddressAsContract(global.eth, to)
-        : { isContractAddress: undefined };
+      // const { isContractAddress } = to
+      //   ? await readAddressAsContract(global.eth, to)
+      //   : { isContractAddress: undefined };
+      // TODO: need to get isContractAddress
+      const isContractAddress = false;
       if (!isContractAddress && !isNonStandardEthChain) {
         return GAS_LIMITS.SIMPLE;
       } else if (!isContractAddress && isNonStandardEthChain) {
@@ -379,18 +381,25 @@ export const initializeSendState = createAsyncThunk(
     }
     console.log('===========[gasPrice]=============', gasPrice);
     // Set a basic gasLimit in the event that other estimation fails
-    const estimatedGasLimit = await estimateGasLimitForSend({
-      gasPrice,
-      blockGasLimit: getCurrentBlockGasLimit(state),
-      selectedAddress: preference.currentAccount?.address,
-      sendToken: asset.details,
-      to: '0x8920df9c52b63d81efb8edea8173481b73a6d66c',
-      value: amount.value,
-      data: draftTransaction.userInputHexData,
-      isNonStandardEthChain,
-      chainId,
-    });
-    const gasLimit = estimatedGasLimit || GAS_LIMITS.SIMPLE;
+    let gasLimit = GAS_LIMITS.SIMPLE;
+    try {
+      const estimatedGasLimit = await estimateGasLimitForSend({
+        gasPrice,
+        blockGasLimit: getCurrentBlockGasLimit(state),
+        selectedAddress: preference.currentAccount?.address,
+        sendToken: asset.details,
+        to: '0x8920df9c52b63d81efb8edea8173481b73a6d66c',
+        value: amount.value,
+        data: draftTransaction.userInputHexData,
+        isNonStandardEthChain,
+        chainId,
+      });
+      gasLimit = estimatedGasLimit;
+    } catch (error) {
+      console.error(
+        'estimateGasLimitForSend failed, this tx will probably not success'
+      );
+    }
     return {
       address: null,
       nativeBalance: '0x0',

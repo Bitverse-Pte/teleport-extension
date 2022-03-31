@@ -19,6 +19,10 @@ import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import AccountManageWidget from 'ui/components/AccountManageWidget';
+import { ErrorCode } from 'constants/code';
+import { UnlockModal } from 'ui/components/UnlockModal';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -30,8 +34,10 @@ const AccountManage: React.FC = () => {
   const [currentAccountIndex, setCurrentAccountIndex] = useState(0);
   const wallet = useWallet();
   const accountManageWidgetRef = useRef();
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+  const [isAdd, setIsAdd] = useState(false);
 
-  const { state } = useLocation<{
+  const { state, pathname } = useLocation<{
     hdWalletId: string;
     hdWalletName: string;
     accountCreateType: AccountCreateType;
@@ -60,11 +66,24 @@ const AccountManage: React.FC = () => {
       onSuccess: () => {
         setAddPopupVisible(false);
         queryAccounts();
-        console.log(accountManageWidgetRef.current);
         (accountManageWidgetRef.current as any).queryAccounts();
+        sensors.track('teleport_account_manage_add_confirm', {
+          page: pathname,
+        });
       },
       onError: (e) => {
-        ClickToCloseMessage.error('Unknown error, please try again later');
+        console.error(e.code);
+        if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
+          ClickToCloseMessage.error({
+            content: 'Name already exists',
+            key: 'Name already exists',
+          });
+        } else {
+          ClickToCloseMessage.error({
+            content: 'Unknown error, please try again later',
+            key: 'Unknown error, please try again later',
+          });
+        }
       },
     }
   );
@@ -72,14 +91,21 @@ const AccountManage: React.FC = () => {
   useAsyncEffect(queryAccounts, []);
 
   const onRenameConfirm = async (accountName) => {
+    sensors.track('teleport_account_manage_rename_confirm', { page: pathname });
     if (accountName.length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     const renamed = await wallet
       .renameDisplayAccount(hdWalletId, accountName, currentAccountIndex)
       .catch((e) => {
-        ClickToCloseMessage.error('Name already exist');
+        ClickToCloseMessage.error({
+          content: 'Name already exist',
+          key: 'Name already exist',
+        });
       });
     if (renamed) {
       setRenamePopupVisible(false);
@@ -88,6 +114,7 @@ const AccountManage: React.FC = () => {
   };
 
   const onDeleteConfirm = async () => {
+    sensors.track('teleport_account_manage_delete_confirm', { page: pathname });
     await wallet.deleteDisplayAccountByExistKeyringAndIndex(
       hdWalletId,
       currentAccountIndex
@@ -95,9 +122,44 @@ const AccountManage: React.FC = () => {
     setDeletePopupVisible(false);
     queryAccounts();
   };
+  const handleUnlock = () => {
+    if (isAdd) {
+      setAddPopupVisible(true);
+    } else {
+      setIsEdit(!isEdit);
+    }
+  };
+
+  const handleEdit = async () => {
+    sensors.track('teleport_account_manage_edit', { page: pathname });
+    setIsAdd(false);
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
+    setIsEdit(!isEdit);
+  };
+
+  const handleAdd = async () => {
+    sensors.track('teleport_account_manage_add', { page: pathname });
+    setIsAdd(true);
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
+    setAddPopupVisible(true);
+  };
 
   return (
     <div className="account-manage flexCol">
+      <UnlockModal
+        title="Unlock Wallet"
+        visible={unlockPopupVisible}
+        setVisible={(visible: boolean) => {
+          setUnlockPopupVisible(visible);
+        }}
+        unlocked={() => handleUnlock()}
+      />
       {isEdit ? (
         <WalletHeader
           title="Accounts"
@@ -119,7 +181,7 @@ const AccountManage: React.FC = () => {
       >
         <div
           className="wallet-manage-button-item cursor flexCol _edit"
-          onClick={() => setIsEdit(!isEdit)}
+          onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
             <img src={editImg} alt="" className="wallet-manage-img" />
@@ -128,7 +190,7 @@ const AccountManage: React.FC = () => {
         </div>
 
         <div
-          onClick={() => setAddPopupVisible(true)}
+          onClick={() => handleAdd()}
           style={
             accountCreateType === AccountCreateType.PRIVATE_KEY
               ? { display: 'none' }
@@ -240,11 +302,15 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
 
   const handleConfirmBtnClick = () => {
     if (value.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     if (props.add && props.add instanceof Function) {
       props.add(value.trim());
+      setValue('');
     }
   };
 
@@ -286,7 +352,7 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
           loading={props.loading}
           onClick={handleConfirmBtnClick}
           block
-          cls="popup-container-top popup-add-btn"
+          cls="popup-container-top theme"
           disabled={_.isEmpty(value)}
         >
           Add
@@ -344,7 +410,10 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
       return;
     }
     if (value.trim().length > 20) {
-      ClickToCloseMessage.error('Name length should be 1-20 chars');
+      ClickToCloseMessage.error({
+        content: 'Name length should be 1-20 characters',
+        key: 'Name length should be 1-20 characters',
+      });
       return;
     }
     if (props.onConfirm && props.onConfirm instanceof Function) {
@@ -388,7 +457,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
           type="primary"
           onClick={handleConfirmBtnClick}
           block
-          cls="popup-container-top"
+          cls="popup-container-top popup-add-btn"
           disabled={_.isEmpty(value.trim())}
         >
           Rename
@@ -420,7 +489,10 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
 
   const handleConfirmBtnClick = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error('Wrong password');
+      ClickToCloseMessage.error({
+        content: 'Wrong password',
+        key: 'Wrong password',
+      });
     });
     if (checksumPassed) {
       if (props.onConfirm && props.onConfirm instanceof Function) {
@@ -456,8 +528,8 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
           }}
         />
         <div className="popup-delete-notice">
-          All information in this account will be lost, and the operation can't
-          be undo.
+          Make sure you’ve backed up this wallet,all accounts belonging to this
+          wallet will be deleted,and the operation can’t reverse.
         </div>
         <span className="popup-item-title">Input password to delete</span>
         <CustomPasswordInput

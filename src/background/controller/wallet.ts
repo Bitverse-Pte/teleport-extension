@@ -10,7 +10,10 @@ import {
   networkController,
   gasFeeController,
   knownMethodService,
+  contactBookService,
+  latestBlockDataHub,
 } from 'background/service';
+import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
 import { INTERNAL_REQUEST_ORIGIN } from 'constants/index';
 import {
@@ -29,6 +32,7 @@ import { AddTokenOpts, Token } from 'types/token';
 import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
 import { CustomGasSettings } from 'types/tx';
+import { BigNumberish } from 'ethers';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -135,6 +139,13 @@ export class WalletController extends BaseController {
     chainName = 'ETH'
   ) => {
     const state = networkPreferenceService.getCustomNetworks();
+    const isSymbolChanged = ticker != state[matchedIdx].ticker;
+    if (isSymbolChanged) {
+      // change symbol of custom token
+      TokenService.changeCustomTokenProfile(state[matchedIdx].id, {
+        symbol: ticker,
+      });
+    }
     state[matchedIdx] = {
       ...state[matchedIdx],
       nickname: newNickname,
@@ -291,7 +302,6 @@ export class WalletController extends BaseController {
   }
 
   getAccountList(useCurrentChain?: boolean): Promise<DisplayWalletManage> {
-    console.log(keyringService.getAccountList());
     return Promise.resolve(keyringService.getAccountList(useCurrentChain));
   }
 
@@ -410,16 +420,13 @@ export class WalletController extends BaseController {
   }
   estimateGas(estimateGasParams) {
     return new Promise((resolve, reject) => {
-      return txController.txGasUtil.query.estimateGas(
-        estimateGasParams,
-        (err, res) => {
-          if (err) {
-            return reject(err);
-          }
-
-          return resolve(res.toString(16));
+      const ethQuery = networkPreferenceService.getCurrentEth();
+      return ethQuery.estimateGas(estimateGasParams, (err, res) => {
+        if (err) {
+          return reject(err);
         }
-      );
+        return resolve(res.toString(16));
+      });
     });
   }
   readAddressAsContract = async (address) => {
@@ -487,6 +494,29 @@ export class WalletController extends BaseController {
   getTxHistory() {
     return txController.txStateManager.getTransactionList();
   }
+  addContact = (data: ContactBookItem) => {
+    contactBookService.addContact(data);
+  };
+  fetchLatestBlockDataNow() {
+    return latestBlockDataHub.fetchLatestBlockNow();
+  }
+  addContactByDefaultName = (address) => {
+    contactBookService.addContactByDefaultName(address);
+  };
+  updateContact = (data: ContactBookItem) => {
+    contactBookService.updateContact(data);
+  };
+  removeContact = (address: string) => {
+    contactBookService.removeContact(address);
+  };
+  listContact = () => contactBookService.listContacts();
+  getContactByAddress = (address: string) =>
+    contactBookService.getContactByAddress(address);
+
+  getManualLocked = () => preferenceService.getManualLocked();
+
+  setManualLocked = (locked: boolean) =>
+    preferenceService.setManualLocked(locked);
 }
 
 export default new WalletController();

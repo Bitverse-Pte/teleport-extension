@@ -1,25 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState, useContext, useMemo } from 'react';
-import {
-  intToHex,
-  isHexString,
-  isHexPrefixed,
-  addHexPrefix,
-  unpadHexString,
-} from 'ethereumjs-util';
-import {
-  Button,
-  Modal,
-  Tooltip,
-  Checkbox,
-  Spin,
-  Tabs,
-  Space,
-  Divider,
-  message,
-} from 'antd';
+import React, { useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
+import { Tabs, Divider } from 'antd';
 import { useTranslation } from 'react-i18next';
-import clsx from 'clsx';
 import {
   useWallet,
   useApproval,
@@ -29,7 +13,6 @@ import {
 import {
   NetworkDisplay,
   SenderToRecipient,
-  StrayPageWithButton,
   UserPreferencedCurrencyDisplay,
 } from 'ui/components';
 import {
@@ -38,11 +21,9 @@ import {
   multipyHexes,
   decGWEIToHexWEI,
 } from 'ui/utils/conversion';
-import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
-import { current } from '@reduxjs/toolkit';
+import { TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
 import { CustomButton } from 'ui/components/Widgets';
-import { t } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   showLoadingIndicator,
@@ -51,7 +32,16 @@ import {
 import { BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
-import { useMethodData } from 'ui/hooks/metamask/useMethodData';
+import { useMethodData } from 'ui/hooks/wallet/useMethodData';
+import { HeaderWithFlex } from 'ui/components/Header';
+import { GAS_ESTIMATE_TYPES } from 'constants/gas';
+import {
+  getGasPriceInHexWei,
+  getRoundedGasPrice,
+} from 'ui/reducer/gas.reducer';
+import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const { TabPane } = Tabs;
 
@@ -89,13 +79,14 @@ const normalizeTxParams = (tx) => {
 };
 
 const valueToDisplay = (tx) => {
-  if ((tx.value === '0x' || tx.value === '0x0') && tx.txParam) {
+  if ((tx.value === '0x' || tx.value === '0x0') && tx.txParam.value) {
     return tx.txParam.value;
   }
   return tx.value;
 };
 
 const SignTx = ({ params, origin }) => {
+  const location = useLocation();
   const { t } = useTranslation();
   const [getApproval, resolveApproval, rejectApproval] = useApproval();
   const dispatch = useDispatch();
@@ -107,40 +98,61 @@ const SignTx = ({ params, origin }) => {
   const gasState: any = useSelector((state) => state.gas);
   const [visible, setVisible] = useState(false);
   const tx = normalizeTxParams(params.data[0]);
-
+  // for 1559 tx
   const [maxFeePerGas, setMaxFeePerGas] = useState<string>(tx.maxFeePerGas);
   const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState<string>(
     tx.maxPriorityFeePerGas
   );
+  // for non-1559 tx
+  const [gasPrice, setGasPrice] = useState<string>(tx.gasPrice);
+
   const [totalGasfee, setTotalGasFee] = useState<string>('0x0');
-  const [currency, setCurrency] = useState('ETH');
 
-  useAsyncEffect(async () => {
+  const initState = async () => {
     const gas = await wallet.fetchGasFeeEstimates();
+    console.debug('signTx fetchGasFeeEstimates: ', gas);
     const { gasFeeEstimates, gasEstimateType } = gas;
-    const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
-      gasFeeEstimates[gasState.gasType];
-    setMaxFeePerGas(
-      addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
-    );
-    setMaxPriorityFeePerGas(
-      addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
-    );
-  }, [gasState]);
+    //const MIN_GAS_LIMIT_HEX = '0x5208';
+    if (tx.type === '0x0') {
+      let gasPrice = '0x1';
+      if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
+        gasPrice = getGasPriceInHexWei(gasFeeEstimates.medium);
+      } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
+        gasPrice = getRoundedGasPrice(gasFeeEstimates.gasPrice);
+      } else {
+        gasPrice = gasFeeEstimates.gasPrice
+          ? getRoundedGasPrice(gasFeeEstimates.gasPrice)
+          : '0x0';
+      }
+      setGasPrice(tx.gasPrice || gasPrice);
+      const total = multipyHexes(
+        gasPrice,
+        tx.gas || MIN_GAS_LIMIT_HEX
+      ).toString();
+      setTotalGasFee(addHexPrefix(total));
+    } else {
+      const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
+        gasFeeEstimates[gasState.gasType];
+      setMaxFeePerGas(
+        addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
+      );
+      setMaxPriorityFeePerGas(
+        addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
+      );
+      const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
+      const total = multipyHexes(a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
+      setTotalGasFee(addHexPrefix(total));
+    }
+  };
 
-  useAsyncEffect(async () => {
-    const currency = await wallet.getCurrentCurrency();
-    setCurrency(currency);
-  });
-
-  useEffect(() => {
-    const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
-    const MIN_GAS_LIMIT_DEC = '21000';
-    const total = multipyHexes(a, MIN_GAS_LIMIT_DEC).toString();
-    setTotalGasFee(addHexPrefix(total));
-  }, [maxFeePerGas, maxPriorityFeePerGas]);
+  useAsyncEffect(initState, [gasState.gasType]);
 
   const handleAllow = async () => {
+    sensors.track('teleport_sign_tx_confirmed', {
+      page: location.pathname,
+      from: tx.from,
+      to: tx.to,
+    });
     dispatch(showLoadingIndicator());
     if (tx.type === TransactionEnvelopeTypes.FEE_MARKET) {
       resolveApproval({
@@ -153,7 +165,7 @@ const SignTx = ({ params, origin }) => {
     } else {
       resolveApproval({
         ...tx,
-        gasPrice: '0xd31db1',
+        gasPrice: gasPrice,
       })
         .then(() => delay(1000))
         .then(() => dispatch(hideLoadingIndicator()));
@@ -162,6 +174,9 @@ const SignTx = ({ params, origin }) => {
   const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));
 
   const handleCancel = () => {
+    sensors.track('teleport_sign_tx_declined', {
+      page: location.pathname,
+    });
     dispatch(showLoadingIndicator());
     rejectApproval('User rejected the request.')
       .then(() => delay(1000))
@@ -169,26 +184,13 @@ const SignTx = ({ params, origin }) => {
   };
 
   const fetchNativePrice = async () => {
+    dispatch(showLoadingIndicator());
     const tokens = await wallet.getTokenBalancesAsync(true);
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
+    dispatch(hideLoadingIndicator());
   };
-
-  const nativeToken = useMemo(() => {
-    const nativeToken = tokens.find((t: Token) => t.isNative);
-    if (prices && nativeToken) {
-      if (nativeToken!.symbol.toUpperCase() in prices) {
-        nativeToken!.price = prices[nativeToken!.symbol.toUpperCase()];
-      }
-    }
-    return nativeToken;
-  }, [tokens, prices]);
-
-  const txToken = useMemo(() => {
-    const txToken = tokens.find((t: Token) => t.symbol === tx.txParam.symbol);
-    return txToken;
-  }, [tokens, prices]);
 
   useAsyncEffect(fetchNativePrice, []);
 
@@ -201,18 +203,35 @@ const SignTx = ({ params, origin }) => {
     setRecipientName(to?.accountName);
   }, []);
 
+  const nativeToken = useMemo(() => {
+    const nativeToken = tokens.find((t: Token) => t.isNative);
+    if (prices && nativeToken) {
+      if (nativeToken!.symbol.toUpperCase() in prices) {
+        nativeToken!.price = prices[nativeToken!.symbol.toUpperCase()];
+      }
+    }
+    return nativeToken;
+  }, [tokens, prices]);
+
+  const txToken = useMemo(() => {
+    const txToken = tx.txParam.symbol
+      ? tokens.find((t: Token) => t.symbol === tx.txParam.symbol)
+      : nativeToken;
+    return txToken;
+  }, [tokens, prices]);
+
   const renderContent = () => {
     if (tx.data) {
       return (
         <div className="tx-details-tab-container flex content-wrap-padding">
-          <Tabs defaultActiveKey="1">
+          <Tabs defaultActiveKey="1" style={{ width: '100% ' }}>
             <TabPane tab={t('DETAILS')} key="1">
               <TxDetailComponent
                 tx={tx}
                 nativeToken={nativeToken}
                 setVisible={setVisible}
                 totalGasfee={totalGasfee}
-                currency={currency}
+                currency={nativeToken?.symbol}
               />
             </TabPane>
             <TabPane tab={t('DATA')} key="2">
@@ -229,7 +248,7 @@ const SignTx = ({ params, origin }) => {
           nativeToken={nativeToken}
           setVisible={setVisible}
           totalGasfee={totalGasfee}
-          currency={currency}
+          currency={nativeToken?.symbol}
         />
       </div>
     );
@@ -237,14 +256,11 @@ const SignTx = ({ params, origin }) => {
 
   return (
     <div className="approval-tx flexCol">
-      <Space
-        size="middle"
-        direction="vertical"
-        align="center"
-        wrap={true}
-        className="top-part-container flexCol"
-      >
-        <NetworkDisplay />
+      <div className="top-part-container flexCol flex-wrap items-center">
+        <HeaderWithFlex
+          title={<NetworkDisplay />}
+          handleBackClick={handleCancel}
+        />
         <SenderToRecipient
           senderAddress={tx.txParam.from || tx.from}
           senderName={senderName}
@@ -257,8 +273,8 @@ const SignTx = ({ params, origin }) => {
           token={txToken}
           origin={origin}
         />
-      </Space>
-      <Divider style={{ margin: 0 }} />
+        <Divider style={{ marginTop: 16, marginBottom: 0 }} />
+      </div>
       {renderContent()}
       <FeeSelector visible={visible} onClose={() => setVisible(false)} />
       <div className="tx-button-container flexCol content-wrap-padding">
@@ -268,7 +284,7 @@ const SignTx = ({ params, origin }) => {
           cls="theme tx-btn-container-top"
           block
         >
-          {t('Confirm')}
+          {t('Send')}
         </CustomButton>
         <CustomButton
           type="default"
@@ -293,11 +309,12 @@ const TxDetailComponent = ({
   const { t } = useTranslation();
 
   const renderTotalMaxAmount = () => {
+    // @todo: need to handle ERC20 Token + ETH fee
     const totalHex = addHexPrefix(
       addHexes(valueToDisplay(tx), totalGasfee).toString()
     );
     const total = getValueFromWeiHex({ value: totalHex, numberOfDecimals: 10 });
-    return `${total} ${currency}`;
+    return `${total} ${currency || ''}`;
   };
 
   const renderTotalGasFeeAmount = () => {
@@ -305,7 +322,7 @@ const TxDetailComponent = ({
       value: totalGasfee,
       numberOfDecimals: 10,
     });
-    return `${totalDec} ${currency}`;
+    return `${totalDec} ${currency || ''}`;
   };
 
   const renderTotalGasFeeFiat = () => {
@@ -328,27 +345,38 @@ const TxDetailComponent = ({
     );
   };
 
+  const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
   return (
     <div className="transaction-detail">
-      <div className="gas-edit-button flex" onClick={() => setVisible(true)}>
-        <IconComponent name="edit" cls="edit-icon" />
-        <div>{t('Edit')}</div>
-      </div>
+      {supportsEIP1559 && (
+        <div
+          className="gas-edit-button flex ml-auto"
+          onClick={() => {
+            setVisible(true);
+            sensors.track('teleport_sign_tx_edit_gas', {
+              page: location.pathname,
+            });
+          }}
+        >
+          <IconComponent name="edit" cls="edit-icon" />
+          <div>{t('Edit')}</div>
+        </div>
+      )}
       <TransactionDetailItem
         key="gas-item"
         detailTitle={t('Referral gas fee')}
         subTitle={undefined}
         detailText={`${renderTotalGasFeeAmount()}`}
-        detailSubText={`≈$ ${renderTotalGasFeeFiat()}`}
+        detailSubText={`$ ${renderTotalGasFeeFiat()}`}
         detailMax={`Max fee: ${renderTotalGasFeeAmount()}`}
       />
-      <Divider style={{ margin: 10 }} />
+      <Divider style={{ margin: '16px 0' }} />
       <TransactionDetailItem
         key="total-item"
-        detailTitle={t('Lump sum')}
+        detailTitle={t('Sum')}
         subTitle={t('Amount + gas fee')}
         detailText={renderTotalMaxAmount()}
-        detailSubText={`≈$ ${renderTotalMaxFiat()}`}
+        detailSubText={`$ ${renderTotalMaxFiat()}`}
         detailMax={`Max amount: ${renderTotalMaxAmount()}`}
       />
     </div>
@@ -381,9 +409,6 @@ const TxSummaryComponent = ({ action, value, token, origin }) => {
       <div className="tx-summary-origin">
         {origin === 'https://teleport.network' ? null : <div>{origin}</div>}
       </div>
-      {/* <div className="tx-summary-action">
-        {action === 'eth_sendTransaction' ? 'Transfer' : action}
-      </div> */}
       <div className="tx-summary-currency">
         <UserPreferencedCurrencyDisplay value={value} token={token} />
       </div>

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { BigNumber, utils } from 'ethers';
 import { useHistory, useParams } from 'react-router';
@@ -10,7 +10,7 @@ import {
   nonceSortedCompletedTransactionsSelector,
   nonceSortedPendingTransactionsSelector,
 } from 'ui/selectors/transactions';
-import { useTransactionDisplayData } from 'ui/hooks/metamask/useTxDisplayData';
+import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
 import {
   TransactionGroup,
   TransactionGroupCategories,
@@ -27,6 +27,9 @@ import { useWallet } from 'ui/utils';
 import CancelSpeedupPopover from 'ui/components/TransactionList/CancelAndSpeedUp/CancelAndSpeedUp.popover';
 import { EDIT_GAS_MODES } from 'constants/gas';
 import { useTranslation } from 'react-i18next';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
+
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
 
@@ -99,6 +102,9 @@ export function _ActivityDetail({
 
   const handleExplorerClick = useCallback(
     (type: 'address' | 'tx', hash: string) => {
+      sensors.track('teleport_activity_open_' + type, {
+        page: location.pathname,
+      });
       window.open(`${rpcPrefs.blockExplorerUrl}/${type}/${hash}`);
     },
     [rpcPrefs]
@@ -127,6 +133,9 @@ export function _ActivityDetail({
 
   const cancelTx = useCallback(() => {
     dispatch(cancelTxs(transaction.transactions, walletController));
+    sensors.track('teleport_activity_cancelled', {
+      page: location.pathname,
+    });
     history.goBack();
   }, [dispatch, history]);
 
@@ -152,112 +161,108 @@ export function _ActivityDetail({
     return { amount, unit };
   }, [primaryCurrency]);
 
+  const matchedNativeToken = useSelector((s) => {
+    const currentProviderId = s.network.provider.id;
+    return s.tokens.tokens.find(
+      (t) => t.isNative && t.chainCustomId === currentProviderId
+    );
+  });
+
   return (
-    <>
-      <div className={'activity-detail ' + statusBackground}>
-        <Header title={t(title)} />
-        <div className="txdetail-direction-logo flex justify-center">
-          {/* workaround as hook treat native token as undefined */}
-          <TokenIcon
-            token={token || ({ isNative: true } as any)}
-            useThemeBg
-            radius={48}
-          />
+    <Fragment>
+    <div className={'activity-detail ' + statusBackground}>
+      <Header title={t(title)} />
+      <div className="txdetail-direction-logo flex justify-center">
+        {/* workaround as hook treat native token as undefined */}
+        <div>
+          <TokenIcon token={token || matchedNativeToken} radius={48} />
         </div>
-        <div className="txdetail-values flex flex-wrap justify-center">
-          <div className="txdetail-value-display">
-            <p className="txdetail-value items-baseline">
-              {displayPrimaryCurrency.amount}
-              <span className="unit">{displayPrimaryCurrency.unit}</span>
-            </p>
-          </div>
-          <div className="break"></div>
-          <p className={'txdetail-status capitalize ' + statusBackground}>
-            {t(displayedStatusKey)}
+      </div>
+      <div className="txdetail-values flex flex-wrap justify-center">
+        <div className="txdetail-value-display">
+          <p className="txdetail-value items-baseline flex-wrap">
+            {displayPrimaryCurrency.amount}
+            <span className="unit">{displayPrimaryCurrency.unit}</span>
           </p>
         </div>
-        <div className="details content-wrap-padding">
-          <div className="row from-and-to justify-center">
-            <AddressCard title="From" address={senderAddress} />
-            <IconComponent name="arrow-right" cls="to-icon" />
-            {recipientAddress && (
-              <AddressCard title="To" address={recipientAddress} />
-            )}
+      <div className="details content-wrap-padding">
+        <div className="row from-and-to justify-center">
+          <AddressCard title="From" address={senderAddress} />
+          <IconComponent name="arrow-right" cls="to-icon" />
+          {recipientAddress && (
+            <AddressCard title="To" address={recipientAddress} />
+          )}
+        </div>
+        {transaction.primaryTransaction.hash && (
+          <div className="row">
+            <div className="field-name">Transaction ID</div>
+            <div className="field-value">
+              <Tooltip
+                placement="topRight"
+                title={transaction.primaryTransaction.hash}
+              >
+                {shortenedStr(transaction.primaryTransaction.hash, 4)}
+              </Tooltip>
+              <CopyOrOpenInScan
+                handleExplorerClick={() =>
+                  handleExplorerClick(
+                    'tx',
+                    transaction.primaryTransaction.hash!
+                  )
+                }
+                textToBeCopy={transaction.primaryTransaction.hash}
+              />
+            </div>
           </div>
-          {transaction.primaryTransaction.hash && (
-            <div className="row">
-              <div className="field-name">Transaction ID</div>
-              <div className="field-value">
-                <Tooltip
-                  placement="topRight"
-                  title={transaction.primaryTransaction.hash}
-                >
-                  {shortenedStr(transaction.primaryTransaction.hash, 4)}
-                </Tooltip>
-                <CopyOrOpenInScan
-                  handleExplorerClick={() =>
-                    handleExplorerClick(
-                      'tx',
-                      transaction.primaryTransaction.hash!
-                    )
-                  }
-                  textToBeCopy={transaction.primaryTransaction.hash}
-                />
-              </div>
+        )}
+        <TransactionFee transaction={transaction} />
+        {!isPending && (
+          <div className="row">
+            <div className="field-name">Time</div>
+            <div className="field-value" title={date}>
+              {dayjs(transaction.primaryTransaction.time).format(
+                'YYYY-MM-DD HH:mm:ss'
+              )}
             </div>
-          )}
-          <TransactionFee transaction={transaction} />
-          {!isPending && (
-            <div className="row">
-              <div className="field-name">Time</div>
-              <div className="field-value" title={date}>
-                {dayjs(transaction.initialTransaction.time).format(
-                  'YYYY-MM-DD HH:mm:ss'
-                )}
-              </div>
-            </div>
-          )}
-          {isPending && (
-            <div className="row pending-tx-actions">
+          </div>
+        )}
+        {isPending && (
+          <div className="row pending-tx-actions">
+            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
               <button
                 className="editGasBtn"
                 type="button"
                 onClick={handleSpeedUpClick}
               >
-                {/* <IconComponent name="rocket" /> */}
-                Gas
+                {t('speedUp')}
               </button>
-              <button
-                className="cancelBtn"
-                type="button"
-                onClick={handleCancelClick}
-              >
-                {/* <IconComponent name="cancel" /> */}
-                Cancel
-              </button>
-            </div>
-          )}
-        </div>
+            <button className="cancelBtn" type="button" onClick={handleCancelClick}>
+              {t('cancel')}
+            </button>
+          </div>
+        )}
       </div>
-      {isPending && (
-        <CancelSpeedupPopover
-          editGasMode={currentEditGasMode}
-          showPopOver={showCancelPopOver}
-          setShowPopOver={setShowCancelPopOver}
-          cancelTransaction={cancelTx}
-          speedUpTransaction={speedUpTx}
-          transaction={transaction.primaryTransaction}
-          updateTransactionToTenPercentIncreasedGasFee={(fee) => {
-            console.debug(
-              'updateTransactionToTenPercentIncreasedGasFee::val',
-              fee
-            );
-          }}
-          updateTransactionUsingEstimate={(l) => {
-            console.debug('updateTransactionUsingEstimate::val', l);
-          }}
-        />
-      )}
-    </>
+    </div>
+  </div>
+  {isPending && (
+    <CancelSpeedupPopover
+      editGasMode={currentEditGasMode}
+      showPopOver={showCancelPopOver}
+      setShowPopOver={setShowCancelPopOver}
+      cancelTransaction={cancelTx}
+      speedUpTransaction={speedUpTx}
+      transaction={transaction.primaryTransaction}
+      updateTransactionToTenPercentIncreasedGasFee={(fee) => {
+        console.debug(
+          'updateTransactionToTenPercentIncreasedGasFee::val',
+          fee
+        );
+      }}
+      updateTransactionUsingEstimate={(l) => {
+        console.debug('updateTransactionUsingEstimate::val', l);
+      }}
+    />
+  )}
+  </Fragment>
   );
 }

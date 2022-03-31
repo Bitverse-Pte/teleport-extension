@@ -4,9 +4,12 @@ import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ACCOUNT_CREATE_TYPE } from '../../../constants/index';
 import walletLogo from 'assets/walletLogo.svg';
+import { BetaIcon } from 'ui/components/Widgets';
 
 import './style.less';
 import { CustomButton } from 'ui/components/Widgets';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const Welcome = () => {
   const { t } = useTranslation();
@@ -15,6 +18,9 @@ const Welcome = () => {
   const handleBtnClick: (type: ACCOUNT_CREATE_TYPE) => void = (
     type: ACCOUNT_CREATE_TYPE
   ) => {
+    sensors.track('teleport_welcome' + ACCOUNT_CREATE_TYPE[type], {
+      page: 'welcome',
+    });
     history.push({
       pathname: type === ACCOUNT_CREATE_TYPE.CREATE ? '/create' : '/recover',
     });
@@ -24,7 +30,10 @@ const Welcome = () => {
       <div className="logo-container">
         <img src={walletLogo} className="logo" />
         <p className="welcome-to">Welcome to</p>
-        <p className="wallet-name">Teleport Wallet</p>
+        <p className="wallet-name flexR">
+          Teleport Wallet
+          <BetaIcon />
+        </p>
       </div>
 
       <div className="btn-container">

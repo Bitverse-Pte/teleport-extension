@@ -17,6 +17,7 @@ import TokenService from './token/TokenService';
 import platform from './extension';
 import knownMethodService from './knownMethod';
 import { LatestBlockDataHubService } from './network/latestBlockDataHub';
+import contactBookService from './contactBook';
 
 const controllerMessenger = new ControllerMessenger();
 
@@ -84,6 +85,7 @@ const txController = new TransactionController({
 });
 
 const latestBlockDataHub = new LatestBlockDataHubService({
+  provider: networkController.getProviderAndBlockTracker().provider,
   blockTracker: networkController.getProviderAndBlockTracker().blockTracker,
   gasFeeTracker: gasFeeController,
   networkProviderStore: networkController.networkStore,
@@ -112,6 +114,7 @@ export {
   knownMethodService,
   TokenService,
   latestBlockDataHub,
+  contactBookService,
 };
 
 async function newUnapprovedTransaction(txParams, req) {

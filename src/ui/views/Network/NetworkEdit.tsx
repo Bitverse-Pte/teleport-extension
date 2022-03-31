@@ -1,11 +1,17 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import './style.less';
-import { useHistory, useParams } from 'react-router';
+import { useHistory, useParams, useLocation } from 'react-router';
 import axios, { AxiosError } from 'axios';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Input, Select } from 'antd';
 import Header from 'ui/components/Header';
 // import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 // import DefaulutIcon from 'assets/tokens/default.svg';
@@ -15,6 +21,9 @@ import { BigNumber } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import clsx from 'clsx';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
 
@@ -22,6 +31,7 @@ const NetworkEdit = () => {
   const { t } = useTranslation();
   const networkContext = useContext(NetworkProviderContext);
   const history = useHistory();
+  const location = useLocation();
   const { idx } = useParams<{ idx: string | undefined }>();
   const formattedIdx = useMemo(() => Number(idx), [idx]);
 
@@ -29,12 +39,15 @@ const NetworkEdit = () => {
     return !isNaN(formattedIdx) && Number.isInteger(formattedIdx);
   }, [idx]);
 
-  const fieldsPresetValues: Record<string, string> = useMemo(() => {
+  const customNetworks = useSelector((s) => s.customNetworks);
+
+  const [fetchedChainId, setFetchedChainId] = useState<string | undefined>();
+
+  const fieldsPresetValues = useMemo(() => {
     const emptyResult = {
       chainId: '',
       explorerUrl: '',
       networkName: '',
-      // category: 'ETH',
       rpcUrl: '',
       symbol: '',
     };
@@ -52,23 +65,18 @@ const NetworkEdit = () => {
     }
   }, [isEdit, formattedIdx, networkContext]);
 
-  const [form] = Form.useForm();
-  const customNetworks = useSelector((s) => s.customNetworks);
-
   const checkRpcUrlAndSetChainId = useCallback(
     async (value: string) => {
       console.info(`RPC URL is ${value}`);
       try {
-        if (!value) return setErrorMessage('rpcUrl');
+        if (!value) return undefined;
 
         const isExistedRpc =
           customNetworks.filter((p) => p.rpcUrl === value).length > 0;
         if (isExistedRpc && !isEdit) {
-          throw new Error(t('same_rpc_url'));
+          return t('same_rpc_url');
         }
 
-        checkIsTrimmed(value);
-        checkIsLegitURL(value);
         type JsonRpcResult = {
           result: string;
         };
@@ -82,10 +90,9 @@ const NetworkEdit = () => {
          * Handle bad RPC that do not respond chainId
          */
         if (isNaN(Number(data.result))) {
-          throw new Error(t('Bad_RPC_URL'));
+          return t('Bad_RPC_URL');
         }
-        form.setFieldsValue({ chainId: Number(data.result) });
-        setErrorMessage('rpcUrl');
+        setFetchedChainId(data.result);
       } catch (error: any | Error | AxiosError) {
         console.error('checkRpcUrlAndSetChainId::error: ', error);
         let uiErrorMsg = '';
@@ -109,10 +116,11 @@ const NetworkEdit = () => {
           uiErrorMsg = error.message;
         }
 
-        setErrorMessage('rpcUrl', uiErrorMsg);
+        return uiErrorMsg;
       }
+      return undefined;
     },
-    [form, customNetworks]
+    [customNetworks]
   );
 
   const editNetwork = useCallback(
@@ -135,6 +143,13 @@ const NetworkEdit = () => {
           symbol,
           explorerUrl
         );
+        sensors.track('teleport_customize_network_edit', {
+          page: location.pathname,
+          networkName: networkName,
+          rpcUrl: rpcUrl,
+          chainId: chainId,
+          symbol: symbol,
+        });
       } else {
         console.debug('Adding Custom Provider');
         await networkContext?.addCustomProvider(
@@ -144,6 +159,14 @@ const NetworkEdit = () => {
           symbol,
           explorerUrl
         );
+        sensors.track('teleport_customize_network_add', {
+          page: location.pathname,
+          networkName: networkName,
+          rpcUrl: rpcUrl,
+          chainId: chainId,
+          symbol: symbol,
+          explorerUrl: explorerUrl,
+        });
       }
 
       ClickToCloseMessage.success({
@@ -155,13 +178,10 @@ const NetworkEdit = () => {
   );
 
   const checkNetworkNickname = useCallback(
-    (_: unknown, value: string) => {
+    (value: string) => {
       const maxCharsInNickname = 20;
-      checkIsTrimmed(value);
       if (value.length > maxCharsInNickname) {
-        throw new Error(
-          `The length of ${'nickname'} is no longer than ${maxCharsInNickname} chars.`
-        );
+        return `The length of ${'nickname'} is no longer than ${maxCharsInNickname} characters.`;
       }
 
       const sameNameWithDefaultNet =
@@ -169,147 +189,142 @@ const NetworkEdit = () => {
           (p) => Boolean(p) && p.nickname === value
         ).length > 0;
       if (sameNameWithDefaultNet) {
-        throw new Error(
-          'Same name with our preset provider, please rename your provider name.'
-        );
+        return 'Same name with our preset provider, please rename your provider name.';
       }
       const sameNameWithCustomNetwork =
         customNetworks.filter((p) => p.nickname === value).length > 0;
       if (sameNameWithCustomNetwork && !isEdit) {
-        throw new Error(
-          'Same name with existed provider, please rename your provider name.'
-        );
+        return 'Same name with existed provider, please rename your provider name.';
       }
+      /**
+       * return undefine if checks are passed
+       */
+      return undefined;
     },
     [customNetworks]
   );
 
-  const setErrorMessage = useCallback(
-    (fieldName: string, message?: string) => {
-      form.setFields([
-        {
-          name: fieldName,
-          errors: [message].filter(isString),
-        },
-      ]);
+  const validateFields = useCallback(
+    async (values: typeof fieldsPresetValues) => {
+      const errors: any = {};
+      const requiredFields = ['networkName', 'rpcUrl', 'chainId'];
+      requiredFields.forEach((fName) => {
+        if (!values[fName]) {
+          errors[fName] = `${fName} is Required`;
+        }
+      });
+      const mustTrimmedFields = [...requiredFields, 'explorerUrl'];
+      mustTrimmedFields.forEach((fName) => {
+        try {
+          checkIsTrimmed(values[fName]);
+        } catch (error: any) {
+          errors[fName] = error.message;
+        }
+      });
+      ['explorerUrl', 'rpcUrl'].forEach((fName) => {
+        try {
+          // skip if empty
+          if (!values[fName]) return;
+          checkIsLegitURL(values[fName]);
+        } catch (error: any) {
+          errors[fName] = error.message;
+        }
+      });
+      if (values.networkName)
+        errors.networkName = checkNetworkNickname(values.networkName);
+      if (values.rpcUrl)
+        errors.rpcUrl = await checkRpcUrlAndSetChainId(values.rpcUrl);
+      try {
+        const chainIdBN = BigNumber.from(values.chainId);
+        if (fetchedChainId && !chainIdBN.eq(fetchedChainId)) {
+          errors.chainId = t('mismatched_chain_id', {
+            replace: {
+              expected: values.chainId,
+              got: Number(fetchedChainId),
+            },
+          });
+        }
+      } catch (_) {
+        errors.chainId = t('bad_chain_id');
+      }
+      Object.keys(errors).forEach((field) => {
+        if (!errors[field]) delete errors[field];
+      });
+      return errors;
     },
-    [form]
+    [fetchedChainId]
   );
-
-  const categories = [
-    { label: 'Ethereum Network', value: 'ETH' },
-    { label: 'Binance Network', value: 'BSC' },
-    { label: 'Polygon Network', value: 'POLYGON' },
-    { label: 'Arbitrum', value: 'ARBITRUM' },
-  ];
 
   return (
     <div className="flexCol network-page-container network-edit">
       <Header title={t('CustomizeNetwork')} />
-      <Form
-        form={form}
-        layout="vertical"
+      <Formik
         initialValues={fieldsPresetValues}
-        onFinish={editNetwork}
-        className="content-wrap-padding"
+        validate={validateFields}
+        onSubmit={async (values, { setSubmitting }) => {
+          await editNetwork(values);
+          setSubmitting(false);
+        }}
       >
-        <div className="form-body">
-          <Form.Item label={t('Network Name')} name="networkName" required>
-            <Input
-              className="rounded-md"
-              placeholder="Enter Network Name"
-              onBlur={({ target: { value } }) => {
-                try {
-                  checkNetworkNickname(undefined, value);
-                } catch (error: any) {
-                  setErrorMessage('networkName', error.message);
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item label={t('RPC URL')} name="rpcUrl" required>
-            <Input
-              className="rounded-md"
-              placeholder="Enter RPC URL"
-              onBlur={({ target }) => checkRpcUrlAndSetChainId(target.value)}
-            />
-          </Form.Item>
-          <Form.Item label={t('Chain ID')} name="chainId" required>
-            <Input
-              className="rounded-md"
-              placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
-              onBlur={({ target }) => {
-                try {
-                  if (target.value == '') return setErrorMessage('chainId');
-                  checkIsTrimmed(target.value);
-                  BigNumber.from(target.value);
-                  setErrorMessage('chainId');
-                } catch (error) {
-                  setErrorMessage('chainId', t('bad_chain_id'));
-                  console.error('chainId::validator', error);
-                }
-              }}
-            />
-          </Form.Item>
-          {/* <Form.Item
-            name="category"
-            label={t('Belonging Chain')}
-          >
-            <Select>
-              {categories.map(({ label, value }) => {
-                return (
-                  <Select.Option value={value} key={value}>
-                    <div className="item-container">
-                      {Icon(categoryToIconSVG(value) || DefaulutIcon)}
-                      <span className="symbol">{value}</span>
-                      <span className="label">{label}</span>
-                    </div>
-                  </Select.Option>
-                );
-              })}
-            </Select>
-          </Form.Item> */}
-          <Form.Item name="symbol" label={t('Currency Symbol')}>
-            <Input
-              className="rounded-md"
-              placeholder={t('Optional')}
-              onBlur={({ target: { value } }) => {
-                try {
-                  checkIsTrimmed(value);
-                  setErrorMessage('symbol');
-                } catch (error: any) {
-                  setErrorMessage('symbol', error.message);
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item name="explorerUrl" label={t('Block Explorer URL')}>
-            <Input
-              className="rounded-md"
-              placeholder={t('Optional')}
-              onBlur={({ target: { value: val } }) => {
-                try {
-                  if (val !== '') {
-                    checkIsLegitURL(val);
-                    checkIsTrimmed(val);
-                  }
-                  setErrorMessage('explorerUrl');
-                } catch (error: any) {
-                  setErrorMessage(
-                    'explorerUrl',
-                    error.message || t('validation error')
-                  );
-                }
-              }}
-            />
-          </Form.Item>
-        </div>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-            {t('Next')}
-          </Button>
-        </Form.Item>
-      </Form>
+        {({ isSubmitting, ...formilk }) => {
+          const isFormNotFinished = Object.keys(formilk.errors).length > 0;
+          return (
+            <Form>
+              <div className="form-body content-wrap-padding">
+                <h1 className="required">{t('Network Name')}</h1>
+                <Field name="networkName" placeholder="Enter Network Name" />
+                <ErrorMessage
+                  name="networkName"
+                  component="div"
+                  className="input-error"
+                />
+                <h1 className="required">{t('RPC URL')}</h1>
+                <Field name="rpcUrl" placeholder="Enter RPC URL" />
+                <ErrorMessage
+                  name="rpcUrl"
+                  component="div"
+                  className="input-error"
+                />
+                <h1 className="required">{t('Chain ID')}</h1>
+                <Field
+                  name="chainId"
+                  placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
+                />
+                <ErrorMessage
+                  name="chainId"
+                  component="div"
+                  className="input-error"
+                />
+                <h1>{t('Currency Symbol')}</h1>
+                <Field name="symbol" placeholder={t('Optional')} />
+                <ErrorMessage
+                  name="symbol"
+                  component="div"
+                  className="input-error"
+                />
+                <h1>{t('Block Explorer URL')}</h1>
+                <Field name="explorerUrl" placeholder={t('Optional')} />
+                <ErrorMessage
+                  name="explorerUrl"
+                  component="div"
+                  className="input-error"
+                />
+              </div>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className={clsx({
+                  disabled_button: isFormNotFinished,
+                })}
+                style={{ margin: '24px', width: '312px' }}
+                disabled={isFormNotFinished}
+              >
+                {t('Next')}
+              </Button>
+            </Form>
+          );
+        }}
+      </Formik>
     </div>
   );
 };
