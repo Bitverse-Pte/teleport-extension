@@ -283,6 +283,7 @@ const SignTx = ({ params, origin }) => {
         onClose={() => setVisible(false)}
         maxPriorityFeePerGas={maxPriorityFeePerGas}
         maxFeePerGas={maxFeePerGas}
+        tx={tx}
       />
       <div className="tx-button-container flexCol content-wrap-padding">
         <CustomButton

@@ -10,6 +10,8 @@ import './feeSelector.less';
 import { IconComponent } from 'ui/components/IconComponents';
 import { useLocation } from 'react-router-dom';
 import skynet from 'utils/skynet';
+import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
+import { EDIT_GAS_MODES } from 'constants/gas';
 const { sensors } = skynet;
 interface Fee {
   type: string;
@@ -25,6 +27,7 @@ interface FeeSelectorProps {
 
   maxPriorityFeePerGas: any;
   maxFeePerGas: any;
+  tx: any;
 }
 
 interface DrawerHeaderProps {
@@ -120,6 +123,10 @@ function FeeSelector(props: FeeSelectorProps) {
     fetchGasFeeEstimates();
     fetchNativePrice();
   }, []);
+  // const GasFeeInputsResults = useGasFeeInputs(
+  //   EDIT_GAS_MODES.MODIFY_IN_PLACE,
+  //   props.tx
+  // );
   useEffect(() => {
     if (gasState.customType) {
       const {
@@ -176,6 +183,8 @@ function FeeSelector(props: FeeSelectorProps) {
               onSelect={onSelect}
               maxFeePerGas={props.maxFeePerGas}
               maxPriorityFeePerGas={props.maxPriorityFeePerGas}
+              // maxFeePerGas={GasFeeInputsResults.maxFeePerGas}
+              // maxPriorityFeePerGas={GasFeeInputsResults.maxPriorityFeePerGas}
             />
           ))}
         </ul>
