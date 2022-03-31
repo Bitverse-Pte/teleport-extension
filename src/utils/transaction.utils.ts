@@ -22,8 +22,10 @@ export function transactionMatchesNetwork(
  */
 export function isEIP1559Transaction(transaction: Transaction): boolean {
   return (
-    isHexString(transaction?.txParams?.maxFeePerGas!) &&
-    isHexString(transaction?.txParams?.maxPriorityFeePerGas!)
+    !!transaction?.txParams?.maxFeePerGas &&
+    !!transaction?.txParams?.maxPriorityFeePerGas &&
+    isHexString(transaction?.txParams?.maxFeePerGas) &&
+    isHexString(transaction?.txParams?.maxPriorityFeePerGas)
   );
 }
 
