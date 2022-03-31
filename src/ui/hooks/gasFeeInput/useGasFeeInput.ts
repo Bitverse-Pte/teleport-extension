@@ -110,7 +110,7 @@ export function useGasFeeInputs(
     gasEstimateType,
     gasFeeEstimates,
     isGasEstimatesLoading,
-    estimatedGasFeeTimeBounds,
+    // estimatedGasFeeTimeBounds,
     isNetworkBusy,
   } = useGasFeeEstimates();
   const userPrefersAdvancedGas = useSelector(
@@ -333,7 +333,7 @@ export function useGasFeeInputs(
     estimateUsed,
     gasFeeEstimates,
     gasEstimateType,
-    estimatedGasFeeTimeBounds,
+    // estimatedGasFeeTimeBounds,
     isNetworkBusy,
     onManualChange,
     estimatedBaseFee,

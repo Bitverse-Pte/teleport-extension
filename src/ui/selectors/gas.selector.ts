@@ -1,5 +1,7 @@
-import { GAS_ESTIMATE_TYPES } from '@metamask/controllers';
-import { NETWORK_CONGESTION_THRESHOLDS } from 'constants/gas';
+import {
+  GAS_ESTIMATE_TYPES,
+  NETWORK_CONGESTION_THRESHOLDS,
+} from 'constants/gas';
 import { RootState } from 'ui/reducer';
 import { checkNetworkAndAccountSupports1559 } from './selectors';
 
