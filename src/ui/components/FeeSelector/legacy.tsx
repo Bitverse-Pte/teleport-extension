@@ -47,6 +47,7 @@ function FeeSelectorLegacy(props) {
   const onFinish = (data) => {
     console.log(data);
     dispatch({ type: SET_LEGACY_GAS, value: data });
+    onClose();
   };
   const fetchGasFeeEstimates = async () => {
     const res = await wallet.fetchGasFeeEstimates();

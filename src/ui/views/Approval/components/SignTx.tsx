@@ -113,9 +113,11 @@ const SignTx = ({ params, origin }) => {
     console.debug('signTx fetchGasFeeEstimates: ', gas);
     const { gasFeeEstimates, gasEstimateType } = gas;
     //const MIN_GAS_LIMIT_HEX = '0x5208';
-    if (tx.type === '0x0') {
+    if (tx.type === TransactionEnvelopeTypes.LEGACY) {
       let gasPrice = '0x1';
-      if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
+      if (gasState.type == 'custom') {
+        gasPrice = gasState.legacyGas.gasPrice;
+      } else if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
         gasPrice = getGasPriceInHexWei(gasFeeEstimates.medium);
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
         gasPrice = getRoundedGasPrice(gasFeeEstimates.gasPrice);
