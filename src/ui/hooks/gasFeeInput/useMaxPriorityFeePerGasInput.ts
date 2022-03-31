@@ -18,7 +18,7 @@ import { Transaction } from 'constants/transaction';
 const getMaxPriorityFeePerGasFromTransaction = (
   transaction: Transaction,
   gasFeeEstimates
-) => {
+): number => {
   if (gasFeeEstimates?.[transaction?.userFeeLevel!]) {
     return gasFeeEstimates[transaction.userFeeLevel!]
       .suggestedMaxPriorityFeePerGas;
@@ -40,9 +40,9 @@ const getMaxPriorityFeePerGasFromTransaction = (
  *  method to update the maxPriorityFeePerGas.
  */
 interface MaxPriorityFeePerGasInputReturnType {
-  maxPriorityFeePerGas: string;
+  maxPriorityFeePerGas: number | null;
   maxPriorityFeePerGasFiat: string;
-  setMaxPriorityFeePerGas: (v: string) => void;
+  setMaxPriorityFeePerGas: (v: number | null) => void;
 }
 
 /**
@@ -76,7 +76,7 @@ export function useMaxPriorityFeePerGasInput({
     ? getMaxPriorityFeePerGasFromTransaction(transaction, gasFeeEstimates)
     : 0;
 
-  const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState(() => {
+  const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState<null | number>(() => {
     if (initialMaxPriorityFeePerGas && feeParamsAreCustom(transaction)) {
       return initialMaxPriorityFeePerGas;
     }

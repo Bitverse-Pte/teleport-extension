@@ -36,7 +36,7 @@ interface useGasPriceInputParams {
 }
 
 interface GasPriceInputsReturnType {
-  gasPrice: string;
+  gasPrice: number | null;
   setGasPrice: (v: number | null) => void;
   setGasPriceHasBeenManuallySet: (v: boolean) => void;
 }

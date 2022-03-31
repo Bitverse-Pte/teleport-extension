@@ -6,7 +6,7 @@ export function getGasFeeEstimate(
   gasFeeEstimates,
   gasEstimateType: GAS_ESTIMATE_TYPES,
   estimateToUse,
-  fallback = '0'
+  fallback: number | string = '0'
 ) {
   if (gasEstimateType === GAS_ESTIMATE_TYPES.FEE_MARKET) {
     return gasFeeEstimates?.[estimateToUse]?.[field] ?? String(fallback);

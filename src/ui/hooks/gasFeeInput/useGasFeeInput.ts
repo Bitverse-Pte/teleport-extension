@@ -254,7 +254,8 @@ export function useGasFeeInputs(
     gasFeeEstimates,
     gasLimit,
     maxPriorityFeePerGas,
-    minimumGasLimit,
+    // minimumGasLimit,
+    estimatedBaseFee,
     transaction,
   });
   // When a user selects an estimate level, it will wipe out what they have

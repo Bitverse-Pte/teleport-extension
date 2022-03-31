@@ -21,7 +21,7 @@ interface ParamsOfuseTransactionFunctions {
   estimatedBaseFee: string;
   gasFeeEstimates: any;
   gasLimit: number;
-  maxPriorityFeePerGas: string;
+  maxPriorityFeePerGas: number | null;
   transaction: Transaction;
 }
 
