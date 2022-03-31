@@ -184,6 +184,16 @@ const Send = () => {
       type: type,
       symbol: selectedToken?.symbol,
     };
+    /**
+     * for Metamask's use
+     */
+    params.txParams = {
+      ...params.txParam,
+      maxFeePerGas: draftTransaction.maxFeePerGas,
+      maxPriorityFeePerGas: draftTransaction.maxPriorityFeePerGas,
+      gasPrice: draftTransaction.gasPrice,
+      gas: draftTransaction.gas,
+    };
     await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({
       method: 'eth_sendTransaction',
