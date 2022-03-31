@@ -10,6 +10,7 @@ export const SET_CUSTOM_GAS_PRICE = 'gas/SET_CUSTOM_GAS_PRICE';
 export const SET_GAS_TYPE = 'gas/SET_GAS_TYPE';
 export const RESET_GAS_TYPE = 'gas/SET_GAS_TYPE';
 export const SET_CUSTOM_TYPE = 'gas/SET_CUSTOM_TYPE';
+export const SET_LEGACY_GAS = 'gas/SET_LEGACY_GAS';
 
 const initState = {
   customType: false,
@@ -19,6 +20,10 @@ const initState = {
     maxFee: null,
   },
   gasType: 'medium',
+  legacyGas: {
+    gasPrice: 0,
+    gasLimit: 21000
+  }
 };
 
 // Reducer
@@ -64,6 +69,11 @@ export default function reducer(state = initState, action) {
       return {
         ...state,
         gasType: null,
+      };
+    case SET_LEGACY_GAS:
+      return {
+        ...state,
+        legacyGas: action.value,
       };
     default:
       return state;

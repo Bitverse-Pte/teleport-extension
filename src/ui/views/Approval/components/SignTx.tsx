@@ -220,6 +220,8 @@ const SignTx = ({ params, origin }) => {
     return txToken;
   }, [tokens, prices]);
 
+  const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
+
   const renderContent = () => {
     if (tx.data) {
       return (
@@ -276,7 +278,11 @@ const SignTx = ({ params, origin }) => {
         <Divider style={{ marginTop: 16, marginBottom: 0 }} />
       </div>
       {renderContent()}
-      <FeeSelector visible={visible} onClose={() => setVisible(false)} />
+      <FeeSelector
+        supportsEIP1559={supportsEIP1559}
+        visible={visible}
+        onClose={() => setVisible(false)}
+      />
       <div className="tx-button-container flexCol content-wrap-padding">
         <CustomButton
           type="primary"
@@ -348,20 +354,18 @@ const TxDetailComponent = ({
   const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
   return (
     <div className="transaction-detail">
-      {supportsEIP1559 && (
-        <div
-          className="gas-edit-button flex ml-auto"
-          onClick={() => {
-            setVisible(true);
-            sensors.track('teleport_sign_tx_edit_gas', {
-              page: location.pathname,
-            });
-          }}
-        >
-          <IconComponent name="edit" cls="edit-icon" />
-          <div>{t('Edit')}</div>
-        </div>
-      )}
+      <div
+        className="gas-edit-button flex ml-auto"
+        onClick={() => {
+          setVisible(true);
+          sensors.track('teleport_sign_tx_edit_gas', {
+            page: location.pathname,
+          });
+        }}
+      >
+        <IconComponent name="edit" cls="edit-icon" />
+        <div>{t('Edit')}</div>
+      </div>
       <TransactionDetailItem
         key="gas-item"
         detailTitle={t('Referral gas fee')}
