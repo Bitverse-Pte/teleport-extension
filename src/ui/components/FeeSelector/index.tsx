@@ -18,6 +18,9 @@ interface Fee {
   time: number;
   gasPrice: number;
   gasLimit?: number;
+
+  suggestedMaxPriorityFeePerGas?: string;
+  suggestedMaxFeePerGas?: string;
 }
 
 interface FeeSelectorProps {
@@ -73,16 +76,19 @@ function FeeSelector(props: FeeSelectorProps) {
         type: 'high',
         gasPrice: Number(high.suggestedMaxFeePerGas),
         time: 30,
+        ...high
       },
       {
         type: 'medium',
         gasPrice: Number(medium.suggestedMaxFeePerGas),
         time: 30,
+        ...medium
       },
       {
         type: 'low',
         gasPrice: Number(low.suggestedMaxFeePerGas),
         time: 30,
+        ...low
       },
     ]);
   };
@@ -181,8 +187,10 @@ function FeeSelector(props: FeeSelectorProps) {
               }}
               selected={item?.type === selectFee}
               onSelect={onSelect}
-              maxFeePerGas={GasFeeInputsResults.maxFeePerGas}
-              maxPriorityFeePerGas={GasFeeInputsResults.maxPriorityFeePerGas}
+              // maxFeePerGas={GasFeeInputsResults.maxFeePerGas}
+              // maxPriorityFeePerGas={GasFeeInputsResults.maxPriorityFeePerGas}
+              maxFeePerGas={item.suggestedMaxFeePerGas}
+              maxPriorityFeePerGas={item.suggestedMaxPriorityFeePerGas}
             />
           ))}
         </ul>
