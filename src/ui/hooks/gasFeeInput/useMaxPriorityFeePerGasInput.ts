@@ -10,8 +10,8 @@ import {
 import { isLegacyTransaction } from 'utils/transaction.utils';
 import { hexWEIToDecGWEI, multiplyCurrencies } from 'utils/conversion';
 
-import { useCurrencyDisplay } from '../metamask/useCurrencyDisplay';
-import { useUserPreferencedCurrency } from '../metamask/useUserPreferencedCurrency';
+import { useCurrencyDisplay } from '../wallet/useCurrencyDisplay';
+import { useUserPreferencedCurrency } from '../wallet/useUserPreferencedCurrency';
 import { feeParamsAreCustom, getGasFeeEstimate } from './utils';
 import { Transaction } from 'constants/transaction';
 
