@@ -132,7 +132,9 @@ const SignTx = ({ params, origin }) => {
       setTotalGasFee(addHexPrefix(total));
     } else {
       const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
-        gasFeeEstimates[gasState.gasType];
+        gasState.gasType === 'custom'
+          ? gasState.customData
+          : gasFeeEstimates[gasState.gasType];
       setMaxFeePerGas(
         addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
       );

@@ -22,8 +22,8 @@ const initState = {
   gasType: 'medium',
   legacyGas: {
     gasPrice: 0,
-    gasLimit: 21000
-  }
+    gasLimit: 21000,
+  },
 };
 
 // Reducer
