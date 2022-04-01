@@ -112,6 +112,7 @@ const SignTx = ({ params, origin }) => {
     const gas = await wallet.fetchGasFeeEstimates();
     console.debug('signTx fetchGasFeeEstimates: ', gas);
     const { gasFeeEstimates, gasEstimateType } = gas;
+    console.log('==========gasState:==========', gasState);
     //const MIN_GAS_LIMIT_HEX = '0x5208';
     if (tx.type === TransactionEnvelopeTypes.LEGACY) {
       let gasPrice = '0x1';
