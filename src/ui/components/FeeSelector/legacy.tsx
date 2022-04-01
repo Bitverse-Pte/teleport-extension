@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { SET_LEGACY_GAS } from 'ui/reducer/gas.reducer';
+import { SET_LEGACY_GAS, SET_GAS_TYPE } from 'ui/reducer/gas.reducer';
 import './legacy.less';
 import { Form, Button, Drawer } from 'antd';
 
@@ -45,8 +45,17 @@ function FeeSelectorLegacy(props) {
 
   const [form] = Form.useForm();
   const onFinish = (data) => {
-    console.log(data);
-    dispatch({ type: SET_LEGACY_GAS, value: data });
+    const _v = {
+      gasLimit: data.gasLimit || gasLimit,
+      gasPrice: data.gasPrice || gasPrice,
+    };
+    console.log(_v);
+    dispatch({
+      type: SET_LEGACY_GAS,
+      value: _v,
+    });
+    dispatch({ type: SET_GAS_TYPE, value: 'custom' });
+    onClose();
   };
   const fetchGasFeeEstimates = async () => {
     const res = await wallet.fetchGasFeeEstimates();
@@ -120,12 +129,7 @@ function FeeSelectorLegacy(props) {
             </div>
           </Form.Item>
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="save-gas-btn"
-              onClick={onFinish}
-            >
+            <Button type="primary" htmlType="submit" className="save-gas-btn">
               Confirm
             </Button>
           </Form.Item>
