@@ -113,9 +113,11 @@ const SignTx = ({ params, origin }) => {
     console.debug('signTx fetchGasFeeEstimates: ', gas);
     const { gasFeeEstimates, gasEstimateType } = gas;
     //const MIN_GAS_LIMIT_HEX = '0x5208';
-    if (tx.type === '0x0') {
+    if (tx.type === TransactionEnvelopeTypes.LEGACY) {
       let gasPrice = '0x1';
-      if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
+      if (gasState.gasType == 'custom') {
+        gasPrice = getRoundedGasPrice(gasState.legacyGas.gasPrice);
+      } else if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
         gasPrice = getGasPriceInHexWei(gasFeeEstimates.medium);
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
         gasPrice = getRoundedGasPrice(gasFeeEstimates.gasPrice);
@@ -132,7 +134,9 @@ const SignTx = ({ params, origin }) => {
       setTotalGasFee(addHexPrefix(total));
     } else {
       const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
-        gasFeeEstimates[gasState.gasType];
+        gasState.gasType === 'custom'
+          ? gasState.customData
+          : gasFeeEstimates[gasState.gasType];
       setMaxFeePerGas(
         addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
       );
@@ -145,7 +149,7 @@ const SignTx = ({ params, origin }) => {
     }
   };
 
-  useAsyncEffect(initState, [gasState.gasType]);
+  useAsyncEffect(initState, [gasState.gasType, gasState.legacyGas]);
 
   const handleAllow = async () => {
     sensors.track('teleport_sign_tx_confirmed', {
@@ -220,6 +224,8 @@ const SignTx = ({ params, origin }) => {
     return txToken;
   }, [tokens, prices]);
 
+  const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
+
   const renderContent = () => {
     if (tx.data) {
       return (
@@ -276,7 +282,11 @@ const SignTx = ({ params, origin }) => {
         <Divider style={{ marginTop: 16, marginBottom: 0 }} />
       </div>
       {renderContent()}
-      <FeeSelector visible={visible} onClose={() => setVisible(false)} />
+      <FeeSelector
+        supportsEIP1559={supportsEIP1559}
+        visible={visible}
+        onClose={() => setVisible(false)}
+      />
       <div className="tx-button-container flexCol content-wrap-padding">
         <CustomButton
           type="primary"
@@ -348,20 +358,18 @@ const TxDetailComponent = ({
   const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
   return (
     <div className="transaction-detail">
-      {supportsEIP1559 && (
-        <div
-          className="gas-edit-button flex ml-auto"
-          onClick={() => {
-            setVisible(true);
-            sensors.track('teleport_sign_tx_edit_gas', {
-              page: location.pathname,
-            });
-          }}
-        >
-          <IconComponent name="edit" cls="edit-icon" />
-          <div>{t('Edit')}</div>
-        </div>
-      )}
+      <div
+        className="gas-edit-button flex ml-auto"
+        onClick={() => {
+          setVisible(true);
+          sensors.track('teleport_sign_tx_edit_gas', {
+            page: location.pathname,
+          });
+        }}
+      >
+        <IconComponent name="edit" cls="edit-icon" />
+        <div>{t('Edit')}</div>
+      </div>
       <TransactionDetailItem
         key="gas-item"
         detailTitle={t('Referral gas fee')}

@@ -10,7 +10,6 @@ function CustomFee(props) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const onFinish = (data) => {
-    console.log(data);
     dispatch({ type: SET_CUSTOM_TYPE, value: true });
     dispatch({ type: SET_CUSTOM_DATA, value: data });
     onSubmit();
@@ -54,7 +53,7 @@ function CustomFee(props) {
           tooltip="Max fee cannot be lower than max priority fee"
         >
           <div className="numeric-input">
-            <input type="number" min="0"></input>
+            <input type="number" min="0" step="1e-18"></input>
             <span className="addon">$1.1</span>
           </div>
         </Form.Item>
