@@ -57,7 +57,7 @@ const NetworkEdit = () => {
     } else {
       return {
         explorerUrl: provider.rpcPrefs.blockExplorerUrl || '',
-        chainId: provider.chainId || '',
+        chainId: Number(provider.chainId).toString(10) || '',
         networkName: provider.nickname || '',
         rpcUrl: provider.rpcUrl || '',
         symbol: provider.ticker || '',
