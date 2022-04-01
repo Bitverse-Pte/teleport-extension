@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import BigNumber from 'bignumber.js';
 
-// import { GAS_ESTIMATE_TYPES } from '@metamask/controllers';
 import { usePrevious } from 'react-use';
 import { GAS_ESTIMATE_TYPES, GAS_FORM_ERRORS } from 'constants/gas';
 import { useTranslation } from 'react-i18next';
@@ -15,28 +14,6 @@ import {
   getIsGasEstimatesLoading,
 } from 'ui/selectors/selectors';
 import { useWallet } from 'ui/utils';
-
-// import { GAS_ESTIMATE_TYPES } from '../../../../shared/constants/gas';
-
-// import { usePrevious } from '../../../hooks/usePrevious';
-// import { I18nContext } from '../../../contexts/i18n';
-
-// import {
-//   getGasEstimateType,
-//   getGasFeeEstimates,
-//   getIsGasEstimatesLoading,
-// } from '../../../ducks/metamask/metamask';
-
-// import h6 from '../../ui/h6/h6';
-// import {
-//   h6,
-//   FONT_WEIGHT,
-// } from '../../../helpers/constants/design-system';
-// import InfoTooltip from '../../ui/info-tooltip/info-tooltip';
-
-// import { getGasFeeTimeEstimate } from '../../../store/actions';
-// import { GAS_FORM_ERRORS } from '../../../helpers/constants/gas';
-// import { useGasFeeContext } from '../../../contexts/gasFee';
 
 // Once we reach this second threshold, we switch to minutes as a unit
 const SECOND_CUTOFF = 90;
