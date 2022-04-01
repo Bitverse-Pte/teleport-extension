@@ -19,8 +19,8 @@ interface Fee {
   gasPrice: number;
   gasLimit?: number;
 
-  suggestedMaxPriorityFeePerGas?: string;
-  suggestedMaxFeePerGas?: string;
+  suggestedMaxPriorityFeePerGas: string;
+  suggestedMaxFeePerGas: string;
 }
 
 interface FeeSelectorProps {
@@ -76,19 +76,19 @@ function FeeSelector(props: FeeSelectorProps) {
         type: 'high',
         gasPrice: Number(high.suggestedMaxFeePerGas),
         time: 30,
-        ...high
+        ...high,
       },
       {
         type: 'medium',
         gasPrice: Number(medium.suggestedMaxFeePerGas),
         time: 30,
-        ...medium
+        ...medium,
       },
       {
         type: 'low',
         gasPrice: Number(low.suggestedMaxFeePerGas),
         time: 30,
-        ...low
+        ...low,
       },
     ]);
   };
@@ -129,10 +129,6 @@ function FeeSelector(props: FeeSelectorProps) {
     fetchGasFeeEstimates();
     fetchNativePrice();
   }, []);
-  const GasFeeInputsResults = useGasFeeInputs(
-    EDIT_GAS_MODES.MODIFY_IN_PLACE,
-    props.tx
-  );
   useEffect(() => {
     if (gasState.customType) {
       const {
@@ -147,6 +143,8 @@ function FeeSelector(props: FeeSelectorProps) {
           time: 30,
           gasPrice,
           gasLimit: Number(gasLimit),
+          suggestedMaxPriorityFeePerGas: maxPriorityFee,
+          suggestedMaxFeePerGas: maxFee,
         },
       ]);
     }
@@ -187,8 +185,6 @@ function FeeSelector(props: FeeSelectorProps) {
               }}
               selected={item?.type === selectFee}
               onSelect={onSelect}
-              // maxFeePerGas={GasFeeInputsResults.maxFeePerGas}
-              // maxPriorityFeePerGas={GasFeeInputsResults.maxPriorityFeePerGas}
               maxFeePerGas={item.suggestedMaxFeePerGas}
               maxPriorityFeePerGas={item.suggestedMaxPriorityFeePerGas}
             />

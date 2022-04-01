@@ -8,8 +8,8 @@ interface FeeItemPropsType {
   selected: boolean;
   onSelect: (type: string) => void;
 
-  maxPriorityFeePerGas: any;
-  maxFeePerGas: any;
+  maxPriorityFeePerGas: string;
+  maxFeePerGas: string;
 }
 
 const type2title = {
