@@ -20,6 +20,7 @@ import {
   addHexes,
   multipyHexes,
   decGWEIToHexWEI,
+  addCurrencies,
 } from 'ui/utils/conversion';
 import { TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
@@ -233,6 +234,7 @@ const SignTx = ({ params, origin }) => {
             <TabPane tab={t('DETAILS')} key="1">
               <TxDetailComponent
                 tx={tx}
+                txToken={txToken}
                 nativeToken={nativeToken}
                 setVisible={setVisible}
                 totalGasfee={totalGasfee}
@@ -250,6 +252,7 @@ const SignTx = ({ params, origin }) => {
       <div className="tx-details-tab-container flex content-wrap-padding">
         <TxDetailComponent
           tx={tx}
+          txToken={txToken}
           nativeToken={nativeToken}
           setVisible={setVisible}
           totalGasfee={totalGasfee}
@@ -310,13 +313,21 @@ const SignTx = ({ params, origin }) => {
 
 const TxDetailComponent = ({
   tx,
+  txToken,
   nativeToken,
   setVisible,
   totalGasfee,
   currency,
+}: {
+  tx: any;
+  txToken: Token | undefined;
+  nativeToken: Token | undefined;
+  setVisible: any;
+  totalGasfee: any;
+  currency: any;
 }) => {
   const { t } = useTranslation();
-  const isNative = () => currency === tx.txParam.symbol;
+  const isNative = () => currency === txToken?.symbol;
 
   const renderTotalMaxAmount = () => {
     if (isNative()) {
@@ -369,12 +380,22 @@ const TxDetailComponent = ({
       );
       return `$ ${totalDec}`;
     }
-    const totalDec = getTotalPricesByAmountAndPrice(
+    const totalTxDec = getTotalPricesByAmountAndPrice(
+      valueToDisplay(tx),
+      txToken?.decimal || 0,
+      txToken?.price || 0
+    );
+    const totalGasDec = getTotalPricesByAmountAndPrice(
       totalGasfee,
       nativeToken?.decimal || 0,
       nativeToken?.price || 0
     );
-    return `$ ${totalDec}`;
+    const totalAmountDec = addCurrencies(totalTxDec, totalGasDec, {
+      aBase: 10,
+      bBase: 10,
+      toNumericBase: 'dec',
+    });
+    return `$ ${totalAmountDec}`;
   };
 
   return (
