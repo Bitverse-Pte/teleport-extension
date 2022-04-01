@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 import CopyOrOpenInScan from './copyOrOpenInScan';
 import clsx from 'clsx';
 import { Tooltip } from 'antd';
-
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 interface AddressCardParameters extends HTMLAttributes<HTMLDivElement> {
   title: string;
   address: string;
@@ -28,6 +29,9 @@ export function AddressCard({
   } = useSelector((state) => state.network);
   const handleExplorerClick = useCallback(
     (type: 'address' | 'tx', hash: string) => {
+      sensors.track('teleport_activity_open_' + type, {
+        page: location.pathname,
+      });
       window.open(`${rpcPrefs.blockExplorerUrl}/${type}/${hash}`);
     },
     [rpcPrefs]
@@ -40,7 +44,9 @@ export function AddressCard({
     >
       <h4 className="title">{title}</h4>
       <CopyOrOpenInScan
-        handleExplorerClick={() => handleExplorerClick('address', address)}
+        handleExplorerClick={() => {
+          handleExplorerClick('address', address);
+        }}
         textToBeCopy={address}
         className="ml-auto"
       />

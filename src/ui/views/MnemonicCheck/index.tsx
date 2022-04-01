@@ -10,9 +10,11 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { AccountHeader } from '../AccountRecover';
 import { Tabs } from 'constants/wallet';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const BackupCheck = () => {
-  const { state } = useLocation<{
+  const { state, pathname } = useLocation<{
     hdWalletId: string;
     accountType: Tabs;
   }>();
@@ -27,6 +29,7 @@ const BackupCheck = () => {
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
       checksumPsd();
+      sensors.track('teleport_mnemonic_backup_next', { page: pathname });
     },
     onError(err) {
       ClickToCloseMessage.error({
@@ -172,7 +175,10 @@ const BackupCheck = () => {
         </CustomButton>
         <CopyToClipboard
           text={state.accountType === Tabs.FIRST ? mnemonic : privateKey}
-          onCopy={() => ClickToCloseMessage.success('Copied')}
+          onCopy={() => {
+            ClickToCloseMessage.success('Copied');
+            sensors.track('teleport_mnemonic_backup_copy', { page: pathname });
+          }}
         >
           <CustomButton
             type="primary"
@@ -190,6 +196,7 @@ const BackupCheck = () => {
           type="default"
           cls="custom-button-default"
           onClick={() => {
+            sensors.track('teleport_mnemonic_backup_done', { page: pathname });
             history.go(-1);
           }}
           block

@@ -21,6 +21,8 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import AccountManageWidget from 'ui/components/AccountManageWidget';
 import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -35,7 +37,7 @@ const AccountManage: React.FC = () => {
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
 
-  const { state } = useLocation<{
+  const { state, pathname } = useLocation<{
     hdWalletId: string;
     hdWalletName: string;
     accountCreateType: AccountCreateType;
@@ -65,6 +67,9 @@ const AccountManage: React.FC = () => {
         setAddPopupVisible(false);
         queryAccounts();
         (accountManageWidgetRef.current as any).queryAccounts();
+        sensors.track('teleport_account_manage_add_confirm', {
+          page: pathname,
+        });
       },
       onError: (e) => {
         console.error(e.code);
@@ -86,6 +91,7 @@ const AccountManage: React.FC = () => {
   useAsyncEffect(queryAccounts, []);
 
   const onRenameConfirm = async (accountName) => {
+    sensors.track('teleport_account_manage_rename_confirm', { page: pathname });
     if (accountName.length > 20) {
       ClickToCloseMessage.error({
         content: 'Name length should be 1-20 characters',
@@ -108,6 +114,7 @@ const AccountManage: React.FC = () => {
   };
 
   const onDeleteConfirm = async () => {
+    sensors.track('teleport_account_manage_delete_confirm', { page: pathname });
     await wallet.deleteDisplayAccountByExistKeyringAndIndex(
       hdWalletId,
       currentAccountIndex
@@ -124,6 +131,7 @@ const AccountManage: React.FC = () => {
   };
 
   const handleEdit = async () => {
+    sensors.track('teleport_account_manage_edit', { page: pathname });
     setIsAdd(false);
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);
@@ -133,6 +141,7 @@ const AccountManage: React.FC = () => {
   };
 
   const handleAdd = async () => {
+    sensors.track('teleport_account_manage_add', { page: pathname });
     setIsAdd(true);
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);

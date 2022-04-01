@@ -1,6 +1,6 @@
 import './style.less';
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.svg';
 import TeleportText from 'assets/teleportText.svg';
@@ -10,7 +10,8 @@ import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
 import { stat } from 'fs';
 import { BetaIcon } from 'ui/components/Widgets';
-
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 interface ISettingFeat {
   title: string;
   link?: string;
@@ -80,6 +81,7 @@ export interface ISettingProps {
 
 const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   const history = useHistory();
+  const location = useLocation();
   const wallet = useWallet();
   const [isDefaultWallet, setIsDefaultWallet] = useState(false);
 
@@ -93,16 +95,26 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   }, []);
 
   const handleWalletManageClick = () => {
+    sensors.track('teleport_setting_manage_wallet', {
+      page: location.pathname,
+    });
     history.push('/wallet-manage');
   };
 
   const handleLockClick = () => {
+    sensors.track('teleport_setting_lock', {
+      page: location.pathname,
+    });
     history.replace('/unlock');
     wallet.setManualLocked(true);
     wallet.lockWallet();
   };
 
   const handleDefaultWalletChange = (checked: boolean) => {
+    sensors.track('teleport_setting_default', {
+      page: location.pathname,
+      params: { default: checked },
+    });
     wallet.setIsDefaultWallet(checked);
     setIsDefaultWallet(checked);
   };
