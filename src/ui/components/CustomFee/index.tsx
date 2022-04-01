@@ -10,7 +10,6 @@ function CustomFee(props) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const onFinish = (data) => {
-    console.log(data);
     dispatch({ type: SET_CUSTOM_TYPE, value: true });
     dispatch({ type: SET_CUSTOM_DATA, value: data });
     onSubmit();

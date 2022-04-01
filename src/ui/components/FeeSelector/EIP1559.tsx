@@ -76,7 +76,6 @@ function FeeSelector(props) {
   const fetchNativePrice = async () => {
     const tokens = await wallet.getTokenBalancesAsync(true);
     const prices = await wallet.queryTokenPrices();
-    console.log(tokens, prices);
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
   };
@@ -100,7 +99,6 @@ function FeeSelector(props) {
     sensors.track('teleport_gas_edit_save_custom', { page: location.pathname });
   };
   const setGasType = () => {
-    console.log('selectFee: ', selectFee);
     dispatch({ type: SET_GAS_TYPE, value: selectFee });
     setCustomVisible(false);
     onClose();
@@ -115,7 +113,6 @@ function FeeSelector(props) {
       const {
         customData: { gasLimit, maxPriorityFee, maxFee },
       } = gasState;
-      console.log(gasLimit, maxPriorityFee, maxFee);
       const gasPrice = getCustomGasPrice(maxPriorityFee, maxFee);
       let customItem: any = null;
       for (const item of feeList) {
