@@ -24,7 +24,7 @@ const getMaxPriorityFeePerGasFromTransaction = (
       .suggestedMaxPriorityFeePerGas;
   }
   const { maxPriorityFeePerGas, maxFeePerGas, gasPrice } =
-    transaction?.txParams || {};
+    transaction?.txParam || {};
   return Number(
     hexWEIToDecGWEI(maxPriorityFeePerGas || maxFeePerGas || gasPrice)
   );
@@ -65,7 +65,7 @@ export function useMaxPriorityFeePerGasInput({
 }): MaxPriorityFeePerGasInputReturnType {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransactionParams(transaction.txParams || transaction);
+    !isLegacyTransactionParams(transaction.txParam || transaction);
 
   const { currency: fiatCurrency, numberOfDecimals: fiatNumberOfDecimals } =
     useUserPreferencedCurrency('SECONDARY');

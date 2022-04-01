@@ -37,7 +37,7 @@ export function useGasEstimates({
 }): GasEstimatesReturnType {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransactionParams(transaction.txParams || transaction);
+    !isLegacyTransactionParams(transaction.txParam || transaction);
 
   const { currency: fiatCurrency, numberOfDecimals: fiatNumberOfDecimals } =
     useUserPreferencedCurrency('SECONDARY');

@@ -29,7 +29,7 @@ const getMaxFeePerGasFromTransaction = (transaction, gasFeeEstimates) => {
   if (gasFeeEstimates?.[transaction?.userFeeLevel]) {
     return gasFeeEstimates[transaction.userFeeLevel].suggestedMaxFeePerGas;
   }
-  const { maxFeePerGas, gasPrice } = transaction?.txParams || {};
+  const { maxFeePerGas, gasPrice } = transaction?.txParam || {};
   return Number(hexWEIToDecGWEI(maxFeePerGas || gasPrice));
 };
 
@@ -71,8 +71,8 @@ export function useMaxFeePerGasInput({
 }: MaxFeePerGasInputType): MaxFeePerGasInputReturnType {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    // !isLegacyTransactionParams(transaction.txParams || transaction);
-    !isLegacyTransactionParams(transaction.txParams || (transaction as any));
+    // !isLegacyTransactionParams(transaction.txParam || transaction);
+    !isLegacyTransactionParams(transaction.txParam || (transaction as any));
 
   const { currency: fiatCurrency, numberOfDecimals: fiatNumberOfDecimals } =
     useUserPreferencedCurrency('SECONDARY');

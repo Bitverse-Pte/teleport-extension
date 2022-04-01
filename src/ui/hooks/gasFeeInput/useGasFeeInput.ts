@@ -101,7 +101,7 @@ export function useGasFeeInputs(
   );
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransactionParams(transaction.txParams || transaction);
+    !isLegacyTransactionParams(transaction.txParam || transaction);
   const supportsEIP1559V2 = supportsEIP1559 && eip1559V2Enabled;
   // We need the gas estimates from the GasFeeController in the background.
   // Calling this hooks initiates polling for new gas estimates and returns the

@@ -52,7 +52,7 @@ export function useGasPriceInput({
   );
 
   const [gasPrice, setGasPrice] = useState(() => {
-    const { gasPrice: txGasPrice } = transaction?.txParams || {};
+    const { gasPrice: txGasPrice } = transaction?.txParam || {};
     return txGasPrice && feeParamsAreCustom(transaction)
       ? Number(hexWEIToDecGWEI(txGasPrice))
       : null;
@@ -68,10 +68,10 @@ export function useGasPriceInput({
     gasPrice !== null &&
     (gasPriceHasBeenManuallySet ||
       gasPriceEstimatesHaveNotChanged ||
-      // isLegacyTransactionParams(transaction.txParams || transaction))
+      // isLegacyTransactionParams(transaction.txParam || transaction))
       // code from mm
       // typing is error, tried to any this
-      isLegacyTransactionParams(transaction.txParams || (transaction as any)))
+      isLegacyTransactionParams(transaction.txParam || (transaction as any)))
       ? gasPrice
       : getGasPriceEstimate(gasFeeEstimates, gasEstimateType, estimateToUse);
 

@@ -182,7 +182,7 @@ export function useGasFeeErrors({
 }) {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransactionParams(transaction.txParams || transaction);
+    !isLegacyTransactionParams(transaction.txParam || transaction);
 
   const isFeeMarketGasEstimate =
     gasEstimateType === GAS_ESTIMATE_TYPES.FEE_MARKET;
