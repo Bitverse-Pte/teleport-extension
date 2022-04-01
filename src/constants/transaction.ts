@@ -228,6 +228,7 @@ export interface Transaction {
   blockNumber?: HexString;
   time: number;
   txParams: TxParams;
+  txParam?: TxParams;
   // only exist if tx was validated by the nodes
   // both success and reverted tx
   txReceipt?: {
