@@ -54,7 +54,7 @@ function CustomFee(props) {
           tooltip="Max fee cannot be lower than max priority fee"
         >
           <div className="numeric-input">
-            <input type="number" min="0"></input>
+            <input type="number" min="0" step="1e-18"></input>
             <span className="addon">$1.1</span>
           </div>
         </Form.Item>

@@ -124,7 +124,12 @@ function FeeSelectorLegacy(props) {
             tooltip="This network requires a “Gas price” field when submitting a transaction. Gas price is the amount you will pay pay per unit of gas."
           >
             <div className="numeric-input">
-              <input type="number" defaultValue={gasPrice}></input>
+              <input
+                type="number"
+                defaultValue={gasPrice}
+                min="0"
+                step="1e-18"
+              ></input>
               {/* <span className="addon">$...</span> */}
             </div>
           </Form.Item>

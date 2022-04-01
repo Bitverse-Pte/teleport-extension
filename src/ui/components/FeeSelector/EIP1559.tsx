@@ -117,15 +117,27 @@ function FeeSelector(props) {
       } = gasState;
       console.log(gasLimit, maxPriorityFee, maxFee);
       const gasPrice = getCustomGasPrice(maxPriorityFee, maxFee);
-      setFeeList([
-        ...feeList,
-        {
-          type: 'custom',
-          time: 30,
-          gasPrice,
-          gasLimit: Number(gasLimit),
-        },
-      ]);
+      let customItem: any = null;
+      for (const item of feeList) {
+        if (item.type === 'custom') {
+          customItem = item;
+        }
+      }
+      if (customItem === null) {
+        setFeeList([
+          ...feeList,
+          {
+            type: 'custom',
+            time: 30,
+            gasPrice,
+            gasLimit: Number(gasLimit),
+          },
+        ]);
+      } else {
+        customItem.gasPrice = gasPrice;
+        customItem.gasLimit = Number(gasLimit);
+        setFeeList(feeList);
+      }
     }
   }, [gasState.customData]);
   return (
