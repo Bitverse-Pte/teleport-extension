@@ -34,7 +34,7 @@ export class EthereumProvider extends EventEmitter {
    */
   networkVersion: string | null = null;
   isTeleportWallet = true;
-  isMetaMask = true;
+  isMetaMask = false;
 
   _isConnected = false;
   _initialized = false;
