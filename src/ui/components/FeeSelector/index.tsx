@@ -137,7 +137,7 @@ function FeeSelector(props: FeeSelectorProps) {
       console.log(gasLimit, maxPriorityFee, maxFee);
       const gasPrice = getCustomGasPrice(maxPriorityFee, maxFee);
       setFeeList([
-        ...feeList,
+        ...feeList.filter((f) => f.type !== 'custom'),
         {
           type: 'custom',
           time: 30,
