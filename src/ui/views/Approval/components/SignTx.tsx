@@ -110,7 +110,6 @@ const SignTx = ({ params, origin }) => {
 
   const initState = async () => {
     const gas = await wallet.fetchGasFeeEstimates();
-    console.debug('signTx fetchGasFeeEstimates: ', gas);
     const { gasFeeEstimates, gasEstimateType } = gas;
     //const MIN_GAS_LIMIT_HEX = '0x5208';
     if (tx.type === TransactionEnvelopeTypes.LEGACY) {
@@ -317,14 +316,28 @@ const TxDetailComponent = ({
   currency,
 }) => {
   const { t } = useTranslation();
+  const isNative = () => currency === tx.txParam.symbol;
 
   const renderTotalMaxAmount = () => {
-    // @todo: need to handle ERC20 Token + ETH fee
-    const totalHex = addHexPrefix(
-      addHexes(valueToDisplay(tx), totalGasfee).toString()
-    );
-    const total = getValueFromWeiHex({ value: totalHex, numberOfDecimals: 10 });
-    return `${total} ${currency || ''}`;
+    if (isNative()) {
+      const totalHex = addHexPrefix(
+        addHexes(valueToDisplay(tx), totalGasfee).toString()
+      );
+      const total = getValueFromWeiHex({
+        value: totalHex,
+        numberOfDecimals: 10,
+      });
+      return `${total} ${currency || ''}`;
+    }
+    const transferDec = getValueFromWeiHex({
+      value: valueToDisplay(tx),
+      numberOfDecimals: 10,
+    });
+    const gasDec = getValueFromWeiHex({
+      value: totalGasfee,
+      numberOfDecimals: 10,
+    });
+    return `${transferDec} ${tx.txParam.symbol} + ${gasDec} ${currency}`;
   };
 
   const renderTotalGasFeeAmount = () => {
@@ -336,26 +349,34 @@ const TxDetailComponent = ({
   };
 
   const renderTotalGasFeeFiat = () => {
-    const res = getTotalPricesByAmountAndPrice(
+    const totalDec = getTotalPricesByAmountAndPrice(
       totalGasfee,
       nativeToken?.decimal || 0,
       nativeToken?.price || 0
     );
-    return res;
+    return `$ ${totalDec}`;
   };
 
   const renderTotalMaxFiat = () => {
-    const totalHex = addHexPrefix(
-      addHexes(valueToDisplay(tx), totalGasfee).toString()
-    );
-    return getTotalPricesByAmountAndPrice(
-      totalHex,
+    if (isNative()) {
+      const totalHex = addHexPrefix(
+        addHexes(valueToDisplay(tx), totalGasfee).toString()
+      );
+      const totalDec = getTotalPricesByAmountAndPrice(
+        totalHex,
+        nativeToken?.decimal || 0,
+        nativeToken?.price || 0
+      );
+      return `$ ${totalDec}`;
+    }
+    const totalDec = getTotalPricesByAmountAndPrice(
+      totalGasfee,
       nativeToken?.decimal || 0,
       nativeToken?.price || 0
     );
+    return `$ ${totalDec}`;
   };
 
-  const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
   return (
     <div className="transaction-detail">
       <div
@@ -375,7 +396,7 @@ const TxDetailComponent = ({
         detailTitle={t('Referral gas fee')}
         subTitle={undefined}
         detailText={`${renderTotalGasFeeAmount()}`}
-        detailSubText={`$ ${renderTotalGasFeeFiat()}`}
+        detailSubText={renderTotalGasFeeFiat()}
         detailMax={`Max fee: ${renderTotalGasFeeAmount()}`}
       />
       <Divider style={{ margin: '16px 0' }} />
@@ -384,7 +405,7 @@ const TxDetailComponent = ({
         detailTitle={t('Sum')}
         subTitle={t('Amount + gas fee')}
         detailText={renderTotalMaxAmount()}
-        detailSubText={`$ ${renderTotalMaxFiat()}`}
+        detailSubText={renderTotalMaxFiat()}
         detailMax={`Max amount: ${renderTotalMaxAmount()}`}
       />
     </div>
