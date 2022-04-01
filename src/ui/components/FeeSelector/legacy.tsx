@@ -34,7 +34,6 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
 };
 
 function FeeSelectorLegacy(props) {
-  console.log('FeeSelectorLegacy props: ', props);
   const location = useLocation();
   const dispatch = useDispatch();
   const { visible, onClose, gasLimit = 21000 } = props;
@@ -49,7 +48,6 @@ function FeeSelectorLegacy(props) {
       gasLimit: data.gasLimit || gasLimit,
       gasPrice: data.gasPrice || gasPrice,
     };
-    console.log(_v);
     dispatch({
       type: SET_LEGACY_GAS,
       value: _v,
@@ -61,12 +59,10 @@ function FeeSelectorLegacy(props) {
     const res = await wallet.fetchGasFeeEstimates();
     const gasPrice = res.gasFeeEstimates.gasPrice;
     setGasPrice(gasPrice);
-    console.log('fetchGasFeeEstimates gasPrice: ', gasPrice);
   };
   const fetchNativePrice = async () => {
     const tokens = await wallet.getTokenBalancesAsync(true);
     const prices = await wallet.queryTokenPrices();
-    console.log('tokens, prices: ', tokens, prices);
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
   };

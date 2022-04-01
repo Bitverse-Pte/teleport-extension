@@ -112,12 +112,11 @@ const SignTx = ({ params, origin }) => {
     const gas = await wallet.fetchGasFeeEstimates();
     console.debug('signTx fetchGasFeeEstimates: ', gas);
     const { gasFeeEstimates, gasEstimateType } = gas;
-    console.log('==========gasState:==========', gasState);
     //const MIN_GAS_LIMIT_HEX = '0x5208';
     if (tx.type === TransactionEnvelopeTypes.LEGACY) {
       let gasPrice = '0x1';
-      if (gasState.type == 'custom') {
-        gasPrice = gasState.legacyGas.gasPrice;
+      if (gasState.gasType == 'custom') {
+        gasPrice = getRoundedGasPrice(gasState.legacyGas.gasPrice);
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
         gasPrice = getGasPriceInHexWei(gasFeeEstimates.medium);
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
@@ -150,7 +149,7 @@ const SignTx = ({ params, origin }) => {
     }
   };
 
-  useAsyncEffect(initState, [gasState.gasType]);
+  useAsyncEffect(initState, [gasState.gasType, gasState.legacyGas]);
 
   const handleAllow = async () => {
     sensors.track('teleport_sign_tx_confirmed', {
