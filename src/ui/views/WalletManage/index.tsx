@@ -74,10 +74,14 @@ const WalletManage: React.FC = () => {
     if (current) {
       setCurrentAccount(current);
     }
-    return current;
+    return {
+      current,
+      hdWalletAccounts: accounts?.hdAccount,
+    };
   };
 
-  const setDefaultTab = (current) => {
+  const setDefaultTab = (current, hdWalletAccounts) => {
+    console.log(hdWalletAccounts);
     if (
       hdWalletAccounts?.some((account) =>
         account.accounts.some(
@@ -92,8 +96,8 @@ const WalletManage: React.FC = () => {
   };
 
   useAsyncEffect(async () => {
-    const current = await queryWallets();
-    setDefaultTab(current);
+    const { current, hdWalletAccounts } = await queryWallets();
+    setDefaultTab(current, hdWalletAccounts);
   }, []);
 
   const handleCreateBtnClick = async () => {
