@@ -33,6 +33,7 @@ import {
 import { BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
+
 import { useMethodData } from 'ui/hooks/wallet/useMethodData';
 import { HeaderWithFlex } from 'ui/components/Header';
 import { GAS_ESTIMATE_TYPES } from 'constants/gas';

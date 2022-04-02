@@ -540,6 +540,207 @@
   "contractDeployment": {
     "message": "Contract Deployment"
   },
+  "gas": {
+    "message": "Gas"
+  },
+  "gasDisplayAcknowledgeDappButtonText": {
+    "message": "Edit suggested gas fee"
+  },
+  "gasDisplayDappWarning": {
+    "message": "This gas fee has been suggested by {{$1}}. Overriding this may cause a problem with your transaction. Please reach out to {{$1}} if you have questions.",
+    "description": "{{$1}} represents the Dapp's origin"
+  },
+  "gasEstimatesUnavailableWarning": {
+    "message": "Our low, medium and high estimates are not available."
+  },
+  "gasLimit": {
+    "message": "Gas Limit"
+  },
+  "gasLimitInfoTooltipContent": {
+    "message": "Gas limit is the maximum amount of units of gas you are willing to spend."
+  },
+  "gasLimitRecommended": {
+    "message": "Recommended gas limit is {{$1}}. If the gas limit is less than that, it may fail."
+  },
+  "gasLimitTooLow": {
+    "message": "Gas limit must be at least 21000"
+  },
+  "gasLimitTooLowWithDynamicFee": {
+    "message": "Gas limit must be at least {{$1}}",
+    "description": "{{$1}} is the custom gas limit, in decimal."
+  },
+  "gasLimitV2": {
+    "message": "Gas limit"
+  },
+  "gasOption": {
+    "message": "Gas option"
+  },
+  "gasPrice": {
+    "message": "Gas Price (GWEI)"
+  },
+  "gasPriceExcessive": {
+    "message": "Your gas fee is set unnecessarily high. Consider lowering the amount."
+  },
+  "gasPriceExcessiveInput": {
+    "message": "Gas Price Is Excessive"
+  },
+  "gasPriceExtremelyLow": {
+    "message": "Gas Price Extremely Low"
+  },
+  "gasPriceFetchFailed": {
+    "message": "Gas price estimation failed due to network error."
+  },
+  "gasPriceInfoTooltipContent": {
+    "message": "Gas price specifies the amount of Ether you are willing to pay for each unit of gas."
+  },
+  "gasTimingHoursShort": {
+    "message": "{{$1}} hrs",
+    "description": "{{$1}} represents a number of hours"
+  },
+  "gasTimingMinutes": {
+    "message": "{{$1}} minutes",
+    "description": "{{$1}} represents a number of minutes"
+  },
+  "gasTimingMinutesShort": {
+    "message": "{{$1}} min",
+    "description": "{{$1}} represents a number of minutes"
+  },
+  "gasTimingNegative": {
+    "message": "Maybe in {{$1}}",
+    "description": "{{$1}} represents an amount of time"
+  },
+  "gasTimingPositive": {
+    "message": "Likely in < {{$1}}",
+    "description": "{{$1}} represents an amount of time"
+  },
+  "gasTimingSeconds": {
+    "message": "{{$1}} seconds",
+    "description": "{{$1}} represents a number of seconds"
+  },
+  "gasTimingSecondsShort": {
+    "message": "{{$1}} sec",
+    "description": "{{$1}} represents a number of seconds"
+  },
+  "gasTimingVeryPositive": {
+    "message": "Very likely in < {{$1}}",
+    "description": "{{$1}} represents an amount of time"
+  },
+  "gasUsed": {
+    "message": "Gas Used"
+  },
+  "editGasEducationButtonText": {
+    "message": "How should I choose?"
+  },
+  "editGasEducationHighExplanation": {
+    "message": "This is best for time sensitive transactions (like Swaps) as it increases the likelihood of a successful transaction. If a Swap takes too long to process it may fail and result in losing some of your gas fee."
+  },
+  "editGasEducationLowExplanation": {
+    "message": "A lower gas fee should only be used when processing time is less important. Lower fees make it hard predict when (or if) your transaction will be successful."
+  },
+  "editGasEducationMediumExplanation": {
+    "message": "A medium gas fee is good for sending, withdrawing or other non-time sensitive transactions. This setting will most often result in a successful transaction."
+  },
+  "editGasEducationModalIntro": {
+    "message": "Selecting the right gas fee depends on the type of transaction and how important it is to you."
+  },
+  "editGasEducationModalTitle": {
+    "message": "How to choose?"
+  },
+  "editGasFeeModalTitle": {
+    "message": "Edit gas fee"
+  },
+  "editGasHigh": {
+    "message": "High"
+  },
+  "editGasLimitOutOfBounds": {
+    "message": "Gas limit must be at least {{$1}}"
+  },
+  "editGasLimitOutOfBoundsV2": {
+    "message": "Gas limit must be greater than {{$1}} and less than $2",
+    "description": "{{$1}} is the minimum limit for gas and $2 is the maximum limit"
+  },
+  "editGasLimitTooltip": {
+    "message": "Gas limit is the maximum units of gas you are willing to use. Units of gas are a multiplier to “Max priority fee” and “Max fee”."
+  },
+  "editGasLow": {
+    "message": "Low"
+  },
+  "editGasMaxBaseFeeGWEIImbalance": {
+    "message": "Max base fee cannot be lower than priority fee"
+  },
+  "editGasMaxBaseFeeHigh": {
+    "message": "Max base fee is higher than necessary"
+  },
+  "editGasMaxBaseFeeLow": {
+    "message": "Max base fee is low for current network conditions"
+  },
+  "editGasMaxFeeHigh": {
+    "message": "Max fee is higher than necessary"
+  },
+  "editGasMaxFeeLow": {
+    "message": "Max fee too low for network conditions"
+  },
+  "editGasMaxFeePriorityImbalance": {
+    "message": "Max fee cannot be lower than max priority fee"
+  },
+  "editGasMaxFeeTooltip": {
+    "message": "The max fee is the most you’ll pay (base fee + priority fee)."
+  },
+  "editGasMaxPriorityFeeBelowMinimum": {
+    "message": "Max priority fee must be greater than 0 GWEI"
+  },
+  "editGasMaxPriorityFeeBelowMinimumV2": {
+    "message": "Priority fee must be greater than 0."
+  },
+  "editGasMaxPriorityFeeHigh": {
+    "message": "Max priority fee is higher than necessary. You may pay more than needed."
+  },
+  "editGasMaxPriorityFeeHighV2": {
+    "message": "Priority fee is higher than necessary. You may pay more than needed"
+  },
+  "editGasMaxPriorityFeeLow": {
+    "message": "Max priority fee is low for current network conditions"
+  },
+  "editGasMaxPriorityFeeLowV2": {
+    "message": "Priority fee is low for current network conditions"
+  },
+  "editGasMaxPriorityFeeTooltip": {
+    "message": "Max priority fee (aka “miner tip”) goes directly to miners and incentivizes them to prioritize your transaction. You’ll most often pay your max setting"
+  },
+  "editGasMedium": {
+    "message": "Medium"
+  },
+  "editGasPriceTooLow": {
+    "message": "Gas price must be greater than 0"
+  },
+  "editGasPriceTooltip": {
+    "message": "This network requires a “Gas price” field when submitting a transaction. Gas price is the amount you will pay pay per unit of gas."
+  },
+  "editGasSubTextAmountLabel": {
+    "message": "Max amount:",
+    "description": "This is meant to be used as the {{$1}} substitution editGasSubTextAmount"
+  },
+  "editGasSubTextFeeLabel": {
+    "message": "Max fee:"
+  },
+  "editGasTitle": {
+    "message": "Edit priority"
+  },
+  "editGasTooLow": {
+    "message": "Unknown processing time"
+  },
+  "editGasTooLowTooltip": {
+    "message": "Your max fee or max priority fee may be low for current market conditions. We don't know when (or if) your transaction will be processed. "
+  },
+  "editGasTooLowWarningTooltip": {
+    "message": "This lowers your maximum fee but if network traffic increases your transaction may be delayed or fail."
+  },
+  "editNonceField": {
+    "message": "Edit Nonce"
+  },
+  "editNonceMessage": {
+    "message": "This is an advanced feature, use cautiously."
+  },
   "contractInteraction": {
     "message": "Contract Interaction"
   },

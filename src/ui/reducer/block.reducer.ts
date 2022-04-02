@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { GAS_ESTIMATE_TYPES } from 'constants/gas';
 import type { RootState } from '.';
 
 interface CurrentBlockSliceState {
   gasLimit: string;
   gasFeeEstimates: any;
+  gasEstimateType: string;
 }
 
 export const currentBlockSlice = createSlice<
@@ -13,9 +15,12 @@ export const currentBlockSlice = createSlice<
       state: CurrentBlockSliceState,
       action: PayloadAction<string>
     ) => any;
-    setGasFeeEstimates: (
+    setGasEstimates: (
       state: CurrentBlockSliceState,
-      action: PayloadAction<string>
+      action: PayloadAction<{
+        gasFeeEstimates: any;
+        gasEstimateType: string;
+      }>
     ) => any;
   }
 >({
@@ -23,18 +28,20 @@ export const currentBlockSlice = createSlice<
   initialState: {
     gasLimit: '',
     gasFeeEstimates: {},
+    gasEstimateType: GAS_ESTIMATE_TYPES.LEGACY,
   },
   reducers: {
     setCurrentGasLimit(state, action) {
       state.gasLimit = action.payload;
     },
-    setGasFeeEstimates(state, action) {
-      state.gasFeeEstimates = action.payload;
+    setGasEstimates(state, action) {
+      state.gasFeeEstimates = action.payload.gasFeeEstimates;
+      state.gasEstimateType = action.payload.gasEstimateType;
     },
   },
 });
 
-export const { setCurrentGasLimit, setGasFeeEstimates } =
+export const { setCurrentGasLimit, setGasEstimates } =
   currentBlockSlice.actions;
 
 /**

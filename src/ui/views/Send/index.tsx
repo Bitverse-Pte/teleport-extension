@@ -167,16 +167,6 @@ const Send = () => {
         amount: userInputAmount,
       });
     }
-    if (isSupport1559) {
-      delete params.gasPrice;
-      params.maxFeePerGas = draftTransaction.maxFeePerGas;
-      params.maxPriorityFeePerGas = draftTransaction.maxPriorityFeePerGas;
-    } else {
-      delete params.maxFeePerGas;
-      delete params.maxPriorityFeePerGas;
-      params.gasPrice = draftTransaction.gasPrice;
-      params.gas = draftTransaction.gas;
-    }
     params.txParam = {
       from: fromAccount?.address,
       to: toAddress,
@@ -184,6 +174,22 @@ const Send = () => {
       type: type,
       symbol: selectedToken?.symbol,
     };
+
+    if (isSupport1559) {
+      delete params.gasPrice;
+      params.maxFeePerGas = draftTransaction.maxFeePerGas;
+      params.maxPriorityFeePerGas = draftTransaction.maxPriorityFeePerGas;
+      params.txParam.maxFeePerGas = draftTransaction.maxFeePerGas;
+      params.txParam.maxPriorityFeePerGas =
+        draftTransaction.maxPriorityFeePerGas;
+    } else {
+      delete params.maxFeePerGas;
+      delete params.maxPriorityFeePerGas;
+      params.gasPrice = draftTransaction.gasPrice;
+      params.gas = draftTransaction.gas;
+      params.txParam.gasPrice = draftTransaction.gasPrice;
+      params.txParam.gas = draftTransaction.gas;
+    }
     await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({
       method: 'eth_sendTransaction',

@@ -186,6 +186,10 @@ export interface Transaction {
   dappSuggestedGasFees: {
     gas?: HexString;
     gasPrice?: HexString;
+
+    // EIP-1559 related new props
+    maxPriorityFeePerGas?: HexString;
+    maxFeePerGas?: HexString;
   } | null;
   estimatedBaseFee?: HexString;
   firstRetryBlockNumber?: string;
@@ -224,6 +228,7 @@ export interface Transaction {
   blockNumber?: HexString;
   time: number;
   txParams: TxParams;
+  txParam?: TxParams;
   // only exist if tx was validated by the nodes
   // both success and reverted tx
   txReceipt?: {

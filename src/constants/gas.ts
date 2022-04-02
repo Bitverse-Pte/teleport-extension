@@ -16,12 +16,12 @@ export const GAS_LIMITS = {
  * These are already declared in @metamask/controllers but importing them from
  * that module and re-exporting causes the UI bundle size to expand beyond 4MB
  */
-export const GAS_ESTIMATE_TYPES = {
-  FEE_MARKET: 'fee-market',
-  LEGACY: 'legacy',
-  ETH_GASPRICE: 'eth_gasPrice',
-  NONE: 'none',
-};
+export enum GAS_ESTIMATE_TYPES {
+  FEE_MARKET = 'fee-market',
+  LEGACY = 'legacy',
+  ETH_GASPRICE = 'eth_gasPrice',
+  NONE = 'none',
+}
 
 /**
  * These represent gas recommendation levels presented in the UI
@@ -65,3 +65,51 @@ export const EDIT_GAS_MODES = {
   MODIFY_IN_PLACE: 'modify-in-place',
   SWAPS: 'swaps',
 };
+
+export enum GAS_FORM_ERRORS {
+  GAS_LIMIT_OUT_OF_BOUNDS = 'editGasLimitOutOfBounds',
+  MAX_PRIORITY_FEE_TOO_LOW = 'editGasMaxPriorityFeeLow',
+  MAX_FEE_TOO_LOW = 'editGasMaxFeeLow',
+  MAX_PRIORITY_FEE_BELOW_MINIMUM = 'editGasMaxPriorityFeeBelowMinimum',
+  MAX_PRIORITY_FEE_HIGH_WARNING = 'editGasMaxPriorityFeeHigh',
+  MAX_FEE_HIGH_WARNING = 'editGasMaxFeeHigh',
+  MAX_FEE_IMBALANCE = 'editGasMaxFeeImbalance',
+  GAS_PRICE_TOO_LOW = 'editGasPriceTooLow',
+}
+
+export const NETWORK_CONGESTION_THRESHOLDS = {
+  NOT_BUSY: 0,
+  STABLE: 0.33,
+  BUSY: 0.66,
+};
+
+export function getGasFormErrorText(
+  type: GAS_FORM_ERRORS,
+  t: any,
+  {
+    minimumGasLimit = '',
+  }: {
+    minimumGasLimit?: string;
+  }
+) {
+  switch (type) {
+    case GAS_FORM_ERRORS.GAS_LIMIT_OUT_OF_BOUNDS:
+      return t('editGasLimitOutOfBounds', [minimumGasLimit]);
+    case GAS_FORM_ERRORS.MAX_PRIORITY_FEE_TOO_LOW:
+      return t('editGasMaxPriorityFeeLow');
+    case GAS_FORM_ERRORS.MAX_FEE_TOO_LOW:
+      return t('editGasMaxFeeLow');
+    case GAS_FORM_ERRORS.MAX_PRIORITY_FEE_BELOW_MINIMUM:
+      return t('editGasMaxPriorityFeeBelowMinimum');
+    case GAS_FORM_ERRORS.MAX_PRIORITY_FEE_HIGH_WARNING:
+      return t('editGasMaxPriorityFeeHigh');
+    case GAS_FORM_ERRORS.MAX_FEE_HIGH_WARNING:
+      return t('editGasMaxFeeHigh');
+    case GAS_FORM_ERRORS.MAX_FEE_IMBALANCE:
+      return t('editGasMaxFeePriorityImbalance');
+    case GAS_FORM_ERRORS.GAS_PRICE_TOO_LOW:
+      return t('editGasPriceTooLow');
+    default:
+      return '';
+  }
+}
