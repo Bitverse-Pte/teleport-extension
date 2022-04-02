@@ -67,6 +67,7 @@ import {
   hexToDecimal,
 } from '../utils/conversion';
 import { toChecksumHexAddress } from '../utils';
+import { GAS_ESTIMATE_TYPES } from 'constants/gas';
 
 /**
  * One of the only remaining valid uses of selecting the network subkey of the
@@ -172,6 +173,34 @@ export function isNotEIP1559Network(state: RootState) {
 
 export function isEIP1559Account(state: RootState) {
   return true;
+}
+
+export function getGasEstimateType(state: RootState) {
+  return state.currentBlock.gasEstimateType;
+}
+
+export function getGasFeeEstimates(state: RootState) {
+  return state.currentBlock.gasFeeEstimates;
+}
+
+export function getIsGasEstimatesLoading(state: RootState) {
+  const networkAndAccountSupports1559 =
+    checkNetworkAndAccountSupports1559(state);
+  const gasEstimateType = getGasEstimateType(state);
+
+  // We consider the gas estimate to be loading if the gasEstimateType is
+  // 'NONE' or if the current gasEstimateType cannot be supported by the current
+  // network
+  const isEIP1559TolerableEstimateType =
+    gasEstimateType === GAS_ESTIMATE_TYPES.FEE_MARKET ||
+    gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE;
+  const isGasEstimatesLoading =
+    gasEstimateType === GAS_ESTIMATE_TYPES.NONE ||
+    (networkAndAccountSupports1559 && !isEIP1559TolerableEstimateType) ||
+    (!networkAndAccountSupports1559 &&
+      gasEstimateType === GAS_ESTIMATE_TYPES.FEE_MARKET);
+
+  return isGasEstimatesLoading;
 }
 
 /**

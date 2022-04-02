@@ -16,6 +16,9 @@ interface Fee {
   time: number;
   gasPrice: number;
   gasLimit?: number;
+
+  suggestedMaxPriorityFeePerGas: string;
+  suggestedMaxFeePerGas: string;
 }
 interface DrawerHeaderProps {
   title: string;
@@ -60,16 +63,19 @@ function FeeSelector(props) {
         type: 'high',
         gasPrice: Number(high.suggestedMaxFeePerGas),
         time: 30,
+        ...high,
       },
       {
         type: 'medium',
         gasPrice: Number(medium.suggestedMaxFeePerGas),
         time: 30,
+        ...medium,
       },
       {
         type: 'low',
         gasPrice: Number(low.suggestedMaxFeePerGas),
         time: 30,
+        ...low,
       },
     ]);
   };
@@ -122,12 +128,14 @@ function FeeSelector(props) {
       }
       if (customItem === null) {
         setFeeList([
-          ...feeList,
+          ...feeList.filter((f) => f.type !== 'custom'),
           {
             type: 'custom',
             time: 30,
             gasPrice,
             gasLimit: Number(gasLimit),
+            suggestedMaxPriorityFeePerGas: maxPriorityFee,
+            suggestedMaxFeePerGas: maxFee,
           },
         ]);
       } else {
@@ -173,6 +181,8 @@ function FeeSelector(props) {
               }}
               selected={item?.type === selectFee}
               onSelect={onSelect}
+              maxFeePerGas={item.suggestedMaxFeePerGas}
+              maxPriorityFeePerGas={item.suggestedMaxPriorityFeePerGas}
             />
           ))}
         </ul>
