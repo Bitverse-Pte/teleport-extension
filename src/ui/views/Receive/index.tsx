@@ -63,9 +63,7 @@ const SendToken = () => {
           />
         </div>
 
-        <div className="address-box">
-          {transferAddress2Display(fromAccount?.address)}
-        </div>
+        <p className="address-box">{fromAccount?.address}</p>
         <div className="copy-box">
           <CopyToClipboard
             text={fromAccount?.address}
