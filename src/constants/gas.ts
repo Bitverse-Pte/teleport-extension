@@ -65,7 +65,7 @@ export enum EDIT_GAS_MODES {
   CANCEL = 'cancel',
   MODIFY_IN_PLACE = 'modify-in-place',
   SWAPS = 'swaps',
-};
+}
 
 export enum GAS_FORM_ERRORS {
   GAS_LIMIT_OUT_OF_BOUNDS = 'editGasLimitOutOfBounds',

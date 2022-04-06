@@ -91,7 +91,7 @@ import { useMaxFeePerGasInput } from './useMaxFeePerGasInput';
 //  */
 export function useGasFeeInputs(
   defaultEstimateToUse = GAS_RECOMMENDATIONS.MEDIUM,
-  transaction,
+  transaction: any,
   minimumGasLimit = '0x5208',
   editGasMode = EDIT_GAS_MODES.MODIFY_IN_PLACE
 ) {

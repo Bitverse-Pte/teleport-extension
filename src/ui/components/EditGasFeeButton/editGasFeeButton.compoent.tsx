@@ -15,10 +15,12 @@ import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
 
 interface EditGasFeeButtonProps {
   userAcknowledgedGasMissing: boolean;
+  transaction: any;
 }
 
 export default function EditGasFeeButton({
   userAcknowledgedGasMissing,
+  transaction: _transaction,
 }: EditGasFeeButtonProps) {
   const {
     editGasMode,
@@ -29,7 +31,7 @@ export default function EditGasFeeButton({
     maxPriorityFeePerGas,
     supportsEIP1559V2,
     transaction,
-  } = useGasFeeInputs();
+  } = useGasFeeInputs(undefined, _transaction);
   const { t } = useTranslation();
   // const { updateTransactionEventFragment } = useTransactionEventFragment();
   //   const { openModal } = useTransactionModalContext();
@@ -89,7 +91,7 @@ export default function EditGasFeeButton({
         <Tooltip
           overlay={
             <div className="edit-gas-fee-button__tooltip">
-              <h6 color={COLORS.NEUTRAL_GREY}>
+              <h6 color="grey">
                 {t('dappSuggestedTooltip', [transaction.origin])}
               </h6>
               <h6>
