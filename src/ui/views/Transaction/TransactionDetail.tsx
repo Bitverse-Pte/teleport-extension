@@ -170,99 +170,103 @@ export function _ActivityDetail({
 
   return (
     <Fragment>
-    <div className={'activity-detail ' + statusBackground}>
-      <Header title={t(title)} />
-      <div className="txdetail-direction-logo flex justify-center">
-        {/* workaround as hook treat native token as undefined */}
-        <div>
-          <TokenIcon token={token || matchedNativeToken} radius={48} />
-        </div>
-      </div>
-      <div className="txdetail-values flex flex-wrap justify-center">
-        <div className="txdetail-value-display">
-          <p className="txdetail-value items-baseline flex-wrap">
-            {displayPrimaryCurrency.amount}
-            <span className="unit">{displayPrimaryCurrency.unit}</span>
-          </p>
-        </div>
-      <div className="details content-wrap-padding">
-        <div className="row from-and-to justify-center">
-          <AddressCard title="From" address={senderAddress} />
-          <IconComponent name="arrow-right" cls="to-icon" />
-          {recipientAddress && (
-            <AddressCard title="To" address={recipientAddress} />
-          )}
-        </div>
-        {transaction.primaryTransaction.hash && (
-          <div className="row">
-            <div className="field-name">Transaction ID</div>
-            <div className="field-value">
-              <Tooltip
-                placement="topRight"
-                title={transaction.primaryTransaction.hash}
-              >
-                {shortenedStr(transaction.primaryTransaction.hash, 4)}
-              </Tooltip>
-              <CopyOrOpenInScan
-                handleExplorerClick={() =>
-                  handleExplorerClick(
-                    'tx',
-                    transaction.primaryTransaction.hash!
-                  )
-                }
-                textToBeCopy={transaction.primaryTransaction.hash}
-              />
-            </div>
+      <div className={'activity-detail ' + statusBackground}>
+        <Header title={t(title)} />
+        <div className="txdetail-direction-logo flex justify-center">
+          {/* workaround as hook treat native token as undefined */}
+          <div>
+            <TokenIcon token={token || matchedNativeToken} radius={48} />
           </div>
-        )}
-        <TransactionFee transaction={transaction} />
-        {!isPending && (
-          <div className="row">
-            <div className="field-name">Time</div>
-            <div className="field-value" title={date}>
-              {dayjs(transaction.primaryTransaction.time).format(
-                'YYYY-MM-DD HH:mm:ss'
+        </div>
+        <div className="txdetail-values flex flex-wrap justify-center">
+          <div className="txdetail-value-display">
+            <p className="txdetail-value items-baseline flex-wrap">
+              {displayPrimaryCurrency.amount}
+              <span className="unit">{displayPrimaryCurrency.unit}</span>
+            </p>
+          </div>
+          <div className="details content-wrap-padding">
+            <div className="row from-and-to justify-center">
+              <AddressCard title="From" address={senderAddress} />
+              <IconComponent name="arrow-right" cls="to-icon" />
+              {recipientAddress && (
+                <AddressCard title="To" address={recipientAddress} />
               )}
             </div>
+            {transaction.primaryTransaction.hash && (
+              <div className="row">
+                <div className="field-name">Transaction ID</div>
+                <div className="field-value">
+                  <Tooltip
+                    placement="topRight"
+                    title={transaction.primaryTransaction.hash}
+                  >
+                    {shortenedStr(transaction.primaryTransaction.hash, 4)}
+                  </Tooltip>
+                  <CopyOrOpenInScan
+                    handleExplorerClick={() =>
+                      handleExplorerClick(
+                        'tx',
+                        transaction.primaryTransaction.hash!
+                      )
+                    }
+                    textToBeCopy={transaction.primaryTransaction.hash}
+                  />
+                </div>
+              </div>
+            )}
+            <TransactionFee transaction={transaction} />
+            {!isPending && (
+              <div className="row">
+                <div className="field-name">Time</div>
+                <div className="field-value" title={date}>
+                  {dayjs(transaction.primaryTransaction.time).format(
+                    'YYYY-MM-DD HH:mm:ss'
+                  )}
+                </div>
+              </div>
+            )}
+            {isPending && (
+              <div className="row pending-tx-actions">
+                {/* @todo: disabled because speedup / cancel is not finish - Frank */}
+                <button
+                  className="editGasBtn"
+                  type="button"
+                  onClick={handleSpeedUpClick}
+                >
+                  {t('speedUp')}
+                </button>
+                <button
+                  className="cancelBtn"
+                  type="button"
+                  onClick={handleCancelClick}
+                >
+                  {t('cancel')}
+                </button>
+              </div>
+            )}
           </div>
-        )}
-        {isPending && (
-          <div className="row pending-tx-actions">
-            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
-              <button
-                className="editGasBtn"
-                type="button"
-                onClick={handleSpeedUpClick}
-              >
-                {t('speedUp')}
-              </button>
-            <button className="cancelBtn" type="button" onClick={handleCancelClick}>
-              {t('cancel')}
-            </button>
-          </div>
-        )}
+        </div>
       </div>
-    </div>
-  </div>
-  {isPending && (
-    <CancelSpeedupPopover
-      editGasMode={currentEditGasMode}
-      showPopOver={showCancelPopOver}
-      setShowPopOver={setShowCancelPopOver}
-      cancelTransaction={cancelTx}
-      speedUpTransaction={speedUpTx}
-      transaction={transaction.primaryTransaction}
-      updateTransactionToTenPercentIncreasedGasFee={(fee) => {
-        console.debug(
-          'updateTransactionToTenPercentIncreasedGasFee::val',
-          fee
-        );
-      }}
-      updateTransactionUsingEstimate={(l) => {
-        console.debug('updateTransactionUsingEstimate::val', l);
-      }}
-    />
-  )}
-  </Fragment>
+      {isPending && (
+        <CancelSpeedupPopover
+          editGasMode={currentEditGasMode}
+          showPopOver={showCancelPopOver}
+          setShowPopOver={setShowCancelPopOver}
+          cancelTransaction={cancelTx}
+          speedUpTransaction={speedUpTx}
+          transaction={transaction.primaryTransaction}
+          updateTransactionToTenPercentIncreasedGasFee={(fee) => {
+            console.debug(
+              'updateTransactionToTenPercentIncreasedGasFee::val',
+              fee
+            );
+          }}
+          updateTransactionUsingEstimate={(l) => {
+            console.debug('updateTransactionUsingEstimate::val', l);
+          }}
+        />
+      )}
+    </Fragment>
   );
 }
