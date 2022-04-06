@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { useGasFeeErrors } from './useGasFeeErrors';
 import { useMaxPriorityFeePerGasInput } from './useMaxPriorityFeePerGasInput';
 import { useGasEstimates } from './useGasEstimates';
-import { useTransactionFunctions } from './useTransactionFunctions';
+// import { useTransactionFunctions } from './useTransactionFunctions';
 import {
   CUSTOM_GAS_ESTIMATE,
   GAS_RECOMMENDATIONS,
@@ -21,7 +21,7 @@ import {
 } from 'constants/gas';
 import { useGasFeeEstimates } from '../gas/useGasFeeEstimates';
 import { checkNetworkAndAccountSupports1559 } from 'ui/selectors/selectors';
-import { isLegacyTransaction } from 'utils/transaction.utils';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import { hexToDecimal } from 'ui/utils/conversion';
 import { useGasPriceInput } from './useGasPriceInput';
 import { useMaxFeePerGasInput } from './useMaxFeePerGasInput';
@@ -101,7 +101,7 @@ export function useGasFeeInputs(
   );
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransaction(transaction?.txParams);
+    !isLegacyTransactionParams(transaction.txParam || transaction);
   const supportsEIP1559V2 = supportsEIP1559 && eip1559V2Enabled;
   // We need the gas estimates from the GasFeeController in the background.
   // Calling this hooks initiates polling for new gas estimates and returns the
@@ -110,7 +110,7 @@ export function useGasFeeInputs(
     gasEstimateType,
     gasFeeEstimates,
     isGasEstimatesLoading,
-    estimatedGasFeeTimeBounds,
+    // estimatedGasFeeTimeBounds,
     isNetworkBusy,
   } = useGasFeeEstimates();
   const userPrefersAdvancedGas = useSelector(
@@ -241,23 +241,23 @@ export function useGasFeeInputs(
       );
     }
   }, [minimumGasLimit, gasErrors.gasLimit, transaction]);
-  const {
-    cancelTransaction,
-    speedUpTransaction,
-    updateTransaction,
-    updateTransactionToTenPercentIncreasedGasFee,
-    updateTransactionUsingDAPPSuggestedValues,
-    updateTransactionUsingEstimate,
-  } = useTransactionFunctions({
-    defaultEstimateToUse,
-    editGasMode,
-    gasFeeEstimates,
-    gasLimit,
-    maxPriorityFeePerGas,
-    // minimumGasLimit,
-    estimatedBaseFee,
-    transaction,
-  });
+  // const {
+  //   cancelTransaction,
+  //   speedUpTransaction,
+  //   updateTransaction,
+  //   updateTransactionToTenPercentIncreasedGasFee,
+  //   updateTransactionUsingDAPPSuggestedValues,
+  //   updateTransactionUsingEstimate,
+  // } = useTransactionFunctions({
+  //   defaultEstimateToUse,
+  //   editGasMode,
+  //   gasFeeEstimates,
+  //   gasLimit,
+  //   maxPriorityFeePerGas,
+  //   // minimumGasLimit,
+  //   estimatedBaseFee,
+  //   transaction,
+  // });
   // When a user selects an estimate level, it will wipe out what they have
   // previously put in the inputs. This returns the inputs to the estimated
   // values at the level specified.
@@ -333,7 +333,7 @@ export function useGasFeeInputs(
     estimateUsed,
     gasFeeEstimates,
     gasEstimateType,
-    estimatedGasFeeTimeBounds,
+    // estimatedGasFeeTimeBounds,
     isNetworkBusy,
     onManualChange,
     estimatedBaseFee,
@@ -347,11 +347,11 @@ export function useGasFeeInputs(
     minimumGasLimitDec: hexToDecimal(minimumGasLimit),
     supportsEIP1559,
     supportsEIP1559V2,
-    cancelTransaction,
-    speedUpTransaction,
-    updateTransaction,
-    updateTransactionToTenPercentIncreasedGasFee,
-    updateTransactionUsingDAPPSuggestedValues,
-    updateTransactionUsingEstimate,
+    // cancelTransaction,
+    // speedUpTransaction,
+    // updateTransaction,
+    // updateTransactionToTenPercentIncreasedGasFee,
+    // updateTransactionUsingDAPPSuggestedValues,
+    // updateTransactionUsingEstimate,
   };
 }

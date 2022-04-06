@@ -20,6 +20,7 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { NetworkSelectionItem } from 'ui/components/Network/NetworkSelection/NetworkSelectionItem.component';
 import { BetaIcon } from 'ui/components/Widgets';
 import { ReactComponent as TLPText } from 'assets/teleportText.svg';
+// import { openInBrowserNewTab } from 'ui/utils';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
@@ -156,6 +157,8 @@ const NetworksSelectionContainer = () => {
           sensors.track('teleport_network_customize', {
             page: location.pathname,
           });
+          // @todo: enable this line below if add/edit page was redesigned
+          // openInBrowserNewTab('/network/add');
           history.push('/network/add');
         }}
       >

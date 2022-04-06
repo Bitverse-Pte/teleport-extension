@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { addHexPrefix } from 'ethereumjs-util';
@@ -52,6 +52,9 @@ const Send = () => {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
+  const { tokenId } = useParams<{
+    tokenId: string | undefined;
+  }>();
   const wallet = useWallet();
   const [selected, setSelected] = useState<BaseAccount | undefined>();
   const { t } = useTranslation();
@@ -104,8 +107,10 @@ const Send = () => {
     });
     if (balances && balances.length) {
       setTokens(balances);
-      const native = balances.find((t: Token) => t.isNative);
-      native ? setSelectedToken(native) : setSelectedToken(balances[0]);
+      const selected = tokenId
+        ? balances.find((t: Token) => tokenId === t.tokenId)
+        : balances.find((t: Token) => t.isNative);
+      selected ? setSelectedToken(selected) : setSelectedToken(balances[0]);
     }
   }, []);
 
@@ -115,8 +120,10 @@ const Send = () => {
     });
     if (balances && balances.length) {
       setTokens(balances);
-      const native = balances.find((t: Token) => t.isNative);
-      native ? setSelectedToken(native) : setSelectedToken(balances[0]);
+      const selected = tokenId
+        ? balances.find((t: Token) => tokenId === t.tokenId)
+        : balances.find((t: Token) => t.isNative);
+      selected ? setSelectedToken(selected) : setSelectedToken(balances[0]);
     }
   }, []);
 
@@ -127,10 +134,6 @@ const Send = () => {
     });
     setRecentAddressList(recentAddress);
   }, []);
-
-  const nativeToken = useMemo(() => {
-    return balance.find((t: Token) => t.isNative);
-  }, [balance]);
 
   const next = async () => {
     if (!(await wallet.isUnlocked())) {
@@ -164,16 +167,6 @@ const Send = () => {
         amount: userInputAmount,
       });
     }
-    if (isSupport1559) {
-      delete params.gasPrice;
-      params.maxFeePerGas = draftTransaction.maxFeePerGas;
-      params.maxPriorityFeePerGas = draftTransaction.maxPriorityFeePerGas;
-    } else {
-      delete params.maxFeePerGas;
-      delete params.maxPriorityFeePerGas;
-      params.gasPrice = draftTransaction.gasPrice;
-      params.gas = draftTransaction.gas;
-    }
     params.txParam = {
       from: fromAccount?.address,
       to: toAddress,
@@ -181,6 +174,22 @@ const Send = () => {
       type: type,
       symbol: selectedToken?.symbol,
     };
+
+    if (isSupport1559) {
+      delete params.gasPrice;
+      params.maxFeePerGas = draftTransaction.maxFeePerGas;
+      params.maxPriorityFeePerGas = draftTransaction.maxPriorityFeePerGas;
+      params.txParam.maxFeePerGas = draftTransaction.maxFeePerGas;
+      params.txParam.maxPriorityFeePerGas =
+        draftTransaction.maxPriorityFeePerGas;
+    } else {
+      delete params.maxFeePerGas;
+      delete params.maxPriorityFeePerGas;
+      params.gasPrice = draftTransaction.gasPrice;
+      params.gas = draftTransaction.gas;
+      params.txParam.gasPrice = draftTransaction.gasPrice;
+      params.txParam.gas = draftTransaction.gas;
+    }
     await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({
       method: 'eth_sendTransaction',

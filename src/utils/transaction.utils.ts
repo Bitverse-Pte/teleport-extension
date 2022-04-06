@@ -47,6 +47,13 @@ export function isLegacyTransaction(transaction: Transaction) {
       isHexString(transaction.txParams.gasPrice))
   );
 }
+export function isLegacyTransactionParams(txParams: Transaction['txParams']) {
+  return (
+    typeof txParams.maxFeePerGas === 'undefined' &&
+    typeof txParams.maxPriorityFeePerGas === 'undefined' &&
+    (typeof txParams.gasPrice === 'undefined' || isHexString(txParams.gasPrice))
+  );
+}
 
 /**
  * Determine if a transactions gas fees in txParams match those in its dappSuggestedGasFees property

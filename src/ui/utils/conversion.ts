@@ -423,5 +423,6 @@ export {
   decGWEIToHexWEI,
   toBigNumber,
   hexToDecimal,
+  decimalToHex,
   toNormalizedDenomination,
 };

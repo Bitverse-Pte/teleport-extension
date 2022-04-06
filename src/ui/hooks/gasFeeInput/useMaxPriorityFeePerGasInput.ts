@@ -7,7 +7,7 @@ import {
   checkNetworkAndAccountSupports1559,
   getShouldShowFiat,
 } from 'ui/selectors/selectors';
-import { isLegacyTransaction } from 'utils/transaction.utils';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import { hexWEIToDecGWEI, multiplyCurrencies } from 'utils/conversion';
 
 import { useCurrencyDisplay } from '../wallet/useCurrencyDisplay';
@@ -19,12 +19,12 @@ const getMaxPriorityFeePerGasFromTransaction = (
   transaction: Transaction,
   gasFeeEstimates
 ): number => {
-  if (gasFeeEstimates?.[transaction?.userFeeLevel!]) {
+  if (gasFeeEstimates?.[transaction?.userFeeLevel as any]) {
     return gasFeeEstimates[transaction.userFeeLevel!]
       .suggestedMaxPriorityFeePerGas;
   }
   const { maxPriorityFeePerGas, maxFeePerGas, gasPrice } =
-    transaction?.txParams || {};
+    transaction?.txParam || {};
   return Number(
     hexWEIToDecGWEI(maxPriorityFeePerGas || maxFeePerGas || gasPrice)
   );
@@ -65,7 +65,7 @@ export function useMaxPriorityFeePerGasInput({
 }): MaxPriorityFeePerGasInputReturnType {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransaction(transaction?.txParams);
+    !isLegacyTransactionParams(transaction.txParam || transaction);
 
   const { currency: fiatCurrency, numberOfDecimals: fiatNumberOfDecimals } =
     useUserPreferencedCurrency('SECONDARY');
@@ -76,7 +76,9 @@ export function useMaxPriorityFeePerGasInput({
     ? getMaxPriorityFeePerGasFromTransaction(transaction, gasFeeEstimates)
     : 0;
 
-  const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState<null | number>(() => {
+  const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState<
+    null | number
+  >(() => {
     if (initialMaxPriorityFeePerGas && feeParamsAreCustom(transaction)) {
       return initialMaxPriorityFeePerGas;
     }

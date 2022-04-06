@@ -10,7 +10,7 @@ import {
   getShouldShowFiat,
 } from 'ui/selectors/selectors';
 import { decimalToHex, decGWEIToHexWEI } from 'ui/utils/conversion';
-import { isLegacyTransaction } from 'utils/transaction.utils';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import { useCurrencyDisplay } from '../wallet/useCurrencyDisplay';
 import { useUserPreferencedCurrency } from '../wallet/useUserPreferencedCurrency';
 
@@ -37,7 +37,7 @@ export function useGasEstimates({
 }): GasEstimatesReturnType {
   const supportsEIP1559 =
     useSelector(checkNetworkAndAccountSupports1559) &&
-    !isLegacyTransaction(transaction?.txParams);
+    !isLegacyTransactionParams(transaction.txParam || transaction);
 
   const { currency: fiatCurrency, numberOfDecimals: fiatNumberOfDecimals } =
     useUserPreferencedCurrency('SECONDARY');

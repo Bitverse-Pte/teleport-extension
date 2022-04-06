@@ -1,11 +1,15 @@
 import React, { useMemo } from 'react';
 import { BigNumber, utils } from 'ethers';
 import './feeItem.less';
+import GasTiming from '../GasTiming/gas-timing.component';
 
 interface FeeItemPropsType {
   params: any;
   selected: boolean;
   onSelect: (type: string) => void;
+
+  maxPriorityFeePerGas: string;
+  maxFeePerGas: string;
 }
 
 const type2title = {
@@ -16,7 +20,8 @@ const type2title = {
   custom: 'CUSTOM',
 };
 function FeeItem(props: FeeItemPropsType) {
-  const { params, selected, onSelect } = props;
+  const { params, selected, onSelect, maxPriorityFeePerGas, maxFeePerGas } =
+    props;
   const { type, time, gasPrice, symbol, gasLimit, price } = params;
   const gas = useMemo(() => {
     const gas: number = Math.floor(Number(gasPrice) * Number(gasLimit));
@@ -39,7 +44,12 @@ function FeeItem(props: FeeItemPropsType) {
           <div className="fee-selector-item-content-left-title">
             {type2title[type]}
           </div>
-          <div className="fee-selector-item-content-left-subtitle">{time}s</div>
+          {/* <div className="fee-selector-item-content-left-subtitle">{time}s</div> */}
+          <GasTiming
+            maxPriorityFeePerGas={maxPriorityFeePerGas}
+            maxFeePerGas={maxFeePerGas}
+            estimateUsed={type}
+          />
         </div>
         <div className="fee-selector-item-content-right">
           <div className="fee-selector-item-content-right-title">

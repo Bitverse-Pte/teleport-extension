@@ -70,33 +70,35 @@ const WalletManage: React.FC = () => {
     if (accounts && accounts.simpleAccount) {
       setSimpleWalletAccount(accounts.simpleAccount);
     }
-  };
-
-  const queryCurrentAccount = async () => {
-    const account: BaseAccount = await wallet.getCurrentAccount();
-    if (account) {
-      setCurrentAccount(account);
+    const current: BaseAccount = await wallet.getCurrentAccount();
+    if (current) {
+      setCurrentAccount(current);
     }
+    return {
+      current,
+      hdWalletAccounts: accounts?.hdAccount,
+    };
   };
 
-  useAsyncEffect(queryWallets, []);
-  useAsyncEffect(queryCurrentAccount, []);
-
-  useMemo(() => {
-    if (currentAccount && hdWalletAccounts && simpleWalletAccounts) {
-      if (
-        hdWalletAccounts.some((account) =>
-          account.accounts.some(
-            (subAccount) => subAccount.address === currentAccount.address
-          )
+  const setDefaultTab = (current, hdWalletAccounts) => {
+    console.log(hdWalletAccounts);
+    if (
+      hdWalletAccounts?.some((account) =>
+        account.accounts.some(
+          (subAccount) => subAccount.address === current.address
         )
-      ) {
-        setAccountType(Tabs.FIRST);
-      } else {
-        setAccountType(Tabs.SECOND);
-      }
+      )
+    ) {
+      setAccountType(Tabs.FIRST);
+    } else {
+      setAccountType(Tabs.SECOND);
     }
-  }, [hdWalletAccounts, simpleWalletAccounts, currentAccount]);
+  };
+
+  useAsyncEffect(async () => {
+    const { current, hdWalletAccounts } = await queryWallets();
+    setDefaultTab(current, hdWalletAccounts);
+  }, []);
 
   const handleCreateBtnClick = async () => {
     sensors.track('teleport_wallet_manage_create', { page: location.pathname });
@@ -126,7 +128,7 @@ const WalletManage: React.FC = () => {
     });
     setDeletePopupVisible(false);
     queryWallets();
-    queryCurrentAccount();
+    //queryCurrentAccount();
   };
 
   const handleWalletClick = async (w: any) => {
@@ -167,7 +169,7 @@ const WalletManage: React.FC = () => {
     if (renamed) {
       setRenamePopupVisible(false);
       queryWallets();
-      queryCurrentAccount();
+      //queryCurrentAccount();
     }
   };
 

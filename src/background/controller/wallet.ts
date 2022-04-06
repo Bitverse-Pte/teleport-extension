@@ -447,6 +447,10 @@ export class WalletController extends BaseController {
   getGasFeeEstimatesAndStartPolling(pollToken) {
     return gasFeeController.getGasFeeEstimatesAndStartPolling(pollToken);
   }
+  getGasFeeTimeEstimate = (
+    maxPriorityFeePerGas: string,
+    maxFeePerGas: string
+  ) => gasFeeController.getTimeEstimate(maxPriorityFeePerGas, maxFeePerGas);
   fetchGasFeeEstimates() {
     return gasFeeController.fetchGasFeeEstimates();
   }

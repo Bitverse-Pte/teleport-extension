@@ -39,6 +39,7 @@ export const UnlockModal: React.FC<PropsInterface> = (
 
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
+      setValue('');
       if (props.setVisible) {
         props.setVisible(false);
       }

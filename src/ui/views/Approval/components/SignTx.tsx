@@ -20,6 +20,7 @@ import {
   addHexes,
   multipyHexes,
   decGWEIToHexWEI,
+  addCurrencies,
 } from 'ui/utils/conversion';
 import { TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
@@ -32,6 +33,7 @@ import {
 import { BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
+
 import { useMethodData } from 'ui/hooks/wallet/useMethodData';
 import { HeaderWithFlex } from 'ui/components/Header';
 import { GAS_ESTIMATE_TYPES } from 'constants/gas';
@@ -110,12 +112,13 @@ const SignTx = ({ params, origin }) => {
 
   const initState = async () => {
     const gas = await wallet.fetchGasFeeEstimates();
-    console.debug('signTx fetchGasFeeEstimates: ', gas);
     const { gasFeeEstimates, gasEstimateType } = gas;
     //const MIN_GAS_LIMIT_HEX = '0x5208';
-    if (tx.type === '0x0') {
+    if (tx.type === TransactionEnvelopeTypes.LEGACY) {
       let gasPrice = '0x1';
-      if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
+      if (gasState.gasType == 'custom') {
+        gasPrice = getRoundedGasPrice(gasState.legacyGas.gasPrice);
+      } else if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
         gasPrice = getGasPriceInHexWei(gasFeeEstimates.medium);
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
         gasPrice = getRoundedGasPrice(gasFeeEstimates.gasPrice);
@@ -132,7 +135,9 @@ const SignTx = ({ params, origin }) => {
       setTotalGasFee(addHexPrefix(total));
     } else {
       const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
-        gasFeeEstimates[gasState.gasType];
+        gasState.gasType === 'custom'
+          ? gasState.customData
+          : gasFeeEstimates[gasState.gasType];
       setMaxFeePerGas(
         addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
       );
@@ -145,7 +150,7 @@ const SignTx = ({ params, origin }) => {
     }
   };
 
-  useAsyncEffect(initState, [gasState.gasType]);
+  useAsyncEffect(initState, [gasState.gasType, gasState.legacyGas]);
 
   const handleAllow = async () => {
     sensors.track('teleport_sign_tx_confirmed', {
@@ -220,6 +225,8 @@ const SignTx = ({ params, origin }) => {
     return txToken;
   }, [tokens, prices]);
 
+  const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
+
   const renderContent = () => {
     if (tx.data) {
       return (
@@ -228,6 +235,7 @@ const SignTx = ({ params, origin }) => {
             <TabPane tab={t('DETAILS')} key="1">
               <TxDetailComponent
                 tx={tx}
+                txToken={txToken}
                 nativeToken={nativeToken}
                 setVisible={setVisible}
                 totalGasfee={totalGasfee}
@@ -245,6 +253,7 @@ const SignTx = ({ params, origin }) => {
       <div className="tx-details-tab-container flex content-wrap-padding">
         <TxDetailComponent
           tx={tx}
+          txToken={txToken}
           nativeToken={nativeToken}
           setVisible={setVisible}
           totalGasfee={totalGasfee}
@@ -276,7 +285,11 @@ const SignTx = ({ params, origin }) => {
         <Divider style={{ marginTop: 16, marginBottom: 0 }} />
       </div>
       {renderContent()}
-      <FeeSelector visible={visible} onClose={() => setVisible(false)} />
+      <FeeSelector
+        supportsEIP1559={supportsEIP1559}
+        visible={visible}
+        onClose={() => setVisible(false)}
+      />
       <div className="tx-button-container flexCol content-wrap-padding">
         <CustomButton
           type="primary"
@@ -301,20 +314,42 @@ const SignTx = ({ params, origin }) => {
 
 const TxDetailComponent = ({
   tx,
+  txToken,
   nativeToken,
   setVisible,
   totalGasfee,
   currency,
+}: {
+  tx: any;
+  txToken: Token | undefined;
+  nativeToken: Token | undefined;
+  setVisible: any;
+  totalGasfee: any;
+  currency: any;
 }) => {
   const { t } = useTranslation();
+  const isNative = () => currency === txToken?.symbol;
 
   const renderTotalMaxAmount = () => {
-    // @todo: need to handle ERC20 Token + ETH fee
-    const totalHex = addHexPrefix(
-      addHexes(valueToDisplay(tx), totalGasfee).toString()
-    );
-    const total = getValueFromWeiHex({ value: totalHex, numberOfDecimals: 10 });
-    return `${total} ${currency || ''}`;
+    if (isNative()) {
+      const totalHex = addHexPrefix(
+        addHexes(valueToDisplay(tx), totalGasfee).toString()
+      );
+      const total = getValueFromWeiHex({
+        value: totalHex,
+        numberOfDecimals: 10,
+      });
+      return `${total} ${currency || ''}`;
+    }
+    const transferDec = getValueFromWeiHex({
+      value: valueToDisplay(tx),
+      numberOfDecimals: 10,
+    });
+    const gasDec = getValueFromWeiHex({
+      value: totalGasfee,
+      numberOfDecimals: 10,
+    });
+    return `${transferDec} ${tx.txParam.symbol} + ${gasDec} ${currency}`;
   };
 
   const renderTotalGasFeeAmount = () => {
@@ -326,48 +361,64 @@ const TxDetailComponent = ({
   };
 
   const renderTotalGasFeeFiat = () => {
-    const res = getTotalPricesByAmountAndPrice(
+    const totalDec = getTotalPricesByAmountAndPrice(
       totalGasfee,
       nativeToken?.decimal || 0,
       nativeToken?.price || 0
     );
-    return res;
+    return `$ ${totalDec}`;
   };
 
   const renderTotalMaxFiat = () => {
-    const totalHex = addHexPrefix(
-      addHexes(valueToDisplay(tx), totalGasfee).toString()
+    if (isNative()) {
+      const totalHex = addHexPrefix(
+        addHexes(valueToDisplay(tx), totalGasfee).toString()
+      );
+      const totalDec = getTotalPricesByAmountAndPrice(
+        totalHex,
+        nativeToken?.decimal || 0,
+        nativeToken?.price || 0
+      );
+      return `$ ${totalDec}`;
+    }
+    const totalTxDec = getTotalPricesByAmountAndPrice(
+      valueToDisplay(tx),
+      txToken?.decimal || 0,
+      txToken?.price || 0
     );
-    return getTotalPricesByAmountAndPrice(
-      totalHex,
+    const totalGasDec = getTotalPricesByAmountAndPrice(
+      totalGasfee,
       nativeToken?.decimal || 0,
       nativeToken?.price || 0
     );
+    const totalAmountDec = addCurrencies(totalTxDec, totalGasDec, {
+      aBase: 10,
+      bBase: 10,
+      toNumericBase: 'dec',
+    });
+    return `$ ${totalAmountDec}`;
   };
 
-  const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
   return (
     <div className="transaction-detail">
-      {supportsEIP1559 && (
-        <div
-          className="gas-edit-button flex ml-auto"
-          onClick={() => {
-            setVisible(true);
-            sensors.track('teleport_sign_tx_edit_gas', {
-              page: location.pathname,
-            });
-          }}
-        >
-          <IconComponent name="edit" cls="edit-icon" />
-          <div>{t('Edit')}</div>
-        </div>
-      )}
+      <div
+        className="gas-edit-button flex ml-auto"
+        onClick={() => {
+          setVisible(true);
+          sensors.track('teleport_sign_tx_edit_gas', {
+            page: location.pathname,
+          });
+        }}
+      >
+        <IconComponent name="edit" cls="edit-icon" />
+        <div>{t('Edit')}</div>
+      </div>
       <TransactionDetailItem
         key="gas-item"
         detailTitle={t('Referral gas fee')}
         subTitle={undefined}
         detailText={`${renderTotalGasFeeAmount()}`}
-        detailSubText={`$ ${renderTotalGasFeeFiat()}`}
+        detailSubText={renderTotalGasFeeFiat()}
         detailMax={`Max fee: ${renderTotalGasFeeAmount()}`}
       />
       <Divider style={{ margin: '16px 0' }} />
@@ -376,7 +427,7 @@ const TxDetailComponent = ({
         detailTitle={t('Sum')}
         subTitle={t('Amount + gas fee')}
         detailText={renderTotalMaxAmount()}
-        detailSubText={`$ ${renderTotalMaxFiat()}`}
+        detailSubText={renderTotalMaxFiat()}
         detailMax={`Max amount: ${renderTotalMaxAmount()}`}
       />
     </div>

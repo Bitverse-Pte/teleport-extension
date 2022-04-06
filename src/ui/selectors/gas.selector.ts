@@ -1,17 +1,16 @@
-import { GAS_ESTIMATE_TYPES } from '@metamask/controllers';
+import {
+  GAS_ESTIMATE_TYPES,
+  NETWORK_CONGESTION_THRESHOLDS,
+} from 'constants/gas';
 import { RootState } from 'ui/reducer';
 import { checkNetworkAndAccountSupports1559 } from './selectors';
 
 export function getGasEstimateType(state: RootState) {
-  // return state.metamask.gasEstimateType;
-  // @todo: implement this
-  return {};
+  return state.currentBlock.gasEstimateType;
 }
 
 export function getGasFeeEstimates(state: RootState) {
-  // return state.metamask.gasFeeEstimates;
-  // @todo: implement this
-  return {};
+  return state.currentBlock.gasFeeEstimates;
 }
 
 export function getEstimatedGasFeeTimeBounds(state: RootState) {

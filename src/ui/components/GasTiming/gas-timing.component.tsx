@@ -4,27 +4,16 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import BigNumber from 'bignumber.js';
 
-import { GAS_ESTIMATE_TYPES } from '../../../../shared/constants/gas';
-
-import { usePrevious } from '../../../hooks/usePrevious';
-import { I18nContext } from '../../../contexts/i18n';
-
+import { usePrevious } from 'react-use';
+import { GAS_ESTIMATE_TYPES, GAS_FORM_ERRORS } from 'constants/gas';
+import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'antd';
 import {
   getGasEstimateType,
   getGasFeeEstimates,
   getIsGasEstimatesLoading,
-} from '../../../ducks/metamask/metamask';
-
-import Typography from '../../ui/typography/typography';
-import {
-  TYPOGRAPHY,
-  FONT_WEIGHT,
-} from '../../../helpers/constants/design-system';
-import InfoTooltip from '../../ui/info-tooltip/info-tooltip';
-
-import { getGasFeeTimeEstimate } from '../../../store/actions';
-import { GAS_FORM_ERRORS } from '../../../helpers/constants/gas';
-import { useGasFeeContext } from '../../../contexts/gasFee';
+} from 'ui/selectors/selectors';
+import { useWallet } from 'ui/utils';
 
 // Once we reach this second threshold, we switch to minutes as a unit
 const SECOND_CUTOFF = 90;
@@ -32,25 +21,38 @@ const SECOND_CUTOFF = 90;
 const EIP_1559_V2 = process.env.EIP_1559_V2;
 
 // Shows "seconds" as unit of time if under SECOND_CUTOFF, otherwise "minutes"
-const toHumanReadableTime = (milliseconds = 1, t) => {
+const toHumanReadableTime = (milliseconds = 1, t: any) => {
   const seconds = Math.ceil(milliseconds / 1000);
   if (seconds <= SECOND_CUTOFF) {
-    return t('gasTimingSeconds', [seconds]);
+    return t('gasTimingSeconds', { replace: { $1: seconds } });
   }
-  return t('gasTimingMinutes', [Math.ceil(seconds / 60)]);
+  return t('gasTimingMinutes', { replace: { $1: Math.ceil(seconds / 60) } });
 };
+
+interface GasTimingPropTypes {
+  maxPriorityFeePerGas: string | number;
+  maxFeePerGas: string | number;
+  gasWarnings?: any;
+
+  estimateUsed: string;
+}
+
 export default function GasTiming({
   maxFeePerGas = 0,
   maxPriorityFeePerGas = 0,
   gasWarnings,
-}) {
+  estimateUsed,
+}: GasTimingPropTypes) {
+  const wallet = useWallet();
   const gasEstimateType = useSelector(getGasEstimateType);
   const gasFeeEstimates = useSelector(getGasFeeEstimates);
   const isGasEstimatesLoading = useSelector(getIsGasEstimatesLoading);
 
-  const [customEstimatedTime, setCustomEstimatedTime] = useState(null);
-  const t = useContext(I18nContext);
-  const { estimateUsed } = useGasFeeContext();
+  const [customEstimatedTime, setCustomEstimatedTime] = useState<any>(null);
+  const { t } = useTranslation();
+  // @todo: useGasFeeContext()
+  // const { estimateUsed } = useGasFeeContext();
+  // const estimateUsed = 'low';
 
   // If the user has chosen a value lower than the low gas fee estimate,
   // We'll need to use the useEffect hook below to make a call to calculate
@@ -74,14 +76,16 @@ export default function GasTiming({
       (fee && fee !== previousMaxFeePerGas)
     ) {
       // getGasFeeTimeEstimate requires parameters in string format
-      getGasFeeTimeEstimate(
-        new BigNumber(priority, 10).toString(10),
-        new BigNumber(fee, 10).toString(10)
-      ).then((result) => {
-        if (maxFeePerGas === fee && maxPriorityFeePerGas === priority) {
-          setCustomEstimatedTime(result);
-        }
-      });
+      wallet
+        .getGasFeeTimeEstimate(
+          new BigNumber(priority, 10).toString(10),
+          new BigNumber(fee, 10).toString(10)
+        )
+        .then((result) => {
+          if (maxFeePerGas === fee && maxPriorityFeePerGas === priority) {
+            setCustomEstimatedTime(result);
+          }
+        });
     }
 
     if (isUnknownLow !== false && previousIsUnknownLow === true) {
@@ -96,15 +100,16 @@ export default function GasTiming({
     previousIsUnknownLow,
   ]);
 
-  let unknownProcessingTimeText;
+  let unknownProcessingTimeText: React.ReactNode | undefined;
   if (EIP_1559_V2) {
     unknownProcessingTimeText = t('editGasTooLow');
   } else {
     unknownProcessingTimeText = (
-      <>
-        {t('editGasTooLow')}{' '}
-        <InfoTooltip position="top" contentText={t('editGasTooLowTooltip')} />
-      </>
+      // <>
+      <Tooltip placement="top" title={t('editGasTooLowTooltip')}>
+        {t('editGasTooLow')}
+      </Tooltip>
+      // </>
     );
   }
 
@@ -113,13 +118,12 @@ export default function GasTiming({
     gasWarnings?.maxFee === GAS_FORM_ERRORS.MAX_FEE_TOO_LOW
   ) {
     return (
-      <Typography
-        variant={TYPOGRAPHY.H7}
-        fontWeight={FONT_WEIGHT.BOLD}
+      <h6
+        style={{ fontWeight: 'bold' }}
         className={classNames('gas-timing', 'gas-timing--negative')}
       >
         {unknownProcessingTimeText}
-      </Typography>
+      </h6>
     );
   }
 
@@ -133,7 +137,7 @@ export default function GasTiming({
 
   const { low = {}, medium = {}, high = {} } = gasFeeEstimates;
 
-  let text = '';
+  let text: React.ReactNode = '';
   let attitude = 'positive';
 
   // Anything medium or faster is positive
@@ -145,14 +149,16 @@ export default function GasTiming({
       Number(maxPriorityFeePerGas) < Number(high.suggestedMaxPriorityFeePerGas)
     ) {
       // Medium
-      text = t('gasTimingPositive', [
-        toHumanReadableTime(low.maxWaitTimeEstimate, t),
-      ]);
+      text = t('gasTimingPositive', {
+        replace: { $1: toHumanReadableTime(low.maxWaitTimeEstimate, t) },
+      });
     } else {
       // High
-      text = t('gasTimingVeryPositive', [
-        toHumanReadableTime(high.minWaitTimeEstimate, t),
-      ]);
+      text = t('gasTimingVeryPositive', {
+        replace: {
+          $1: toHumanReadableTime(high.minWaitTimeEstimate, t),
+        },
+      });
     }
   } else {
     if (!EIP_1559_V2 || estimateUsed === 'low') {
@@ -170,46 +176,40 @@ export default function GasTiming({
       ) {
         text = unknownProcessingTimeText;
       } else {
-        text = t('gasTimingNegative', [
-          toHumanReadableTime(Number(customEstimatedTime?.upperTimeBound), t),
-        ]);
+        text = t('gasTimingNegative', {
+          $1: toHumanReadableTime(
+            Number(customEstimatedTime?.upperTimeBound),
+            t
+          ),
+        });
       }
     }
     // code below needs to cleaned-up once EIP_1559_V2 flag is removed
     else if (EIP_1559_V2) {
-      text = t('gasTimingNegative', [
-        toHumanReadableTime(low.maxWaitTimeEstimate, t),
-      ]);
+      text = t('gasTimingNegative', {
+        replace: { $1: toHumanReadableTime(low.maxWaitTimeEstimate, t) },
+      });
     } else {
       text = (
-        <>
-          {t('gasTimingNegative', [
-            toHumanReadableTime(low.maxWaitTimeEstimate, t),
-          ])}
-          <InfoTooltip
-            position="top"
-            contentText={t('editGasTooLowWarningTooltip')}
-          />
-        </>
+        <Tooltip placement="top" title={t('editGasTooLowWarningTooltip')}>
+          {t('gasTimingNegative', {
+            replace: {
+              $1: toHumanReadableTime(low.maxWaitTimeEstimate, t),
+            },
+          })}
+        </Tooltip>
       );
     }
   }
 
   return (
-    <Typography
-      variant={TYPOGRAPHY.H7}
+    <h6
       className={classNames('gas-timing', {
         [`gas-timing--${attitude}`]: attitude && !EIP_1559_V2,
         [`gas-timing--${attitude}-V2`]: attitude && EIP_1559_V2,
       })}
     >
       {text}
-    </Typography>
+    </h6>
   );
 }
-
-GasTiming.propTypes = {
-  maxPriorityFeePerGas: PropTypes.string,
-  maxFeePerGas: PropTypes.string,
-  gasWarnings: PropTypes.object,
-};

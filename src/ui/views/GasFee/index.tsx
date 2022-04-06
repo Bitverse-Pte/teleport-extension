@@ -12,7 +12,7 @@ function Fee() {
       <Button type="primary" block onClick={() => setVisible(true)}>
         show
       </Button>
-      <FeeSelector visible={visible} onClose={() => setVisible(false)} />
+      {/* <FeeSelector visible={visible} onClose={() => setVisible(false)} /> */}
       <div>{gasState.gasType}</div>
     </div>
   );

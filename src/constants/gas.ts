@@ -60,12 +60,12 @@ export const CUSTOM_GAS_ESTIMATE = 'custom';
 /**
  * These represent the different edit modes presented in the UI
  */
-export enum EDIT_GAS_MODES {
-  SPEED_UP = 'speed-up',
-  CANCEL = 'cancel',
-  MODIFY_IN_PLACE = 'modify-in-place',
-  SWAPS = 'swaps',
-}
+export const EDIT_GAS_MODES = {
+  SPEED_UP: 'speed-up',
+  CANCEL: 'cancel',
+  MODIFY_IN_PLACE: 'modify-in-place',
+  SWAPS: 'swaps',
+};
 
 export enum GAS_FORM_ERRORS {
   GAS_LIMIT_OUT_OF_BOUNDS = 'editGasLimitOutOfBounds',
@@ -76,4 +76,41 @@ export enum GAS_FORM_ERRORS {
   MAX_FEE_HIGH_WARNING = 'editGasMaxFeeHigh',
   MAX_FEE_IMBALANCE = 'editGasMaxFeeImbalance',
   GAS_PRICE_TOO_LOW = 'editGasPriceTooLow',
+}
+
+export const NETWORK_CONGESTION_THRESHOLDS = {
+  NOT_BUSY: 0,
+  STABLE: 0.33,
+  BUSY: 0.66,
+};
+
+export function getGasFormErrorText(
+  type: GAS_FORM_ERRORS,
+  t: any,
+  {
+    minimumGasLimit = '',
+  }: {
+    minimumGasLimit?: string;
+  }
+) {
+  switch (type) {
+    case GAS_FORM_ERRORS.GAS_LIMIT_OUT_OF_BOUNDS:
+      return t('editGasLimitOutOfBounds', [minimumGasLimit]);
+    case GAS_FORM_ERRORS.MAX_PRIORITY_FEE_TOO_LOW:
+      return t('editGasMaxPriorityFeeLow');
+    case GAS_FORM_ERRORS.MAX_FEE_TOO_LOW:
+      return t('editGasMaxFeeLow');
+    case GAS_FORM_ERRORS.MAX_PRIORITY_FEE_BELOW_MINIMUM:
+      return t('editGasMaxPriorityFeeBelowMinimum');
+    case GAS_FORM_ERRORS.MAX_PRIORITY_FEE_HIGH_WARNING:
+      return t('editGasMaxPriorityFeeHigh');
+    case GAS_FORM_ERRORS.MAX_FEE_HIGH_WARNING:
+      return t('editGasMaxFeeHigh');
+    case GAS_FORM_ERRORS.MAX_FEE_IMBALANCE:
+      return t('editGasMaxFeePriorityImbalance');
+    case GAS_FORM_ERRORS.GAS_PRICE_TOO_LOW:
+      return t('editGasPriceTooLow');
+    default:
+      return '';
+  }
 }

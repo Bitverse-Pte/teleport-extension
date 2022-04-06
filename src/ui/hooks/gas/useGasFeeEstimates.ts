@@ -1,13 +1,17 @@
-import { GasFeeEstimates, GasFeeState } from '@metamask/controllers';
+import type {
+  GasFeeEstimates,
+  // GasFeeState
+} from '@metamask/controllers';
 import isEqual from 'lodash/isEqual';
 import { shallowEqual, useSelector } from 'react-redux';
 import { GAS_ESTIMATE_TYPES } from 'constants/gas';
 import {
   getGasEstimateType,
-  getEstimatedGasFeeTimeBounds,
+  // getEstimatedGasFeeTimeBounds,
   getIsGasEstimatesLoading,
   getIsNetworkBusy,
 } from 'ui/selectors/gas.selector';
+import { getGasFeeEstimates } from 'ui/selectors/selectors';
 
 /**
  * @property gasEstimateType - The type of estimate provided
@@ -20,7 +24,7 @@ import {
 interface GasEstimatesReturn {
   gasEstimateType: GAS_ESTIMATE_TYPES;
   gasFeeEstimates: GasFeeEstimates;
-  estimatedGasFeeTimeBounds: GasFeeState['estimatedGasFeeTimeBounds'];
+  // estimatedGasFeeTimeBounds: GasFeeState['estimatedGasFeeTimeBounds'];
   isGasEstimatesLoading: boolean;
   isNetworkBusy?: boolean;
 }
@@ -35,21 +39,18 @@ interface GasEstimatesReturn {
  */
 export function useGasFeeEstimates(): GasEstimatesReturn {
   const gasEstimateType = useSelector(getGasEstimateType);
-  const gasFeeEstimates = useSelector(
-    (s) => s.currentBlock.gasFeeEstimates,
-    isEqual
-  );
-  const estimatedGasFeeTimeBounds = useSelector(
-    getEstimatedGasFeeTimeBounds,
-    shallowEqual
-  );
+  const gasFeeEstimates = useSelector(getGasFeeEstimates, isEqual);
+  // const estimatedGasFeeTimeBounds = useSelector(
+  //   getEstimatedGasFeeTimeBounds,
+  //   shallowEqual
+  // );
   const isGasEstimatesLoading = useSelector(getIsGasEstimatesLoading);
   const isNetworkBusy = useSelector(getIsNetworkBusy);
 
   return {
     gasFeeEstimates,
-    gasEstimateType,
-    estimatedGasFeeTimeBounds,
+    gasEstimateType: gasEstimateType as GAS_ESTIMATE_TYPES,
+    // estimatedGasFeeTimeBounds,
     isGasEstimatesLoading,
     isNetworkBusy,
   };
