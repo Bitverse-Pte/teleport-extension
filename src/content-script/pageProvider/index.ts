@@ -119,7 +119,6 @@ export class EthereumProvider extends EventEmitter {
         chain: chainId,
         networkVersion,
       });
-
       this._pushEventHandlers.accountsChanged(accounts);
     } catch {
       //
@@ -265,7 +264,9 @@ window.addEventListener('message', function (event) {
         method: 'isDefaultWallet',
         params: [],
       })
-      .then((isDefaultWallet) => {
+      .then((isDefaultWallet: any) => {
+        // set provider isMetamask attribute as isDefaultWallet to fit different dapp scenario
+        provider.isMetaMask = isDefaultWallet;
         if (isDefaultWallet) {
           Object.defineProperty(window, 'ethereum', {
             value: new Proxy(provider, {

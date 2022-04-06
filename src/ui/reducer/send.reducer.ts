@@ -20,6 +20,7 @@ import {
 } from 'ui/utils/transactions';
 import { multiplyCurrencies } from 'utils/conversion';
 import { RootState } from '.';
+import { hideLoadingIndicator, showLoadingIndicator } from './appState.reducer';
 import { getCurrentBlockGasLimit } from './block.reducer';
 import { getGasPriceInHexWei, getRoundedGasPrice } from './gas.reducer';
 
@@ -363,6 +364,11 @@ export const initializeSendState = createAsyncThunk(
     } = state;
 
     let gasPrice = '0x1';
+    /**
+     * Show loading indicator to block the page
+     * avoid user to click next without gas estimation
+     */
+    thunkApi.dispatch(showLoadingIndicator());
     const { gasEstimateType, gasFeeEstimates } = await fetchGasFeeEstimates();
     console.log('===========[gasEstimateType]=============', gasEstimateType);
     console.log('===========[gasFeeEstimates]=============', gasFeeEstimates);
@@ -399,6 +405,9 @@ export const initializeSendState = createAsyncThunk(
       console.error(
         'estimateGasLimitForSend failed, this tx will probably not success'
       );
+    } finally {
+      // loaded, unblock user from interacting
+      thunkApi.dispatch(hideLoadingIndicator());
     }
     return {
       address: null,
