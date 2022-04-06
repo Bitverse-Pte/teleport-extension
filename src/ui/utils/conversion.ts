@@ -418,7 +418,6 @@ export {
   conversionLTE,
   conversionMax,
   toNegative,
-  decimalToHex,
   subtractCurrencies,
   decGWEIToHexWEI,
   toBigNumber,

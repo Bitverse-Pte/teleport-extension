@@ -60,11 +60,11 @@ export const CUSTOM_GAS_ESTIMATE = 'custom';
 /**
  * These represent the different edit modes presented in the UI
  */
-export const EDIT_GAS_MODES = {
-  SPEED_UP: 'speed-up',
-  CANCEL: 'cancel',
-  MODIFY_IN_PLACE: 'modify-in-place',
-  SWAPS: 'swaps',
+export enum EDIT_GAS_MODES {
+  SPEED_UP = 'speed-up',
+  CANCEL = 'cancel',
+  MODIFY_IN_PLACE = 'modify-in-place',
+  SWAPS = 'swaps',
 };
 
 export enum GAS_FORM_ERRORS {

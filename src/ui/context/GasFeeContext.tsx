@@ -12,7 +12,7 @@ interface GasFeeContextProviderpropTypes {
 }
 
 export const GasFeeContext = createContext<ReturnType<typeof useGasFeeInputs>>(
-  {}
+  {} as any
 );
 
 export const GasFeeContextProvider = ({

@@ -30,7 +30,7 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { Button, Tooltip } from 'antd';
 import { gasEstimateGreaterThanGasUsedPlusTenPercent } from 'ui/helpers/utils/gas';
 import { SimpleModal } from 'ui/components/universal/SimpleModal';
-import { useTransactionFunctions } from 'ui/hooks/gasFeeInput/useTransactionFunctions';
+// import { useTransactionFunctions } from 'ui/hooks/gasFeeInput/useTransactionFunctions';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;

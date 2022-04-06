@@ -10,36 +10,36 @@ import { useSelector } from 'react-redux';
 // import { selectMatchingFragment } from '../selectors';
 // import { TRANSACTION_EVENTS } from '../../shared/constants/transaction';
 
-export const useTransactionEventFragment = ({
-  transaction,
-}: {
-  transaction: Transaction;
-}) => {
-  //   const { transaction } = useGasFeeContext();
-  const fragment = useSelector((state) =>
-    selectMatchingFragment(state, {
-      fragmentOptions: {},
-      existingId: `transaction-added-${transaction?.id}`,
-    })
-  );
+// export const useTransactionEventFragment = ({
+//   transaction,
+// }: {
+//   transaction: Transaction;
+// }) => {
+//   //   const { transaction } = useGasFeeContext();
+//   const fragment = useSelector((state) =>
+//     selectMatchingFragment(state, {
+//       fragmentOptions: {},
+//       existingId: `transaction-added-${transaction?.id}`,
+//     })
+//   );
 
-  const updateTransactionEventFragment = useCallback(
-    async (params) => {
-      if (!transaction || !transaction.id) {
-        return;
-      }
-      if (!fragment) {
-        await createTransactionEventFragment(
-          transaction.id,
-          TRANSACTION_EVENTS.APPROVED
-        );
-      }
-      updateEventFragment(`transaction-added-${transaction.id}`, params);
-    },
-    [fragment, transaction]
-  );
+//   const updateTransactionEventFragment = useCallback(
+//     async (params) => {
+//       if (!transaction || !transaction.id) {
+//         return;
+//       }
+//       if (!fragment) {
+//         await createTransactionEventFragment(
+//           transaction.id,
+//           TRANSACTION_EVENTS.APPROVED
+//         );
+//       }
+//       updateEventFragment(`transaction-added-${transaction.id}`, params);
+//     },
+//     [fragment, transaction]
+//   );
 
-  return {
-    updateTransactionEventFragment,
-  };
-};
+//   return {
+//     updateTransactionEventFragment,
+//   };
+// };
