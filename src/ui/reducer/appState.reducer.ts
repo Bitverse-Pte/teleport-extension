@@ -1,12 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+interface AppState {
+  isLoading: boolean;
+}
+
 export const appStateSlice = createSlice<
+  AppState,
   {
-    isLoading: boolean;
-  },
-  {
-    showLoadingIndicator: (state: any) => any;
-    hideLoadingIndicator: (state: any) => any;
+    showLoadingIndicator: (state: AppState) => any;
+    hideLoadingIndicator: (state: AppState) => any;
   }
 >({
   name: 'appState',
