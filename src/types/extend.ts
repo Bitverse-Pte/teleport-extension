@@ -26,6 +26,7 @@ export interface BaseAccount {
   countOfPhrase: number;
   signatureAlgorithm: SignatureAlgorithm;
   accountCreateType: AccountCreateType;
+  deletedHdPathIndex?: number[];
 }
 
 export interface Secret {

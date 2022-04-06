@@ -285,10 +285,18 @@ class KeyringService extends EventEmitter {
       (a: BaseAccount, b: BaseAccount) => b.hdPathIndex - a.hdPathIndex
     );
     const maxIndex = currentHdWalletAccount[0].hdPathIndex;
+    let hdPathIndex = maxIndex;
+    if (currentHdWalletAccount[0].deletedHdPathIndex) {
+      while (
+        currentHdWalletAccount[0].deletedHdPathIndex.includes(hdPathIndex + 1)
+      ) {
+        hdPathIndex++;
+      }
+    }
     const createOpts: ICreateAccountOpts = {
       name: opts.hdWalletName,
       mnemonic: mnemonic,
-      addressIndex: maxIndex + 1,
+      addressIndex: hdPathIndex + 1,
       accountName: opts.accountName,
     };
 
@@ -921,6 +929,15 @@ class KeyringService extends EventEmitter {
         a.hdPathIndex === addressIndex
       ) {
         shouldDeleteAccountAddressSet.add(a.address);
+      }
+    });
+    this.accounts.forEach((a: BaseAccount) => {
+      if (a.hdWalletId === hdWalletId && a.hdPathIndex !== addressIndex) {
+        if (a.deletedHdPathIndex) {
+          a.deletedHdPathIndex.push(addressIndex);
+        } else {
+          a.deletedHdPathIndex = [addressIndex];
+        }
       }
     });
     this.secrets = this.secrets.filter(
