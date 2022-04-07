@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { isEIP1559Transaction } from 'utils/transaction.utils';
 import { decGWEIToHexWEI } from 'utils/conversion';
 import { addTenPercent } from 'ui/helpers/utils/gas';
-import { useGasFeeEstimates } from './useGasFeeEstimates'
+import { useGasFeeEstimates } from './useGasFeeEstimates';
 import { Transaction } from 'constants/transaction';
 import { CustomGasSettings } from 'types/tx';
 
@@ -16,12 +16,15 @@ import { CustomGasSettings } from 'types/tx';
  * @param {string} currentEstimate - decGwei value of the current medium gasFee estimate (maxFee or maxPriorityfee)
  * @returns {string} hexWei value of the higher of the two inputs.
  */
-function getHighestIncrementedFee(originalFee: string, currentEstimate: string): string {
+function getHighestIncrementedFee(
+  originalFee: string,
+  currentEstimate: string
+): string {
   const buffedOriginalHexWei = addTenPercent(originalFee);
   const currentEstimateHexWei = decGWEIToHexWEI(currentEstimate);
 
   return new BigNumber(buffedOriginalHexWei as string, 16).greaterThan(
-    new BigNumber(currentEstimateHexWei, 16),
+    new BigNumber(currentEstimateHexWei, 16)
   )
     ? buffedOriginalHexWei
     : currentEstimateHexWei;
@@ -40,7 +43,9 @@ function getHighestIncrementedFee(originalFee: string, currentEstimate: string):
  *   '../../app/scripts/controllers/transactions'
  * ).CustomGasSettings} Gas settings for cancellations/speed ups
  */
-export function useIncrementedGasFees(transaction: Transaction): CustomGasSettings {
+export function useIncrementedGasFees(
+  transaction: Transaction
+): CustomGasSettings {
   const { gasFeeEstimates } = useGasFeeEstimates();
 
   // We memoize this value so that it can be relied upon in other hooks.
@@ -71,7 +76,7 @@ export function useIncrementedGasFees(transaction: Transaction): CustomGasSettin
           ? '0x0'
           : getHighestIncrementedFee(
               transactionMaxFeePerGas,
-              suggestedMaxFeePerGas,
+              suggestedMaxFeePerGas
             );
       temporaryGasSettings.maxPriorityFeePerGas =
         transactionMaxPriorityFeePerGas === undefined ||
@@ -79,7 +84,7 @@ export function useIncrementedGasFees(transaction: Transaction): CustomGasSettin
           ? '0x0'
           : getHighestIncrementedFee(
               transactionMaxPriorityFeePerGas,
-              suggestedMaxPriorityFeePerGas,
+              suggestedMaxPriorityFeePerGas
             );
     } else {
       const transactionGasPrice = transaction.txParams?.gasPrice;
@@ -88,7 +93,7 @@ export function useIncrementedGasFees(transaction: Transaction): CustomGasSettin
           ? '0x0'
           : getHighestIncrementedFee(
               transactionGasPrice,
-              suggestedMaxFeePerGas,
+              suggestedMaxFeePerGas
             );
     }
     return temporaryGasSettings;
