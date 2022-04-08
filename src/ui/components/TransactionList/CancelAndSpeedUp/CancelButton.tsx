@@ -12,12 +12,14 @@ interface CancelButtonParams {
   transaction: any;
   cancelTransaction: (...args: any) => void;
   detailsModal?: boolean;
+  className?: string;
 }
 
 export default function CancelButton({
   cancelTransaction,
   transaction,
   detailsModal,
+  ...props
 }: CancelButtonParams) {
   const { t } = useTranslation();
 
@@ -42,11 +44,14 @@ export default function CancelButton({
       onClick={cancelTransaction}
       danger
       shape="round"
-      className={classnames({
-        'transaction-list-item__header-button': !detailsModal,
-        'transaction-list-item-details__header-button-rounded-button':
-          detailsModal,
-      })}
+      className={classnames(
+        {
+          'transaction-list-item__header-button': !detailsModal,
+          'transaction-list-item-details__header-button-rounded-button':
+            detailsModal,
+        },
+        props.className
+      )}
       disabled={!hasEnoughCancelGas}
     >
       {t('cancel')}

@@ -29,6 +29,7 @@ import { EDIT_GAS_MODES } from 'constants/gas';
 import { useTranslation } from 'react-i18next';
 import skynet from 'utils/skynet';
 import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
+import CancelButton from 'ui/components/TransactionList/CancelAndSpeedUp/CancelButton';
 const { sensors } = skynet;
 
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
@@ -232,13 +233,11 @@ export function _ActivityDetail({
                 >
                   {t('speedUp')}
                 </button>
-                <button
+                <CancelButton
+                  cancelTransaction={handleCancelClick}
                   className="cancelBtn"
-                  type="button"
-                  onClick={handleCancelClick}
-                >
-                  {t('cancel')}
-                </button>
+                  transaction={transaction.primaryTransaction}
+                />
               </div>
             )}
           </div>
