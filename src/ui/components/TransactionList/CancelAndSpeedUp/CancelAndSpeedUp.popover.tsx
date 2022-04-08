@@ -30,46 +30,35 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { Button, Tooltip } from 'antd';
 import { gasEstimateGreaterThanGasUsedPlusTenPercent } from 'ui/helpers/utils/gas';
 import { SimpleModal } from 'ui/components/universal/SimpleModal';
-// import { useTransactionFunctions } from 'ui/hooks/gasFeeInput/useTransactionFunctions';
+import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
+import { useTransactionFunctions } from 'ui/hooks/gasFeeInput/useTransactionFunctions';
+import { useGasFeeEstimates } from 'ui/hooks/gas/useGasFeeEstimates';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
-  cancelTransaction: () => void;
-  speedUpTransaction: () => void;
   transaction: Transaction;
-  // updateTransaction: () => void;
-  updateTransactionToTenPercentIncreasedGasFee: (v: boolean) => void;
-  updateTransactionUsingEstimate: (l: PRIORITY_LEVELS) => void;
   showPopOver: boolean;
   setShowPopOver: (v: boolean) => void;
+
+  isSpeedUp?: boolean;
 }
 
 const CancelSpeedupPopover = ({
-  cancelTransaction,
-  speedUpTransaction,
-  editGasMode,
   transaction,
-  updateTransactionToTenPercentIncreasedGasFee,
-  updateTransactionUsingEstimate,
   showPopOver,
   setShowPopOver,
 }: CancelAndSpeedUpPopoverParams) => {
   const { t } = useTranslation();
   const appIsLoading = useSelector((s) => s.appState.isLoading);
-  // const {
+  const {
+    cancelTransaction,
+    speedUpTransaction,
+    editGasMode,
+    updateTransactionToTenPercentIncreasedGasFee,
+    updateTransactionUsingEstimate,
+  } = useGasFeeInputs(undefined, transaction);
 
-  // } = useTransactionFunctions({
-  //   transaction,
-  //   editGasMode,
-  //   // gasLimit,
-  //   // gasFeeEstimates,
-  //   // maxPriorityFeePerGas,
-  //   // defaultEstimateToUse,
-  //   // estimatedBaseFee
-  // });
-
-  // @todo: gasFeeEstimates
-  const gasFeeEstimates: any = {};
+  const gasFeeEstimates = useGasFeeEstimates();
 
   useEffect(() => {
     if ((transaction as any).previousGas || appIsLoading || !showPopOver) {

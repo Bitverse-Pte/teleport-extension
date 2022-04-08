@@ -214,16 +214,13 @@ export function createCancelTransaction(
 
   return async (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {
     // await new Promise((resolve, reject) => {
-    await background.createCancelTransaction(
+    const res = await background.createCancelTransaction(
       txId,
       customGasSettings,
       newTxMetaProps
     );
-
-    // const { currentNetworkTxList } = newState;
-    // const { id } = currentNetworkTxList[currentNetworkTxList.length - 1];
-    // newTxId = id;
-    // return newTxId;
+    console.info('createCancelTransaction::res', res);
+    return res.id;
   };
 }
 
@@ -237,7 +234,7 @@ export function createSpeedUpTransaction(
 
   return async (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {
     // await new Promise((resolve, reject) => {
-    await background.createSpeedUpTransaction(
+    const res = await background.createSpeedUpTransaction(
       txId,
       customGasSettings,
       newTxMetaProps
@@ -245,6 +242,8 @@ export function createSpeedUpTransaction(
     // const { currentNetworkTxList } = newState;
     // newTx = currentNetworkTxList[currentNetworkTxList.length - 1];
     // return newTx;
+    console.info('createSpeedUpTransaction::res', res);
+    return res.id;
   };
 }
 
