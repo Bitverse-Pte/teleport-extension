@@ -1,19 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { SET_CUSTOM_DATA, SET_CUSTOM_TYPE } from 'ui/reducer/gas.reducer';
 import './customFee.less';
-import { Form, Button, InputNumber } from 'antd';
+import { Form, Button } from 'antd';
 
 function CustomFee(props) {
   // const gasReducer = useSelector((state) => state.gas);
-  const { onSubmit } = props;
+  const {
+    onSubmit,
+    selectFee: { suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas },
+    gasLimit,
+  } = props;
+  const [gl, setGl] = useState(gasLimit);
+  const [mf, setMf] = useState(suggestedMaxFeePerGas);
+  const [mp, setMp] = useState(suggestedMaxPriorityFeePerGas);
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const onFinish = (data) => {
+  const onFinish = () => {
     dispatch({ type: SET_CUSTOM_TYPE, value: true });
-    dispatch({ type: SET_CUSTOM_DATA, value: data });
+    dispatch({
+      type: SET_CUSTOM_DATA,
+      value: {
+        gasLimit: gl,
+        maxPriorityFee: mp,
+        maxFee: mf,
+      },
+    });
     onSubmit();
   };
+  useEffect(() => {
+    setGl(gasLimit);
+    setMf(suggestedMaxFeePerGas);
+    setMp(suggestedMaxPriorityFeePerGas);
+  }, [gasLimit, suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas]);
   return (
     <div className="custom-fee">
       <Form
@@ -27,10 +46,16 @@ function CustomFee(props) {
           label="Gas Limit"
           name="gasLimit"
           className="gas-form"
-          tooltip="Gas limit must be at least 21000"
         >
           <div className="numeric-input">
-            <input type="number" min="21000"></input>
+            <input
+              type="number"
+              min="0"
+              value={gl}
+              onChange={(e) => {
+                setGl(e.target.value);
+              }}
+            ></input>
           </div>
         </Form.Item>
         <Form.Item
@@ -41,8 +66,15 @@ function CustomFee(props) {
           tooltip="Max priority fee must be greater than 0 GWEI"
         >
           <div className="numeric-input">
-            <input type="number" min="0"></input>
-            <span className="addon">$1.1</span>
+            <input
+              type="number"
+              min="0"
+              step="1e-18"
+              value={mf}
+              onChange={(e) => {
+                setMf(e.target.value);
+              }}
+            ></input>
           </div>
         </Form.Item>
         <Form.Item
@@ -53,8 +85,16 @@ function CustomFee(props) {
           tooltip="Max fee cannot be lower than max priority fee"
         >
           <div className="numeric-input">
-            <input type="number" min="0" step="1e-18"></input>
-            <span className="addon">$1.1</span>
+            <input
+              type="number"
+              min="0"
+              step="1e-18"
+              value={mp}
+              onChange={(e) => {
+                setMp(e.target.value);
+              }}
+            ></input>
+            {/* <span className="addon">$1.1</span> */}
           </div>
         </Form.Item>
         <Form.Item>
