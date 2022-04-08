@@ -32,18 +32,29 @@ export function TransactionFee({ transaction }: Params) {
     return null;
   }
 
+  const formattedTxFee = () => {
+    let val = '';
+    try {
+      val = utils.formatEther(
+        BigNumber.from(
+          // use gasPrice (legacy) or maxFeePerGas(1559 network)
+          transaction.primaryTransaction.txParams.maxFeePerGas ||
+            transaction.primaryTransaction.txParams.gasPrice
+        ).mul(transaction.primaryTransaction.txParams.gas!)
+      );
+    } catch (error) {
+      console.error('TransactionFee::formattedTxFee::error: ', error);
+      val = '0.00';
+    } finally {
+      return val;
+    }
+  };
+
   return (
     <div className="row">
       <div className="field-name">Transaction Fee</div>
       <div className="field-value">
-        {utils.formatEther(
-          BigNumber.from(
-            // use gasPrice (legacy) or maxFeePerGas(1559 network)
-            transaction.primaryTransaction.txParams.maxFeePerGas ||
-              transaction.primaryTransaction.txParams.gasPrice
-          ).mul(transaction.primaryTransaction.txParams.gas!)
-        )}{' '}
-        {currentProviderSymbol}
+        {formattedTxFee()} {currentProviderSymbol}
       </div>
     </div>
   );
