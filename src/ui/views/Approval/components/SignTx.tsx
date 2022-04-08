@@ -127,7 +127,7 @@ const SignTx = ({ params, origin }) => {
           ? getRoundedGasPrice(gasFeeEstimates.gasPrice)
           : '0x0';
       }
-      setGasPrice(tx.gasPrice || gasPrice);
+      setGasPrice(gasPrice);
       const total = multipyHexes(
         gasPrice,
         tx.gas || MIN_GAS_LIMIT_HEX
