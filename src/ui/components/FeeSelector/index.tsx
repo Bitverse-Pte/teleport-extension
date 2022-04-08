@@ -6,6 +6,7 @@ interface FeeSelectorProps {
   supportsEIP1559: boolean;
   visible: boolean;
   onClose: (...args: any[]) => void;
+  gasLimit: number;
 }
 
 function FeeSelector(props: FeeSelectorProps) {

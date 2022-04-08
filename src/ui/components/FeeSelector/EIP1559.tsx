@@ -232,7 +232,11 @@ function FeeSelector(props) {
           type={2}
           handleCloseIconClick={() => setCustomVisible(false)}
         />
-        <CustomFee onSubmit={onSaveCustom} />
+        <CustomFee
+          selectFee={feeList.filter((e) => e.type === selectFee)[0]}
+          gasLimit={gasLimit}
+          onSubmit={onSaveCustom}
+        />
       </Drawer>
     </Drawer>
   );
