@@ -3,16 +3,14 @@ import { useSelector } from 'react-redux';
 import classnames from 'classnames';
 import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
-// import { useIncrementedGasFees } from '@/ui/hooks/metamask/useIncrementedGasFees';
-// import { getMaximumGasTotalInHexWei } from '../../../../shared/modules/gas.utils';
-// import { getConversionRate } from '../../../ducks/metamask/metamask';
-// import { useIncrementedGasFees } from '../../../hooks/useIncrementedGasFees';
-// import { isBalanceSufficient } from '../../../pages/send/send.utils';
-// import { getSelectedAccount } from '../../../selectors';
+import { isBalanceSufficient } from 'ui/context/send.utils';
+import { getMaximumGasTotalInHexWei } from 'utils/gas';
+import { useIncrementedGasFees } from 'ui/hooks/gas/useIncrementedGasFees';
+import { getTeleportWalletCachedBalances } from 'ui/selectors/selectors';
 
 interface CancelButtonParams {
   transaction: any;
-  cancelTransaction: () => void;
+  cancelTransaction: (...args: any) => void;
   detailsModal?: boolean;
 }
 
@@ -23,18 +21,21 @@ export default function CancelButton({
 }: CancelButtonParams) {
   const { t } = useTranslation();
 
-  // const customCancelGasSettings = useIncrementedGasFees(transaction);
+  const customCancelGasSettings = useIncrementedGasFees(transaction);
 
-  // const selectedAccount = useSelector(getSelectedAccount);
-  //   const conversionRate = useSelector(getConversionRate);
+  const selectedAccountBalance = useSelector(getTeleportWalletCachedBalances);
+  const conversionRate = useSelector(
+    // getConversionRate
+    // @todo: impl getConversionRate later if related module exist
+    () => 1
+  );
 
-  // const hasEnoughCancelGas = isBalanceSufficient({
-  //   amount: '0x0',
-  //   gasTotal: getMaximumGasTotalInHexWei(customCancelGasSettings),
-  //   balance: selectedAccount.balance,
-  //   conversionRate,
-  // });
-  const hasEnoughCancelGas = true;
+  const hasEnoughCancelGas = isBalanceSufficient({
+    amount: '0x0',
+    gasTotal: getMaximumGasTotalInHexWei(customCancelGasSettings),
+    balance: selectedAccountBalance,
+    conversionRate,
+  });
 
   const btn = (
     <Button
@@ -46,7 +47,7 @@ export default function CancelButton({
         'transaction-list-item-details__header-button-rounded-button':
           detailsModal,
       })}
-      // disabled={!hasEnoughCancelGas}
+      disabled={!hasEnoughCancelGas}
     >
       {t('cancel')}
     </Button>
