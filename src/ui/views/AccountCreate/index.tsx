@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MIN_PASSWORD_LENGTH } from 'constants/index';
 import { Checkbox, message } from 'antd';
@@ -16,6 +16,7 @@ import {
 import { AccountHeader } from '../AccountRecover';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
+import { ErrorCode } from 'constants/code';
 const { sensors } = skynet;
 
 const AccountCreate = () => {
@@ -45,10 +46,17 @@ const AccountCreate = () => {
     },
     onError(err) {
       console.error(err);
-      ClickToCloseMessage.error({
-        content: 'Unknown error, please try again later',
-        key: 'Unknown error, please try again later',
-      });
+      if (err?.code === ErrorCode.WALLET_NAME_REPEAT) {
+        ClickToCloseMessage.error({
+          content: 'Name already exists',
+          key: 'Name already exists',
+        });
+      } else {
+        ClickToCloseMessage.error({
+          content: 'Unknown error, please try again later',
+          key: 'Unknown error, please try again later',
+        });
+      }
     },
   });
 
@@ -171,14 +179,9 @@ const AccountCreate = () => {
             }}
           />
           <span className="policy-title">I have read and agree to&nbsp;</span>
-          <span
-            className="policy-link cursor"
-            onClick={() => {
-              history.push('/policy');
-            }}
-          >
+          <Link className="policy-link cursor" to="/policy">
             the privacy & terms
-          </span>
+          </Link>
         </div>
       </div>
       <div className="button content-wrap-padding">
