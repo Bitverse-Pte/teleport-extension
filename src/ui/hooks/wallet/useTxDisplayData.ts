@@ -121,8 +121,8 @@ export function useTransactionDisplayData(
   const { t } = useTranslation();
   const { initialTransaction, primaryTransaction } = transactionGroup;
   // initialTransaction contains the data we need to derive the primary purpose of this transaction group
-  // const { type } = initialTransaction;
-  const { type } = primaryTransaction;
+  const { type } = initialTransaction;
+  // const { type } = primaryTransaction;
 
   const { from: senderAddress, to } = primaryTransaction.txParams || {};
 
@@ -319,6 +319,9 @@ export function useTransactionDisplayData(
       replace: { $1: shortenAddress(recipientAddress as string) },
     });
   } else {
+    console.warn(
+      `useTransactionDisplayData does not recognize transaction type. Type received is: ${type}`
+    );
     // dispatch(
     //   // captureSingleException(
     //   //   `useTransactionDisplayData does not recognize transaction type. Type received is: ${type}`,
