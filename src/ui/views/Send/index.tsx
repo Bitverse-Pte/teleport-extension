@@ -351,7 +351,7 @@ const Send = () => {
           {t('Transfer between my accounts')}
         </span>
         <AccountSelect
-          currentSelect={selected}
+          currentToAddress={toAddress}
           visible={accountSelectPopupVisible}
           onClose={(selected?: BaseAccount) => {
             if (selected) {

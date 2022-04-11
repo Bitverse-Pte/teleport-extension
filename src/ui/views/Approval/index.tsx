@@ -13,8 +13,13 @@ const Approval = () => {
 
   const init = async () => {
     const approval = await getApproval();
+    console.log('=======approval========', approval);
     if (!approval) {
-      history.replace('/');
+      history.replace('/home');
+      return null;
+    }
+    if (approval.lock) {
+      history.replace('/home');
       return null;
     }
     setApproval(approval);
