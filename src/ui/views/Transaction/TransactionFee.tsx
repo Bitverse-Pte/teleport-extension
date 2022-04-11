@@ -45,9 +45,8 @@ export function TransactionFee({ transaction }: Params) {
     } catch (error) {
       console.error('TransactionFee::formattedTxFee::error: ', error);
       val = '0.00';
-    } finally {
-      return val;
     }
+    return val;
   };
 
   return (
