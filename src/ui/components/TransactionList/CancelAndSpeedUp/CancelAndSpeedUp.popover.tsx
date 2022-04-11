@@ -44,6 +44,7 @@ interface CancelAndSpeedUpPopoverParams {
 }
 
 const CancelSpeedupPopover = ({
+  editGasMode,
   transaction,
   showPopOver,
   setShowPopOver,
@@ -53,10 +54,9 @@ const CancelSpeedupPopover = ({
   const {
     cancelTransaction,
     speedUpTransaction,
-    editGasMode,
     updateTransactionToTenPercentIncreasedGasFee,
     updateTransactionUsingEstimate,
-  } = useGasFeeInputs(undefined, transaction);
+  } = useGasFeeInputs(undefined, transaction, undefined, editGasMode);
 
   const gasFeeEstimates = useGasFeeEstimates();
 

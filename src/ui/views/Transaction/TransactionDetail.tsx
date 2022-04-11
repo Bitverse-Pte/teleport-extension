@@ -248,18 +248,7 @@ export function _ActivityDetail({
           editGasMode={currentEditGasMode}
           showPopOver={showCancelPopOver}
           setShowPopOver={setShowCancelPopOver}
-          cancelTransaction={cancelTx}
-          speedUpTransaction={speedUpTx}
           transaction={transaction.primaryTransaction}
-          updateTransactionToTenPercentIncreasedGasFee={(fee) => {
-            console.debug(
-              'updateTransactionToTenPercentIncreasedGasFee::val',
-              fee
-            );
-          }}
-          updateTransactionUsingEstimate={(l) => {
-            console.debug('updateTransactionUsingEstimate::val', l);
-          }}
         />
       )}
     </Fragment>
