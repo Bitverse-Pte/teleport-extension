@@ -8,7 +8,7 @@ import { ethErrors } from 'eth-rpc-errors';
 import abi from 'utils/human-standard-token-abi-extended';
 import Common from '@ethereumjs/common';
 import { TransactionFactory } from '@ethereumjs/tx';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import NonceTracker from 'nonce-tracker';
 import Eth from 'ethjs';
 import log from 'loglevel';
@@ -648,33 +648,24 @@ export default class TransactionController extends EventEmitter {
       previousGasParams.maxPriorityFeePerGas = txParams.maxPriorityFeePerGas;
       newGasParams.maxFeePerGas =
         customGasSettings?.maxFeePerGas ||
-        bnToHex(
-          BnMultiplyByFraction(
-            hexToBn(txParams.maxFeePerGas),
-            incrementNumerator,
-            10
-          )
-        );
+        BigNumber.from(txParams.maxFeePerGas)
+          .mul(incrementNumerator)
+          .div(10)
+          .toHexString();
       newGasParams.maxPriorityFeePerGas =
         customGasSettings?.maxPriorityFeePerGas ||
-        bnToHex(
-          BnMultiplyByFraction(
-            hexToBn(txParams.maxPriorityFeePerGas),
-            incrementNumerator,
-            10
-          )
-        );
+        BigNumber.from(txParams.maxPriorityFeePerGas)
+          .mul(incrementNumerator)
+          .div(10)
+          .toHexString();
     } else {
       previousGasParams.gasPrice = txParams.gasPrice;
       newGasParams.gasPrice =
         customGasSettings?.gasPrice ||
-        bnToHex(
-          BnMultiplyByFraction(
-            hexToBn(txParams.gasPrice),
-            incrementNumerator,
-            10
-          )
-        );
+        BigNumber.from(txParams.gasPrice)
+          .mul(incrementNumerator)
+          .div(10)
+          .toHexString();
     }
 
     return { previousGasParams, newGasParams };
