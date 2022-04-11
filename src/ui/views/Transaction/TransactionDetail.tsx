@@ -182,7 +182,7 @@ export function _ActivityDetail({
               <span className="unit">{displayPrimaryCurrency.unit}</span>
             </p>
           </div>
-          <div className="details content-wrap-padding">
+          <div className="details">
             <div className="row from-and-to justify-center">
               <AddressCard title="From" address={senderAddress} />
               <IconComponent name="arrow-right" cls="to-icon" />
