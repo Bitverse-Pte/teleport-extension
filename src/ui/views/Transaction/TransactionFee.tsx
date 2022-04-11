@@ -42,6 +42,12 @@ export function TransactionFee({ transaction }: Params) {
             transaction.primaryTransaction.txParams.gasPrice
         ).mul(transaction.primaryTransaction.txParams.gas!)
       );
+      if (val.length > 11) {
+        /**
+         * parsed as number then rounding it
+         */
+        val = Number(val).toFixed(8);
+      }
     } catch (error) {
       console.error('TransactionFee::formattedTxFee::error: ', error);
       val = '0.00';
