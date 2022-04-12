@@ -45,6 +45,39 @@ export function transactionMatchesNetwork(
   return transaction.metamaskNetworkId === networkId;
 }
 
+function withoutDigits(hexstr: string): string {
+  return hexstr.split('.')[0];
+}
+
+/**
+ * I hate BN! they caused incompatibility with `BigNumber` from ethers
+ * let get rid of hexstring with digits!
+ * @param transaction tx object
+ * @returns a purified tx object
+ */
+export function purifyTxParamsGasFields(transaction: Transaction) {
+  const _copiedTx = { ...transaction };
+
+  if (transaction.txParams.maxFeePerGas)
+    transaction.txParams.maxFeePerGas = withoutDigits(
+      transaction.txParams.maxFeePerGas
+    );
+  if (transaction.txParams.maxPriorityFeePerGas)
+    transaction.txParams.maxPriorityFeePerGas = withoutDigits(
+      transaction.txParams.maxPriorityFeePerGas
+    );
+  if (transaction.txParams.gasLimit)
+    transaction.txParams.gasLimit = withoutDigits(
+      transaction.txParams.gasLimit
+    );
+  if (transaction.txParams.gasPrice)
+    transaction.txParams.gasPrice = withoutDigits(
+      transaction.txParams.gasPrice
+    );
+
+  return _copiedTx;
+}
+
 export function isEIP1559Transaction(transaction) {
   return (
     isHexString(transaction?.txParams?.maxFeePerGas) &&

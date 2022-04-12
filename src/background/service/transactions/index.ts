@@ -39,7 +39,7 @@ import {
   CHAIN_ID_TO_GAS_LIMIT_BUFFER_MAP,
   CommonSupportNetwork,
 } from 'constants/network';
-import { isEIP1559Transaction } from './lib/util';
+import { isEIP1559Transaction, purifyTxParamsGasFields } from './lib/util';
 import TransactionStateManager from './tx-state-manager';
 import TxGasUtil from './tx-gas-utils';
 import PendingTransactionTracker from './pending-tx-tracker';
@@ -632,18 +632,19 @@ export default class TransactionController extends EventEmitter {
    * @returns {{ newGasParams: CustomGasSettings, previousGasParams: CustomGasSettings }}
    */
   generateNewGasParams(
-    originalTxMeta,
+    _originalTxMeta,
     customGasSettings: CustomGasSettings = {},
     incrementNumerator = 11
   ) {
+    const originalTxMeta = purifyTxParamsGasFields(_originalTxMeta);
     const { txParams } = originalTxMeta;
     const previousGasParams: any = {};
     const newGasParams: any = {};
     if (customGasSettings.gasLimit) {
       newGasParams.gas = customGasSettings?.gas ?? GAS_LIMITS.SIMPLE;
     }
-
-    if (isEIP1559Transaction(originalTxMeta)) {
+    const is1559Tx = isEIP1559Transaction(originalTxMeta);
+    if (is1559Tx) {
       previousGasParams.maxFeePerGas = txParams.maxFeePerGas;
       previousGasParams.maxPriorityFeePerGas = txParams.maxPriorityFeePerGas;
       newGasParams.maxFeePerGas =
