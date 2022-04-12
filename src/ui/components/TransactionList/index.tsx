@@ -29,6 +29,8 @@ import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
+import CancelSpeedupPopover from './CancelAndSpeedUp/CancelAndSpeedUp.popover';
+import { EDIT_GAS_MODES } from 'constants/gas';
 
 dayjs.extend(relativeTime);
 
@@ -141,16 +143,25 @@ function TransactionItem({
   // );
   const shouldShowSpeedUp = true;
 
-  // @todo: need to implement the cancel and retry
+  const [showCancelPopOver, setShowCancelPopOver] = useState(false);
+  const [currentEditGasMode, setEditGasMode] = useState<EDIT_GAS_MODES>(
+    EDIT_GAS_MODES.MODIFY_IN_PLACE
+  );
+
+  const popupCancelAndSpeedUpWithMode = (mode: EDIT_GAS_MODES) => {
+    setEditGasMode(mode);
+    setShowCancelPopOver(true);
+  };
+
   const cancelTransaction = (e: React.MouseEvent<HTMLButtonElement>) => {
     // stop going to detail page
     e.stopPropagation();
-    alert('Cancel tx, to be implemented...');
+    popupCancelAndSpeedUpWithMode(EDIT_GAS_MODES.CANCEL);
   };
   const retryTransaction = (e: React.MouseEvent<HTMLButtonElement>) => {
     // stop going to detail page
     e.stopPropagation();
-    alert('retry tx to edit, to be implemented...');
+    popupCancelAndSpeedUpWithMode(EDIT_GAS_MODES.SPEED_UP);
   };
 
   const speedUpButton = useMemo(() => {
@@ -250,8 +261,7 @@ function TransactionItem({
         )}
         {isPending && (
           <div className="pending-tx-actions ml-auto">
-            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
-            {/* {speedUpButton} */}
+            {speedUpButton}
             {/* {!hasCancelled && !isUnapproved && (
               <CancelButton
                 transaction={transactionGroup.primaryTransaction}
@@ -261,6 +271,12 @@ function TransactionItem({
           </div>
         )}
       </div>
+      <CancelSpeedupPopover
+        editGasMode={currentEditGasMode}
+        showPopOver={showCancelPopOver}
+        setShowPopOver={setShowCancelPopOver}
+        transaction={transactionGroup.primaryTransaction}
+      />
     </div>
     // {isPending && (
     //   <div className={'activity pending-tx-actions ' + isEvenStyle}>
