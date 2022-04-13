@@ -1,31 +1,9 @@
 import { useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react';
 
-// import {
-//   EDIT_GAS_MODES,
-//   PRIORITY_LEVELS,
-// } from '../../../../shared/constants/gas';
-// import {
-//   ALIGN_ITEMS,
-//   DISPLAY,
-//   FLEX_DIRECTION,
-//   TYPOGRAPHY,
-// } from '../../../helpers/constants/design-system';
-// import { getAppIsLoading } from '../../../selectors';
-// import { gasEstimateGreaterThanGasUsedPlusTenPercent } from '../../../helpers/utils/gas';
-// import { useGasFeeContext } from '../../../contexts/gasFee';
-// import { useTransactionModalContext } from '../../../contexts/transaction-modal';
-// import EditGasFeeButton from '../edit-gas-fee-button';
-// import GasDetailsItem from '../gas-details-item';
-// import Button from '../../ui/button';
-// import I18nValue from '../../ui/i18n-value';
-// import InfoTooltip from '../../ui/info-tooltip';
-// import Popover from '../../ui/popover';
-// import Typography from '../../ui/typography';
-// import AppLoadingSpinner from '../app-loading-spinner';
 import { useTranslation } from 'react-i18next';
 import { EDIT_GAS_MODES, PRIORITY_LEVELS } from 'constants/gas';
-import { Transaction } from 'constants/transaction';
+import { Transaction, TransactionEnvelopeTypes } from 'constants/transaction';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Button, Tooltip } from 'antd';
 import { gasEstimateGreaterThanGasUsedPlusTenPercent } from 'ui/helpers/utils/gas';
@@ -33,6 +11,17 @@ import { SimpleModal } from 'ui/components/universal/SimpleModal';
 import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
 import { useTransactionFunctions } from 'ui/hooks/gasFeeInput/useTransactionFunctions';
 import { useGasFeeEstimates } from 'ui/hooks/gas/useGasFeeEstimates';
+import FeeSelector from 'ui/components/FeeSelector';
+import {
+  MIN_GAS_LIMIT_DEC,
+  MIN_GAS_LIMIT_HEX,
+} from 'ui/context/send.constants';
+import { getValueFromWeiHex, multipyHexes } from 'ui/utils/conversion';
+import {
+  getCurrentProviderNativeToken,
+  getGasFeeEstimates,
+} from 'ui/selectors/selectors';
+import { utils } from 'ethers';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -45,18 +34,20 @@ interface CancelAndSpeedUpPopoverParams {
 
 const CancelSpeedupPopover = ({
   editGasMode,
-  transaction,
+  transaction: _transaction,
   showPopOver,
   setShowPopOver,
 }: CancelAndSpeedUpPopoverParams) => {
   const { t } = useTranslation();
+  const [gasFeeSelectorVisible, setGasFeeSelectorVisible] = useState(false);
   const appIsLoading = useSelector((s) => s.appState.isLoading);
   const {
     cancelTransaction,
     speedUpTransaction,
     updateTransactionToTenPercentIncreasedGasFee,
     updateTransactionUsingEstimate,
-  } = useGasFeeInputs(undefined, transaction, undefined, editGasMode);
+    transaction,
+  } = useGasFeeInputs(undefined, _transaction, undefined, editGasMode);
 
   const gasFeeEstimates = useGasFeeEstimates();
 
@@ -87,6 +78,23 @@ const CancelSpeedupPopover = ({
     updateTransactionToTenPercentIncreasedGasFee,
     updateTransactionUsingEstimate,
   ]);
+  const gasSettings = useSelector((s) => s.gas);
+  const nativeToken = useSelector(getCurrentProviderNativeToken);
+  console.info('gasSettings', gasSettings);
+
+  useEffect(() => {
+    console.info('transaction:txParams', transaction.txParams);
+  }, [transaction]);
+
+  useEffect(() => {
+    if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
+      updateTransactionUsingEstimate(gasSettings.gasType);
+    } else {
+      console.warn(
+        `not supported gas type ${gasSettings.gasType}, implment needed`
+      );
+    }
+  }, [gasSettings]);
 
   if (!showPopOver) {
     return null;
@@ -99,6 +107,28 @@ const CancelSpeedupPopover = ({
       speedUpTransaction();
     }
     setShowPopOver(false);
+  };
+
+  const totalGasfee = () => {
+    try {
+      const gasPrice =
+        transaction.txParams.maxFeePerGas || transaction.txParams.gasPrice;
+      return multipyHexes(
+        gasPrice,
+        transaction.txParams.gas || MIN_GAS_LIMIT_HEX
+      );
+    } catch (error) {
+      console.error('totalGasfee::error', error);
+      return '0x1';
+    }
+  };
+
+  const renderTotalGasFeeAmount = () => {
+    const totalDec = getValueFromWeiHex({
+      value: totalGasfee(),
+      numberOfDecimals: 10,
+    });
+    return `${totalDec} ${nativeToken?.symbol || ''}`;
   };
 
   return (
@@ -151,18 +181,41 @@ const CancelSpeedupPopover = ({
           </Tooltip>
         </h6>
         <div className="cancel-speedup-popover__separator" />
+
         <div className="flex items-center flex-col" style={{ marginTop: 4 }}>
-          {/* <div className="cancel-speedup-popover__edit-gas-button">
-            {!appIsLoading && <EditGasFeeButton />}
-          </div>
-          <div className="cancel-speedup-popover__gas-details">
-            <GasDetailsItem />
-          </div> */}
+          <p
+            style={{
+              fontSize: 20,
+            }}
+          >
+            {renderTotalGasFeeAmount()}
+          </p>
+          <Button onClick={() => setGasFeeSelectorVisible(true)}>
+            Edit Gas
+          </Button>
         </div>
-        <Button type="primary" onClick={submitTransactionChange}>
+        <Button
+          type="primary"
+          onClick={submitTransactionChange}
+          className="w-full"
+          style={{
+            marginTop: 24
+          }}
+        >
           {t('submit')}
         </Button>
       </div>
+      <FeeSelector
+        disableCustomGasFee
+        onClose={() => {
+          setGasFeeSelectorVisible(false);
+        }}
+        gasLimit={Number(transaction.txParams.gas || MIN_GAS_LIMIT_DEC)}
+        supportsEIP1559={
+          transaction.txParams.type === TransactionEnvelopeTypes.FEE_MARKET
+        }
+        visible={gasFeeSelectorVisible}
+      />
     </SimpleModal>
   );
 };
