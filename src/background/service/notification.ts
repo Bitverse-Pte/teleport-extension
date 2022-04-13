@@ -1,8 +1,7 @@
 import { ethErrors } from 'eth-rpc-errors';
 import { EthereumProviderError } from 'eth-rpc-errors/dist/classes';
 import { winMgr } from 'background/webapi';
-import { IS_CHROME, IS_LINUX } from 'constants/index';
-import { preferenceService, txController } from 'background/service';
+import { preferenceService } from 'background/service';
 
 interface Approval {
   data?: {
@@ -36,6 +35,10 @@ class NotificationService {
       if (this.notifiWindowId && winId !== this.notifiWindowId) {
         console.info('winId:', winId);
         console.info('notifiWindowId:', this.notifiWindowId);
+        if (winId === chrome.windows.WINDOW_ID_NONE) {
+          // Wired issue: When notification popuped, will focus to -1 first then focus on notification
+          return;
+        }
         this.rejectApproval();
       }
     });
@@ -50,6 +53,7 @@ class NotificationService {
   };
 
   rejectApproval = async (err?: string) => {
+    console.log('============rejectApproval(err)==========', err);
     this.approval?.reject &&
       this.approval?.reject(ethErrors.provider.userRejectedRequest<any>(err));
     await this.clear();
