@@ -39,7 +39,7 @@ import {
   CHAIN_ID_TO_GAS_LIMIT_BUFFER_MAP,
   CommonSupportNetwork,
 } from 'constants/network';
-import { isEIP1559Transaction, purifyTxParamsGasFields } from './lib/util';
+import { isEIP1559Transaction } from './lib/util';
 import TransactionStateManager from './tx-state-manager';
 import TxGasUtil from './tx-gas-utils';
 import PendingTransactionTracker from './pending-tx-tracker';
@@ -50,6 +50,7 @@ import preferenceService from '../preference';
 import { NetworkController } from 'types/network';
 import { CustomGasSettings } from 'types/tx';
 import ns from '../network';
+import { purifyTxParamsGasFields } from 'utils/transaction.utils';
 
 const hstInterface = new ethers.utils.Interface(abi);
 
