@@ -193,14 +193,15 @@ export function updateTransaction(
       throw error;
     }
 
-    try {
-      dispatch(updateTransactionParams(txData.id, txData.txParams));
-      // dispatch(updateMetamaskState(newState));
-      // dispatch(showConfTxPage({ id: txData.id }));
-      return txData;
-    } finally {
-      dispatch(hideLoadingIndicator());
-    }
+    // try {
+    //   dispatch(updateTransactionParams(txData.id, txData.txParams));
+    //   // dispatch(updateMetamaskState(newState));
+    //   // dispatch(showConfTxPage({ id: txData.id }));
+    //   return txData;
+    // } finally {
+    //   dispatch(hideLoadingIndicator());
+    // }
+    dispatch(hideLoadingIndicator());
   };
 }
 
