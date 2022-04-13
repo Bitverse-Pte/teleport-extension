@@ -65,27 +65,33 @@ export function withoutDigits(hexstr: string): string {
  * @param transaction tx object
  * @returns a purified tx object
  */
-export function purifyTxParamsGasFields(transaction: Transaction) {
-  const _copiedTx = { ...transaction };
+export function purifyTxParamsGasFields(originalTx: Transaction) {
+  // const transaction = { ...originalTx };
+  const partsOfNewTxParams: Partial<Transaction['txParams']> = {};
 
-  if (transaction.txParams.maxFeePerGas)
-    transaction.txParams.maxFeePerGas = withoutDigits(
-      transaction.txParams.maxFeePerGas
+  if (originalTx.txParams.maxFeePerGas)
+    partsOfNewTxParams.maxFeePerGas = withoutDigits(
+      originalTx.txParams.maxFeePerGas
     );
-  if (transaction.txParams.maxPriorityFeePerGas)
-    transaction.txParams.maxPriorityFeePerGas = withoutDigits(
-      transaction.txParams.maxPriorityFeePerGas
+  if (originalTx.txParams.maxPriorityFeePerGas)
+    partsOfNewTxParams.maxPriorityFeePerGas = withoutDigits(
+      originalTx.txParams.maxPriorityFeePerGas
     );
-  if (transaction.txParams.gasLimit)
-    transaction.txParams.gasLimit = withoutDigits(
-      transaction.txParams.gasLimit
-    );
-  if (transaction.txParams.gasPrice)
-    transaction.txParams.gasPrice = withoutDigits(
-      transaction.txParams.gasPrice
-    );
+  if (originalTx.txParams.gasLimit)
+    partsOfNewTxParams.gasLimit = withoutDigits(originalTx.txParams.gasLimit);
+  if (originalTx.txParams.gasPrice)
+    partsOfNewTxParams.gasPrice = withoutDigits(originalTx.txParams.gasPrice);
 
-  return _copiedTx;
+  /**
+   * Avoid readonly object error issues
+   */
+  const newTxParams = Object.assign(
+    {},
+    originalTx.txParams,
+    partsOfNewTxParams
+  );
+
+  return Object.assign({}, originalTx, { txParams: newTxParams });
 }
 
 /**
