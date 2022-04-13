@@ -1,5 +1,10 @@
 import './style.less';
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
+import React, {
+  useState,
+  useImperativeHandle,
+  forwardRef,
+  useMemo,
+} from 'react';
 import { Collapse, Tooltip } from 'antd';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import { BaseAccount } from 'types/extend';
@@ -160,26 +165,36 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
     queryAccounts();
   };
 
+  const selectedIndex = useMemo(
+    () => tempAccounts?.findIndex((a: IDisplayAccountManage) => a.selected),
+    [tempAccounts]
+  );
+
   return (
     <div className="account-manage-widget flexR">
       <div className="side-bar flexCol">
         {tempAccounts?.map((account: IDisplayAccountManage, i) => {
           return (
             <div
-              className={clsx('flexR id-item')}
+              className={clsx('flexR id-item', {
+                'id-item-selected': account.selected,
+                'id-item-selected-previous': i === (selectedIndex || 0) - 1,
+                'id-item-selected-after': i === (selectedIndex || 0) + 1,
+              })}
               onClick={() => handleAccountClick(account)}
-              style={account.selected ? { width: '40px', height: '40px' } : {}}
               key={i}
             >
-              <Jazzicon
-                diameter={account.selected ? 40 : 30}
-                seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
-              />
-              <img
-                src={selectedIcon}
-                className="account-manage-selected-icon"
-                style={{ display: account.selected ? 'block' : 'none' }}
-              />
+              <div className="id-item-wrap flexR">
+                <Jazzicon
+                  diameter={account.selected ? 40 : 30}
+                  seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
+                />
+                {/*  <img
+                  src={selectedIcon}
+                  className="account-manage-selected-icon"
+                  style={{ display: account.selected ? 'block' : 'none' }}
+                /> */}
+              </div>
             </div>
           );
         })}
