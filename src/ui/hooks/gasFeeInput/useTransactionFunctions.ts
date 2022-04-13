@@ -10,12 +10,13 @@ import {
   updateTransaction as updateTransactionFn,
 } from 'ui/state/actions';
 import { Transaction } from 'constants/transaction';
+import type { GasFeeEstimates } from '@metamask/controllers';
 
 interface ParamsOfuseTransactionFunctions {
   defaultEstimateToUse: any;
   editGasMode: EDIT_GAS_MODES;
   estimatedBaseFee: string;
-  gasFeeEstimates: any;
+  gasFeeEstimates: GasFeeEstimates;
   gasLimit: number;
   maxPriorityFeePerGas: number | null;
   transaction: Transaction;
