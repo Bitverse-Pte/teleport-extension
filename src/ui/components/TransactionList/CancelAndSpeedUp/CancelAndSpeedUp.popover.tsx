@@ -22,6 +22,8 @@ import {
   getGasFeeEstimates,
 } from 'ui/selectors/selectors';
 import { utils } from 'ethers';
+import { UnlockModal } from 'ui/components/UnlockModal';
+import { useWallet } from 'ui/utils';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -48,6 +50,8 @@ const CancelSpeedupPopover = ({
     updateTransactionUsingEstimate,
     transaction,
   } = useGasFeeInputs(undefined, _transaction, undefined, editGasMode);
+
+  const wallet = useWallet();
 
   const gasFeeEstimates = useGasFeeEstimates();
 
@@ -87,6 +91,10 @@ const CancelSpeedupPopover = ({
   }, [transaction]);
 
   useEffect(() => {
+    console.debug('gasFeeEstimates::updated:', gasFeeEstimates);
+  }, [gasFeeEstimates]);
+
+  useEffect(() => {
     if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
       updateTransactionUsingEstimate(gasSettings.gasType);
     } else {
@@ -96,11 +104,18 @@ const CancelSpeedupPopover = ({
     }
   }, [gasSettings]);
 
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+
   if (!showPopOver) {
     return null;
   }
 
-  const submitTransactionChange = () => {
+  const submitTransactionChange = async () => {
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
+
     if (editGasMode === EDIT_GAS_MODES.CANCEL) {
       cancelTransaction();
     } else {
@@ -199,7 +214,7 @@ const CancelSpeedupPopover = ({
           onClick={submitTransactionChange}
           className="w-full"
           style={{
-            marginTop: 24
+            marginTop: 24,
           }}
         >
           {t('submit')}
@@ -215,6 +230,14 @@ const CancelSpeedupPopover = ({
           transaction.txParams.type === TransactionEnvelopeTypes.FEE_MARKET
         }
         visible={gasFeeSelectorVisible}
+      />
+      <UnlockModal
+        title="Unlock Wallet to continue"
+        visible={unlockPopupVisible}
+        setVisible={(v) => {
+          setUnlockPopupVisible(v);
+        }}
+        // unlocked={() => next()}
       />
     </SimpleModal>
   );
