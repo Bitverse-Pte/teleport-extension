@@ -7,6 +7,8 @@ interface FeeSelectorProps {
   visible: boolean;
   onClose: (...args: any[]) => void;
   gasLimit: number;
+  /** @todo: remove this line asap */
+  disableCustomGasFee?: boolean;
 }
 
 function FeeSelector(props: FeeSelectorProps) {
