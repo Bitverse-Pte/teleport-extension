@@ -10,31 +10,36 @@ import {
   HdAccountStruct,
 } from 'types/extend';
 import { Object } from 'ts-toolbelt';
-import { WALLET_THEME_COLOR } from 'constants/wallet';
+import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
 import Jazzicon from 'react-jazzicon';
 import { Drawer } from 'antd';
 import * as _ from 'lodash';
+import { CustomTab, WalletName } from '../Widgets';
+import { NoContent } from '../universal/NoContent';
+import { IconComponent } from '../IconComponents';
+import ChainIcons from '../ChainIcons';
+import { findIndex } from 'lodash';
 
 interface AccountSelectProps {
   onClose: (selected?: BaseAccount) => void;
   visible?: boolean;
-  currentSelect?: BaseAccount;
+  currentToAddress?: string;
 }
 
 const AccountSelect: React.FC<AccountSelectProps> = (
   props: AccountSelectProps
 ) => {
   const wallet = useWallet();
-  const [accountCreateType, setAccountCreateType] = useState(
-    AccountCreateType.MNEMONIC
-  );
+  const [accountCreateType, setAccountCreateType] = useState(Tabs.FIRST);
   const [displayAccounts, setDisplayAccount] = useState<any>({});
   const { t } = useTranslation();
+  const isMnemonic = useMemo(() => {
+    return accountCreateType === Tabs.FIRST;
+  }, [accountCreateType]);
 
   useAsyncEffect(async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList(true);
-    const account: BaseAccount | undefined = await wallet.getCurrentAccount();
-    if (accounts && account) {
+    if (accounts) {
       for (const k in accounts) {
         if (k === 'hdAccount') {
           accounts[k].forEach(
@@ -44,7 +49,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
                 (
                   subAccount: Object.Merge<BaseAccount, { selected?: boolean }>
                 ) => {
-                  if (subAccount.address === account.address) {
+                  if (subAccount.address === props.currentToAddress) {
                     subAccount.selected = true;
                     a.selected = true;
                     setDisplayAccount(AccountCreateType.MNEMONIC);
@@ -58,19 +63,34 @@ const AccountSelect: React.FC<AccountSelectProps> = (
         } else {
           accounts[k].forEach(
             (a: Object.Merge<BaseAccount, { selected?: boolean }>) => {
-              a.selected = a.address === account.address;
-              if (a.selected)
-                setAccountCreateType(AccountCreateType.PRIVATE_KEY);
+              a.selected = a.address === props.currentToAddress;
+              if (a.selected) setAccountCreateType(Tabs.SECOND);
             }
           );
         }
+      }
+      //check selected account: make first hdAccount be selected, if not selected in accounts
+      if (
+        !accounts.hdAccount.find(
+          (a: Object.Merge<HdAccountStruct, { selected?: boolean }>) =>
+            a.selected
+        ) &&
+        !accounts.simpleAccount.find(
+          (a: Object.Merge<BaseAccount, { selected?: boolean }>) => a.selected
+        )
+      ) {
+        const firstSelect: Object.Merge<
+          HdAccountStruct,
+          { selected?: boolean }
+        > = accounts.hdAccount[0];
+        firstSelect.selected = true;
       }
       setDisplayAccount(accounts);
     }
   }, [props.visible]);
 
   const accountList = useMemo(() => {
-    if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
+    if (accountCreateType === Tabs.SECOND) {
       return displayAccounts?.simpleAccount;
     } else {
       return (
@@ -82,9 +102,9 @@ const AccountSelect: React.FC<AccountSelectProps> = (
     }
   }, [displayAccounts, accountCreateType]);
 
-  const handleTabClick = (type: AccountCreateType) => {
+  const handleTabClick = (type: Tabs) => {
     setAccountCreateType(type);
-    if (type === AccountCreateType.MNEMONIC) {
+    if (type === Tabs.FIRST) {
       if (displayAccounts?.hdAccount.every((ha) => !ha.selected)) {
         displayAccounts.hdAccount[0].selected = true;
         setDisplayAccount(displayAccounts);
@@ -114,55 +134,37 @@ const AccountSelect: React.FC<AccountSelectProps> = (
 
   return (
     <Drawer
-      title={t('Select Account')}
+      title={t('Choose Account')}
       placement="bottom"
       visible={props.visible}
       maskClosable
       closable={false}
-      // use not select any address
       onClose={() => props.onClose(undefined)}
+      bodyStyle={{
+        boxSizing: 'border-box',
+        padding: '0',
+      }}
+      contentWrapperStyle={{
+        borderRadius: '16px 16px 0 0',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
     >
       <div className="account-select flexCol">
-        <div className="header">
-          <div className="tab flex">
-            <span
-              className={clsx('tab-item', {
-                'tab-item-active':
-                  accountCreateType === AccountCreateType.MNEMONIC,
-              })}
-              onClick={() => handleTabClick(AccountCreateType.MNEMONIC)}
-            >
-              ID Wallet
-            </span>
-            <span
-              className={clsx('tab-item', {
-                'tab-item-active':
-                  accountCreateType === AccountCreateType.PRIVATE_KEY,
-              })}
-              onClick={() => handleTabClick(AccountCreateType.PRIVATE_KEY)}
-            >
-              Normal
-            </span>
-          </div>
-          <div className="active-container flex">
-            <span
-              className={clsx(
-                'active',
-                accountCreateType === AccountCreateType.MNEMONIC
-                  ? 'id'
-                  : 'normal'
-              )}
-            />
-          </div>
+        <div className="header content-wrap-padding">
+          <CustomTab
+            tab1="ID Wallet"
+            tab2="Normal Wallet"
+            currentTab={accountCreateType}
+            handleTabClick={handleTabClick}
+          />
         </div>
         <div className="content flex">
           <div
             className="side-bar flexCol"
             style={{
               display:
-                accountCreateType === AccountCreateType.PRIVATE_KEY
-                  ? 'none'
-                  : 'flex',
+                !isMnemonic || accountList?.length === 0 ? 'none' : 'flex',
             }}
           >
             {displayAccounts?.hdAccount?.map(
@@ -186,49 +188,60 @@ const AccountSelect: React.FC<AccountSelectProps> = (
             <span
               className="wallet-name"
               style={{
-                display:
-                  accountCreateType === AccountCreateType.PRIVATE_KEY
-                    ? 'none'
-                    : 'block',
+                display: !isMnemonic ? 'none' : 'block',
                 color: walletNameColor,
               }}
             >
-              {
-                displayAccounts?.hdAccount?.find(
-                  (a: Object.Merge<HdAccountStruct, { selected?: boolean }>) =>
-                    a.selected
-                )?.hdWalletName
-              }
+              <WalletName width={100} cls="">
+                {
+                  displayAccounts?.hdAccount?.find(
+                    (
+                      a: Object.Merge<HdAccountStruct, { selected?: boolean }>
+                    ) => a.selected
+                  )?.hdWalletName
+                }
+              </WalletName>
             </span>
             <div className="accounts flexCol">
-              {accountList?.map(
-                (a: Object.Merge<BaseAccount, { selected?: boolean }>) => {
-                  return (
-                    <div
-                      className="account-item flex"
-                      onClick={() => {
-                        //selectAccount
-                        props.onClose && props.onClose(a);
-                      }}
-                      key={a.address}
-                    >
-                      <div className="account-left flex">
-                        <Jazzicon
-                          diameter={30}
-                          seed={Number(a?.address?.substr(0, 8) || 0)}
-                        />
-                        <div className="account-info flexCol">
-                          <span className="account-name">
-                            {a.accountName || a.hdWalletName}
-                          </span>
-                          <span className="account-address">
-                            {transferAddress2Display(a.address)}
-                          </span>
+              {accountList?.length > 0 ? (
+                accountList?.map(
+                  (a: Object.Merge<BaseAccount, { selected?: boolean }>) => {
+                    return (
+                      <div
+                        className="account-item flex"
+                        onClick={() => {
+                          //selectAccount
+                          props.onClose && props.onClose(a);
+                        }}
+                        key={a.address}
+                      >
+                        <div className="account-left flex">
+                          <Jazzicon
+                            diameter={30}
+                            seed={Number(a?.address?.substr(0, 8) || 0)}
+                          />
+                          <div className="account-info flexCol">
+                            <WalletName cls="account-name" width={100}>
+                              {a.accountName || a.hdWalletName}
+                            </WalletName>
+                            <span className="account-address">
+                              {transferAddress2Display(a.address)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="account-right">
+                          {a.selected ? (
+                            <IconComponent name="check" cls="base-text-color" />
+                          ) : isMnemonic ? null : (
+                            <ChainIcons coinType={a.coinType} />
+                          )}
                         </div>
                       </div>
-                    </div>
-                  );
-                }
+                    );
+                  }
+                )
+              ) : (
+                <NoContent title="Wallet" />
               )}
             </div>
           </div>
