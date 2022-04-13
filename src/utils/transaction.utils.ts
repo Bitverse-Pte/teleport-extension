@@ -79,6 +79,8 @@ export function purifyTxParamsGasFields(originalTx: Transaction) {
     );
   if (originalTx.txParams.gasLimit)
     partsOfNewTxParams.gasLimit = withoutDigits(originalTx.txParams.gasLimit);
+  if (originalTx.txParams.gas)
+    partsOfNewTxParams.gasLimit = withoutDigits(originalTx.txParams.gas);
   if (originalTx.txParams.gasPrice)
     partsOfNewTxParams.gasPrice = withoutDigits(originalTx.txParams.gasPrice);
 
