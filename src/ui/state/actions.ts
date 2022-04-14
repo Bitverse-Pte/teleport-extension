@@ -185,7 +185,8 @@ export function updateTransaction(
     try {
       await background.updateTransaction(txData);
     } catch (error) {
-      dispatch(updateTransactionParams(txData.id, txData.txParams));
+      console.error('updateTransaction::error', error);
+      // dispatch(updateTransactionParams(txData.id, txData.txParams));
       // dispatch(hideLoadingIndication());
       // dispatch(txError(error));
       // dispatch(goHome());
