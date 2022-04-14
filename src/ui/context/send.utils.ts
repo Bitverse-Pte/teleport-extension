@@ -35,7 +35,7 @@ function isBalanceSufficient({
   conversionRate = 1,
   gasTotal = '0x0',
   primaryCurrency,
-}: Record<string, any>) {
+}) {
   const totalAmount = addCurrencies(amount, gasTotal, {
     aBase: 16,
     bBase: 16,

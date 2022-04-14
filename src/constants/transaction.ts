@@ -148,7 +148,6 @@ export interface TxParams {
   data?: HexString;
   from: HexString;
   gas?: HexString;
-  gasLimit?: HexString;
   gasPrice?: HexString;
   estimateSuggested?: string;
   estimateUsed?: string;
@@ -184,7 +183,6 @@ export interface Transaction {
   retryCount?: number;
   baseFeePerGas?: HexString;
   chainId: HexString;
-  previousGas?: Partial<TxParams>;
   dappSuggestedGasFees: {
     gas?: HexString;
     gasPrice?: HexString;

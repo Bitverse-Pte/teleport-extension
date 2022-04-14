@@ -186,20 +186,18 @@ function FeeSelector(props) {
             />
           ))}
         </ul>
-        {!props.disableCustomGasFee && (
-          <div
-            className="custom-box"
-            onClick={() => {
-              setCustomVisible(true);
-              sensors.track('teleport_gas_edit_customize', {
-                page: location.pathname,
-              });
-            }}
-          >
-            <span>Custom Gas Fee</span>
-            <IconComponent name="chevron-right" cls="base-text-color" />
-          </div>
-        )}
+        <div
+          className="custom-box"
+          onClick={() => {
+            setCustomVisible(true);
+            sensors.track('teleport_gas_edit_customize', {
+              page: location.pathname,
+            });
+          }}
+        >
+          <span>Custom Gas Fee</span>
+          <IconComponent name="chevron-right" cls="base-text-color" />
+        </div>
       </div>
       <div className="gas-fee-bottom">
         <Button

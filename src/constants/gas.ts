@@ -44,7 +44,6 @@ export const GAS_RECOMMENDATIONS = {
 // };
 
 export enum PRIORITY_LEVELS {
-  TEN_PERCENT_INCREASED = 'tenPercentIncreased',
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
