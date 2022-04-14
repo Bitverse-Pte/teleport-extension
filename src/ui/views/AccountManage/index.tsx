@@ -204,6 +204,7 @@ const AccountManage: React.FC = () => {
           <span className="wallet-manage-button-item-title">Add</span>
         </div>
       </div>
+      <p className="wallet-manage-br content-wrap-padding"></p>
 
       {isEdit ? (
         <div className="content flexCol content-wrap-padding">
