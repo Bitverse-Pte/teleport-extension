@@ -286,7 +286,7 @@ const SignTx = ({ params, origin }) => {
       </div>
       {renderContent()}
       <FeeSelector
-        gasLimit={Number(tx.gas || MIN_GAS_LIMIT_HEX)}
+        gasLimit={Number(tx.gas || addHexPrefix(MIN_GAS_LIMIT_HEX))}
         supportsEIP1559={supportsEIP1559}
         visible={visible}
         onClose={() => setVisible(false)}
