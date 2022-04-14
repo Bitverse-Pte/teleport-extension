@@ -56,6 +56,7 @@ export const useTransactionFunctions = ({
       gasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
+      gasPrice,
       estimateSuggested,
     }) => {
       const newGasSettings: any = {
@@ -70,6 +71,9 @@ export const useTransactionFunctions = ({
       if (maxPriorityFeePerGas) {
         newGasSettings.maxPriorityFeePerGas =
           maxPriorityFeePerGas || decGWEIToHexWEI(maxPriorityFeePerGasValue);
+      }
+      if (gasPrice) {
+        newGasSettings.gasPrice = gasPrice;
       }
       const txMeta = getTxMeta();
       const updatedTxMeta: Transaction = {

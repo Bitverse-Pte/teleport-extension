@@ -106,17 +106,24 @@ const CancelSpeedupPopover = ({
        * for EIP1559 Fee Market customization only
        */
       const { gasLimit, maxFee, maxPriorityFee } = gasSettings.customData;
-      updateTransaction({
-        gasLimit,
-        maxFeePerGas: utils.parseUnits(maxFee, 'gwei').toHexString(),
-        maxPriorityFeePerGas: utils
-          .parseUnits(maxPriorityFee, 'gwei')
-          .toHexString(),
-      });
+      const isEIP1559Tx = Boolean(maxFee);
+      if (isEIP1559Tx) {
+        updateTransaction({
+          gasLimit,
+          maxFeePerGas: utils.parseUnits(maxFee, 'gwei').toHexString(),
+          maxPriorityFeePerGas: utils
+            .parseUnits(maxPriorityFee, 'gwei')
+            .toHexString(),
+        });
+      } else {
+        const { gasLimit, gasPrice } = gasSettings.legacyGas;
+        // support for `LEGACY`
+        updateTransaction({
+          gasLimit,
+          gasPrice: utils.parseUnits(gasPrice, 'gwei').toHexString(),
+        });
+      }
     } else {
-      /**
-       * @todo: support for `LEGACY`
-       */
       console.warn(
         `not supported gas type ${gasSettings.gasType}, implementation needed`,
         gasSettings
