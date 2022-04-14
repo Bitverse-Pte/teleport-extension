@@ -48,6 +48,7 @@ const CancelSpeedupPopover = ({
     speedUpTransaction,
     updateTransactionToTenPercentIncreasedGasFee,
     updateTransactionUsingEstimate,
+    updateTransaction,
     transaction,
   } = useGasFeeInputs(undefined, _transaction, undefined, editGasMode);
 
@@ -96,10 +97,29 @@ const CancelSpeedupPopover = ({
 
   useEffect(() => {
     if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
+      /**
+       * Update by EIP1559 Fee Market estimation tier
+       */
       updateTransactionUsingEstimate(gasSettings.gasType);
+    } else if (gasSettings.gasType === 'custom') {
+      /**
+       * for EIP1559 Fee Market customization only
+       */
+      const { gasLimit, maxFee, maxPriorityFee } = gasSettings.customData;
+      updateTransaction({
+        gasLimit,
+        maxFeePerGas: utils.parseUnits(maxFee, 'gwei').toHexString(),
+        maxPriorityFeePerGas: utils
+          .parseUnits(maxPriorityFee, 'gwei')
+          .toHexString(),
+      });
     } else {
+      /**
+       * @todo: support for `LEGACY`
+       */
       console.warn(
-        `not supported gas type ${gasSettings.gasType}, implment needed`
+        `not supported gas type ${gasSettings.gasType}, implementation needed`,
+        gasSettings
       );
     }
   }, [gasSettings]);
@@ -221,7 +241,6 @@ const CancelSpeedupPopover = ({
         </Button>
       </div>
       <FeeSelector
-        disableCustomGasFee
         onClose={() => {
           setGasFeeSelectorVisible(false);
         }}
