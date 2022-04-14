@@ -50,6 +50,7 @@ import {
 import { ComposedStore, ObservableStore } from '@metamask/obs-store';
 import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
+import { parseStringTemplate } from 'utils/string';
 
 let defaultProviderConfigOpts = defaultNetworks['ethereum'] as Provider;
 if (process.env.IN_TEST === 'true') {
@@ -525,16 +526,9 @@ class NetworkPreferenceService extends EventEmitter {
    */
   setProviderConfig(config: Provider) {
     const copiedConfig = config;
-    if (copiedConfig.rpcUrl.includes('${INFURA_API_KEY}')) {
-      /**
-       * Handle networks that added from ChainList
-       * we inject the api key in order to make it work.
-       */
-      copiedConfig.rpcUrl = copiedConfig.rpcUrl.replace(
-        '${INFURA_API_KEY}',
-        process.env.INFURA_PROJECT_ID as string
-      );
-    }
+    copiedConfig.rpcUrl = parseStringTemplate(copiedConfig.rpcUrl, {
+      INFURA_API_KEY: process.env.INFURA_PROJECT_ID as string,
+    });
     this.networkStore.updateState({
       previousProviderStore: this.getProviderConfig(),
       provider: copiedConfig,
