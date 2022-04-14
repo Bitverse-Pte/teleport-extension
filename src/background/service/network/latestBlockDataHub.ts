@@ -43,7 +43,6 @@ interface LatestBlockDataHubConstructorParams {
   blockTracker: PollingBlockTracker;
   gasFeeTracker: GasFeeController;
   networkProviderStore: NetworkProviderStore;
-  getPopupOpen: () => boolean;
 }
 
 export class LatestBlockDataHubService {
@@ -54,7 +53,7 @@ export class LatestBlockDataHubService {
   private _provider: any;
   private _query: any;
   private rpcUrl: string;
-  private getPopupOpen: () => boolean;
+  private isUiOpened = false;
 
   constructor(opts: LatestBlockDataHubConstructorParams) {
     this.store = new ObservableStore({
@@ -64,7 +63,6 @@ export class LatestBlockDataHubService {
       // use Legacy as default value, the compatible way
       gasEstimateType: GAS_ESTIMATE_TYPES.LEGACY,
     });
-    this.getPopupOpen = opts.getPopupOpen;
 
     this._provider = opts.provider;
     this._query = pify(new EthQuery(this._provider));
@@ -79,9 +77,23 @@ export class LatestBlockDataHubService {
     // bind function for easier listener syntax
     this.updateForBlock = this.updateForBlock.bind(this);
     this.handleProviderChange = this.handleProviderChange.bind(this);
+    this.handleUIStatus = this.handleUIStatus.bind(this);
     this.rpcUrl = opts.networkProviderStore.getState().provider.rpcUrl;
     // keep `rpcUrl` updated
     opts.networkProviderStore.subscribe(this.handleProviderChange);
+
+    eventBus.addEventListener('UI_STATUS', this.handleUIStatus);
+  }
+
+  private handleUIStatus(_isUiOpened: boolean) {
+    console.debug('LatestBlockDataHubService::UI_STATUS:', _isUiOpened);
+    this.isUiOpened = _isUiOpened;
+    if (!_isUiOpened) {
+      this.stop();
+    } else {
+      // start if UI are back
+      this.start();
+    }
   }
 
   fetchLatestBlockNow() {
@@ -99,10 +111,7 @@ export class LatestBlockDataHubService {
     /**
      * not update when UI close
      */
-    if (!this.getPopupOpen()) {
-      console.debug(
-        'LatestBlockDataHubService::updateForBlock: skipped because popup is not open.'
-      );
+    if (!this.isUiOpened) {
       return;
     }
     this.currentBlockNumber = blockNumber;
