@@ -410,7 +410,7 @@ export function TransactionsList({
 
   return (
     <div
-      style={{ height: listContiannerHeight, overflow: 'scroll' }}
+      style={{ height: listContiannerHeight, overflowY: 'scroll' }}
       onScroll={onContainnerScroll}
     >
       {transactions.map((tx, idx) => (
