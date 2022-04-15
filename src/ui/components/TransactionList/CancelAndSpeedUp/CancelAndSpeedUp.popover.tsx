@@ -34,7 +34,17 @@ interface CancelAndSpeedUpPopoverParams {
   isSpeedUp?: boolean;
 }
 
-const CancelSpeedupPopover = ({
+const CancelSpeedupPopover = (props: CancelAndSpeedUpPopoverParams) => {
+  /**
+   * do not execute Implementation if popover is not showed
+   */
+  if (!props.showPopOver) {
+    return null;
+  }
+  return <CancelSpeedupPopoverImplementation {...props} />;
+};
+
+const CancelSpeedupPopoverImplementation = ({
   editGasMode,
   transaction: _transaction,
   showPopOver,
@@ -96,6 +106,7 @@ const CancelSpeedupPopover = ({
   }, [gasFeeEstimates]);
 
   useEffect(() => {
+    console.debug('changing transaction type');
     if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
       /**
        * Update by EIP1559 Fee Market estimation tier
@@ -132,10 +143,6 @@ const CancelSpeedupPopover = ({
   }, [gasSettings]);
 
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
-
-  if (!showPopOver) {
-    return null;
-  }
 
   const submitTransactionChange = async () => {
     if (!(await wallet.isUnlocked())) {
