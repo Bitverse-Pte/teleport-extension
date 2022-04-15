@@ -22,8 +22,8 @@ function CustomFee(props) {
       type: SET_CUSTOM_DATA,
       value: {
         gasLimit: gl,
-        maxPriorityFee: mp,
-        maxFee: mf,
+        suggestedMaxPriorityFeePerGas: mp,
+        suggestedMaxFeePerGas: mf,
       },
     });
     onSubmit();
