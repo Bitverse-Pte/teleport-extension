@@ -204,6 +204,8 @@ const Home = () => {
           <div
             className="home-preview-top-container flexR"
             onClick={() => {
+              if (account?.accountCreateType !== AccountCreateType.MNEMONIC)
+                return;
               sensors.track('teleport_home_accounts', {
                 page: location.pathname,
               });
@@ -221,7 +223,9 @@ const Home = () => {
                   : account?.hdWalletName}
               </span>
             </div>
-            <IconComponent name="chevron-down" cls="chevron-down" />
+            {account?.accountCreateType === AccountCreateType.MNEMONIC ? (
+              <IconComponent name="chevron-down" cls="chevron-down" />
+            ) : null}
           </div>
           <div className="home-preview-address-container flexR">
             <span className="home-preview-address">

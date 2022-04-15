@@ -18,7 +18,7 @@ const Welcome = () => {
   const handleBtnClick: (type: ACCOUNT_CREATE_TYPE) => void = (
     type: ACCOUNT_CREATE_TYPE
   ) => {
-    sensors.track('teleport_welcome' + ACCOUNT_CREATE_TYPE[type], {
+    sensors.track('teleport_welcome_' + ACCOUNT_CREATE_TYPE[type], {
       page: 'welcome',
     });
     history.push({

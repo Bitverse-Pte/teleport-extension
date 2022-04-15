@@ -16,8 +16,8 @@ const initState = {
   customType: false,
   customData: {
     gasLimit: 21000,
-    maxPriorityFee: null,
-    maxFee: null,
+    suggestedMaxPriorityFeePerGas: null,
+    suggestedMaxFeePerGas: null,
   },
   gasType: 'medium',
   legacyGas: {

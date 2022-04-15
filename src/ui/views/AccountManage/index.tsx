@@ -204,6 +204,7 @@ const AccountManage: React.FC = () => {
           <span className="wallet-manage-button-item-title">Add</span>
         </div>
       </div>
+      <p className="wallet-manage-br content-wrap-padding"></p>
 
       {isEdit ? (
         <div className="content flexCol content-wrap-padding">
@@ -447,7 +448,11 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
             }
           }}
         />
-        <span className="popup-item-title">New account name</span>
+        <span className="popup-item-title">
+          {props.title === 'Rename Wallet'
+            ? 'New wallet name'
+            : 'New account name'}
+        </span>
         <CustomInput
           value={value}
           cls="popup-container-input"

@@ -127,7 +127,7 @@ const SignTx = ({ params, origin }) => {
           ? getRoundedGasPrice(gasFeeEstimates.gasPrice)
           : '0x0';
       }
-      setGasPrice(tx.gasPrice || gasPrice);
+      setGasPrice(gasPrice);
       const total = multipyHexes(
         gasPrice,
         tx.gas || MIN_GAS_LIMIT_HEX
@@ -286,6 +286,7 @@ const SignTx = ({ params, origin }) => {
       </div>
       {renderContent()}
       <FeeSelector
+        gasLimit={Number(tx.gas || addHexPrefix(MIN_GAS_LIMIT_HEX))}
         supportsEIP1559={supportsEIP1559}
         visible={visible}
         onClose={() => setVisible(false)}
