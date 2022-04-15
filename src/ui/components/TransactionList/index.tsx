@@ -24,13 +24,11 @@ import {
 import { isEqualCaseInsensitive, shortenAddress } from 'ui/utils/utils';
 import { useShouldShowSpeedUp } from 'ui/hooks/wallet/useShouldShowSpeedUp';
 import { Button, Tooltip } from 'antd';
-import CancelButton from './CancelAndSpeedUp/CancelButton';
+import CancelButton from './CancelButton';
 import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
-import CancelSpeedupPopover from './CancelAndSpeedUp/CancelAndSpeedUp.popover';
-import { EDIT_GAS_MODES } from 'constants/gas';
 
 dayjs.extend(relativeTime);
 
@@ -143,25 +141,16 @@ function TransactionItem({
   // );
   const shouldShowSpeedUp = true;
 
-  const [showCancelPopOver, setShowCancelPopOver] = useState(false);
-  const [currentEditGasMode, setEditGasMode] = useState<EDIT_GAS_MODES>(
-    EDIT_GAS_MODES.MODIFY_IN_PLACE
-  );
-
-  const popupCancelAndSpeedUpWithMode = (mode: EDIT_GAS_MODES) => {
-    setEditGasMode(mode);
-    setShowCancelPopOver(true);
-  };
-
+  // @todo: need to implement the cancel and retry
   const cancelTransaction = (e: React.MouseEvent<HTMLButtonElement>) => {
     // stop going to detail page
     e.stopPropagation();
-    popupCancelAndSpeedUpWithMode(EDIT_GAS_MODES.CANCEL);
+    alert('Cancel tx, to be implemented...');
   };
   const retryTransaction = (e: React.MouseEvent<HTMLButtonElement>) => {
     // stop going to detail page
     e.stopPropagation();
-    popupCancelAndSpeedUpWithMode(EDIT_GAS_MODES.SPEED_UP);
+    alert('retry tx to edit, to be implemented...');
   };
 
   const speedUpButton = useMemo(() => {
@@ -261,7 +250,8 @@ function TransactionItem({
         )}
         {isPending && (
           <div className="pending-tx-actions ml-auto">
-            {speedUpButton}
+            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
+            {/* {speedUpButton} */}
             {/* {!hasCancelled && !isUnapproved && (
               <CancelButton
                 transaction={transactionGroup.primaryTransaction}
@@ -271,12 +261,6 @@ function TransactionItem({
           </div>
         )}
       </div>
-      <CancelSpeedupPopover
-        editGasMode={currentEditGasMode}
-        showPopOver={showCancelPopOver}
-        setShowPopOver={setShowCancelPopOver}
-        transaction={transactionGroup.primaryTransaction}
-      />
     </div>
     // {isPending && (
     //   <div className={'activity pending-tx-actions ' + isEvenStyle}>

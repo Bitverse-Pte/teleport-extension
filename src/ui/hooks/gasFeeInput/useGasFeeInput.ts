@@ -25,7 +25,6 @@ import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import { hexToDecimal } from 'ui/utils/conversion';
 import { useGasPriceInput } from './useGasPriceInput';
 import { useMaxFeePerGasInput } from './useMaxFeePerGasInput';
-import { useTransactionFunctions } from './useTransactionFunctions';
 /**
 //  * In EIP_1559_V2 implementation as used by useGasfeeInputContext() the use of this hook is evolved.
 //  * It is no longer used to keep transient state of advance gas fee inputs.
@@ -92,7 +91,7 @@ import { useTransactionFunctions } from './useTransactionFunctions';
 //  */
 export function useGasFeeInputs(
   defaultEstimateToUse = GAS_RECOMMENDATIONS.MEDIUM,
-  transaction: any,
+  transaction,
   minimumGasLimit = '0x5208',
   editGasMode = EDIT_GAS_MODES.MODIFY_IN_PLACE
 ) {
@@ -242,23 +241,23 @@ export function useGasFeeInputs(
       );
     }
   }, [minimumGasLimit, gasErrors.gasLimit, transaction]);
-  const {
-    cancelTransaction,
-    speedUpTransaction,
-    updateTransaction,
-    updateTransactionToTenPercentIncreasedGasFee,
-    updateTransactionUsingDAPPSuggestedValues,
-    updateTransactionUsingEstimate,
-  } = useTransactionFunctions({
-    defaultEstimateToUse,
-    editGasMode,
-    gasFeeEstimates,
-    gasLimit,
-    maxPriorityFeePerGas,
-    // minimumGasLimit,
-    estimatedBaseFee,
-    transaction,
-  });
+  // const {
+  //   cancelTransaction,
+  //   speedUpTransaction,
+  //   updateTransaction,
+  //   updateTransactionToTenPercentIncreasedGasFee,
+  //   updateTransactionUsingDAPPSuggestedValues,
+  //   updateTransactionUsingEstimate,
+  // } = useTransactionFunctions({
+  //   defaultEstimateToUse,
+  //   editGasMode,
+  //   gasFeeEstimates,
+  //   gasLimit,
+  //   maxPriorityFeePerGas,
+  //   // minimumGasLimit,
+  //   estimatedBaseFee,
+  //   transaction,
+  // });
   // When a user selects an estimate level, it will wipe out what they have
   // previously put in the inputs. This returns the inputs to the estimated
   // values at the level specified.
@@ -348,11 +347,11 @@ export function useGasFeeInputs(
     minimumGasLimitDec: hexToDecimal(minimumGasLimit),
     supportsEIP1559,
     supportsEIP1559V2,
-    cancelTransaction,
-    speedUpTransaction,
-    updateTransaction,
-    updateTransactionToTenPercentIncreasedGasFee,
-    updateTransactionUsingDAPPSuggestedValues,
-    updateTransactionUsingEstimate,
+    // cancelTransaction,
+    // speedUpTransaction,
+    // updateTransaction,
+    // updateTransactionToTenPercentIncreasedGasFee,
+    // updateTransactionUsingDAPPSuggestedValues,
+    // updateTransactionUsingEstimate,
   };
 }

@@ -8,7 +8,7 @@ import { ethErrors } from 'eth-rpc-errors';
 import abi from 'utils/human-standard-token-abi-extended';
 import Common from '@ethereumjs/common';
 import { TransactionFactory } from '@ethereumjs/tx';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import NonceTracker from 'nonce-tracker';
 import Eth from 'ethjs';
 import log from 'loglevel';
@@ -50,7 +50,6 @@ import preferenceService from '../preference';
 import { NetworkController } from 'types/network';
 import { CustomGasSettings } from 'types/tx';
 import ns from '../network';
-import { purifyTxParamsGasFields } from 'utils/transaction.utils';
 
 const hstInterface = new ethers.utils.Interface(abi);
 
@@ -633,41 +632,49 @@ export default class TransactionController extends EventEmitter {
    * @returns {{ newGasParams: CustomGasSettings, previousGasParams: CustomGasSettings }}
    */
   generateNewGasParams(
-    _originalTxMeta,
+    originalTxMeta,
     customGasSettings: CustomGasSettings = {},
     incrementNumerator = 11
   ) {
-    const originalTxMeta = purifyTxParamsGasFields(_originalTxMeta);
     const { txParams } = originalTxMeta;
     const previousGasParams: any = {};
     const newGasParams: any = {};
     if (customGasSettings.gasLimit) {
       newGasParams.gas = customGasSettings?.gas ?? GAS_LIMITS.SIMPLE;
     }
-    const is1559Tx = isEIP1559Transaction(originalTxMeta);
-    if (is1559Tx) {
+
+    if (isEIP1559Transaction(originalTxMeta)) {
       previousGasParams.maxFeePerGas = txParams.maxFeePerGas;
       previousGasParams.maxPriorityFeePerGas = txParams.maxPriorityFeePerGas;
       newGasParams.maxFeePerGas =
         customGasSettings?.maxFeePerGas ||
-        BigNumber.from(txParams.maxFeePerGas)
-          .mul(incrementNumerator)
-          .div(10)
-          .toHexString();
+        bnToHex(
+          BnMultiplyByFraction(
+            hexToBn(txParams.maxFeePerGas),
+            incrementNumerator,
+            10
+          )
+        );
       newGasParams.maxPriorityFeePerGas =
         customGasSettings?.maxPriorityFeePerGas ||
-        BigNumber.from(txParams.maxPriorityFeePerGas)
-          .mul(incrementNumerator)
-          .div(10)
-          .toHexString();
+        bnToHex(
+          BnMultiplyByFraction(
+            hexToBn(txParams.maxPriorityFeePerGas),
+            incrementNumerator,
+            10
+          )
+        );
     } else {
       previousGasParams.gasPrice = txParams.gasPrice;
       newGasParams.gasPrice =
         customGasSettings?.gasPrice ||
-        BigNumber.from(txParams.gasPrice)
-          .mul(incrementNumerator)
-          .div(10)
-          .toHexString();
+        bnToHex(
+          BnMultiplyByFraction(
+            hexToBn(txParams.gasPrice),
+            incrementNumerator,
+            10
+          )
+        );
     }
 
     return { previousGasParams, newGasParams };

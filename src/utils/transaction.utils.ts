@@ -55,47 +55,6 @@ export function isLegacyTransactionParams(txParams: Transaction['txParams']) {
   );
 }
 
-export function withoutDigits(hexstr: string): string {
-  return hexstr.split('.')[0];
-}
-
-/**
- * I hate BN! they caused incompatibility with `BigNumber` from ethers
- * let get rid of hexstring with digits!
- * @param transaction tx object
- * @returns a purified tx object
- */
-export function purifyTxParamsGasFields(originalTx: Transaction) {
-  // const transaction = { ...originalTx };
-  const partsOfNewTxParams: Partial<Transaction['txParams']> = {};
-
-  if (originalTx.txParams.maxFeePerGas)
-    partsOfNewTxParams.maxFeePerGas = withoutDigits(
-      originalTx.txParams.maxFeePerGas
-    );
-  if (originalTx.txParams.maxPriorityFeePerGas)
-    partsOfNewTxParams.maxPriorityFeePerGas = withoutDigits(
-      originalTx.txParams.maxPriorityFeePerGas
-    );
-  if (originalTx.txParams.gasLimit)
-    partsOfNewTxParams.gasLimit = withoutDigits(originalTx.txParams.gasLimit);
-  if (originalTx.txParams.gas)
-    partsOfNewTxParams.gasLimit = withoutDigits(originalTx.txParams.gas);
-  if (originalTx.txParams.gasPrice)
-    partsOfNewTxParams.gasPrice = withoutDigits(originalTx.txParams.gasPrice);
-
-  /**
-   * Avoid readonly object error issues
-   */
-  const newTxParams = Object.assign(
-    {},
-    originalTx.txParams,
-    partsOfNewTxParams
-  );
-
-  return Object.assign({}, originalTx, { txParams: newTxParams });
-}
-
 /**
  * Determine if a transactions gas fees in txParams match those in its dappSuggestedGasFees property
  *
