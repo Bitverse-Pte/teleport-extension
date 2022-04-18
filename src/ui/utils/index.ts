@@ -107,10 +107,6 @@ export const ellipsisOverflowedText = (
   return `${cut}...`;
 };
 
-export function openInBrowserNewTab(path: string) {
-  return window.open(`index.html#${path}`);
-}
-
 export function toChecksumHexAddress(address) {
   if (!address) {
     // our internal checksumAddress function that this method replaces would
