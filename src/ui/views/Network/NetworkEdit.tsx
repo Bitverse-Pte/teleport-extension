@@ -256,75 +256,94 @@ const NetworkEdit = () => {
   );
 
   return (
-    <div className="flexCol network-page-container network-edit">
-      <Header title={t('CustomizeNetwork')} />
-      <Formik
-        initialValues={fieldsPresetValues}
-        validate={validateFields}
-        onSubmit={async (values, { setSubmitting }) => {
-          await editNetwork(values);
-          setSubmitting(false);
-        }}
-      >
-        {({ isSubmitting, ...formilk }) => {
-          const isFormNotFinished = Object.keys(formilk.errors).length > 0;
-          return (
-            <Form>
-              <div className="form-body content-wrap-padding">
-                <h1 className="required">{t('Network Name')}</h1>
-                <Field name="networkName" placeholder="Enter Network Name" />
-                <ErrorMessage
-                  name="networkName"
-                  component="div"
-                  className="input-error"
-                />
-                <h1 className="required">{t('RPC URL')}</h1>
-                <Field name="rpcUrl" placeholder="Enter RPC URL" />
-                <ErrorMessage
-                  name="rpcUrl"
-                  component="div"
-                  className="input-error"
-                />
-                <h1 className="required">{t('Chain ID')}</h1>
-                <Field
-                  name="chainId"
-                  placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
-                />
-                <ErrorMessage
-                  name="chainId"
-                  component="div"
-                  className="input-error"
-                />
-                <h1>{t('Currency Symbol')}</h1>
-                <Field name="symbol" placeholder={t('Optional')} />
-                <ErrorMessage
-                  name="symbol"
-                  component="div"
-                  className="input-error"
-                />
-                <h1>{t('Block Explorer URL')}</h1>
-                <Field name="explorerUrl" placeholder={t('Optional')} />
-                <ErrorMessage
-                  name="explorerUrl"
-                  component="div"
-                  className="input-error"
-                />
-              </div>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className={clsx({
-                  disabled_button: isFormNotFinished,
-                })}
-                style={{ margin: '24px', width: '312px' }}
-                disabled={isFormNotFinished}
-              >
-                {t('Next')}
-              </Button>
-            </Form>
-          );
-        }}
-      </Formik>
+    <div className="network-edit">
+      <div className="flexCol network-page-container">
+        <div className="edit-network-header flex justify-center">
+          <h1 className="title">{t('CustomizeNetwork')}</h1>
+        </div>
+        <Formik
+          initialValues={fieldsPresetValues}
+          validate={validateFields}
+          onSubmit={async (values, { setSubmitting }) => {
+            await editNetwork(values);
+            setSubmitting(false);
+          }}
+        >
+          {({ isSubmitting, ...formilk }) => {
+            const isFormNotFinished = Object.keys(formilk.errors).length > 0;
+            return (
+              <Form className="form-deco">
+                <div className="form-body">
+                  <h1 className="required">{t('Network Name')}</h1>
+                  <Field name="networkName" placeholder="Enter Network Name" />
+                  <ErrorMessage
+                    name="networkName"
+                    component="div"
+                    className="input-error"
+                  />
+                  <h1 className="required">{t('RPC URL')}</h1>
+                  <Field name="rpcUrl" placeholder="Enter RPC URL" />
+                  <ErrorMessage
+                    name="rpcUrl"
+                    component="div"
+                    className="input-error"
+                  />
+                  <h1 className="required">{t('Chain ID')}</h1>
+                  <Field
+                    name="chainId"
+                    placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
+                  />
+                  <ErrorMessage
+                    name="chainId"
+                    component="div"
+                    className="input-error"
+                  />
+                  <h1>
+                    {t('Currency Symbol')} <span>({t('Optional')})</span>
+                  </h1>
+                  <Field name="symbol" placeholder={t('Optional')} />
+                  <ErrorMessage
+                    name="symbol"
+                    component="div"
+                    className="input-error"
+                  />
+                  <h1>
+                    {t('Block Explorer URL')} <span>({t('Optional')})</span>
+                  </h1>
+                  <Field name="explorerUrl" placeholder={t('Optional')} />
+                  <ErrorMessage
+                    name="explorerUrl"
+                    component="div"
+                    className="input-error"
+                  />
+                </div>
+                <Button
+                  type="default"
+                  // style={{
+                  //   width: '312px',
+                  //   color: "#1484F5",
+                  //   border: "solid 1px #1484F5"
+                  // }}
+                  className="cancel-btn"
+                >
+                  {t('Cancel')}
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className={clsx({
+                    disabled_button: isFormNotFinished,
+                  })}
+                  style={{ width: '250px' }}
+                  disabled={isFormNotFinished}
+                >
+                  {t('Next')}
+                </Button>
+              </Form>
+            );
+          }}
+        </Formik>
+      </div>
     </div>
   );
 };
