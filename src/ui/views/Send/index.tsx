@@ -16,7 +16,12 @@ import {
   getWeiHexFromDecimalValue,
 } from 'ui/utils/conversion';
 import Header from 'ui/components/Header';
-import { useWallet, useAsyncEffect, denom2SymbolRatio } from 'ui/utils';
+import {
+  useWallet,
+  useAsyncEffect,
+  denom2SymbolRatio,
+  removeCommas,
+} from 'ui/utils';
 import { transferAddress2Display } from 'ui/utils';
 import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
 import AccountSelect from 'ui/components/AccountSelect';
@@ -214,7 +219,11 @@ const Send = () => {
       selectedToken?.amount || 0,
       selectedToken?.decimal || 0
     );
-    setAmount(amountDecimal);
+    /**
+     * we do not need commas in the amount input field
+     */
+    const sanitizedAmount = removeCommas(amountDecimal);
+    setAmount(sanitizedAmount);
   };
 
   const handleTokenSelect = (val) => {

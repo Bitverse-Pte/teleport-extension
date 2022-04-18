@@ -67,6 +67,10 @@ export function denom2SymbolRatio(
   ).toFormat();
 }
 
+export function removeCommas(numberInStr: string) {
+  return numberInStr.replace(',', '');
+}
+
 export const getOriginName = (origin: string) => {
   const matches = origin.replace(/https?:\/\//, '').match(/^([^.]+\.)?(\S+)\./);
 
