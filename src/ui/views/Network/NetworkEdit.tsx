@@ -12,10 +12,6 @@ import { useHistory, useParams, useLocation } from 'react-router';
 import axios, { AxiosError } from 'axios';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { Button, Input, Select } from 'antd';
-import Header from 'ui/components/Header';
-// import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
-// import DefaulutIcon from 'assets/tokens/default.svg';
-import { isString } from 'util';
 import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
@@ -319,12 +315,8 @@ const NetworkEdit = () => {
                 </div>
                 <Button
                   type="default"
-                  // style={{
-                  //   width: '312px',
-                  //   color: "#1484F5",
-                  //   border: "solid 1px #1484F5"
-                  // }}
                   className="cancel-btn"
+                  onClick={() => history.push('/network')}
                 >
                   {t('Cancel')}
                 </Button>
