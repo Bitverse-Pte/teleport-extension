@@ -1,16 +1,27 @@
-import React, { useMemo } from 'react';
-import { TransactionGroup, TransactionStatuses } from 'constants/transaction';
+import React, { Fragment, useMemo } from 'react';
+import {
+  TransactionGroup,
+  TransactionGroupCategories,
+  TransactionStatuses,
+} from 'constants/transaction';
 import { utils, BigNumber } from 'ethers';
 import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import { purifyTxParamsGasFields } from 'utils/transaction.utils';
+import { useTransactionBreakDown } from 'ui/hooks/utils/useTransactionBreakdown';
+import { useTranslation } from 'react-i18next';
 
 interface Params {
   transaction: TransactionGroup;
 }
 
 export function TransactionFee({ transaction: txGroup }: Params) {
-  const { displayedStatusKey } = useTransactionDisplayData(txGroup);
+  const { t } = useTranslation();
+  const { displayedStatusKey, category } = useTransactionDisplayData(txGroup);
+  const { hexGasTotal, nativeCurrency } = useTransactionBreakDown(
+    txGroup.primaryTransaction,
+    category == TransactionGroupCategories.APPROVAL
+  );
 
   const isTxSigned = useMemo(() => {
     return (
@@ -18,10 +29,6 @@ export function TransactionFee({ transaction: txGroup }: Params) {
       TransactionStatuses.UNAPPROVED.toLowerCase()
     );
   }, []);
-
-  const currentProviderSymbol = useSelector(
-    (s) => s.network.provider.ticker || 'ETH'
-  );
 
   const primaryTransaction = purifyTxParamsGasFields(
     txGroup.primaryTransaction
@@ -39,13 +46,7 @@ export function TransactionFee({ transaction: txGroup }: Params) {
   const formattedTxFee = () => {
     let val = '';
     try {
-      val = utils.formatEther(
-        BigNumber.from(
-          // use gasPrice (legacy) or maxFeePerGas(1559 network)
-          primaryTransaction.txParams.maxFeePerGas ||
-            primaryTransaction.txParams.gasPrice
-        ).mul(primaryTransaction.txParams.gas!)
-      );
+      val = utils.formatEther(hexGasTotal);
       if (val.length > 11) {
         /**
          * parsed as number then rounding it
@@ -63,7 +64,7 @@ export function TransactionFee({ transaction: txGroup }: Params) {
     <div className="row">
       <div className="field-name">Transaction Fee</div>
       <div className="field-value">
-        {formattedTxFee()} {currentProviderSymbol}
+        {formattedTxFee()} {nativeCurrency}
       </div>
     </div>
   );
