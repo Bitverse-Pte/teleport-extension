@@ -138,6 +138,8 @@ h2.category-name {
     backdrop-filter: blur(24px);
     border-radius: 20px;
     padding: 40px 106px;
+
+    margin-bottom: 48px;
   }
 
   .input-error {
@@ -167,8 +169,7 @@ h2.category-name {
       border-radius: 8px !important;
       border-color: #F8FAFC;
       margin-bottom: 20px;
-      max-width: 514px;
-      width: 100%;
+      width: 514px;
       // height: 48px;
       padding: 11px 16px;
     }
@@ -189,9 +190,11 @@ h2.category-name {
   }
   .form-body {
     padding: 0 4px;
-    overflow-y: scroll;
     overflow-x: hidden;
     margin-bottom: 48px;
+  }
+  .form-body > h1,input,.input-error {
+    max-width: 514px;
   }
 
   .cancel-btn {

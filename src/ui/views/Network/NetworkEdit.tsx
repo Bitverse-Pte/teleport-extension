@@ -274,7 +274,7 @@ const NetworkEdit = () => {
   }
 
   return (
-    <div className="network-edit h-full">
+    <div className="network-edit" style={{ minHeight: '100%' }}>
       <div className="flexCol network-page-container">
         <div className="edit-network-header flex justify-center">
           <h1 className="title">{t('CustomizeNetwork')}</h1>
@@ -335,24 +335,19 @@ const NetworkEdit = () => {
                     className="input-error"
                   />
                 </div>
-                <Button
-                  type="default"
-                  className="cancel-btn"
-                  onClick={() => history.push('/network')}
-                >
-                  {t('Cancel')}
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  className={clsx({
-                    disabled_button: isFormNotFinished,
-                  })}
-                  style={{ width: '250px' }}
-                  disabled={isFormNotFinished}
-                >
-                  {t('Next')}
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className={clsx({
+                      disabled_button: isFormNotFinished,
+                    })}
+                    style={{ width: '250px' }}
+                    disabled={isFormNotFinished}
+                  >
+                    {t('Next')}
+                  </Button>
+                </div>
               </Form>
             );
           }}
