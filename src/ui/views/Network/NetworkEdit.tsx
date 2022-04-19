@@ -252,7 +252,7 @@ const NetworkEdit = () => {
   );
 
   return (
-    <div className="network-edit">
+    <div className="network-edit h-full">
       <div className="flexCol network-page-container">
         <div className="edit-network-header flex justify-center">
           <h1 className="title">{t('CustomizeNetwork')}</h1>
