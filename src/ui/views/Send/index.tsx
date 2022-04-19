@@ -14,6 +14,7 @@ import { addHexPrefix } from 'ethereumjs-util';
 import {
   EthDenomination,
   getWeiHexFromDecimalValue,
+  multiplyCurrencies,
 } from 'ui/utils/conversion';
 import Header from 'ui/components/Header';
 import {
@@ -145,13 +146,15 @@ const Send = () => {
       setUnlockPopupVisible(true);
       return;
     }
-    const userInputAmount = addHexPrefix(
-      getWeiHexFromDecimalValue({
-        value: amount,
-        fromCurrency: ETH,
-        fromDenomination: EthDenomination.ETH,
-      }).toString()
+    const multiplier = Math.pow(10, Number(selectedToken?.decimal || 0));
+    const hexAmountValue = addHexPrefix(
+      multiplyCurrencies(amount || 0, multiplier, {
+        multiplicandBase: 10,
+        multiplierBase: 10,
+        toNumericBase: 'hex',
+      })
     );
+
     const type = isSupport1559
       ? TransactionEnvelopeTypes.FEE_MARKET
       : TransactionEnvelopeTypes.LEGACY;
@@ -163,19 +166,19 @@ const Send = () => {
     };
     if (selectedToken?.isNative) {
       params.to = toAddress;
-      params.value = userInputAmount;
+      params.value = hexAmountValue;
     } else {
       // erc-20 tokens
       params.to = selectedToken?.contractAddress;
       params.data = generateTokenTransferData({
         toAddress: toAddress,
-        amount: userInputAmount,
+        amount: hexAmountValue,
       });
     }
     params.txParam = {
       from: fromAccount?.address,
       to: toAddress,
-      value: userInputAmount,
+      value: hexAmountValue,
       type: type,
       symbol: selectedToken?.symbol,
     };
