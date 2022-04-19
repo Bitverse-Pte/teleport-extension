@@ -117,6 +117,7 @@ const NetworksSelectionContainer = () => {
             <BetaIcon />
           </span>
         }
+        onXButtonClick={() => history.push('/home')}
         extCls="network-list-header"
       />
       <div className="networkList">
