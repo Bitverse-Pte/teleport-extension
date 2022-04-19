@@ -345,7 +345,7 @@ const NetworkEdit = () => {
                     style={{ width: '250px' }}
                     disabled={isFormNotFinished}
                   >
-                    {t('Next')}
+                    {t('Confirm')}
                   </Button>
                 </div>
               </Form>
