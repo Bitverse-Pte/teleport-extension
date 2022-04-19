@@ -39,6 +39,14 @@ const NetworkEdit = () => {
 
   const [fetchedChainId, setFetchedChainId] = useState<string | undefined>();
 
+  const matchedProvider = useMemo(() => {
+    if (!isEdit) {
+      return undefined;
+    }
+    console.debug('matchedProvider::customNetworks:', customNetworks);
+    return customNetworks[formattedIdx];
+  }, [isEdit, formattedIdx, customNetworks]);
+
   const fieldsPresetValues = useMemo(() => {
     const emptyResult = {
       chainId: '',
@@ -47,19 +55,18 @@ const NetworkEdit = () => {
       rpcUrl: '',
       symbol: '',
     };
-    const provider = networkContext?.getCustomProvider(formattedIdx);
-    if (!isEdit || !provider) {
+    if (!matchedProvider) {
       return emptyResult;
     } else {
       return {
-        explorerUrl: provider.rpcPrefs.blockExplorerUrl || '',
-        chainId: Number(provider.chainId).toString(10) || '',
-        networkName: provider.nickname || '',
-        rpcUrl: provider.rpcUrl || '',
-        symbol: provider.ticker || '',
+        explorerUrl: matchedProvider.rpcPrefs.blockExplorerUrl || '',
+        chainId: Number(matchedProvider.chainId).toString(10) || '',
+        networkName: matchedProvider.nickname || '',
+        rpcUrl: matchedProvider.rpcUrl || '',
+        symbol: matchedProvider.ticker || '',
       };
     }
-  }, [isEdit, formattedIdx, networkContext]);
+  }, [matchedProvider]);
 
   const checkRpcUrlAndSetChainId = useCallback(
     async (value: string) => {
@@ -250,6 +257,21 @@ const NetworkEdit = () => {
     },
     [fetchedChainId]
   );
+
+  if (!matchedProvider && isEdit) {
+    /**
+     * in edit mode, need to wait for `customNetworks` loaded from service worker
+     * so we can fill the form, so set a loading in the mean time
+     */
+    return (
+      <div className="network-edit h-full">
+        <div className="box">
+          <h1 className="title">{t('loading')}...</h1>
+          <p>{t('network_loading_message')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="network-edit h-full">
