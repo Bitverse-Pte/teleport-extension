@@ -261,6 +261,19 @@ const NetworkEdit = () => {
             },
           });
         }
+        /**
+         * Basic chain id validation passed, now looking for existed provider with same chainId
+         */
+        const matchedProvider = customNetworks.find((p) =>
+          chainIdBN.eq(p.chainId)
+        );
+        if (matchedProvider) {
+          errors.chainId = t('chainIdExistsErrorMsg', {
+            replace: {
+              name: matchedProvider.nickname,
+            },
+          });
+        }
       } catch (_) {
         errors.chainId = t('bad_chain_id');
       }
@@ -269,7 +282,7 @@ const NetworkEdit = () => {
       });
       return errors;
     },
-    [checkRpcUrlAndSetChainId, fetchedChainId]
+    [checkRpcUrlAndSetChainId, customNetworks, fetchedChainId]
   );
 
   if (!matchedProvider && isEdit) {

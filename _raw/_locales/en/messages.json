@@ -455,6 +455,9 @@
   "Confirm": {
     "message": "Confirm"
   },
+  "chainIdExistsErrorMsg": {
+    "message": "This Chain ID is currently used by the '{{name}}' network."
+  },
   "Please__enter__the__password": {
     "message": "Please enter the password"
   },
