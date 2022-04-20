@@ -255,7 +255,7 @@ const NetworkEdit = () => {
       });
       return errors;
     },
-    [fetchedChainId]
+    [checkRpcUrlAndSetChainId, fetchedChainId]
   );
 
   if (!matchedProvider && isEdit) {
