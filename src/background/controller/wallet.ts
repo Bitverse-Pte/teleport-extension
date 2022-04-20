@@ -114,6 +114,10 @@ export class WalletController extends BaseController {
       isNative: true,
     });
 
+    networkPreferenceService.setProviderConfig({
+      ...network,
+      type: 'rpc',
+    });
     return network;
   };
 

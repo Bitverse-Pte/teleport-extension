@@ -175,7 +175,7 @@ const NetworkEdit = () => {
       ClickToCloseMessage.success({
         content: t('Custom Provider Saved!'),
       });
-      history.push('/network');
+      history.push('/home');
     },
     [history, networkContext, isEdit, formattedIdx]
   );

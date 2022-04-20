@@ -149,14 +149,22 @@ export function NetworkStoreProvider({
       blockExplorerUrl?: string,
       coinType = CoinType.ETH
     ) => {
-      await wallet.addCustomNetwork(
-        nickname,
-        rpcUrl,
-        chainId,
-        ticker,
-        blockExplorerUrl,
-        coinType
-      );
+      dispatch(showLoadingIndicator());
+      try {
+        await wallet.addCustomNetwork(
+          nickname,
+          rpcUrl,
+          chainId,
+          ticker,
+          blockExplorerUrl,
+          coinType
+        );
+        await wallet.fetchLatestBlockDataNow();
+      } catch (error) {
+        console.error('addCustomProvider::error', error);
+      } finally {
+        dispatch(hideLoadingIndicator());
+      }
     },
     [wallet]
   );
