@@ -33,10 +33,6 @@
       cursor: pointer;
       box-sizing: border-box;
 
-      &:hover {
-        background: #FAFCFE;
-      }
-
       .account-left {
         align-items: center;
 
@@ -60,6 +56,70 @@
 
         }
       }
+
+      .account-right {
+        align-items: center;
+        justify-content: flex-end;
+
+        .account-item-action {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          justify-content: center;
+          align-items: center;
+          background: #F8FAFC;
+          box-sizing: border-box;
+
+          .account-item-action-icon {
+            height: 14px;
+          }
+
+          .key-default-icon {
+            display: block;
+          }
+
+          .key-active-icon {
+            display: none;
+          }
+
+          &:hover {
+            background: #F0F9FF;
+
+            .key-default-icon {
+              display: none;
+            }
+
+            .key-active-icon {
+              display: block;
+            }
+          }
+
+          &:last-child {
+            margin-left: 12px;
+          }
+        }
+
+      }
+
+      &:hover {
+        background: #F8FAFC;
+
+        .account-right {
+          .account-item-action {
+            border: 0.5px solid #E1E8F0;
+
+            &:hover {
+              background: #F0F9FF;
+              border: none;
+            }
+          }
+
+        }
+      }
+    }
+    
+    .account-list-active {
+      background: #F0F9FF;
     }
   }
 

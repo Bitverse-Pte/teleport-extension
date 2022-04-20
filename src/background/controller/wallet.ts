@@ -259,8 +259,11 @@ export class WalletController extends BaseController {
     return keyringService.renameHdWalletByHdWalletId(hdWalletId, name);
   }
 
-  public getPrivateKeyByHdWalletId(name: string): Promise<string> {
-    return keyringService.getPrivateKeyByHdWalletId(name);
+  public getPrivateKeyByHdWalletId(
+    hdWalletId: string,
+    address?: string
+  ): Promise<string> {
+    return keyringService.getPrivateKeyByHdWalletId(hdWalletId, address);
   }
 
   public getMnemonicByHdWalletId(name: string): Promise<string> {

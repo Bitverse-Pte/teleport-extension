@@ -1,8 +1,8 @@
 import './style.less';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import Header from 'ui/components/Header';
-import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
+import { useAsyncEffect, useWallet } from 'ui/utils';
 import {
   AccountCreateType,
   BaseAccount,
@@ -403,7 +403,7 @@ const WalletManage: React.FC = () => {
         onConfirm={onDeleteConfirm}
       />
       <Rename
-        title="Rename Wallet"
+        title="New wallet name"
         visible={renamePopupVisible}
         defaultValue={currentWalletName}
         setVisible={(visible: boolean) => {
