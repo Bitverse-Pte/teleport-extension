@@ -17,7 +17,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 248px;
+    height: 246px;
     background: url(../../../assets/homeBg.png) no-repeat 0 0;
     background-size: 100% 100%;
     z-index: -1;
@@ -27,14 +27,20 @@
     box-sizing: border-box;
     padding-top: 2px;
 
-    .home-wallet-name {
-      margin-bottom: 4px;
-      width: 100%;
-      padding-left: @pagePaddingLeft;
-      box-sizing: border-box;
-      font-size: 12px;
+    .home-content-name-wrap{
+      align-items: center;
+      font-size:12px;
+      font-family: MontserratBold;
+      color: @themeColor;
+      margin-bottom: 8px;
       height: 12px;
+
+      .home-wallet-name {
+        margin-left: 5px;
+      }
     }
+
+    
 
     .home-preview-container {
       height: 160px;
@@ -404,8 +410,16 @@
       font-size: 24px;
     }
   
-    div.account-switch-accounts-manage-wallet-container {
-      width: 14px;      
+    span.account-switch-accounts-manage-wallet-container {
+      font-size: 12px;
+      font-family: MontserratBold;
+      color: @themeColor;
+      margin-right: 8px;
+      align-items: center;
+
+      .chevron-right{
+        fill: @themeColor;
+      }   
     }
   }
 }
