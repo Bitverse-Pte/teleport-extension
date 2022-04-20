@@ -907,9 +907,13 @@ class KeyringService extends EventEmitter {
     return secrets[0].mnemonic;
   }
 
-  async getPrivateKeyByHdWalletId(hdWalletId: string): Promise<string> {
+  async getPrivateKeyByHdWalletId(
+    hdWalletId: string,
+    address?: string
+  ): Promise<string> {
     const secrets: Secret[] = this.secrets.filter(
-      (a: Secret) => a.hdWalletId === hdWalletId
+      (a: Secret) =>
+        a.hdWalletId === hdWalletId && (address ? address === a.address : true)
     );
     if (!secrets || secrets.length === 0)
       return Promise.reject('there is no private key for this id');

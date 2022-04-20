@@ -13,6 +13,7 @@ import IconEdit from 'assets/action-icon/edit.svg';
 import { IconComponent } from 'ui/components/IconComponents';
 import './style.less';
 import skynet from 'utils/skynet';
+import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
 const { sensors } = skynet;
 
 type NetworkProviderWithOptionalTag = Provider & { idx?: number };
@@ -97,7 +98,7 @@ const RpcNetworkOptions = ({
 }) => {
   const providerContext = useContext(NetworkProviderContext);
   const { t } = useTranslation();
-  const history = useHistory();
+  const jumpToExpandedView = useJumpToExpandedView();
 
   const handleRemove = useCallback(
     (e: React.MouseEvent<any>) => {
@@ -143,7 +144,7 @@ const RpcNetworkOptions = ({
         onClick={(e) => {
           // stop the parent's onClick event
           e.stopPropagation();
-          history.push(`/network/edit/${network.idx}`);
+          jumpToExpandedView(`/network/edit/${network.idx}`);
         }}
       />
     </div>

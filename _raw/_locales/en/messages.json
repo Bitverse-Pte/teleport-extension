@@ -19,6 +19,9 @@
   "loading": {
     "message": "Loading"
   },
+  "network_loading_message": {
+    "message": "If you see this page for more than 30s, your custom network may broken. Please remove the broken custom network and add it once again."
+  },
   "Set__Unlock__Password": {
     "message": "Set Unlock Password"
   },

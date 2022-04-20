@@ -17,6 +17,7 @@ const BackupCheck = () => {
   const { state, pathname } = useLocation<{
     hdWalletId: string;
     accountType: Tabs;
+    address?: string;
   }>();
 
   const [unlocked, setUnlocked] = useState(false);
@@ -58,7 +59,10 @@ const BackupCheck = () => {
   };
 
   const getPrivateKey = async () => {
-    const pk = await wallet.getPrivateKeyByHdWalletId(state.hdWalletId);
+    const pk = await wallet.getPrivateKeyByHdWalletId(
+      state.hdWalletId,
+      state.address
+    );
     if (pk) {
       if (pk.startsWith('0x')) {
         setPrivateKey(pk.replace('0x', ''));

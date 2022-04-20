@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
-import { message, Drawer } from 'antd';
+import { Drawer } from 'antd';
 import {
   useWallet,
   useAsyncEffect,
@@ -10,16 +10,10 @@ import {
   denom2SymbolRatio,
   getTotalPricesByAmountAndPrice,
 } from 'ui/utils';
-import AccountSwitch from 'ui/components/AccountSwitch';
 import Setting from 'ui/views/Setting';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { HomeHeader } from 'ui/components/Home/Header';
-import {
-  AccountCreateType,
-  BaseAccount,
-  DisplayWalletManage,
-  HdAccountStruct,
-} from 'types/extend';
+import { AccountCreateType, BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Token } from 'types/token';
 import {
@@ -30,13 +24,12 @@ import {
   TokenIcon,
   WalletName,
 } from 'ui/components/Widgets';
-import { Provider } from 'types/network';
 import { TransactionsList } from 'ui/components/TransactionList';
 import './style.less';
 import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
-import WalletManageNewIcon from '../../../assets/walletManageNew.svg';
+import ArrowRight from '../../../assets/arrowRight.svg';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
@@ -52,15 +45,13 @@ const Home = () => {
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
-  const [accountList, setAccountList] = useState<DisplayWalletManage>();
+  //const [accountList, setAccountList] = useState<DisplayWalletManage>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
   const [tabType, setTabType] = useState(Tabs.FIRST);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
-  const start = new Date().getTime();
-  (window as any).wallet = wallet;
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -93,12 +84,12 @@ const Home = () => {
     if (account) setAccount(account);
   };
 
-  const getAccountList = async () => {
+  /* const getAccountList = async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList();
     setAccountList(accounts);
-  };
+  }; */
 
-  useAsyncEffect(getAccountList, []);
+  //useAsyncEffect(getAccountList, []);
   useAsyncEffect(updateAccount, []);
   useAsyncEffect(getTokenBalancesAsync, []);
   useAsyncEffect(getTokenBalancesSync, []);
@@ -134,6 +125,11 @@ const Home = () => {
     sensors.track('teleport_home_account_click', {
       page: location.pathname,
     });
+  };
+
+  const handleSiteClick = async (account: BaseAccount) => {
+    setPopupVisible(false);
+    console.log(account);
   };
 
   const handleReceiveBtnClick = () => {
@@ -195,11 +191,19 @@ const Home = () => {
       />
       <div className="home-bg"></div>
       <div className="home-content">
-        <WalletName width={200} cls="home-wallet-name">
-          {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
-            ? ' '
-            : account?.hdWalletName}
-        </WalletName>
+        <div className="home-content-name-wrap content-wrap-padding flexR">
+          <img
+            onClick={handleAddTokenBtnClick}
+            src={ArrowRight}
+            className="home-content-name-arrow-right"
+          />
+          <WalletName width={200} cls="home-wallet-name">
+            {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
+              ? 'Normal Wallet'
+              : `ID Wallet: ${account?.hdWalletName}`}
+          </WalletName>
+        </div>
+
         <div className="home-preview-container flexCol content-wrap-padding">
           <div
             className="home-preview-top-container flexR"
@@ -395,7 +399,8 @@ const Home = () => {
           </div>
           <div className="account-switch-accounts flexR content-wrap-padding">
             <span className="account-switch-accounts-title">Accounts</span>
-            <img
+            <span
+              className="account-switch-accounts-manage-wallet-container cursor flexR"
               onClick={() => {
                 sensors.track('teleport_home_account_manage', {
                   page: location.pathname,
@@ -409,14 +414,16 @@ const Home = () => {
                   },
                 });
               }}
-              src={WalletManageNewIcon}
-              className="account-switch-accounts-manage-wallet-container cursor"
-            />
+            >
+              Manage Account
+              <IconComponent name="chevron-right" cls="icon chevron-right" />
+            </span>
           </div>
 
           <CurrentWalletAccountSwitch
             visible={accountPopupVisible}
             handleAccountClick={handleAccountClick}
+            handleSiteClick={handleSiteClick}
           />
         </div>
       </Drawer>

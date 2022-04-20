@@ -1,16 +1,21 @@
 import './style.less';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useAsyncEffect, useWallet, transferAddress2Display } from 'ui/utils';
-import clsx from 'clsx';
 import { AccountCreateType, BaseAccount } from 'types/extend';
 import { Object } from 'ts-toolbelt';
 import Jazzicon from 'react-jazzicon';
-import cloneDeep from 'lodash/cloneDeep';
-import { IconComponent } from '../IconComponents';
 import { WalletName } from '../Widgets';
+import { useHistory } from 'react-router-dom';
+import { Tabs } from 'constants/wallet';
+import keyDefaultIcon from 'assets/keyDefault.svg';
+import keyActiveIcon from 'assets/keyActive.svg';
+import siteDefaultIcon from 'assets/siteDefault.svg';
+import siteActiveIcon from 'assets/siteActive.svg';
+import classnames from 'classnames';
 
 interface AccountSwitchProps {
   handleAccountClick?: (account: BaseAccount) => void;
+  handleSiteClick?: (account: BaseAccount) => void;
   visible?: boolean;
 }
 
@@ -18,6 +23,7 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
   props: AccountSwitchProps
 ) => {
   const wallet = useWallet();
+  const history = useHistory();
   const [accountList, setAccountList] =
     useState<Object.Merge<BaseAccount, { selected?: boolean }>[]>();
   const [walletName, setWalletName] = useState('');
@@ -59,7 +65,9 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
           (a: Object.Merge<BaseAccount, { selected?: boolean }>) => {
             return (
               <div
-                className="account-item flexR"
+                className={classnames('account-item flexR', {
+                  'account-list-active': a?.selected,
+                })}
                 onClick={() => {
                   if (props.handleAccountClick) {
                     props.handleAccountClick(a);
@@ -81,10 +89,48 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
                     </span>
                   </div>
                 </div>
-                <div className="account-right">
-                  {a.selected ? (
-                    <IconComponent name="check" cls="base-text-color" />
-                  ) : null}
+                <div className="account-right flexR">
+                  <div
+                    className="account-item-action cursor flexR"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      history.push({
+                        pathname: '/mnemonic-check',
+                        state: {
+                          hdWalletId: a.hdWalletId,
+                          accountType: Tabs.SECOND,
+                          address: a.address,
+                        },
+                      });
+                    }}
+                  >
+                    <img
+                      src={keyDefaultIcon}
+                      className="account-item-action-icon key-default-icon"
+                    />
+                    <img
+                      src={keyActiveIcon}
+                      className="account-item-action-icon key-active-icon"
+                    />
+                  </div>
+                  <div
+                    className="account-item-action cursor flexR"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (props.handleSiteClick) {
+                        props.handleSiteClick(a);
+                      }
+                    }}
+                  >
+                    <img
+                      src={siteDefaultIcon}
+                      className="account-item-action-icon key-default-icon"
+                    />
+                    <img
+                      src={siteActiveIcon}
+                      className="account-item-action-icon key-active-icon"
+                    />
+                  </div>
                 </div>
               </div>
             );
