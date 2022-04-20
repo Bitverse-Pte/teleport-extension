@@ -467,6 +467,10 @@
   "Sign__Text": {
     "message": "Sign Text"
   },
+  "chainListReturnedDifferentTickerSymbol": {
+    "message": "The network with chain ID {{chainId}} may use a different currency symbol ({{returnedNativeCurrencySymbol}}) than the one you have entered. Please verify before continuing.",
+    "description": "chainId is the chain id currently entered in the network form and returnedNativeCurrencySymbol is the return value of nativeCurrency.symbol from chainlist.network"
+  },
   "view__Raw": {
     "message": "view Raw"
   },

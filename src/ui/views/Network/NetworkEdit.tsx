@@ -23,6 +23,7 @@ import {
   hideLoadingIndicator,
   showLoadingIndicator,
 } from 'ui/reducer/appState.reducer';
+import { useChainList } from 'ui/hooks/utils/useChainList';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
@@ -52,7 +53,7 @@ const NetworkEdit = () => {
   }, [isProviderLoaded]);
 
   const [fetchedChainId, setFetchedChainId] = useState<string | undefined>();
-
+  const chainListData = useChainList();
   const matchedProvider = useMemo(() => {
     if (!isEdit) {
       return undefined;
@@ -277,12 +278,31 @@ const NetworkEdit = () => {
       } catch (_) {
         errors.chainId = t('bad_chain_id');
       }
+      /**
+       * validating symbol
+       */
+      if (!chainListData.loading && chainListData.value) {
+        const matchedChain = chainListData.value.find((c) =>
+          BigNumber.from(values.chainId).eq(c.chainId)
+        );
+        if (
+          matchedChain &&
+          matchedChain.nativeCurrency.symbol !== values.symbol
+        ) {
+          errors.symbol = t('chainListReturnedDifferentTickerSymbol', {
+            replace: {
+              chainId: values.chainId,
+              returnedNativeCurrencySymbol: matchedChain.nativeCurrency.symbol,
+            },
+          });
+        }
+      }
       Object.keys(errors).forEach((field) => {
         if (!errors[field]) delete errors[field];
       });
       return errors;
     },
-    [checkRpcUrlAndSetChainId, customNetworks, fetchedChainId]
+    [checkRpcUrlAndSetChainId, customNetworks, fetchedChainId, chainListData]
   );
 
   if (!matchedProvider && isEdit) {
@@ -350,7 +370,7 @@ const NetworkEdit = () => {
                   <ErrorMessage
                     name="symbol"
                     component="div"
-                    className="input-error"
+                    className="input-warning"
                   />
                   <h1>
                     {t('Block Explorer URL')} <span>({t('Optional')})</span>
