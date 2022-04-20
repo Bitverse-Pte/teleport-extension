@@ -88,12 +88,6 @@ const NetworkEdit = () => {
       try {
         if (!value) return undefined;
 
-        const isExistedRpc =
-          customNetworks.filter((p) => p.rpcUrl === value).length > 0;
-        if (isExistedRpc && !isEdit) {
-          return t('same_rpc_url');
-        }
-
         type JsonRpcResult = {
           result: string;
         };
@@ -110,6 +104,12 @@ const NetworkEdit = () => {
           return t('Bad_RPC_URL');
         }
         setFetchedChainId(data.result);
+
+        const isExistedRpc =
+          customNetworks.filter((p) => p.rpcUrl === value).length > 0;
+        if (isExistedRpc && !isEdit) {
+          return t('same_rpc_url');
+        }
       } catch (error: any | Error | AxiosError) {
         console.error('checkRpcUrlAndSetChainId::error: ', error);
         let uiErrorMsg = '';
