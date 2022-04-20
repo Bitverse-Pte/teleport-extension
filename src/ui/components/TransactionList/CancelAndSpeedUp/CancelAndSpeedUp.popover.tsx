@@ -6,7 +6,10 @@ import { EDIT_GAS_MODES, PRIORITY_LEVELS } from 'constants/gas';
 import { Transaction, TransactionEnvelopeTypes } from 'constants/transaction';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Button, Tooltip } from 'antd';
-import { gasEstimateGreaterThanGasUsedPlusTenPercent } from 'ui/helpers/utils/gas';
+import {
+  addTenPercentAndRound,
+  gasEstimateGreaterThanGasUsedPlusTenPercent,
+} from 'ui/helpers/utils/gas';
 import { SimpleModal } from 'ui/components/universal/SimpleModal';
 import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
 import { useTransactionFunctions } from 'ui/hooks/gasFeeInput/useTransactionFunctions';
@@ -53,6 +56,18 @@ const CancelSpeedupPopoverImplementation = ({
   const { t } = useTranslation();
   const [gasFeeSelectorVisible, setGasFeeSelectorVisible] = useState(false);
   const appIsLoading = useSelector((s) => s.appState.isLoading);
+  const [draftNewTxParams, setDraftTxParams] = useState({
+    ..._transaction.txParams,
+    // default will add 10% because it's a override tx(for both speedup and cancel)
+    estimateSuggested: PRIORITY_LEVELS.TEN_PERCENT_INCREASED,
+    estimateUsed: PRIORITY_LEVELS.TEN_PERCENT_INCREASED,
+    maxFeePerGas: addTenPercentAndRound(_transaction.txParams.maxFeePerGas),
+    maxPriorityFeePerGas: addTenPercentAndRound(
+      _transaction.txParams.maxPriorityFeePerGas
+    ),
+    gasPrice: addTenPercentAndRound(_transaction.txParams.gasPrice),
+  });
+  console.info('draftNewTxParams', draftNewTxParams);
   const {
     cancelTransaction,
     speedUpTransaction,
@@ -107,32 +122,29 @@ const CancelSpeedupPopoverImplementation = ({
 
   useEffect(() => {
     console.debug('changing transaction type');
-    if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
-      /**
-       * Update by EIP1559 Fee Market estimation tier
-       */
-      updateTransactionUsingEstimate(gasSettings.gasType);
-    } else if (gasSettings.gasType === 'custom') {
+    if (gasSettings.gasType === 'custom') {
       /**
        * for EIP1559 Fee Market customization only
        */
       const { gasLimit, maxFee, maxPriorityFee } = gasSettings.customData;
       const isEIP1559Tx = Boolean(maxFee);
       if (isEIP1559Tx) {
-        updateTransaction({
+        setDraftTxParams((previous) => ({
+          ...previous,
           gasLimit,
           maxFeePerGas: utils.parseUnits(maxFee, 'gwei').toHexString(),
           maxPriorityFeePerGas: utils
             .parseUnits(maxPriorityFee, 'gwei')
             .toHexString(),
-        });
+        }));
       } else {
         const { gasLimit, gasPrice } = gasSettings.legacyGas;
         // support for `LEGACY`
-        updateTransaction({
+        setDraftTxParams((previous) => ({
+          ...previous,
           gasLimit,
           gasPrice: utils.parseUnits(gasPrice, 'gwei').toHexString(),
-        });
+        }));
       }
     } else {
       console.warn(
@@ -149,7 +161,18 @@ const CancelSpeedupPopoverImplementation = ({
       setUnlockPopupVisible(true);
       return;
     }
-
+    /**
+     * update the temp tx gas estimation here
+     */
+    if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
+      /**
+       * Update by EIP1559 Fee Market estimation tier
+       */
+      updateTransactionUsingEstimate(gasSettings.gasType);
+    } else {
+      // for custom gas settings
+      updateTransaction(draftNewTxParams);
+    }
     if (editGasMode === EDIT_GAS_MODES.CANCEL) {
       cancelTransaction();
     } else {
@@ -161,11 +184,8 @@ const CancelSpeedupPopoverImplementation = ({
   const totalGasfee = () => {
     try {
       const gasPrice =
-        transaction.txParams.maxFeePerGas || transaction.txParams.gasPrice;
-      return multipyHexes(
-        gasPrice,
-        transaction.txParams.gas || MIN_GAS_LIMIT_HEX
-      );
+        draftNewTxParams.maxFeePerGas || draftNewTxParams.gasPrice;
+      return multipyHexes(gasPrice, draftNewTxParams.gas || MIN_GAS_LIMIT_HEX);
     } catch (error) {
       console.error('totalGasfee::error', error);
       return '0x1';
@@ -258,7 +278,7 @@ const CancelSpeedupPopoverImplementation = ({
         onClose={() => {
           setGasFeeSelectorVisible(false);
         }}
-        gasLimit={Number(transaction.txParams.gas || MIN_GAS_LIMIT_DEC)}
+        gasLimit={Number(draftNewTxParams.gas || MIN_GAS_LIMIT_DEC)}
         supportsEIP1559={
           transaction.txParams.type === TransactionEnvelopeTypes.FEE_MARKET
         }
