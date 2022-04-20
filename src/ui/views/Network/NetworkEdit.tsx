@@ -19,6 +19,10 @@ import { useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import clsx from 'clsx';
 import skynet from 'utils/skynet';
+import {
+  hideLoadingIndicator,
+  showLoadingIndicator,
+} from 'ui/reducer/appState.reducer';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
@@ -35,7 +39,17 @@ const NetworkEdit = () => {
     return !isNaN(formattedIdx) && Number.isInteger(formattedIdx);
   }, [idx]);
 
-  const customNetworks = useSelector((s) => s.customNetworks);
+  const { providers: customNetworks, isLoaded: isProviderLoaded } = useSelector(
+    (s) => s.customNetworks
+  );
+
+  useEffect(() => {
+    if (!isProviderLoaded) {
+      showLoadingIndicator();
+    } else {
+      hideLoadingIndicator();
+    }
+  }, [isProviderLoaded]);
 
   const [fetchedChainId, setFetchedChainId] = useState<string | undefined>();
 
