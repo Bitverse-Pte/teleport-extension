@@ -193,7 +193,6 @@ const Home = () => {
       <div className="home-content">
         <div className="home-content-name-wrap content-wrap-padding flexR">
           <img
-            onClick={handleAddTokenBtnClick}
             src={ArrowRight}
             className="home-content-name-arrow-right"
           />
