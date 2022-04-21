@@ -319,7 +319,7 @@ const Send = () => {
           addonAfter={addonSymbol}
           value={amount}
           stringMode
-          onChange={(v: string) => {
+          onBlur={({ target: { value: v } }) => {
             console.debug(
               'InputNumber::Token?.decimal',
               selectedToken?.decimal
