@@ -320,7 +320,19 @@ const Send = () => {
           value={amount}
           stringMode
           onChange={(v: string) => {
-            setAmount(v);
+            console.debug(
+              'InputNumber::Token?.decimal',
+              selectedToken?.decimal
+            );
+            let parsedNumber = amount;
+            try {
+              parsedNumber = new BigNumber(v).toFixed(
+                Number(selectedToken?.decimal) || 0
+              );
+            } catch (error) {
+              console.error('input::Not a number: ', v);
+            }
+            setAmount(parsedNumber);
           }}
         />
         <div className="available-container flexR">
