@@ -773,7 +773,7 @@
     "message": "Speed Up"
   },
   "mismatched_chain_id": {
-    "message": "Chain ID doesn’t match with the server, expect: {{expected}} got: {{got}}"
+    "message": "The RPC URL you have entered returned a different chain ID ({{got}}). Please update the Chain ID to match the RPC URL of the network you are trying to add."
   },
   "gasCostTitle": {
     "message": "Est. gas cost"

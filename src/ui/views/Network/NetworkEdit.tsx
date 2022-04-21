@@ -257,7 +257,6 @@ const NetworkEdit = () => {
         if (fetchedChainId && !chainIdBN.eq(fetchedChainId)) {
           errors.chainId = t('mismatched_chain_id', {
             replace: {
-              expected: values.chainId,
               got: Number(fetchedChainId),
             },
           });
