@@ -19,7 +19,11 @@ import {
   MIN_GAS_LIMIT_DEC,
   MIN_GAS_LIMIT_HEX,
 } from 'ui/context/send.constants';
-import { getValueFromWeiHex, multipyHexes } from 'ui/utils/conversion';
+import {
+  decGWEIToHexWEI,
+  getValueFromWeiHex,
+  multipyHexes,
+} from 'ui/utils/conversion';
 import {
   getCurrentProviderNativeToken,
   getGasFeeEstimates,
@@ -71,6 +75,8 @@ const CancelSpeedupPopoverImplementation = ({
   const {
     cancelTransaction,
     speedUpTransaction,
+    cancelTransactionWithTxParams,
+    speedUpTransactionWithTxParams,
     updateTransactionToTenPercentIncreasedGasFee,
     updateTransactionUsingEstimate,
     updateTransaction,
@@ -81,33 +87,34 @@ const CancelSpeedupPopoverImplementation = ({
 
   const gasFeeEstimates = useGasFeeEstimates();
 
-  useEffect(() => {
-    if ((transaction as any).previousGas || appIsLoading || !showPopOver) {
-      return;
-    }
-    // If gas used previously + 10% is less than medium estimated gas
-    // estimate is set to medium, else estimate is set to tenPercentIncreased
-    const gasUsedLessThanMedium =
-      gasFeeEstimates &&
-      gasEstimateGreaterThanGasUsedPlusTenPercent(
-        transaction.txParams,
-        gasFeeEstimates,
-        PRIORITY_LEVELS.MEDIUM
-      );
-    if (gasUsedLessThanMedium) {
-      updateTransactionUsingEstimate(PRIORITY_LEVELS.MEDIUM);
-      return;
-    }
-    updateTransactionToTenPercentIncreasedGasFee(true);
-  }, [
-    appIsLoading,
-    editGasMode,
-    gasFeeEstimates,
-    transaction,
-    // updateTransaction,
-    updateTransactionToTenPercentIncreasedGasFee,
-    updateTransactionUsingEstimate,
-  ]);
+  // useEffect(() => {
+  //   if ((transaction as any).previousGas || appIsLoading || !showPopOver) {
+  //     return;
+  //   }
+  //   // If gas used previously + 10% is less than medium estimated gas
+  //   // estimate is set to medium, else estimate is set to tenPercentIncreased
+  //   const gasUsedLessThanMedium =
+  //     gasFeeEstimates &&
+  //     gasEstimateGreaterThanGasUsedPlusTenPercent(
+  //       transaction.txParams,
+  //       gasFeeEstimates,
+  //       PRIORITY_LEVELS.MEDIUM
+  //     );
+  //   if (gasUsedLessThanMedium) {
+  //     updateTransactionUsingEstimate(PRIORITY_LEVELS.MEDIUM);
+  //     return;
+  //   }
+  //   updateTransactionToTenPercentIncreasedGasFee(true);
+  // }, [
+  //   appIsLoading,
+  //   editGasMode,
+  //   gasFeeEstimates,
+  //   transaction,
+  //   showPopOver,
+  //   // updateTransaction,
+  //   updateTransactionToTenPercentIncreasedGasFee,
+  //   updateTransactionUsingEstimate,
+  // ]);
   const gasSettings = useSelector((s) => s.gas);
   const nativeToken = useSelector(getCurrentProviderNativeToken);
   console.info('gasSettings', gasSettings);
@@ -161,22 +168,43 @@ const CancelSpeedupPopoverImplementation = ({
       setUnlockPopupVisible(true);
       return;
     }
-    /**
-     * update the temp tx gas estimation here
-     */
-    if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
+    try {
       /**
-       * Update by EIP1559 Fee Market estimation tier
+       * update the temp tx gas estimation here
        */
-      updateTransactionUsingEstimate(gasSettings.gasType);
-    } else {
-      // for custom gas settings
-      updateTransaction(draftNewTxParams);
-    }
-    if (editGasMode === EDIT_GAS_MODES.CANCEL) {
-      cancelTransaction();
-    } else {
-      speedUpTransaction();
+      if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
+        /**
+         * Update by EIP1559 Fee Market estimation tier
+         */
+        const gasUsedLessThanMedium =
+          gasFeeEstimates &&
+          gasEstimateGreaterThanGasUsedPlusTenPercent(
+            transaction.txParams,
+            gasFeeEstimates,
+            gasSettings.gasType
+          );
+        if (gasUsedLessThanMedium) {
+          const { suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas } =
+            gasFeeEstimates[gasSettings.gasType];
+          setDraftTxParams((prev) => ({
+            ...prev,
+            estimateUsed: gasSettings.gasType,
+            maxFeePerGas: decGWEIToHexWEI(suggestedMaxFeePerGas),
+            maxPriorityFeePerGas: decGWEIToHexWEI(
+              suggestedMaxPriorityFeePerGas
+            ),
+          }));
+        }
+      } else {
+        // just use custom gas settings
+      }
+      if (editGasMode === EDIT_GAS_MODES.CANCEL) {
+        cancelTransactionWithTxParams(draftNewTxParams);
+      } else {
+        speedUpTransactionWithTxParams(draftNewTxParams);
+      }
+    } catch (error) {
+      console.error('submitTransactionChange::error:', error);
     }
     setShowPopOver(false);
   };
