@@ -61,6 +61,9 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
       })}
       onClick={() => selectProvider(network)}
     >
+      <div className="drag-object" style={{ marginRight: 16 }}>
+        ⭕️
+      </div>
       <Tooltip title={network.nickname}>
         <span className="network-name">{network.nickname}</span>
       </Tooltip>
