@@ -19,6 +19,9 @@
   "loading": {
     "message": "Loading"
   },
+  "txFee": {
+    "message": "Transaction Fee"
+  },
   "Set__Unlock__Password": {
     "message": "Set Unlock Password"
   },

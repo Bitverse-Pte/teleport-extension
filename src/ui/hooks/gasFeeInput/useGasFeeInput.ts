@@ -245,6 +245,8 @@ export function useGasFeeInputs(
   const {
     cancelTransaction,
     speedUpTransaction,
+    cancelTransactionWithTxParams,
+    speedUpTransactionWithTxParams,
     updateTransaction,
     updateTransactionToTenPercentIncreasedGasFee,
     updateTransactionUsingDAPPSuggestedValues,
@@ -350,6 +352,8 @@ export function useGasFeeInputs(
     supportsEIP1559V2,
     cancelTransaction,
     speedUpTransaction,
+    cancelTransactionWithTxParams,
+    speedUpTransactionWithTxParams,
     updateTransaction,
     updateTransactionToTenPercentIncreasedGasFee,
     updateTransactionUsingDAPPSuggestedValues,

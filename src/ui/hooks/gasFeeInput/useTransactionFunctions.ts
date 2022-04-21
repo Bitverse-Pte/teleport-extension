@@ -121,6 +121,28 @@ export const useTransactionFunctions = ({
       })
     );
   }, [dispatch, estimatedBaseFee, transaction]);
+  const cancelTransactionWithTxParams = useCallback(
+    (txParams: Transaction['txParams']) => {
+      console.debug('cancelTransactionWithTxParams', txParams);
+      dispatch(
+        createCancelTransaction(transaction.id, txParams, {
+          estimatedBaseFee,
+        })
+      );
+    },
+    [dispatch, estimatedBaseFee, transaction]
+  );
+  const speedUpTransactionWithTxParams = useCallback(
+    (txParams: Transaction['txParams']) => {
+      console.debug('speedUpTransactionWithTxParams', txParams);
+      dispatch(
+        createSpeedUpTransaction(transaction.id, txParams, {
+          estimatedBaseFee,
+        })
+      );
+    },
+    [dispatch, estimatedBaseFee, transaction]
+  );
   const updateTransactionToTenPercentIncreasedGasFee = useCallback(
     (initTransaction = false) => {
       const {
@@ -167,6 +189,8 @@ export const useTransactionFunctions = ({
   return {
     cancelTransaction,
     speedUpTransaction,
+    cancelTransactionWithTxParams,
+    speedUpTransactionWithTxParams,
     updateTransaction,
     updateTransactionToTenPercentIncreasedGasFee,
     updateTransactionUsingDAPPSuggestedValues,
