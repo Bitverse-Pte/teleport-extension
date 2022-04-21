@@ -228,7 +228,7 @@ const NetworkEdit = () => {
       const requiredFields = ['networkName', 'rpcUrl', 'chainId'];
       requiredFields.forEach((fName) => {
         if (!values[fName]) {
-          errors[fName] = `${fName} is Required`;
+          errors[fName] = t(`required_field_${fName}`);
         }
       });
       const mustTrimmedFields = [...requiredFields, 'explorerUrl'];
