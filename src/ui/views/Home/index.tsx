@@ -36,6 +36,7 @@ const { sensors } = skynet;
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
+import ConnectedSites from '../ConnectedSites';
 
 const onCopy = () => {
   sensors.track('teleport_home_copy_account', { page: location.pathname });
@@ -45,9 +46,13 @@ const Home = () => {
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
+  const [account2ConnectedSite, setAccount2ConnectedSite] =
+    useState<BaseAccount>();
   //const [accountList, setAccountList] = useState<DisplayWalletManage>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
+  const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
+    useState(false);
   const [tabType, setTabType] = useState(Tabs.FIRST);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
@@ -128,7 +133,8 @@ const Home = () => {
   };
 
   const handleSiteClick = async (account: BaseAccount) => {
-    setPopupVisible(false);
+    setAccount2ConnectedSite(account);
+    setConnectedSitePopupVisible(true);
     console.log(account);
   };
 
@@ -426,6 +432,28 @@ const Home = () => {
             handleSiteClick={handleSiteClick}
           />
         </div>
+        <Drawer
+          placement="top"
+          closable={true}
+          closeIcon={<IconComponent name="back" cls="icon back-icon" />}
+          onClose={() => {
+            setConnectedSitePopupVisible(false);
+          }}
+          height="76vh"
+          bodyStyle={{
+            padding: 0,
+          }}
+          contentWrapperStyle={{
+            borderRadius: '0 0 23px 23px',
+            overflow: 'hidden',
+          }}
+          visible={connectedSitePopupVisible}
+          key="inside"
+        >
+          <div style={{ width: '100%', height: '100%' }}>
+            <ConnectedSites account={account2ConnectedSite}></ConnectedSites>
+          </div>
+        </Drawer>
       </Drawer>
       <Drawer
         placement="top"
