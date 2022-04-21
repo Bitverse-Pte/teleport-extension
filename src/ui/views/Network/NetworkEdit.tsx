@@ -222,6 +222,8 @@ const NetworkEdit = () => {
     [customNetworks]
   );
 
+  const [symbolWarningMessage, setSymbolWarningMessage] = useState<string>();
+
   const validateFields = useCallback(
     async (values: typeof fieldsPresetValues) => {
       const errors: any = {};
@@ -289,12 +291,17 @@ const NetworkEdit = () => {
           matchedChain &&
           matchedChain.nativeCurrency.symbol !== values.symbol
         ) {
-          errors.symbol = t('chainListReturnedDifferentTickerSymbol', {
-            replace: {
-              chainId: values.chainId,
-              returnedNativeCurrencySymbol: matchedChain.nativeCurrency.symbol,
-            },
-          });
+          setSymbolWarningMessage(
+            t('chainListReturnedDifferentTickerSymbol', {
+              replace: {
+                chainId: values.chainId,
+                returnedNativeCurrencySymbol:
+                  matchedChain.nativeCurrency.symbol,
+              },
+            })
+          );
+        } else {
+          setSymbolWarningMessage(undefined);
         }
       }
       Object.keys(errors).forEach((field) => {
@@ -372,6 +379,7 @@ const NetworkEdit = () => {
                     component="div"
                     className="input-warning"
                   />
+                  <div className="input-warning">{symbolWarningMessage}</div>
                   <h1>
                     {t('Block Explorer URL')} <span>({t('Optional')})</span>
                   </h1>
