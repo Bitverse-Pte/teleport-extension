@@ -1,92 +1,19 @@
-import React, {
-  Fragment,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { NetworksCategories } from './typing';
-import DefaulutIcon from 'assets/tokens/default.svg';
-import './style.less';
+import '../style.less';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
-import { defaultNetworks } from 'constants/defaultNetwork';
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import { Button } from 'antd';
-import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
-import { useSelector } from 'react-redux';
 import { IconComponent } from 'ui/components/IconComponents';
-import { NetworkSelectionItem } from 'ui/components/Network/NetworkSelection/NetworkSelectionItem.component';
+import { NetworkSelectionItem } from './components/NetworkSelectionItem.component';
 import { BetaIcon } from 'ui/components/Widgets';
 import { ReactComponent as TLPText } from 'assets/teleportText.svg';
 import skynet from 'utils/skynet';
 import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
+import { ChainCategoryIcon } from './components/ChainCategoryIcon';
+import { useProviderList } from './useProviderList';
 const { sensors } = skynet;
-
-const ChainCategoryIcon = ({ src = DefaulutIcon }: { src?: string }) => (
-  <img
-    style={{
-      width: '24px',
-      height: '24px',
-      borderRadius: '100%',
-      // padding: '4px',
-      marginRight: '12px',
-    }}
-    src={src}
-  />
-);
-
-function useProviderList() {
-  const { providers: customProviders } = useSelector((s) => s.customNetworks);
-  const networkList: NetworksCategories = useMemo(() => {
-    const category: NetworksCategories = {
-      EVM: {
-        displayName: 'EVM Networks',
-        icon: categoryToIconSVG('ETH'),
-        networks: [],
-      },
-      COSMOS: {
-        displayName: 'Cosmos Networks',
-        icon: categoryToIconSVG('BSC'),
-        networks: [],
-      },
-      POLKADOT: {
-        displayName: 'Polkadot Networks',
-        icon: categoryToIconSVG('POLYGON'),
-        networks: [],
-      },
-    };
-    // inject preset providers
-    Object.values(defaultNetworks)
-      .filter((v) => Boolean(v))
-      .forEach((val) => {
-        category['EVM'].networks.push(val);
-      });
-    customProviders.forEach((_pro, idx) => {
-      const withIdx = { ..._pro, idx };
-      category['EVM'].networks.push(withIdx);
-    });
-    return category;
-  }, [customProviders]);
-
-  const currentProviderId = useSelector((s) => s.network.provider.id);
-  const currentSelectedCategory: string | undefined = useMemo(() => {
-    const foundedInNetworks = Object.entries(networkList).filter(
-      ([_, { networks }]) => {
-        return networks.filter((n) => n.id === currentProviderId).length > 0;
-      }
-    );
-    if (foundedInNetworks.length > 0) {
-      const [name] = foundedInNetworks[0];
-      return name;
-    } else {
-      return undefined;
-    }
-  }, [currentProviderId]);
-
-  return { networkList, currentSelectedCategory };
-}
 
 const NetworksSelectionContainer = () => {
   const { t } = useTranslation();
