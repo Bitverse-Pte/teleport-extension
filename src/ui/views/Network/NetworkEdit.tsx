@@ -270,7 +270,7 @@ const NetworkEdit = () => {
         const matchedProvider = customNetworks.find((p) =>
           chainIdBN.eq(p.chainId)
         );
-        if (matchedProvider) {
+        if (matchedProvider && !isEdit) {
           errors.chainId = t('chainIdExistsErrorMsg', {
             replace: {
               name: matchedProvider.nickname,
