@@ -20,6 +20,11 @@ const NetworksSelectionContainer = () => {
   const history = useHistory();
   const location = useLocation();
   const [activeKeys, setActiveKeys] = useState<Record<string, boolean>>({});
+  const toggleForCategory = (key: string) =>
+    setActiveKeys((prevActiveKeys) => ({
+      ...prevActiveKeys,
+      [key]: !activeKeys[key],
+    }));
   const providerContext = useContext(NetworkProviderContext);
   const { networkList, currentSelectedCategory } = useProviderList();
   const toExpanedView = useJumpToExpandedView();
@@ -49,33 +54,32 @@ const NetworksSelectionContainer = () => {
       />
       <div className="networkList">
         {Object.keys(networkList).map((key) => {
-          const currentCategory = networkList[key];
+          const { networks, icon, displayName } = networkList[key];
+          const isCategoryActive = activeKeys[key];
           // hide if empty
-          if (currentCategory.networks.length === 0) {
+          if (networks.length === 0) {
             return <Fragment key={key}></Fragment>;
           }
+
+          const networksBelongToThisCategory =
+            isCategoryActive &&
+            networks.map((network) => (
+              <NetworkSelectionItem network={network} key={network.id} />
+            ));
           return (
             <div className="networklist-category" key={key}>
               <div
                 className="category-tag flex items-center cursor-pointer"
-                onClick={() => {
-                  setActiveKeys({
-                    ...activeKeys,
-                    [key]: !activeKeys[key],
-                  });
-                }}
+                onClick={() => toggleForCategory(key)}
               >
-                <ChainCategoryIcon src={currentCategory.icon} />
-                <h2 className="category-name">{currentCategory.displayName}</h2>
+                <ChainCategoryIcon src={icon} />
+                <h2 className="category-name">{displayName}</h2>
                 <IconComponent
-                  name={`chevron-${!activeKeys[key] ? 'down' : 'up'}`}
+                  name={`chevron-${isCategoryActive ? 'up' : 'down'}`}
                   cls="ml-auto"
                 />
               </div>
-              {activeKeys[key] &&
-                currentCategory.networks.map((network) => (
-                  <NetworkSelectionItem network={network} key={network.id} />
-                ))}
+              {networksBelongToThisCategory}
             </div>
           );
         })}
