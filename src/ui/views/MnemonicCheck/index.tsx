@@ -108,7 +108,8 @@ const BackupCheck = () => {
       />
       <div className="mnemonic-check-content content-wrap-padding">
         <p className="sub-notice">
-          If you switch browsers or computers, you will need to use the mnemonic
+          If you switch browsers or computers, you will need to use the{' '}
+          {state.accountType === Tabs.FIRST ? 'mnemonic' : 'private key '}
           phrase to restore your account.
         </p>
         <ul className="notice">
@@ -117,14 +118,17 @@ const BackupCheck = () => {
             Please keep it in a safe and confidential place.
           </li>
           <li className="item">
-            Do not share the mnemonic phrase with anyone!
+            Do not share the{' '}
+            {state.accountType === Tabs.FIRST ? 'mnemonic' : 'private key'}{' '}
+            phrase with anyone!
           </li>
           <li
             className="item"
             style={{ listStyleType: 'none', fontWeight: 'normal' }}
           >
-            Because others can use mnemonic words to open wallets and steal
-            assets
+            Because others can use{' '}
+            {state.accountType === Tabs.FIRST ? 'mnemonic' : 'private key'}{' '}
+            words to open wallets and steal assets
           </li>
         </ul>
 
