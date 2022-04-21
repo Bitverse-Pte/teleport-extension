@@ -56,8 +56,17 @@
   "CHAIN_ID_INPUT_PLACEHOLDER": {
     "message": "Enter Chain ID"
   },
+  "required_field_networkName": {
+    "message": "Network Name is required."
+  },
+  "required_field_rpcUrl": {
+    "message": "RPC Url is required."
+  },
+  "required_field_chainId": {
+    "message": "ChainID is required."
+  },
   "bad_chain_id": {
-    "message": " That didn't seems to be a valid ChainID. maybe you should refill RPC url?"
+    "message": "The ChainID is invalid."
   },
   "mismatch_chain_id": {
     "message": "Chain ID doesn’t match with the server,please check it again."
@@ -764,7 +773,7 @@
     "message": "Speed Up"
   },
   "mismatched_chain_id": {
-    "message": "Chain ID doesn’t match with the server, expect: {{expected}} got: {{got}}"
+    "message": "The RPC URL you have entered returned a different chain ID ({{got}}). Please update the Chain ID to match the RPC URL of the network you are trying to add."
   },
   "gasCostTitle": {
     "message": "Est. gas cost"

@@ -319,8 +319,20 @@ const Send = () => {
           addonAfter={addonSymbol}
           value={amount}
           stringMode
-          onChange={(v: string) => {
-            setAmount(v);
+          onBlur={({ target: { value: v } }) => {
+            console.debug(
+              'InputNumber::Token?.decimal',
+              selectedToken?.decimal
+            );
+            let parsedNumber = amount;
+            try {
+              parsedNumber = new BigNumber(v).toFixed(
+                Number(selectedToken?.decimal) || 0
+              );
+            } catch (error) {
+              console.error('input::Not a number: ', v);
+            }
+            setAmount(parsedNumber);
           }}
         />
         <div className="available-container flexR">

@@ -222,13 +222,15 @@ const NetworkEdit = () => {
     [customNetworks]
   );
 
+  const [symbolWarningMessage, setSymbolWarningMessage] = useState<string>();
+
   const validateFields = useCallback(
     async (values: typeof fieldsPresetValues) => {
       const errors: any = {};
       const requiredFields = ['networkName', 'rpcUrl', 'chainId'];
       requiredFields.forEach((fName) => {
         if (!values[fName]) {
-          errors[fName] = `${fName} is Required`;
+          errors[fName] = t(`required_field_${fName}`);
         }
       });
       const mustTrimmedFields = [...requiredFields, 'explorerUrl'];
@@ -257,7 +259,6 @@ const NetworkEdit = () => {
         if (fetchedChainId && !chainIdBN.eq(fetchedChainId)) {
           errors.chainId = t('mismatched_chain_id', {
             replace: {
-              expected: values.chainId,
               got: Number(fetchedChainId),
             },
           });
@@ -268,7 +269,7 @@ const NetworkEdit = () => {
         const matchedProvider = customNetworks.find((p) =>
           chainIdBN.eq(p.chainId)
         );
-        if (matchedProvider) {
+        if (matchedProvider && !isEdit) {
           errors.chainId = t('chainIdExistsErrorMsg', {
             replace: {
               name: matchedProvider.nickname,
@@ -289,12 +290,17 @@ const NetworkEdit = () => {
           matchedChain &&
           matchedChain.nativeCurrency.symbol !== values.symbol
         ) {
-          errors.symbol = t('chainListReturnedDifferentTickerSymbol', {
-            replace: {
-              chainId: values.chainId,
-              returnedNativeCurrencySymbol: matchedChain.nativeCurrency.symbol,
-            },
-          });
+          setSymbolWarningMessage(
+            t('chainListReturnedDifferentTickerSymbol', {
+              replace: {
+                chainId: values.chainId,
+                returnedNativeCurrencySymbol:
+                  matchedChain.nativeCurrency.symbol,
+              },
+            })
+          );
+        } else {
+          setSymbolWarningMessage(undefined);
         }
       }
       Object.keys(errors).forEach((field) => {
@@ -372,6 +378,7 @@ const NetworkEdit = () => {
                     component="div"
                     className="input-warning"
                   />
+                  <div className="input-warning">{symbolWarningMessage}</div>
                   <h1>
                     {t('Block Explorer URL')} <span>({t('Optional')})</span>
                   </h1>
