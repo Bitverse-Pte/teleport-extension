@@ -1,34 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'types/network';
 
+type CustomNetworkStoreState = {
+  providers: Provider[];
+  isLoaded: boolean;
+};
+
 export const customNetworkSlice = createSlice<
-  Provider[],
+  CustomNetworkStoreState,
   {
     setCustomNetworks: (
-      state: Provider[],
+      state: CustomNetworkStoreState,
       action: {
         type: string;
         payload: Provider[];
       }
     ) => any;
-    addCustomNetwork: (
-      state: Provider[],
-      action: {
-        type: string;
-        payload: Provider;
-      }
-    ) => any;
-    removeCustomNetwork: (
-      state: Provider[],
-      action: {
-        type: string;
-        payload: number;
-      }
-    ) => any;
   }
 >({
   name: 'customNetworks',
-  initialState: [],
+  initialState: {
+    providers: [],
+    isLoaded: false,
+  },
   reducers: {
     setCustomNetworks(
       _,
@@ -37,30 +31,14 @@ export const customNetworkSlice = createSlice<
         payload: Provider[];
       }
     ) {
-      return action.payload;
-    },
-    addCustomNetwork: (
-      state: Provider[],
-      action: {
-        type: string;
-        payload: Provider;
-      }
-    ) => {
-      state.push(action.payload);
-    },
-    removeCustomNetwork(
-      state: Provider[],
-      action: {
-        type: string;
-        payload: number;
-      }
-    ) {
-      return state.filter((_, idx) => idx !== action.payload);
+      return {
+        providers: action.payload,
+        isLoaded: true,
+      };
     },
   },
 });
 
-export const { addCustomNetwork, removeCustomNetwork, setCustomNetworks } =
-  customNetworkSlice.actions;
+export const { setCustomNetworks } = customNetworkSlice.actions;
 
 export default customNetworkSlice.reducer;

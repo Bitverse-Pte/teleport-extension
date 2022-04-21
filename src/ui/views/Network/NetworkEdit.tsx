@@ -19,6 +19,11 @@ import { useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import clsx from 'clsx';
 import skynet from 'utils/skynet';
+import {
+  hideLoadingIndicator,
+  showLoadingIndicator,
+} from 'ui/reducer/appState.reducer';
+import { useChainList } from 'ui/hooks/utils/useChainList';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
@@ -35,10 +40,20 @@ const NetworkEdit = () => {
     return !isNaN(formattedIdx) && Number.isInteger(formattedIdx);
   }, [idx]);
 
-  const customNetworks = useSelector((s) => s.customNetworks);
+  const { providers: customNetworks, isLoaded: isProviderLoaded } = useSelector(
+    (s) => s.customNetworks
+  );
+
+  useEffect(() => {
+    if (!isProviderLoaded) {
+      showLoadingIndicator();
+    } else {
+      hideLoadingIndicator();
+    }
+  }, [isProviderLoaded]);
 
   const [fetchedChainId, setFetchedChainId] = useState<string | undefined>();
-
+  const chainListData = useChainList();
   const matchedProvider = useMemo(() => {
     if (!isEdit) {
       return undefined;
@@ -74,12 +89,6 @@ const NetworkEdit = () => {
       try {
         if (!value) return undefined;
 
-        const isExistedRpc =
-          customNetworks.filter((p) => p.rpcUrl === value).length > 0;
-        if (isExistedRpc && !isEdit) {
-          return t('same_rpc_url');
-        }
-
         type JsonRpcResult = {
           result: string;
         };
@@ -96,6 +105,12 @@ const NetworkEdit = () => {
           return t('Bad_RPC_URL');
         }
         setFetchedChainId(data.result);
+
+        const isExistedRpc =
+          customNetworks.filter((p) => p.rpcUrl === value).length > 0;
+        if (isExistedRpc && !isEdit) {
+          return t('same_rpc_url');
+        }
       } catch (error: any | Error | AxiosError) {
         console.error('checkRpcUrlAndSetChainId::error: ', error);
         let uiErrorMsg = '';
@@ -175,7 +190,7 @@ const NetworkEdit = () => {
       ClickToCloseMessage.success({
         content: t('Custom Provider Saved!'),
       });
-      history.push('/network');
+      history.push('/home');
     },
     [history, networkContext, isEdit, formattedIdx]
   );
@@ -213,7 +228,7 @@ const NetworkEdit = () => {
       const requiredFields = ['networkName', 'rpcUrl', 'chainId'];
       requiredFields.forEach((fName) => {
         if (!values[fName]) {
-          errors[fName] = `${fName} is Required`;
+          errors[fName] = t(`required_field_${fName}`);
         }
       });
       const mustTrimmedFields = [...requiredFields, 'explorerUrl'];
@@ -242,20 +257,51 @@ const NetworkEdit = () => {
         if (fetchedChainId && !chainIdBN.eq(fetchedChainId)) {
           errors.chainId = t('mismatched_chain_id', {
             replace: {
-              expected: values.chainId,
               got: Number(fetchedChainId),
+            },
+          });
+        }
+        /**
+         * Basic chain id validation passed, now looking for existed provider with same chainId
+         */
+        const matchedProvider = customNetworks.find((p) =>
+          chainIdBN.eq(p.chainId)
+        );
+        if (matchedProvider) {
+          errors.chainId = t('chainIdExistsErrorMsg', {
+            replace: {
+              name: matchedProvider.nickname,
             },
           });
         }
       } catch (_) {
         errors.chainId = t('bad_chain_id');
       }
+      /**
+       * validating symbol
+       */
+      if (!chainListData.loading && chainListData.value) {
+        const matchedChain = chainListData.value.find((c) =>
+          BigNumber.from(values.chainId).eq(c.chainId)
+        );
+        if (
+          matchedChain &&
+          matchedChain.nativeCurrency.symbol !== values.symbol
+        ) {
+          errors.symbol = t('chainListReturnedDifferentTickerSymbol', {
+            replace: {
+              chainId: values.chainId,
+              returnedNativeCurrencySymbol: matchedChain.nativeCurrency.symbol,
+            },
+          });
+        }
+      }
       Object.keys(errors).forEach((field) => {
         if (!errors[field]) delete errors[field];
       });
       return errors;
     },
-    [fetchedChainId]
+    [checkRpcUrlAndSetChainId, customNetworks, fetchedChainId, chainListData]
   );
 
   if (!matchedProvider && isEdit) {
@@ -323,7 +369,7 @@ const NetworkEdit = () => {
                   <ErrorMessage
                     name="symbol"
                     component="div"
-                    className="input-error"
+                    className="input-warning"
                   />
                   <h1>
                     {t('Block Explorer URL')} <span>({t('Optional')})</span>

@@ -336,6 +336,7 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
         <DrawerHeader
           title={props.title}
           handleCloseIconClick={() => {
+            setValue('');
             if (props.setVisible) {
               props.setVisible(false);
             }

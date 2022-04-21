@@ -38,7 +38,7 @@ const ChainCategoryIcon = ({ src = DefaulutIcon }: { src?: string }) => (
 );
 
 function useProviderList() {
-  const customProviders = useSelector((s) => s.customNetworks);
+  const { providers: customProviders } = useSelector((s) => s.customNetworks);
   const networkList: NetworksCategories = useMemo(() => {
     const category: NetworksCategories = {
       EVM: {

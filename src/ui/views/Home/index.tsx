@@ -198,11 +198,7 @@ const Home = () => {
       <div className="home-bg"></div>
       <div className="home-content">
         <div className="home-content-name-wrap content-wrap-padding flexR">
-          <img
-            onClick={handleAddTokenBtnClick}
-            src={ArrowRight}
-            className="home-content-name-arrow-right"
-          />
+          <img src={ArrowRight} className="home-content-name-arrow-right" />
           <WalletName width={200} cls="home-wallet-name">
             {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
               ? 'Normal Wallet'
