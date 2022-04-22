@@ -101,7 +101,7 @@ const NetworksSelectionContainer = () => {
                   <h2 className="category-name">{displayName}</h2>
                   <IconComponent
                     name={`chevron-${isCategoryActive ? 'up' : 'down'}`}
-                    cls="ml-auto"
+                    cls="ml-auto chevron-icon"
                   />
                 </div>
                 <Droppable droppableId={key}>
