@@ -14,15 +14,27 @@ import { IconComponent } from 'ui/components/IconComponents';
 import './style.less';
 import skynet from 'utils/skynet';
 import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
+import type {
+  DraggableProvidedDraggableProps,
+  DraggableProvidedDragHandleProps,
+} from 'react-beautiful-dnd';
 const { sensors } = skynet;
 
 type NetworkProviderWithOptionalTag = Provider & { idx?: number };
 
 interface NetworkSelectionItemProps {
   network: NetworkProviderWithOptionalTag;
+  draggableProps: DraggableProvidedDraggableProps;
+  dragHandleProps?: DraggableProvidedDragHandleProps;
+  innerRef: any;
 }
 
-export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
+export function NetworkSelectionItem({
+  network,
+  draggableProps,
+  dragHandleProps,
+  innerRef,
+}: NetworkSelectionItemProps) {
   /**
    * Some data source hooks
    */
@@ -55,13 +67,19 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
   );
   return (
     <div
+      {...draggableProps}
+      ref={innerRef}
       key={network.chainId}
       className={clsx('flex items-center network-item', {
         'network-item-active': isSelectedNetwork,
       })}
       onClick={() => selectProvider(network)}
     >
-      <div className="drag-object" style={{ marginRight: 16 }}>
+      <div
+        className="drag-object"
+        style={{ marginRight: 16 }}
+        {...dragHandleProps}
+      >
         ⭕️
       </div>
       <Tooltip title={network.nickname}>

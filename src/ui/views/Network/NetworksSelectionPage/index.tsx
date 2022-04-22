@@ -13,6 +13,12 @@ import skynet from 'utils/skynet';
 import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
 import { ChainCategoryIcon } from './components/ChainCategoryIcon';
 import { useProviderList } from './useProviderList';
+import {
+  DragDropContext,
+  DragDropContextProps,
+  Draggable,
+  Droppable,
+} from 'react-beautiful-dnd';
 const { sensors } = skynet;
 
 const NetworksSelectionContainer = () => {
@@ -36,75 +42,104 @@ const NetworksSelectionContainer = () => {
       });
   }, []);
 
+  const onDragEnd: DragDropContextProps['onDragEnd'] = (res, provided) => {
+    console.debug('DragDropContext::onDragEnd::res', res);
+    console.debug('DragDropContext::onDragEnd::provided', provided);
+  };
+
   if (!providerContext) {
     return <p>Loading...</p>;
   }
 
   return (
-    <div className="flexCol network-page-container">
-      <GeneralHeader
-        title={
-          <span className="title flex">
-            <TLPText style={{ marginRight: 4 }} />
-            <BetaIcon />
-          </span>
-        }
-        onXButtonClick={() => history.push('/home')}
-        extCls="network-list-header"
-      />
-      <div className="networkList">
-        {Object.keys(networkList).map((key) => {
-          const { networks, icon, displayName } = networkList[key];
-          const isCategoryActive = activeKeys[key];
-          // hide if empty
-          if (networks.length === 0) {
-            return <Fragment key={key}></Fragment>;
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="flexCol network-page-container">
+        <GeneralHeader
+          title={
+            <span className="title flex">
+              <TLPText style={{ marginRight: 4 }} />
+              <BetaIcon />
+            </span>
           }
+          onXButtonClick={() => history.push('/home')}
+          extCls="network-list-header"
+        />
+        <div className="networkList">
+          {Object.keys(networkList).map((key) => {
+            const { networks, icon, displayName } = networkList[key];
+            const isCategoryActive = activeKeys[key];
+            // hide if empty
+            if (networks.length === 0) {
+              return <Fragment key={key}></Fragment>;
+            }
 
-          const networksBelongToThisCategory =
-            isCategoryActive &&
-            networks.map((network) => (
-              <NetworkSelectionItem network={network} key={network.id} />
-            ));
-          return (
-            <div className="networklist-category" key={key}>
-              <div
-                className="category-tag flex items-center cursor-pointer"
-                onClick={() => toggleForCategory(key)}
-              >
-                <ChainCategoryIcon src={icon} />
-                <h2 className="category-name">{displayName}</h2>
-                <IconComponent
-                  name={`chevron-${isCategoryActive ? 'up' : 'down'}`}
-                  cls="ml-auto"
-                />
+            const networksBelongToThisCategory =
+              isCategoryActive &&
+              networks.map((network, idx) => (
+                <Draggable
+                  draggableId={network.id}
+                  index={idx}
+                  key={network.id}
+                >
+                  {(provided) => (
+                    <NetworkSelectionItem
+                      network={network}
+                      draggableProps={provided.draggableProps}
+                      dragHandleProps={provided.dragHandleProps}
+                      innerRef={provided.innerRef}
+                    />
+                  )}
+                </Draggable>
+              ));
+            return (
+              <div className="networklist-category" key={key}>
+                <div
+                  className="category-tag flex items-center cursor-pointer"
+                  onClick={() => toggleForCategory(key)}
+                >
+                  <ChainCategoryIcon src={icon} />
+                  <h2 className="category-name">{displayName}</h2>
+                  <IconComponent
+                    name={`chevron-${isCategoryActive ? 'up' : 'down'}`}
+                    cls="ml-auto"
+                  />
+                </div>
+                <Droppable droppableId={key}>
+                  {(provided) => {
+                    return (
+                      <div {...provided.droppableProps} ref={provided.innerRef}>
+                        {networksBelongToThisCategory}
+                        {provided.placeholder}
+                      </div>
+                    );
+                  }}
+                </Droppable>
               </div>
-              {networksBelongToThisCategory}
-            </div>
-          );
-        })}
-      </div>
-      <div
-        className="cursor-pointer hover-to-highlight custom-network-card flex items-center"
-        onClick={() => {
-          sensors.track('teleport_network_customize', {
-            page: location.pathname,
-          });
-          toExpanedView('/network/add');
-        }}
-      >
-        <h2 className="category-name">{t('CustomizeNetwork')}</h2>
-        <div className="actions" style={{ marginLeft: 'auto' }}>
-          <Button type="text">
-            <IconComponent
-              name="chevron-right"
-              cls="base-text-color"
-              style={{ padding: '1px' }}
-            />
-          </Button>
+            );
+          })}
+        </div>
+        <div
+          className="cursor-pointer hover-to-highlight custom-network-card flex items-center"
+          onClick={() => {
+            sensors.track('teleport_network_customize', {
+              page: location.pathname,
+            });
+            toExpanedView('/network/add');
+          }}
+        >
+          <h2 className="category-name">{t('CustomizeNetwork')}</h2>
+          <div className="actions" style={{ marginLeft: 'auto' }}>
+            <Button type="text">
+              <IconComponent
+                name="chevron-right"
+                cls="base-text-color"
+                style={{ padding: '1px' }}
+              />
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </DragDropContext>
   );
 };
 
