@@ -243,7 +243,7 @@ export function _ActivityDetail({
           </div>
         </div>
       </div>
-      {isPending && (
+      {isPending && showCancelPopOver && (
         <CancelSpeedupPopover
           editGasMode={currentEditGasMode}
           showPopOver={showCancelPopOver}

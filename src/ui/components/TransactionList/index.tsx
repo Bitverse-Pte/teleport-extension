@@ -271,12 +271,14 @@ function TransactionItem({
           </div>
         )}
       </div>
-      <CancelSpeedupPopover
-        editGasMode={currentEditGasMode}
-        showPopOver={showCancelPopOver}
-        setShowPopOver={setShowCancelPopOver}
-        transaction={transactionGroup.primaryTransaction}
-      />
+      {showCancelPopOver && (
+        <CancelSpeedupPopover
+          editGasMode={currentEditGasMode}
+          showPopOver={showCancelPopOver}
+          setShowPopOver={setShowCancelPopOver}
+          transaction={transactionGroup.primaryTransaction}
+        />
+      )}
     </div>
     // {isPending && (
     //   <div className={'activity pending-tx-actions ' + isEvenStyle}>
