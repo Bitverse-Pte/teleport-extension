@@ -1,3 +1,43 @@
 .narrow-padding {
     padding: 4px 8px;
 }
+
+
+.network-item {
+    /**
+      * NetworkSelectionItem
+      */
+    padding: 16px 24px 16px 28px;
+    cursor: pointer;
+    .actions {
+      margin-left: auto;
+      height: 16px;
+      // max-width: 32%;
+      // justify-content: end;
+      .actions-not-selected {
+        // only when .network-item:hover display
+        justify-content: center;
+        align-items: center;
+        display: none;
+      }
+    }
+
+    .drag-handle {
+        margin-right: 16px;
+        border-radius: 4px;
+    }
+    .drag-handle:hover {
+        background: #E1E8F0;
+    }
+}
+.network-item:hover {
+    background-color: #F8FAFC;
+    .actions {
+      .actions-not-selected {
+        display: flex;
+      }
+    }
+}
+.network-item.network-item-active {
+  background-color: #D6EFFF;
+}

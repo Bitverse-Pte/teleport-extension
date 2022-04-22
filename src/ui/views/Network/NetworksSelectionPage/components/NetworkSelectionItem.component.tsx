@@ -1,4 +1,4 @@
-import { Modal, Tooltip } from 'antd';
+import { Button, Modal, Tooltip } from 'antd';
 import clsx from 'clsx';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import { IconComponent } from 'ui/components/IconComponents';
 import './style.less';
 import skynet from 'utils/skynet';
 import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
+import { ReactComponent as DragHandleIcon } from 'assets/action-icon/drag-handle.svg';
 import type {
   DraggableProvidedDraggableProps,
   DraggableProvidedDragHandleProps,
@@ -76,11 +77,11 @@ export function NetworkSelectionItem({
       onClick={() => selectProvider(network)}
     >
       <div
-        className="drag-object"
-        style={{ marginRight: 16 }}
+        className="drag-handle"
         {...dragHandleProps}
+        onClick={(e) => e.stopPropagation()}
       >
-        ⭕️
+        <DragHandleIcon />
       </div>
       <Tooltip title={network.nickname}>
         <span className="network-name">{network.nickname}</span>
