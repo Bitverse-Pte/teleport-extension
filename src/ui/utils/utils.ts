@@ -17,6 +17,7 @@ import { toChecksumHexAddress } from '@metamask/controllers/dist/util';
 import dayjs from 'dayjs';
 import { addHexPrefix } from 'ethereumjs-util';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useTranslation } from 'react-i18next';
 // use relativeTime support
 dayjs.extend(relativeTime);
 // import { toChecksumHexAddress } from '../../../shared/modules/hexstring-utils';
@@ -504,18 +505,30 @@ const MINUTE_CUTOFF = 90 * 60;
 const SECOND_CUTOFF = 90;
 
 export const toHumanReadableTime = (
-  t: (arg0: string, arg1: number[]) => any,
+  t: any,
   milliseconds: number | null | undefined
 ) => {
   if (milliseconds === undefined || milliseconds === null) return '';
   const seconds = Math.ceil(milliseconds / 1000);
   if (seconds <= SECOND_CUTOFF) {
-    return t('gasTimingSecondsShort', [seconds]);
+    return t('gasTimingSecondsShort', {
+      replace: {
+        $1: seconds,
+      },
+    });
   }
   if (seconds <= MINUTE_CUTOFF) {
-    return t('gasTimingMinutesShort', [Math.ceil(seconds / 60)]);
+    return t('gasTimingMinutesShort', {
+      replace: {
+        $1: Math.ceil(seconds / 60),
+      },
+    });
   }
-  return t('gasTimingHoursShort', [Math.ceil(seconds / 3600)]);
+  return t('gasTimingHoursShort', {
+    replace: {
+      $1: Math.ceil(seconds / 3600),
+    },
+  });
 };
 
 export function clearClipboard() {

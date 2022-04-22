@@ -11,6 +11,8 @@ interface SimpleModalProps {
   children?: string | React.ReactNode;
   className?: string;
   isTitleCentered?: boolean;
+
+  modalCustomStyle?: React.CSSProperties;
 }
 
 /**
@@ -21,6 +23,7 @@ export function SimpleModal({
   title,
   children,
   isTitleCentered = true,
+  modalCustomStyle = {},
   ...props
 }: SimpleModalProps) {
   if (!props.visible) {
@@ -32,7 +35,11 @@ export function SimpleModal({
       className={clsx('simple-modal-mask overlay', props.className)}
       onClick={props.onClose}
     >
-      <div className="simple-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="simple-modal"
+        style={modalCustomStyle}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="simple-modal-header flex items-center justify-end w-full">
           <div
             className={clsx('title', {

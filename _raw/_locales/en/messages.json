@@ -649,6 +649,9 @@
     "message": "{{$1}} seconds",
     "description": "{{$1}} represents a number of seconds"
   },
+  "addTenPercent": {
+    "message": "Add 10%"
+  },
   "gasTimingSecondsShort": {
     "message": "{{$1}} sec",
     "description": "{{$1}} represents a number of seconds"

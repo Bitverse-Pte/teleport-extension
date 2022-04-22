@@ -1,36 +1,27 @@
 import { useSelector } from 'react-redux';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { EDIT_GAS_MODES, PRIORITY_LEVELS } from 'constants/gas';
-import { Transaction, TransactionEnvelopeTypes } from 'constants/transaction';
-import { IconComponent } from 'ui/components/IconComponents';
-import { Button, Tooltip } from 'antd';
-import {
-  addTenPercentAndRound,
-  gasEstimateGreaterThanGasUsedPlusTenPercent,
-} from 'ui/helpers/utils/gas';
+import { Transaction } from 'constants/transaction';
+import { Button, InputNumber } from 'antd';
+import { addTenPercentAndRound as _addTenPercentAndRound } from 'ui/helpers/utils/gas';
 import { SimpleModal } from 'ui/components/universal/SimpleModal';
 import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
-import { useTransactionFunctions } from 'ui/hooks/gasFeeInput/useTransactionFunctions';
 import { useGasFeeEstimates } from 'ui/hooks/gas/useGasFeeEstimates';
-import FeeSelector from 'ui/components/FeeSelector';
-import {
-  MIN_GAS_LIMIT_DEC,
-  MIN_GAS_LIMIT_HEX,
-} from 'ui/context/send.constants';
-import {
-  decGWEIToHexWEI,
-  getValueFromWeiHex,
-  multipyHexes,
-} from 'ui/utils/conversion';
-import {
-  getCurrentProviderNativeToken,
-  getGasFeeEstimates,
-} from 'ui/selectors/selectors';
-import { utils } from 'ethers';
+import { decGWEIToHexWEI } from 'ui/utils/conversion';
+import './style.less';
+import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
+import { BigNumber, utils } from 'ethers';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import { useWallet } from 'ui/utils';
+import {
+  isEIP1559Transaction,
+  purifyTxParamsGasFields,
+} from 'utils/transaction.utils';
+import { toHumanReadableTime } from 'ui/utils/utils';
+import clsx from 'clsx';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -51,6 +42,54 @@ const CancelSpeedupPopover = (props: CancelAndSpeedUpPopoverParams) => {
   return <CancelSpeedupPopoverImplementation {...props} />;
 };
 
+const addTenPercentAndRound = (hexStr?: string) =>
+  _addTenPercentAndRound(hexStr)?.split('.')[0];
+
+const TierItem = ({
+  levelName,
+  estimateTime,
+  gasPrice,
+  gasLimit = 21000,
+  selected,
+  disabled,
+  onClick,
+}: {
+  levelName: string;
+  estimateTime: string;
+  gasPrice: BigNumber;
+  gasLimit?: string | number;
+  selected: boolean;
+  disabled?: boolean;
+  onClick?: (e: any) => void;
+}) => {
+  const nativeToken = useSelector(getCurrentProviderNativeToken);
+
+  return (
+    <div
+      className={clsx('tier', {
+        selected: selected,
+        disabled: disabled,
+      })}
+      onClick={
+        !disabled
+          ? onClick
+          : () =>
+              ClickToCloseMessage.error(
+                'Not enough to replace the old transaction'
+              )
+      }
+    >
+      <div className="level-name bold">{levelName}</div>
+      <div className="estimate-time">{estimateTime}</div>
+      <div className="maximum-charge">
+        <span className="amount">
+          {utils.formatEther(gasPrice.mul(gasLimit))}
+        </span>
+        {nativeToken?.symbol}
+      </div>
+    </div>
+  );
+};
 const CancelSpeedupPopoverImplementation = ({
   editGasMode,
   transaction: _transaction,
@@ -58,108 +97,47 @@ const CancelSpeedupPopoverImplementation = ({
   setShowPopOver,
 }: CancelAndSpeedUpPopoverParams) => {
   const { t } = useTranslation();
-  const [gasFeeSelectorVisible, setGasFeeSelectorVisible] = useState(false);
-  const appIsLoading = useSelector((s) => s.appState.isLoading);
-  const [draftNewTxParams, setDraftTxParams] = useState({
-    ..._transaction.txParams,
-    // default will add 10% because it's a override tx(for both speedup and cancel)
-    estimateSuggested: PRIORITY_LEVELS.TEN_PERCENT_INCREASED,
-    estimateUsed: PRIORITY_LEVELS.TEN_PERCENT_INCREASED,
-    maxFeePerGas: addTenPercentAndRound(_transaction.txParams.maxFeePerGas),
-    maxPriorityFeePerGas: addTenPercentAndRound(
-      _transaction.txParams.maxPriorityFeePerGas
-    ),
-    gasPrice: addTenPercentAndRound(_transaction.txParams.gasPrice),
-  });
-  console.info('draftNewTxParams', draftNewTxParams);
-  const {
-    cancelTransaction,
-    speedUpTransaction,
-    cancelTransactionWithTxParams,
-    speedUpTransactionWithTxParams,
-    updateTransactionToTenPercentIncreasedGasFee,
-    updateTransactionUsingEstimate,
-    updateTransaction,
-    transaction,
-  } = useGasFeeInputs(undefined, _transaction, undefined, editGasMode);
+  const transaction = purifyTxParamsGasFields(_transaction);
+  // const
+  const [gasLimit, setGasLimit] = useState(transaction.txParams.gas);
+  const add10PercentTxParams = useMemo(() => {
+    return {
+      ...transaction.txParams,
+      // default will add 10% because it's a override tx(for both speedup and cancel)
+      estimateSuggested: PRIORITY_LEVELS.TEN_PERCENT_INCREASED,
+      estimateUsed: PRIORITY_LEVELS.TEN_PERCENT_INCREASED,
+      maxFeePerGas: addTenPercentAndRound(transaction.txParams.maxFeePerGas),
+      maxPriorityFeePerGas: addTenPercentAndRound(
+        transaction.txParams.maxPriorityFeePerGas
+      ),
+      gasPrice: addTenPercentAndRound(transaction.txParams.gasPrice),
+      gasLimit,
+    };
+  }, [transaction, gasLimit]);
+  const isEIP1559Tx = isEIP1559Transaction(transaction);
+  const { cancelTransactionWithTxParams, speedUpTransactionWithTxParams } =
+    useGasFeeInputs(undefined, transaction, undefined, editGasMode);
 
   const wallet = useWallet();
 
-  const gasFeeEstimates = useGasFeeEstimates();
+  const { gasFeeEstimates, isGasEstimatesLoading } = useGasFeeEstimates();
 
-  // useEffect(() => {
-  //   if ((transaction as any).previousGas || appIsLoading || !showPopOver) {
-  //     return;
-  //   }
-  //   // If gas used previously + 10% is less than medium estimated gas
-  //   // estimate is set to medium, else estimate is set to tenPercentIncreased
-  //   const gasUsedLessThanMedium =
-  //     gasFeeEstimates &&
-  //     gasEstimateGreaterThanGasUsedPlusTenPercent(
-  //       transaction.txParams,
-  //       gasFeeEstimates,
-  //       PRIORITY_LEVELS.MEDIUM
-  //     );
-  //   if (gasUsedLessThanMedium) {
-  //     updateTransactionUsingEstimate(PRIORITY_LEVELS.MEDIUM);
-  //     return;
-  //   }
-  //   updateTransactionToTenPercentIncreasedGasFee(true);
-  // }, [
-  //   appIsLoading,
-  //   editGasMode,
-  //   gasFeeEstimates,
-  //   transaction,
-  //   showPopOver,
-  //   // updateTransaction,
-  //   updateTransactionToTenPercentIncreasedGasFee,
-  //   updateTransactionUsingEstimate,
-  // ]);
-  const gasSettings = useSelector((s) => s.gas);
-  const nativeToken = useSelector(getCurrentProviderNativeToken);
-  console.info('gasSettings', gasSettings);
+  const [selectedGasTier, setGasTier] = useState<PRIORITY_LEVELS>(
+    PRIORITY_LEVELS.TEN_PERCENT_INCREASED
+  );
 
-  useEffect(() => {
-    console.info('transaction:txParams', transaction.txParams);
-  }, [transaction]);
+  const [customGasPrice, setCustomGasPrice] = useState<
+    Partial<Transaction['txParams']>
+  >({
+    estimateUsed: PRIORITY_LEVELS.CUSTOM,
+    maxFeePerGas: add10PercentTxParams.maxFeePerGas,
+    maxPriorityFeePerGas: add10PercentTxParams.maxPriorityFeePerGas,
+    gasPrice: add10PercentTxParams.gasPrice,
+  });
 
   useEffect(() => {
     console.debug('gasFeeEstimates::updated:', gasFeeEstimates);
   }, [gasFeeEstimates]);
-
-  useEffect(() => {
-    console.debug('changing transaction type');
-    if (gasSettings.gasType === 'custom') {
-      /**
-       * for EIP1559 Fee Market customization only
-       */
-      const { gasLimit, maxFee, maxPriorityFee } = gasSettings.customData;
-      const isEIP1559Tx = Boolean(maxFee);
-      if (isEIP1559Tx) {
-        setDraftTxParams((previous) => ({
-          ...previous,
-          gasLimit,
-          maxFeePerGas: utils.parseUnits(maxFee, 'gwei').toHexString(),
-          maxPriorityFeePerGas: utils
-            .parseUnits(maxPriorityFee, 'gwei')
-            .toHexString(),
-        }));
-      } else {
-        const { gasLimit, gasPrice } = gasSettings.legacyGas;
-        // support for `LEGACY`
-        setDraftTxParams((previous) => ({
-          ...previous,
-          gasLimit,
-          gasPrice: utils.parseUnits(gasPrice, 'gwei').toHexString(),
-        }));
-      }
-    } else {
-      console.warn(
-        `not supported gas type ${gasSettings.gasType}, implementation needed`,
-        gasSettings
-      );
-    }
-  }, [gasSettings]);
 
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
 
@@ -168,40 +146,45 @@ const CancelSpeedupPopoverImplementation = ({
       setUnlockPopupVisible(true);
       return;
     }
-    try {
+    let newTxParams = {
+      ...transaction.txParams,
+      gasLimit,
+    };
+    if (
+      [
+        PRIORITY_LEVELS.LOW,
+        PRIORITY_LEVELS.MEDIUM,
+        PRIORITY_LEVELS.HIGH,
+      ].includes(selectedGasTier)
+    ) {
+      const { suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas } =
+        gasFeeEstimates[selectedGasTier];
+      newTxParams = {
+        ...newTxParams,
+        estimateUsed: selectedGasTier,
+        maxFeePerGas: decGWEIToHexWEI(suggestedMaxFeePerGas),
+        maxPriorityFeePerGas: decGWEIToHexWEI(suggestedMaxPriorityFeePerGas),
+      };
+    } else if (PRIORITY_LEVELS.TEN_PERCENT_INCREASED === selectedGasTier) {
+      newTxParams = add10PercentTxParams;
+    } else if (PRIORITY_LEVELS.CUSTOM === selectedGasTier) {
       /**
-       * update the temp tx gas estimation here
+       * Custom mode. need to care it's on eip1559 network
        */
-      if (['high', 'medium', 'low'].includes(gasSettings.gasType)) {
-        /**
-         * Update by EIP1559 Fee Market estimation tier
-         */
-        const gasUsedLessThanMedium =
-          gasFeeEstimates &&
-          gasEstimateGreaterThanGasUsedPlusTenPercent(
-            transaction.txParams,
-            gasFeeEstimates,
-            gasSettings.gasType
-          );
-        if (gasUsedLessThanMedium) {
-          const { suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas } =
-            gasFeeEstimates[gasSettings.gasType];
-          setDraftTxParams((prev) => ({
-            ...prev,
-            estimateUsed: gasSettings.gasType,
-            maxFeePerGas: decGWEIToHexWEI(suggestedMaxFeePerGas),
-            maxPriorityFeePerGas: decGWEIToHexWEI(
-              suggestedMaxPriorityFeePerGas
-            ),
-          }));
-        }
-      } else {
-        // just use custom gas settings
-      }
+      newTxParams = {
+        ...newTxParams,
+        ...customGasPrice,
+      };
+    }
+    console.debug(
+      'submitTransactionChange::sending with newTxParams: ',
+      newTxParams
+    );
+    try {
       if (editGasMode === EDIT_GAS_MODES.CANCEL) {
-        cancelTransactionWithTxParams(draftNewTxParams);
+        cancelTransactionWithTxParams(newTxParams);
       } else {
-        speedUpTransactionWithTxParams(draftNewTxParams);
+        speedUpTransactionWithTxParams(newTxParams);
       }
     } catch (error) {
       console.error('submitTransactionChange::error:', error);
@@ -209,23 +192,60 @@ const CancelSpeedupPopoverImplementation = ({
     setShowPopOver(false);
   };
 
-  const totalGasfee = () => {
-    try {
-      const gasPrice =
-        draftNewTxParams.maxFeePerGas || draftNewTxParams.gasPrice;
-      return multipyHexes(gasPrice, draftNewTxParams.gas || MIN_GAS_LIMIT_HEX);
-    } catch (error) {
-      console.error('totalGasfee::error', error);
-      return '0x1';
-    }
-  };
-
-  const renderTotalGasFeeAmount = () => {
-    const totalDec = getValueFromWeiHex({
-      value: totalGasfee(),
-      numberOfDecimals: 10,
-    });
-    return `${totalDec} ${nativeToken?.symbol || ''}`;
+  const tiersForEIP1559Network = () => {
+    console.log('isGasEstimatesLoading', isGasEstimatesLoading);
+    if (!isEIP1559Tx || isGasEstimatesLoading) return null;
+    // avoid undefined error
+    if (!gasFeeEstimates.low) return null;
+    const getEstimatedTimeMinFast = (priorityLevel: string) => {
+      const ms =
+        priorityLevel === PRIORITY_LEVELS.HIGH
+          ? gasFeeEstimates?.high.minWaitTimeEstimate
+          : gasFeeEstimates?.low.maxWaitTimeEstimate;
+      return toHumanReadableTime(t, ms);
+    };
+    const parsedMFPG = (tier: string) =>
+      utils.parseUnits(gasFeeEstimates[tier].suggestedMaxFeePerGas, 'gwei');
+    return (
+      <Fragment>
+        <TierItem
+          levelName={t('Low')}
+          estimateTime={getEstimatedTimeMinFast('low')}
+          gasPrice={parsedMFPG('low')}
+          gasLimit={gasLimit}
+          selected={selectedGasTier == 'low'}
+          /**
+           * add10Percent's maxFeePerGas > current level of maxFeePerGas
+           */
+          disabled={BigNumber.from(add10PercentTxParams.maxFeePerGas).gt(
+            parsedMFPG('low')
+          )}
+          onClick={() => setGasTier(PRIORITY_LEVELS.LOW)}
+        />
+        <TierItem
+          levelName={t('Market')}
+          estimateTime={getEstimatedTimeMinFast('medium')}
+          gasPrice={parsedMFPG('medium')}
+          gasLimit={gasLimit}
+          selected={selectedGasTier == 'medium'}
+          disabled={BigNumber.from(add10PercentTxParams.maxFeePerGas).gt(
+            parsedMFPG('medium')
+          )}
+          onClick={() => setGasTier(PRIORITY_LEVELS.MEDIUM)}
+        />
+        <TierItem
+          levelName={t('Fast')}
+          estimateTime={getEstimatedTimeMinFast('high')}
+          gasPrice={parsedMFPG('high')}
+          gasLimit={gasLimit}
+          selected={selectedGasTier == 'high'}
+          disabled={BigNumber.from(add10PercentTxParams.maxFeePerGas).gt(
+            parsedMFPG('high')
+          )}
+          onClick={() => setGasTier(PRIORITY_LEVELS.HIGH)}
+        />
+      </Fragment>
+    );
   };
 
   return (
@@ -236,13 +256,15 @@ const CancelSpeedupPopoverImplementation = ({
           ? `❌${t('cancel')}`
           : `🚀${t('speedUp')}`
       }
+      modalCustomStyle={{
+        marginTop: '10px',
+      }}
       visible={showPopOver}
       isTitleCentered={false}
       onClose={() => {
         setShowPopOver(false);
       }}
     >
-      {/* <AppLoadingSpinner className="cancel-speedup-popover__spinner" /> */}
       <div className="cancel-speedup-popover__wrapper">
         <h6
           className="flex items-center flex-wrap"
@@ -253,43 +275,121 @@ const CancelSpeedupPopoverImplementation = ({
               $1: 'replace',
             },
           })}
-          <Tooltip
-            // position="top"
-            placement="top"
-            title={
-              <div>
-                <div>
-                  <a
-                    href="https://community.metamask.io/t/how-to-speed-up-or-cancel-transactions-on-metamask/3296"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t('learnMoreUpperCase')}
-                  </a>
-                </div>
-              </div>
-            }
-          >
-            {t('cancelSpeedUpTransactionTooltip', {
-              replace: {
-                $1: EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp'),
-              },
-            })}
-          </Tooltip>
+          {/* {t('cancelSpeedUpTransactionTooltip', {
+            replace: {
+              $1: EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp'),
+            },
+          })} */}
         </h6>
         <div className="cancel-speedup-popover__separator" />
 
-        <div className="flex items-center flex-col" style={{ marginTop: 4 }}>
-          <p
-            style={{
-              fontSize: 20,
-            }}
-          >
-            {renderTotalGasFeeAmount()}
-          </p>
-          <Button onClick={() => setGasFeeSelectorVisible(true)}>
-            Edit Gas
-          </Button>
+        <div className="tier-select">
+          <div className="tier">
+            <div className="level-name bold">Options</div>
+            <div className="estimate-time bold">Time</div>
+            <div className="maximum-charge bold">Max. Cost</div>
+          </div>
+          <TierItem
+            levelName={t('addTenPercent')}
+            estimateTime={'--'}
+            gasPrice={BigNumber.from(
+              add10PercentTxParams.maxFeePerGas || add10PercentTxParams.gasPrice
+            )}
+            gasLimit={gasLimit}
+            selected={selectedGasTier == PRIORITY_LEVELS.TEN_PERCENT_INCREASED}
+            onClick={() => setGasTier(PRIORITY_LEVELS.TEN_PERCENT_INCREASED)}
+          />
+          {tiersForEIP1559Network()}
+          <TierItem
+            levelName={t('Custom')}
+            estimateTime={'--'}
+            gasPrice={BigNumber.from(
+              customGasPrice.maxFeePerGas || customGasPrice.gasPrice
+            )}
+            gasLimit={gasLimit}
+            selected={selectedGasTier == PRIORITY_LEVELS.CUSTOM}
+            onClick={() => setGasTier(PRIORITY_LEVELS.CUSTOM)}
+          />
+        </div>
+
+        <div
+          className="flex items-center flex-col custom-gas"
+          style={{ marginTop: 4 }}
+        >
+          <div className="field">
+            <h1 className="form-title bold">Gas Limit</h1>
+            <InputNumber<string>
+              style={{ width: '100% ' }}
+              stringMode
+              value={Number(gasLimit || 21000).toString()}
+              onBlur={({ target }) => {
+                setGasLimit(BigNumber.from(target.value).toHexString());
+              }}
+            />
+          </div>
+          {!isEIP1559Tx && selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
+            <div className="field">
+              <h1 className="form-title bold">Gas Price</h1>
+              <InputNumber<string>
+                style={{ width: '100% ' }}
+                addonAfter="Gwei"
+                // onChange={onChange}
+                stringMode
+                value={utils.formatUnits(
+                  customGasPrice.gasPrice || '0',
+                  'gwei'
+                )}
+                onBlur={({ target: { value } }) => {
+                  setCustomGasPrice((prevState) => ({
+                    ...prevState,
+                    gasPrice: utils.parseUnits(value, 'gwei').toHexString(),
+                  }));
+                }}
+              />
+            </div>
+          )}
+          {isEIP1559Tx && selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
+            <div className="field">
+              <h1 className="form-title bold">Max Fee</h1>
+              <InputNumber<string>
+                style={{ width: '100% ' }}
+                value={utils.formatUnits(
+                  customGasPrice.maxFeePerGas || '0',
+                  'gwei'
+                )}
+                onBlur={({ target: { value } }) => {
+                  setCustomGasPrice((prevState) => ({
+                    ...prevState,
+                    maxFeePerGas: utils.parseUnits(value, 'gwei').toHexString(),
+                  }));
+                }}
+                addonAfter="Gwei"
+                stringMode
+              />
+            </div>
+          )}
+          {isEIP1559Tx && selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
+            <div className="field">
+              <h1 className="form-title bold">Max Priority Fee</h1>
+              <InputNumber<string>
+                style={{ width: '100% ' }}
+                value={utils.formatUnits(
+                  customGasPrice.maxPriorityFeePerGas || '0',
+                  'gwei'
+                )}
+                onBlur={({ target: { value } }) => {
+                  setCustomGasPrice((prevState) => ({
+                    ...prevState,
+                    maxPriorityFeePerGas: utils
+                      .parseUnits(value, 'gwei')
+                      .toHexString(),
+                  }));
+                }}
+                addonAfter="Gwei"
+                stringMode
+              />
+            </div>
+          )}
         </div>
         <Button
           type="primary"
@@ -302,23 +402,12 @@ const CancelSpeedupPopoverImplementation = ({
           {t('submit')}
         </Button>
       </div>
-      <FeeSelector
-        onClose={() => {
-          setGasFeeSelectorVisible(false);
-        }}
-        gasLimit={Number(draftNewTxParams.gas || MIN_GAS_LIMIT_DEC)}
-        supportsEIP1559={
-          transaction.txParams.type === TransactionEnvelopeTypes.FEE_MARKET
-        }
-        visible={gasFeeSelectorVisible}
-      />
       <UnlockModal
         title="Unlock Wallet to continue"
         visible={unlockPopupVisible}
         setVisible={(v) => {
           setUnlockPopupVisible(v);
         }}
-        // unlocked={() => next()}
       />
     </SimpleModal>
   );
