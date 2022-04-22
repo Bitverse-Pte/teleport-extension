@@ -139,8 +139,8 @@ class PermissionService {
       return;
     }
     const i = site.accounts.indexOf(account);
-    if (i && i > -1) {
-      site.accounts = site.accounts.splice(i, 1);
+    if (i > -1) {
+      site.accounts.splice(i, 1);
     }
     if (!site.accounts?.length) {
       this.lruCache.del(origin);

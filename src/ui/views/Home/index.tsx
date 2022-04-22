@@ -447,7 +447,13 @@ const Home = () => {
           key="inside"
         >
           <div style={{ width: '100%', height: '100%' }}>
-            <ConnectedSites account={account2ConnectedSite}></ConnectedSites>
+            <ConnectedSites
+              account={account2ConnectedSite}
+              visible={connectedSitePopupVisible}
+              handleOnClose={() => {
+                setConnectedSitePopupVisible(false);
+              }}
+            />
           </div>
         </Drawer>
       </Drawer>
