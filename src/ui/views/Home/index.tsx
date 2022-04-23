@@ -66,7 +66,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const timer = setInterval(getTokenBalancesAsync, 5000);
+    const timer = setInterval(getTokenBalancesAsync, 15000);
     return () => clearInterval(timer);
   }, []);
 
