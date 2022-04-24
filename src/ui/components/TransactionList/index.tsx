@@ -30,6 +30,7 @@ import clsx from 'clsx';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import CancelSpeedupPopover from './CancelAndSpeedUp/CancelAndSpeedUp.popover';
 import { EDIT_GAS_MODES } from 'constants/gas';
+import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
 
 dayjs.extend(relativeTime);
 
@@ -172,7 +173,7 @@ function TransactionItem({
         onClick={hasCancelled ? cancelTransaction : retryTransaction}
         style={hasCancelled ? { width: 'auto' } : {}}
       >
-        {t('gas')}
+        <RocketIcon /> {t('gas')}
       </button>
     );
   }, [

@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import skynet from 'utils/skynet';
 import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import CancelButton from 'ui/components/TransactionList/CancelAndSpeedUp/CancelButton';
+import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
 const { sensors } = skynet;
 
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
@@ -230,6 +231,7 @@ export function _ActivityDetail({
                   type="button"
                   onClick={handleSpeedUpClick}
                 >
+                  <RocketIcon />
                   {hasCancelled ? t('speedUpCancellation') : t('speedUp')}
                 </button>
                 {!hasCancelled && (
