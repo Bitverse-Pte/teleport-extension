@@ -332,13 +332,33 @@ export const getSelectedAddress = (state: RootState) =>
 //   return state.network.accounts;
 // }
 
-// export function getTeleportWalletCachedBalances(state: RootState) {
-//   const chainId = getCurrentChainId(state);
+export const getCurrentProviderNativeToken = (s: RootState) => {
+  const currentProviderId = s.network.provider.id;
+  return s.tokens.tokens.find(
+    (t) => t.isNative && t.chainCustomId === currentProviderId
+  );
+};
 
-//   return (
-//     state.network.cachedBalances[chainId]
-//   );
-// }
+export const getBalanceMapOfToken = (
+  s: RootState,
+  providerId: string,
+  account: string
+) => {
+  return s.tokens.balances![account].find(
+    (t) => t.isNative && t.chainCustomId === providerId
+  );
+};
+
+export function getTeleportWalletCachedBalances(state: RootState) {
+  const token = getCurrentProviderNativeToken(state);
+  const currentAddress = getSelectedAddress(state);
+  const tokenWithBalance = getBalanceMapOfToken(
+    state,
+    token?.chainCustomId as string,
+    currentAddress as string
+  );
+  return tokenWithBalance?.amount;
+}
 
 // /**
 //  * Get ordered (by keyrings) accounts with identity and balance

@@ -89,6 +89,7 @@ const latestBlockDataHub = new LatestBlockDataHubService({
   blockTracker: networkController.getProviderAndBlockTracker().blockTracker,
   gasFeeTracker: gasFeeController,
   networkProviderStore: networkController.networkStore,
+  getPopupOpen: preferenceService.getPopupOpen,
 });
 
 latestBlockDataHub.store.subscribe(({ isBaseFeePerGasExist }) => {

@@ -524,11 +524,22 @@ class NetworkPreferenceService extends EventEmitter {
    * Sets the provider config and switches the network.
    */
   setProviderConfig(config: Provider) {
+    const copiedConfig = config;
+    if (copiedConfig.rpcUrl.includes('${INFURA_API_KEY}')) {
+      /**
+       * Handle networks that added from ChainList
+       * we inject the api key in order to make it work.
+       */
+      copiedConfig.rpcUrl = copiedConfig.rpcUrl.replace(
+        '${INFURA_API_KEY}',
+        process.env.INFURA_PROJECT_ID as string
+      );
+    }
     this.networkStore.updateState({
       previousProviderStore: this.getProviderConfig(),
-      provider: config,
+      provider: copiedConfig,
     });
-    this._switchNetwork(config);
+    this._switchNetwork(copiedConfig);
   }
 
   rollbackToPreviousProvider() {
