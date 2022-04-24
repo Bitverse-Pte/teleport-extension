@@ -21,7 +21,7 @@ import {
 } from 'ui/utils/networkCategoryToIcon';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { CoinTypeEcosystemMapping } from 'constants/wallet';
-import selectedIcon from '../../../assets/accountSelected.svg';
+import classnames from 'classnames';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -184,7 +184,11 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
               onClick={() => handleAccountClick(account)}
               key={i}
             >
-              <div className="id-item-wrap flexR">
+              <div
+                className={classnames('id-item-wrap flexR', {
+                  'first-id-item-wrap': i === 0,
+                })}
+              >
                 <Jazzicon
                   diameter={account.selected ? 40 : 30}
                   seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
