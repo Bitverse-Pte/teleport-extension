@@ -9,7 +9,7 @@ import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
-import { addHexPrefix } from 'ethereumjs-util';
+import { addHexPrefix, isValidAddress } from 'ethereumjs-util';
 
 import {
   EthDenomination,
@@ -355,25 +355,32 @@ const Send = () => {
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => setToAddress(e.target.value)}
         />
-        {showToList && (
-          <Card title={t('Recent Address')} size="small">
-            {recentAddressList?.map((addr) => (
-              <p
-                onClick={() => {
-                  setToAddress(addr);
-                  setShowToList(false);
-                }}
-                className="recent"
-                key={addr}
-              >
-                {transferAddress2Display(addr)}
-              </p>
-            ))}
-          </Card>
+        {showToList ? (
+          <div className="recent">
+            <div className="recent-title">{t('Recent Address')}</div>
+            <div className="recent-body">
+              {recentAddressList
+                ?.filter((addr) => isValidAddress(addr))
+                .map((addr) => (
+                  <p
+                    onClick={() => {
+                      setToAddress(addr);
+                      setShowToList(false);
+                    }}
+                    className="recent-item"
+                    key={addr}
+                  >
+                    {transferAddress2Display(addr)}
+                  </p>
+                ))}
+            </div>
+          </div>
+        ) : (
+          <span className="tbmy" onClick={myAccountsSelect}>
+            {t('Transfer between my accounts')}
+          </span>
         )}
-        <span className="tbmy" onClick={myAccountsSelect}>
-          {t('Transfer between my accounts')}
-        </span>
+
         <AccountSelect
           currentToAddress={toAddress}
           visible={accountSelectPopupVisible}
@@ -391,7 +398,7 @@ const Send = () => {
         <CustomButton
           type="primary"
           disabled={
-            !toAddress ||
+            !isValidAddress(toAddress || '0x0') ||
             !amount ||
             !selectedToken ||
             (selectedToken.amount &&
