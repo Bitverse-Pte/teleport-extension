@@ -1,27 +1,20 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
-import { BigNumber, utils } from 'ethers';
 import { useHistory, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from 'ui/components/Header';
-import { TxDirectionLogo } from 'ui/components/TransactionList/TxDirectionLogo';
 import './activity-detail.less';
 import {
   nonceSortedCompletedTransactionsSelector,
   nonceSortedPendingTransactionsSelector,
 } from 'ui/selectors/transactions';
 import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
-import {
-  TransactionGroup,
-  TransactionGroupCategories,
-  TransactionStatuses,
-} from 'constants/transaction';
+import { TransactionGroup, TransactionStatuses } from 'constants/transaction';
 import CopyOrOpenInScan from 'ui/components/universal/copyOrOpenInScan';
 import { AddressCard } from 'ui/components/universal/AddressCard';
 import { IconComponent } from 'ui/components/IconComponents';
 import { TokenIcon } from 'ui/components/Widgets';
 import { Tooltip } from 'antd';
-import { TransactionFee } from './TransactionFee';
 import { cancelTxs } from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
 import CancelSpeedupPopover from 'ui/components/TransactionList/CancelAndSpeedUp/CancelAndSpeedUp.popover';
@@ -31,6 +24,8 @@ import skynet from 'utils/skynet';
 import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import CancelButton from 'ui/components/TransactionList/CancelAndSpeedUp/CancelButton';
 import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
+import { TransactionItemDetail } from './components/TransactionItemDetail.component';
+import { TransactionGasDetail } from './components/TxGasDetail.component';
 const { sensors } = skynet;
 
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
@@ -191,39 +186,32 @@ export function _ActivityDetail({
                 <AddressCard title="To" address={recipientAddress} />
               )}
             </div>
-            {transaction.primaryTransaction.hash && (
+            {primaryTransaction.hash && (
               <div className="row">
                 <div className="field-name">Transaction ID</div>
                 <div className="field-value">
-                  <Tooltip
-                    placement="topRight"
-                    title={transaction.primaryTransaction.hash}
-                  >
-                    {shortenedStr(transaction.primaryTransaction.hash, 4)}
+                  <Tooltip placement="topRight" title={primaryTransaction.hash}>
+                    {shortenedStr(primaryTransaction.hash, 4)}
                   </Tooltip>
                   <CopyOrOpenInScan
                     handleExplorerClick={() =>
-                      handleExplorerClick(
-                        'tx',
-                        transaction.primaryTransaction.hash!
-                      )
+                      handleExplorerClick('tx', primaryTransaction.hash!)
                     }
-                    textToBeCopy={transaction.primaryTransaction.hash}
+                    textToBeCopy={primaryTransaction.hash}
                   />
                 </div>
               </div>
             )}
-            <TransactionFee transaction={transaction} />
             {!isPending && (
-              <div className="row">
-                <div className="field-name">Time</div>
-                <div className="field-value" title={date}>
-                  {dayjs(transaction.primaryTransaction.time).format(
-                    'YYYY-MM-DD HH:mm:ss'
-                  )}
-                </div>
-              </div>
+              <TransactionItemDetail
+                name="Time"
+                hoverValueText={date}
+                value={dayjs(primaryTransaction.time).format(
+                  'YYYY-MM-DD HH:mm:ss'
+                )}
+              />
             )}
+            <TransactionGasDetail txGroup={transaction} category={category} />
             {isPending && !isUnapproved && (
               <div className="row pending-tx-actions">
                 <button
@@ -238,7 +226,7 @@ export function _ActivityDetail({
                   <CancelButton
                     cancelTransaction={handleCancelClick}
                     className="cancelBtn"
-                    transaction={transaction.primaryTransaction}
+                    transaction={primaryTransaction}
                   />
                 )}
               </div>
@@ -251,7 +239,7 @@ export function _ActivityDetail({
           editGasMode={currentEditGasMode}
           showPopOver={showCancelPopOver}
           setShowPopOver={setShowCancelPopOver}
-          transaction={transaction.primaryTransaction}
+          transaction={primaryTransaction}
         />
       )}
     </Fragment>
