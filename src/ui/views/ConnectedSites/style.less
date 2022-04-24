@@ -1,90 +1,144 @@
+@import '../../style/mixin';
+
 .current-connected-sites {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  box-sizing: border-box;
+  padding: 10px 24px;
+
+  .page-header {
+    font-family: 'MontserratBold';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 100%;
+    color: #364361;
+  }
+
+  .account-item {
     width: 100%;
-    height: 100%;
-    flex: 1;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    padding: 0 24px;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    flex: 0 0 64px;
+    border: 1px solid #E1E8F0;
     box-sizing: border-box;
-    padding: 10px 24px;
-    .page-header {
-        font-family: 'MontserratBold';
-        font-style: normal;
-        font-weight: 700;
-        font-size: 20px;
-        line-height: 100%;
-        color: #364361;
+    border-radius: 12px;
+
+    .account-left {
+      align-items: center;
+
+      .account-info {
+        align-items: flex-start;
+        justify-self: center;
+        margin-left: 14px;
+
+        .account-name {
+          font-size: 14px;
+          font-family: MontserratBold;
+          line-height: 1;
+          margin-bottom: 4px;
+        }
+
+        .account-address {
+          font-size: 12px;
+          color: #9EA2A9;
+          line-height: 1;
+        }
+
+      }
     }
-    .account-item {
-        width: 100%;
-        margin-top: 16px;
-        margin-bottom: 16px;
-        padding: 0 24px;
+
+    .account-right {
+      align-items: center;
+      justify-content: flex-end;
+
+      .account-item-action {
+        width: 44px;
+        height: 44px;
+        justify-content: center;
         align-items: center;
-        justify-content: space-between;
-        height: 64px;
-        flex: 0 0 64px;
-        border: 1px solid #E1E8F0;
-        box-sizing: border-box;
+
+        .account-item-action-icon {
+          height: 14px;
+        }
+
+        .key-default-icon {
+          display: block;
+        }
+
+        &:last-child {
+          margin-left: 12px;
+        }
+      }
+
+    }
+  }
+
+  .content-desc {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 130%;
+    color: #364361;
+  }
+
+  .connected-site-list {
+    width: 100%;
+    margin-top: 16px;
+    //border: 1px solid #E1E8F0;
+    box-sizing: border-box;
+    flex: 1;
+    overflow-y: auto;
+    height: 0;
+
+    .site-item {
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      flex: 0 0 64px;
+      // cursor: pointer;
+      box-sizing: border-box;
+
+      .site-item-left {
+        align-items: center;
+
+        .site-icon {
+          width: 32px;
+          height: 32px;
+          flex: 0 0 32px;
+          border-radius: 16px;
+          display: block;
+        }
+
+        .site-origin {
+          margin-left: 12px;
+          font-family: 'Montserrat';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 14px;
+          line-height: 100%;
+          color: #5E6C8A;
+        }
+
+      }
+
+      .site-item-right {
+        align-items: center;
+        justify-content: flex-end;
+        background: #F8FAFC;
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
-  
-        .account-left {
-          align-items: center;
-  
-          .account-info {
-            align-items: flex-start;
-            justify-self: center;
-            margin-left: 14px;
-  
-            .account-name {
-              font-size: 14px;
-              font-family: MontserratBold;
-              line-height: 1;
-              margin-bottom: 4px;
-            }
-  
-            .account-address {
-              font-size: 12px;
-              color: #9EA2A9;
-              line-height: 1;
-            }
-  
-          }
-        }
-  
-        .account-right {
-          align-items: center;
-          justify-content: flex-end;
-  
-          .account-item-action {
-            width: 44px;
-            height: 44px;
-            justify-content: center;
-            align-items: center;
-            .account-item-action-icon {
-              height: 14px;
-            }
-  
-            .key-default-icon {
-              display: block;
-            }
-  
-            &:last-child {
-              margin-left: 12px;
-            }
-          }
-  
-        }
-    }
-    .content-desc {
-        font-family: 'Montserrat';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 130%;
-        color: #364361;
-    }
-    .connected-site-list {
-        width: 100%;
-        margin-top: 16px;
-        //border: 1px solid #E1E8F0;
+        justify-content: center;
+        align-items: center;
+        background: #F8FAFC;
         box-sizing: border-box;
         flex: 1;
         overflow-y: auto;
@@ -166,12 +220,55 @@
                 }
               }
             }
-
+          }
+        .site-item-action-icon {
+          height: 14px;
         }
 
-        
+        .key-default-icon {
+          display: block;
+        }
+
+        .key-active-icon {
+          display: none;
+        }
+
+        &:hover {
+          background: #F0F9FF;
+
+          .key-default-icon {
+            display: none;
+          }
+
+          .key-active-icon {
+            display: block;
+          }
+        }
+
+        &:last-child {
+          margin-left: 12px;
+        }
+      }
+
+      &:hover {
+        background: #F8FAFC;
+
+        .site-item-right {
+          border: 0.5px solid #E1E8F0;
+
+          &:hover {
+            background: #FFF3F0;
+            ;
+            border: none;
+          }
+        }
+      }
 
     }
+
+
+
+  }
 }
 
 .delete-confoirm-title {
@@ -184,6 +281,7 @@
   text-align: center;
   color: #364361;
 }
+
 .delete-confoirm-content {
   font-family: 'Montserrat';
   font-style: normal;
@@ -195,5 +293,24 @@
 }
 
 .ant-modal-confirm-btns {
-  float:inherit;
+  width: 100%;
+  display: flex;
+
+  .ant-btn {
+    width: 134px;
+    color: @themeColor;
+    border-color: @themeColor;
+
+    span {
+      font-family: MontserratBold;
+    }
+  }
+
+  .ant-btn-primary {
+    color: #ffffff;
+    background: @themeColor;
+  }
+}
+.ant-modal-confirm .ant-modal-body{
+  padding-top: 20px;
 }
