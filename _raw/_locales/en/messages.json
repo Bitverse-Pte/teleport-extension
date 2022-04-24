@@ -649,6 +649,9 @@
     "message": "{{$1}} seconds",
     "description": "{{$1}} represents a number of seconds"
   },
+  "addTenPercent": {
+    "message": "Add 10%"
+  },
   "gasTimingSecondsShort": {
     "message": "{{$1}} sec",
     "description": "{{$1}} represents a number of seconds"
@@ -784,6 +787,9 @@
   },
   "speedUp": {
     "message": "Speed Up"
+  },
+  "speedUpCancellation": {
+    "message": "Speed up this cancellation"
   },
   "mismatched_chain_id": {
     "message": "Chain ID doesn’t match with the server, expect: {{expected}} got: {{got}}"

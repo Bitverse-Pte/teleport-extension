@@ -10,6 +10,7 @@ import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
 import { purifyTxParamsGasFields } from 'utils/transaction.utils';
 import { useTransactionBreakDown } from 'ui/hooks/utils/useTransactionBreakdown';
 import { useTranslation } from 'react-i18next';
+import { TransactionItemDetail } from './components/TransactionItemDetail.component';
 
 interface Params {
   transaction: TransactionGroup;
@@ -61,11 +62,9 @@ export function TransactionFee({ transaction: txGroup }: Params) {
   };
 
   return (
-    <div className="row">
-      <div className="field-name">Transaction Fee</div>
-      <div className="field-value">
-        {formattedTxFee()} {nativeCurrency}
-      </div>
-    </div>
+    <TransactionItemDetail
+      name="Transaction Fee"
+      value={`${formattedTxFee()} ${nativeCurrency}`}
+    />
   );
 }

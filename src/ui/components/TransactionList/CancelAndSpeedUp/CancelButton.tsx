@@ -7,6 +7,7 @@ import { isBalanceSufficient } from 'ui/context/send.utils';
 import { getMaximumGasTotalInHexWei } from 'utils/gas';
 import { useIncrementedGasFees } from 'ui/hooks/gas/useIncrementedGasFees';
 import { getTeleportWalletCachedBalances } from 'ui/selectors/selectors';
+import { ReactComponent as CancelIcon } from 'assets/cancel.svg';
 
 interface CancelButtonParams {
   transaction: any;
@@ -54,6 +55,7 @@ export default function CancelButton({
       )}
       disabled={!hasEnoughCancelGas}
     >
+      <CancelIcon />
       {t('cancel')}
     </Button>
   );
