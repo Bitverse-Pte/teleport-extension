@@ -24,7 +24,6 @@ import {
 import { isEqualCaseInsensitive, shortenAddress } from 'ui/utils/utils';
 import { useShouldShowSpeedUp } from 'ui/hooks/wallet/useShouldShowSpeedUp';
 import { Button, Tooltip } from 'antd';
-import CancelButton from './CancelAndSpeedUp/CancelButton';
 import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
@@ -128,10 +127,9 @@ function TransactionItem({
     hasCancelled,
   } = transactionGroup;
   const { t } = useTranslation();
-  // @todo: implement button for these status
-  const isSignatureReq =
-    category === TransactionGroupCategories.SIGNATURE_REQUEST;
-  const isApproval = category === TransactionGroupCategories.APPROVAL;
+  // const isSignatureReq =
+  //   category === TransactionGroupCategories.SIGNATURE_REQUEST;
+  // const isApproval = category === TransactionGroupCategories.APPROVAL;
   const isUnapproved = status === TransactionStatuses.UNAPPROVED;
   // const isSwap = category === TransactionGroupCategories.SWAP;
 
@@ -174,7 +172,7 @@ function TransactionItem({
         onClick={hasCancelled ? cancelTransaction : retryTransaction}
         style={hasCancelled ? { width: 'auto' } : {}}
       >
-        {t('speedUp')}
+        {t('gas')}
       </button>
     );
   }, [
@@ -260,15 +258,7 @@ function TransactionItem({
           </span>
         )}
         {isPending && (
-          <div className="pending-tx-actions ml-auto">
-            {speedUpButton}
-            {/* {!hasCancelled && !isUnapproved && (
-              <CancelButton
-                transaction={transactionGroup.primaryTransaction}
-                cancelTransaction={cancelTransaction}
-              />
-            )} */}
-          </div>
+          <div className="pending-tx-actions ml-auto">{speedUpButton}</div>
         )}
       </div>
       {showCancelPopOver && (
@@ -280,17 +270,6 @@ function TransactionItem({
         />
       )}
     </div>
-    // {isPending && (
-    //   <div className={'activity pending-tx-actions ' + isEvenStyle}>
-    //     {speedUpButton}
-    //     {!hasCancelled && !isUnapproved && (
-    //       <CancelButton
-    //         transaction={transactionGroup.primaryTransaction}
-    //         cancelTransaction={cancelTransaction}
-    //       />
-    //     )}
-    //   </div>
-    // )}
   );
 }
 

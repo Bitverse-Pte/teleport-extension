@@ -788,6 +788,9 @@
   "speedUp": {
     "message": "Speed Up"
   },
+  "speedUpCancellation": {
+    "message": "Speed up this cancellation"
+  },
   "mismatched_chain_id": {
     "message": "Chain ID doesn’t match with the server, expect: {{expected}} got: {{got}}"
   },

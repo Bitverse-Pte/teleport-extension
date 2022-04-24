@@ -79,6 +79,7 @@ export function _ActivityDetail({
 }: {
   transaction: TransactionGroup;
 }) {
+  const { hasCancelled, primaryTransaction } = transaction;
   const {
     title,
     subtitle,
@@ -93,6 +94,9 @@ export function _ActivityDetail({
     senderAddress,
     token,
   } = useTransactionDisplayData(transaction);
+
+  const isUnapproved =
+    primaryTransaction.status === TransactionStatuses.UNAPPROVED;
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -140,10 +144,6 @@ export function _ActivityDetail({
     });
     history.goBack();
   }, [dispatch, history]);
-
-  const speedUpTx = useCallback(() => {
-    alert('Gas Edit to be implemented');
-  }, []);
 
   const handleSpeedUpClick = useCallback(() => {
     setEditGasMode(EDIT_GAS_MODES.SPEED_UP);
@@ -223,21 +223,22 @@ export function _ActivityDetail({
                 </div>
               </div>
             )}
-            {isPending && (
+            {isPending && !isUnapproved && (
               <div className="row pending-tx-actions">
-                {/* @todo: disabled because speedup / cancel is not finish - Frank */}
                 <button
                   className="editGasBtn"
                   type="button"
                   onClick={handleSpeedUpClick}
                 >
-                  {t('speedUp')}
+                  {hasCancelled ? t('speedUpCancellation') : t('speedUp')}
                 </button>
-                <CancelButton
-                  cancelTransaction={handleCancelClick}
-                  className="cancelBtn"
-                  transaction={transaction.primaryTransaction}
-                />
+                {!hasCancelled && (
+                  <CancelButton
+                    cancelTransaction={handleCancelClick}
+                    className="cancelBtn"
+                    transaction={transaction.primaryTransaction}
+                  />
+                )}
               </div>
             )}
           </div>
