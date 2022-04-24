@@ -140,7 +140,87 @@
         align-items: center;
         background: #F8FAFC;
         box-sizing: border-box;
+        flex: 1;
+        overflow-y: auto;
+        height: 0;
+        .site-item {
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            flex: 0 0 64px;
+            // cursor: pointer;
+            box-sizing: border-box;
+            
+            .site-item-left {
+                align-items: center;
+                .site-icon {
+                    width: 32px;
+                    height: 32px;
+                    flex: 0 0 32px;
+                    border-radius: 16px;
+                    display: block;
+                }
+                .site-origin {
+                    max-width: 200px;
+                    margin-left: 12px;
+                    font-family: 'Montserrat';
+                    font-style: normal;
+                    font-weight: 400;
+                    font-size: 14px;
+                    line-height: 100%;
+                    color: #5E6C8A;
+                }
 
+            }
+            .site-item-right {
+                align-items: center;
+                justify-content: flex-end;
+                background: #F8FAFC;
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                justify-content: center;
+                align-items: center;
+                background: #F8FAFC;
+                box-sizing: border-box;
+                .site-item-action-icon {
+                  height: 14px;
+                }
+                .key-default-icon {
+                  display: block;
+                }
+                .key-active-icon {
+                  display: none;
+                }
+                &:hover {
+                  background: #F0F9FF;
+      
+                  .key-default-icon {
+                    display: none;
+                  }
+      
+                  .key-active-icon {
+                    display: block;
+                  }
+                }
+                &:last-child {
+                  margin-left: 12px;
+                }
+            }
+
+            &:hover {
+              background: #F8FAFC;
+      
+              .site-item-right {
+                border: 0.5px solid #E1E8F0;
+                &:hover {
+                  background: #FFF3F0;;
+                  border: none;
+                }
+              }
+            }
+          }
         .site-item-action-icon {
           height: 14px;
         }
