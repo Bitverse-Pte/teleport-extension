@@ -21,8 +21,9 @@ import {
   multipyHexes,
   decGWEIToHexWEI,
   addCurrencies,
+  conversionUtil,
 } from 'ui/utils/conversion';
-import { TransactionEnvelopeTypes } from 'constants/transaction';
+import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
 import { CustomButton } from 'ui/components/Widgets';
 import { useDispatch, useSelector } from 'react-redux';
@@ -342,9 +343,13 @@ const TxDetailComponent = ({
       });
       return `${total} ${currency || ''}`;
     }
-    const transferDec = getValueFromWeiHex({
-      value: valueToDisplay(tx),
-      numberOfDecimals: 10,
+    const multiplier = Math.pow(10, Number(txToken?.decimal || 0));
+    const transferDec = conversionUtil(addHexPrefix(valueToDisplay(tx)), {
+      fromNumericBase: 'hex',
+      toNumericBase: 'dec',
+      toCurrency: txToken?.symbol || ETH,
+      conversionRate: multiplier,
+      invertConversionRate: true,
     });
     const gasDec = getValueFromWeiHex({
       value: totalGasfee,
