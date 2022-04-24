@@ -22,6 +22,7 @@ import {
 import { toHumanReadableTime } from 'ui/utils/utils';
 import clsx from 'clsx';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import { MIN_GAS_LIMIT_DEC } from 'ui/context/send.constants';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -119,6 +120,7 @@ const CancelSpeedupPopoverImplementation = ({
     useGasFeeInputs(undefined, transaction, undefined, editGasMode);
 
   const wallet = useWallet();
+  const currentBlockMaxGasLimit = useSelector((s) => s.currentBlock.gasLimit);
 
   const { gasFeeEstimates, isGasEstimatesLoading } = useGasFeeEstimates();
 
@@ -248,6 +250,10 @@ const CancelSpeedupPopoverImplementation = ({
     );
   };
 
+  const isSubmitDisabled =
+    BigNumber.from(gasLimit).lt(MIN_GAS_LIMIT_DEC) ||
+    BigNumber.from(gasLimit).gt(currentBlockMaxGasLimit);
+
   return (
     // <div className="cancel-speedup-popover">
     <SimpleModal
@@ -322,6 +328,9 @@ const CancelSpeedupPopoverImplementation = ({
               style={{ width: '100% ' }}
               stringMode
               value={Number(gasLimit || 21000).toString()}
+              min="21000"
+              max={BigNumber.from(currentBlockMaxGasLimit).toString()}
+              controls={false}
               onBlur={({ target }) => {
                 setGasLimit(BigNumber.from(target.value).toHexString());
               }}
@@ -339,6 +348,7 @@ const CancelSpeedupPopoverImplementation = ({
                   customGasPrice.gasPrice || '0',
                   'gwei'
                 )}
+                controls={false}
                 onBlur={({ target: { value } }) => {
                   setCustomGasPrice((prevState) => ({
                     ...prevState,
@@ -357,6 +367,7 @@ const CancelSpeedupPopoverImplementation = ({
                   customGasPrice.maxFeePerGas || '0',
                   'gwei'
                 )}
+                controls={false}
                 onBlur={({ target: { value } }) => {
                   setCustomGasPrice((prevState) => ({
                     ...prevState,
@@ -377,6 +388,7 @@ const CancelSpeedupPopoverImplementation = ({
                   customGasPrice.maxPriorityFeePerGas || '0',
                   'gwei'
                 )}
+                controls={false}
                 onBlur={({ target: { value } }) => {
                   setCustomGasPrice((prevState) => ({
                     ...prevState,
@@ -398,6 +410,7 @@ const CancelSpeedupPopoverImplementation = ({
           style={{
             marginTop: 24,
           }}
+          disabled={isSubmitDisabled}
         >
           {t('submit')}
         </Button>

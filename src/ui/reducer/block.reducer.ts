@@ -26,7 +26,8 @@ export const currentBlockSlice = createSlice<
 >({
   name: 'currentBlock',
   initialState: {
-    gasLimit: '',
+    // MIN_ETH_GAS_LIMIT * 10
+    gasLimit: '210000',
     gasFeeEstimates: {},
     gasEstimateType: GAS_ESTIMATE_TYPES.LEGACY,
   },
