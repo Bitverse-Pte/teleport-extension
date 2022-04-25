@@ -125,8 +125,14 @@ export function useTransactionDisplayData(
 
   const { from: senderAddress, to } = initialTransaction.txParams || {};
 
-  // for smart contract interactions, methodData can be used to derive the name of the action being taken
-  const methodData = useMethodData(initialTransaction.txParams.data);
+  let methodData: ReturnType<typeof useMethodData>;
+  /**
+   * avoid infinite loop when txParams.data is useless
+   */
+  if (type !== TransactionTypes.DEPLOY_CONTRACT) {
+    // for smart contract interactions, methodData can be used to derive the name of the action being taken
+    methodData = useMethodData(initialTransaction.txParams.data);
+  }
 
   const displayedStatusKey = getStatusKey(primaryTransaction);
   const isPending = displayedStatusKey in PENDING_STATUS_HASH;

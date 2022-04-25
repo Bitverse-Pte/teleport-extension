@@ -182,9 +182,7 @@ export function _ActivityDetail({
             <div className="row from-and-to justify-center">
               <AddressCard title="From" address={senderAddress} />
               <IconComponent name="arrow-right" cls="to-icon" />
-              {recipientAddress && (
-                <AddressCard title="To" address={recipientAddress} />
-              )}
+              <AddressCard title="To" address={recipientAddress} />
             </div>
             {primaryTransaction.hash && (
               <div className="row">
