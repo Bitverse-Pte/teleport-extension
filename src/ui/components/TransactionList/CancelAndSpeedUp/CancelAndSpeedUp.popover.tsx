@@ -34,11 +34,34 @@ interface CancelAndSpeedUpPopoverParams {
 }
 
 const CancelSpeedupPopover = (props: CancelAndSpeedUpPopoverParams) => {
+  const { t } = useTranslation();
+
   /**
    * do not execute Implementation if popover is not showed
    */
   if (!props.showPopOver) {
     return null;
+  }
+  if (!props.transaction.txParams.gas) {
+    return (
+      <SimpleModal
+        title={
+          props.editGasMode === EDIT_GAS_MODES.CANCEL
+            ? t('cancel')
+            : t('speedUp')
+        }
+        modalCustomStyle={{
+          marginTop: '10px',
+        }}
+        visible={props.showPopOver}
+        isTitleCentered={false}
+        onClose={() => {
+          props.setShowPopOver(false);
+        }}
+      >
+        Loading...
+      </SimpleModal>
+    );
   }
   return <CancelSpeedupPopoverImplementation {...props} />;
 };
