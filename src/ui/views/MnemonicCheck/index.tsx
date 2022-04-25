@@ -122,14 +122,6 @@ const BackupCheck = () => {
             {state.accountType === Tabs.FIRST ? 'mnemonic' : 'private key'}{' '}
             phrase with anyone!
           </li>
-          <li
-            className="item"
-            style={{ listStyleType: 'none', fontWeight: 'normal' }}
-          >
-            Because others can use{' '}
-            {state.accountType === Tabs.FIRST ? 'mnemonic' : 'private key'}{' '}
-            words to open wallets and steal assets
-          </li>
         </ul>
 
         <div
