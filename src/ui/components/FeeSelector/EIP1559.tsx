@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { SET_GAS_TYPE } from 'ui/reducer/gas.reducer';
+import { SET_GAS_TYPE, SET_CUSTOM_TYPE } from 'ui/reducer/gas.reducer';
 import { Button, Drawer } from 'antd';
 import { Token } from 'types/token';
 import FeeItem from './feeItem';
@@ -52,6 +52,7 @@ function FeeSelector(props) {
   const [baseFee, setBaseFee] = useState(0);
   const [feeList, setFeeList] = useState<Fee[]>([]);
   const onSelect = (type) => {
+    dispatch({ type: SET_CUSTOM_TYPE, value: true });
     setSelectFee(type);
   };
   const fetchGasFeeEstimates = async () => {
@@ -117,7 +118,11 @@ function FeeSelector(props) {
   useEffect(() => {
     if (gasState.customType) {
       const {
-        customData: { gasLimit, maxPriorityFee, maxFee },
+        customData: {
+          gasLimit,
+          suggestedMaxPriorityFeePerGas: maxPriorityFee,
+          suggestedMaxFeePerGas: maxFee,
+        },
       } = gasState;
       const gasPrice = getCustomGasPrice(maxPriorityFee, maxFee);
       let customItem: any = null;

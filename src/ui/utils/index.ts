@@ -67,6 +67,10 @@ export function denom2SymbolRatio(
   ).toFormat();
 }
 
+export function removeCommas(numberInStr: string) {
+  return numberInStr.replace(',', '');
+}
+
 export const getOriginName = (origin: string) => {
   const matches = origin.replace(/https?:\/\//, '').match(/^([^.]+\.)?(\S+)\./);
 
@@ -102,10 +106,6 @@ export const ellipsisOverflowedText = (
   }
   return `${cut}...`;
 };
-
-export function openInBrowserNewTab(path: string) {
-  return window.open(`index.html#${path}`);
-}
 
 export function toChecksumHexAddress(address) {
   if (!address) {

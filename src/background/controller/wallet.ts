@@ -115,6 +115,10 @@ export class WalletController extends BaseController {
       isNative: true,
     });
 
+    networkPreferenceService.setProviderConfig({
+      ...network,
+      type: 'rpc',
+    });
     return network;
   };
 
@@ -186,6 +190,12 @@ export class WalletController extends BaseController {
   getCurrentCurrency = () => preferenceService.getCurrentCurrency();
 
   getConnectedSite = (session) => permissionService.getConnectedSite(session);
+
+  getConnectedSitesByAccount = (account: string) =>
+    permissionService.getConnectedSitesByAccount(account);
+
+  removeConnectedSite = (origin: string, account: string) =>
+    permissionService.removeConnectedSite(origin, account);
 
   getPrivateKey = async (password: string, hdWalletId: string) => {
     await this.verifyPassword(password);
@@ -260,8 +270,11 @@ export class WalletController extends BaseController {
     return keyringService.renameHdWalletByHdWalletId(hdWalletId, name);
   }
 
-  public getPrivateKeyByHdWalletId(name: string): Promise<string> {
-    return keyringService.getPrivateKeyByHdWalletId(name);
+  public getPrivateKeyByHdWalletId(
+    hdWalletId: string,
+    address?: string
+  ): Promise<string> {
+    return keyringService.getPrivateKeyByHdWalletId(hdWalletId, address);
   }
 
   public getMnemonicByHdWalletId(name: string): Promise<string> {

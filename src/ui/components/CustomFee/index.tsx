@@ -22,8 +22,8 @@ function CustomFee(props) {
       type: SET_CUSTOM_DATA,
       value: {
         gasLimit: gl,
-        maxPriorityFee: mp,
-        maxFee: mf,
+        suggestedMaxPriorityFeePerGas: mp,
+        suggestedMaxFeePerGas: mf,
       },
     });
     onSubmit();
@@ -70,9 +70,9 @@ function CustomFee(props) {
               type="number"
               min="0"
               step="1e-18"
-              value={mf}
+              value={mp}
               onChange={(e) => {
-                setMf(e.target.value);
+                setMp(e.target.value);
               }}
             ></input>
           </div>
@@ -89,9 +89,9 @@ function CustomFee(props) {
               type="number"
               min="0"
               step="1e-18"
-              value={mp}
+              value={mf}
               onChange={(e) => {
-                setMp(e.target.value);
+                setMf(e.target.value);
               }}
             ></input>
             {/* <span className="addon">$1.1</span> */}

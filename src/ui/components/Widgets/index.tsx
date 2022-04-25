@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Input, Tooltip } from 'antd';
+import { Button, Input } from 'antd';
 import { IconComponent } from '../IconComponents';
-import eth from 'assets/tokens/eth.svg';
 import passwordChecked from 'assets/passwordChecked.svg';
 import passwordUnchecked from 'assets/passwordUnchecked.svg';
 import { Token } from 'types/token';
@@ -468,7 +467,16 @@ export const TipButton = (props: TipButtonProps) => {
       className="tip-button-button-item flexCol cursor"
       onClick={() => props.handleClick()}
     >
-      <div className="tip-button-send-img flex">
+      <div
+        className={classnames('flex tip-button-img', {
+          'tip-button-send-img':
+            props.type === TipButtonEnum.SEND ||
+            props.type === TipButtonEnum.RECEIVE,
+          'tip-button-not-send-img':
+            props.type !== TipButtonEnum.SEND &&
+            props.type !== TipButtonEnum.RECEIVE,
+        })}
+      >
         <img src={getTipImg(props.type)} className="tip-button-send-img-item" />
       </div>
       <span className="tip-button-send-title">{props.title}</span>
