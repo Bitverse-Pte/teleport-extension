@@ -5,7 +5,7 @@ import { PageHeader, Button, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import QrCodeView from 'ui/components/QrCode';
-import { useWallet, useAsyncEffect, transferAddress2Display } from 'ui/utils';
+import { useWallet, useAsyncEffect } from 'ui/utils';
 import { BaseAccount } from 'types/extend';
 import './style.less';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
@@ -41,7 +41,7 @@ const SendToken = () => {
             alt="Chain Logo"
             className="chain-logo"
           />
-          <h1>{currentNetworkController.provider.chainName} </h1>{' '}
+          <h1>{currentNetworkController.provider.ticker}</h1>{' '}
           <span className="chain-name">
             ({currentNetworkController.provider.nickname})
           </span>
