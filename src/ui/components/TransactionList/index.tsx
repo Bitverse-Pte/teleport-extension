@@ -173,7 +173,7 @@ function TransactionItem({
         onClick={hasCancelled ? cancelTransaction : retryTransaction}
         style={hasCancelled ? { width: 'auto' } : {}}
       >
-        <RocketIcon /> {t('gas')}
+        <RocketIcon /> {t('speedUp')}
       </button>
     );
   }, [

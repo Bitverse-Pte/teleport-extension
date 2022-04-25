@@ -257,11 +257,7 @@ const CancelSpeedupPopoverImplementation = ({
   return (
     // <div className="cancel-speedup-popover">
     <SimpleModal
-      title={
-        editGasMode === EDIT_GAS_MODES.CANCEL
-          ? `❌${t('cancel')}`
-          : `🚀${t('speedUp')}`
-      }
+      title={editGasMode === EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp')}
       modalCustomStyle={{
         marginTop: '10px',
       }}
@@ -412,7 +408,7 @@ const CancelSpeedupPopoverImplementation = ({
           }}
           disabled={isSubmitDisabled}
         >
-          {t('submit')}
+          {t('Submit')}
         </Button>
       </div>
       <UnlockModal
@@ -421,6 +417,7 @@ const CancelSpeedupPopoverImplementation = ({
         setVisible={(v) => {
           setUnlockPopupVisible(v);
         }}
+        unlocked={submitTransactionChange}
       />
     </SimpleModal>
   );
