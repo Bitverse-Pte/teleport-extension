@@ -262,7 +262,7 @@ function TransactionItem({
           <div className="pending-tx-actions ml-auto">{speedUpButton}</div>
         )}
       </div>
-      {showCancelPopOver && (
+      {isPending && showCancelPopOver && (
         <CancelSpeedupPopover
           editGasMode={currentEditGasMode}
           showPopOver={showCancelPopOver}
