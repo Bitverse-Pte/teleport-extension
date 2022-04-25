@@ -339,9 +339,25 @@ export const getCurrentProviderNativeToken = (s: RootState) => {
   );
 };
 
+export const getBalanceMapOfToken = (
+  s: RootState,
+  providerId: string,
+  account: string
+) => {
+  return s.tokens.balances![account].find(
+    (t) => t.isNative && t.chainCustomId === providerId
+  );
+};
+
 export function getTeleportWalletCachedBalances(state: RootState) {
   const token = getCurrentProviderNativeToken(state);
-  return token?.amount;
+  const currentAddress = getSelectedAddress(state);
+  const tokenWithBalance = getBalanceMapOfToken(
+    state,
+    token?.chainCustomId as string,
+    currentAddress as string
+  );
+  return tokenWithBalance?.amount;
 }
 
 // /**

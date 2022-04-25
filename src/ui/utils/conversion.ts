@@ -272,6 +272,15 @@ const addHexes = (
   });
 };
 
+export function subtractHexes(aHexWEI: string, bHexWEI: string) {
+  return subtractCurrencies(aHexWEI, bHexWEI, {
+    aBase: 16,
+    bBase: 16,
+    toNumericBase: 'hex',
+    numberOfDecimals: 6,
+  });
+}
+
 const multipyHexes = (
   a,
   b,

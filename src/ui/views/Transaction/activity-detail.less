@@ -1,6 +1,6 @@
 .row {
     display: flex;
-    padding: 24px 0;
+    padding: 10px 0;
     justify-content: center;
     align-items: center;
     .field-name {
@@ -129,6 +129,7 @@ svg.blue {
 
     .row.pending-tx-actions {
         button {
+            width: 144px;
         }
         button.editGasBtn {
             display: flex;
@@ -138,7 +139,6 @@ svg.blue {
             padding: 6px 14px;
 
             position: static;
-            width: 144px;
             height: 36px;
             left: 0px;
             top: 0px;
@@ -155,8 +155,12 @@ svg.blue {
             flex: none;
             order: 0;
             flex-grow: 1;
-            margin: 0px 24px;
+            margin-right: 24px;
             // from figma
+
+            svg {
+                margin-right: 4px;
+            }
         }
         button.cancelBtn {
             display: flex;
@@ -164,9 +168,9 @@ svg.blue {
             justify-content: center;
             align-items: center;
             padding: 6px 14px;
+            border: 0;
 
             position: static;
-            width: 144px;
             height: 36px;
             left: 168px;
             top: 0px;
@@ -183,8 +187,11 @@ svg.blue {
             flex: none;
             order: 1;
             flex-grow: 1;
-            margin: 0px 24px;
             // from figma
+
+            svg {
+                margin-right: 4px;
+            }
         }
     }
 }

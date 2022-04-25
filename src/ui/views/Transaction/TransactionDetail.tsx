@@ -1,32 +1,31 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
-import { BigNumber, utils } from 'ethers';
 import { useHistory, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from 'ui/components/Header';
-import { TxDirectionLogo } from 'ui/components/TransactionList/TxDirectionLogo';
 import './activity-detail.less';
 import {
   nonceSortedCompletedTransactionsSelector,
   nonceSortedPendingTransactionsSelector,
 } from 'ui/selectors/transactions';
 import { useTransactionDisplayData } from 'ui/hooks/wallet/useTxDisplayData';
-import {
-  TransactionGroup,
-  TransactionGroupCategories,
-  TransactionStatuses,
-} from 'constants/transaction';
+import { TransactionGroup, TransactionStatuses } from 'constants/transaction';
 import CopyOrOpenInScan from 'ui/components/universal/copyOrOpenInScan';
 import { AddressCard } from 'ui/components/universal/AddressCard';
 import { IconComponent } from 'ui/components/IconComponents';
 import { TokenIcon } from 'ui/components/Widgets';
 import { Tooltip } from 'antd';
-import { TransactionFee } from './TransactionFee';
 import { cancelTxs } from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
+import CancelSpeedupPopover from 'ui/components/TransactionList/CancelAndSpeedUp/CancelAndSpeedUp.popover';
+import { EDIT_GAS_MODES } from 'constants/gas';
 import { useTranslation } from 'react-i18next';
 import skynet from 'utils/skynet';
 import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
+import CancelButton from 'ui/components/TransactionList/CancelAndSpeedUp/CancelButton';
+import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
+import { TransactionItemDetail } from './components/TransactionItemDetail.component';
+import { TransactionGasDetail } from './components/TxGasDetail.component';
 const { sensors } = skynet;
 
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
@@ -76,6 +75,7 @@ export function _ActivityDetail({
 }: {
   transaction: TransactionGroup;
 }) {
+  const { hasCancelled, primaryTransaction } = transaction;
   const {
     title,
     subtitle,
@@ -90,6 +90,9 @@ export function _ActivityDetail({
     senderAddress,
     token,
   } = useTransactionDisplayData(transaction);
+
+  const isUnapproved =
+    primaryTransaction.status === TransactionStatuses.UNAPPROVED;
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -108,6 +111,12 @@ export function _ActivityDetail({
     },
     [rpcPrefs]
   );
+
+  const [currentEditGasMode, setEditGasMode] = useState<EDIT_GAS_MODES>(
+    EDIT_GAS_MODES.MODIFY_IN_PLACE
+  );
+
+  const [showCancelPopOver, setShowCancelPopOver] = useState(false);
 
   const statusBackground = useMemo(() => {
     switch (displayedStatusKey) {
@@ -132,6 +141,15 @@ export function _ActivityDetail({
     history.goBack();
   }, [dispatch, history]);
 
+  const handleSpeedUpClick = useCallback(() => {
+    setEditGasMode(EDIT_GAS_MODES.SPEED_UP);
+    setShowCancelPopOver(true);
+  }, []);
+  const handleCancelClick = useCallback(() => {
+    setEditGasMode(EDIT_GAS_MODES.CANCEL);
+    setShowCancelPopOver(true);
+  }, []);
+
   /**
    * This fn is only build for UI
    */
@@ -144,83 +162,86 @@ export function _ActivityDetail({
   const matchedNativeToken = useSelector(getCurrentProviderNativeToken);
 
   return (
-    <div className={'activity-detail ' + statusBackground}>
-      <Header title={t(title)} />
-      <div className="txdetail-direction-logo flex justify-center">
-        {/* workaround as hook treat native token as undefined */}
-        <div>
-          <TokenIcon token={token || matchedNativeToken} radius={48} />
-        </div>
-      </div>
-      <div className="txdetail-values flex flex-wrap justify-center">
-        <div className="txdetail-value-display">
-          <p className="txdetail-value items-baseline flex-wrap">
-            {displayPrimaryCurrency.amount}
-            <span className="unit">{displayPrimaryCurrency.unit}</span>
-          </p>
-        </div>
-        <div className="break"></div>
-        <p className={'txdetail-status capitalize ' + statusBackground}>
-          {displayedStatusKey}
-        </p>
-      </div>
-      <div className="details content-wrap-padding">
-        <div className="row from-and-to justify-center">
-          <AddressCard title="From" address={senderAddress} />
-          <IconComponent name="arrow-right" cls="to-icon" />
-          {recipientAddress && (
-            <AddressCard title="To" address={recipientAddress} />
-          )}
-        </div>
-        {transaction.primaryTransaction.hash && (
-          <div className="row">
-            <div className="field-name">Transaction ID</div>
-            <div className="field-value">
-              <Tooltip
-                placement="topRight"
-                title={transaction.primaryTransaction.hash}
-              >
-                {shortenedStr(transaction.primaryTransaction.hash, 4)}
-              </Tooltip>
-              <CopyOrOpenInScan
-                handleExplorerClick={() =>
-                  handleExplorerClick(
-                    'tx',
-                    transaction.primaryTransaction.hash!
-                  )
-                }
-                textToBeCopy={transaction.primaryTransaction.hash}
-              />
-            </div>
+    <Fragment>
+      <div className={'activity-detail ' + statusBackground}>
+        <Header title={t(title)} />
+        <div className="txdetail-direction-logo flex justify-center">
+          {/* workaround as hook treat native token as undefined */}
+          <div>
+            <TokenIcon token={token || matchedNativeToken} radius={48} />
           </div>
-        )}
-        <TransactionFee transaction={transaction} />
-        {!isPending && (
-          <div className="row">
-            <div className="field-name">Time</div>
-            <div className="field-value" title={date}>
-              {dayjs(transaction.primaryTransaction.time).format(
-                'YYYY-MM-DD HH:mm:ss'
+        </div>
+        <div className="txdetail-values flex flex-wrap justify-center">
+          <div className="txdetail-value-display">
+            <p className="txdetail-value items-baseline flex-wrap">
+              {displayPrimaryCurrency.amount}
+              <span className="unit">{displayPrimaryCurrency.unit}</span>
+            </p>
+          </div>
+          <div className="details">
+            <div className="row from-and-to justify-center">
+              <AddressCard title="From" address={senderAddress} />
+              <IconComponent name="arrow-right" cls="to-icon" />
+              {recipientAddress && (
+                <AddressCard title="To" address={recipientAddress} />
               )}
             </div>
+            {primaryTransaction.hash && (
+              <div className="row">
+                <div className="field-name">Transaction ID</div>
+                <div className="field-value">
+                  <Tooltip placement="topRight" title={primaryTransaction.hash}>
+                    {shortenedStr(primaryTransaction.hash, 4)}
+                  </Tooltip>
+                  <CopyOrOpenInScan
+                    handleExplorerClick={() =>
+                      handleExplorerClick('tx', primaryTransaction.hash!)
+                    }
+                    textToBeCopy={primaryTransaction.hash}
+                  />
+                </div>
+              </div>
+            )}
+            {!isPending && (
+              <TransactionItemDetail
+                name="Time"
+                hoverValueText={date}
+                value={dayjs(primaryTransaction.time).format(
+                  'YYYY-MM-DD HH:mm:ss'
+                )}
+              />
+            )}
+            <TransactionGasDetail txGroup={transaction} category={category} />
+            {isPending && !isUnapproved && (
+              <div className="row pending-tx-actions">
+                <button
+                  className="editGasBtn"
+                  type="button"
+                  onClick={handleSpeedUpClick}
+                >
+                  <RocketIcon />
+                  {hasCancelled ? t('speedUpCancellation') : t('speedUp')}
+                </button>
+                {!hasCancelled && (
+                  <CancelButton
+                    cancelTransaction={handleCancelClick}
+                    className="cancelBtn"
+                    transaction={primaryTransaction}
+                  />
+                )}
+              </div>
+            )}
           </div>
-        )}
-        {isPending && (
-          <div className="row pending-tx-actions">
-            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
-            {/* <button
-              className="editGasBtn"
-              type="button"
-              onClick={() => alert('Gas Edit to be implemented')}
-            >
-              {t('speedUp')}
-            </button> */}
-            <button className="cancelBtn" type="button" onClick={cancelTx}>
-              {t('cancel')}
-            </button>
-          </div>
-        )}
+        </div>
       </div>
-    </div>
+      {isPending && showCancelPopOver && (
+        <CancelSpeedupPopover
+          editGasMode={currentEditGasMode}
+          showPopOver={showCancelPopOver}
+          setShowPopOver={setShowCancelPopOver}
+          transaction={primaryTransaction}
+        />
+      )}
+    </Fragment>
   );
 }

@@ -31,6 +31,7 @@ import { CoinType, Provider } from 'types/network';
 import { AddTokenOpts, Token } from 'types/token';
 import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
+import { CustomGasSettings } from 'types/tx';
 import { BigNumberish } from 'ethers';
 
 export class WalletController extends BaseController {
@@ -477,6 +478,29 @@ export class WalletController extends BaseController {
   }
   cancelTransaction(txId: string) {
     return txController.cancelTransaction(txId);
+  }
+  updateTransaction = (data: any) => txController.updateTransaction(data);
+  createCancelTransaction(
+    originalTxId: string,
+    customGasSettings: CustomGasSettings,
+    options: any = {}
+  ) {
+    return txController.createCancelTransaction(
+      originalTxId,
+      customGasSettings,
+      options
+    );
+  }
+  createSpeedUpTransaction(
+    originalTxId: string,
+    customGasSettings: CustomGasSettings,
+    options: any = {}
+  ) {
+    return txController.createSpeedUpTransaction(
+      originalTxId,
+      customGasSettings,
+      options
+    );
   }
   setPopupOpen(val: boolean) {
     preferenceService.setPopupOpen(val);
