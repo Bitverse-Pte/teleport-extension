@@ -26,6 +26,7 @@ import { cancelTxs } from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
 import { useTranslation } from 'react-i18next';
 import skynet from 'utils/skynet';
+import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 const { sensors } = skynet;
 
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
@@ -140,12 +141,7 @@ export function _ActivityDetail({
     return { amount, unit };
   }, [primaryCurrency]);
 
-  const matchedNativeToken = useSelector((s) => {
-    const currentProviderId = s.network.provider.id;
-    return s.tokens.tokens.find(
-      (t) => t.isNative && t.chainCustomId === currentProviderId
-    );
-  });
+  const matchedNativeToken = useSelector(getCurrentProviderNativeToken);
 
   return (
     <div className={'activity-detail ' + statusBackground}>
