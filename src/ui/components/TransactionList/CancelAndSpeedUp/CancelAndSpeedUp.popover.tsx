@@ -273,9 +273,17 @@ const CancelSpeedupPopoverImplementation = ({
     );
   };
 
-  const isSubmitDisabled =
-    BigNumber.from(gasLimit).lt(MIN_GAS_LIMIT_DEC) ||
-    BigNumber.from(gasLimit).gt(currentBlockMaxGasLimit);
+  const isSubmitDisabled = useMemo(() => {
+    try {
+      return (
+        BigNumber.from(gasLimit).lt(MIN_GAS_LIMIT_DEC) ||
+        BigNumber.from(gasLimit).gt(currentBlockMaxGasLimit || 21000 * 10)
+      );
+    } catch (error) {
+      console.error('isSubmitDisabled::error', error);
+      return false;
+    }
+  }, [gasLimit, currentBlockMaxGasLimit]);
 
   return (
     // <div className="cancel-speedup-popover">
