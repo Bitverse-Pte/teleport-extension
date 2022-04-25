@@ -133,13 +133,6 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
             <li className="item">
               Do not share the mnemonic phrase with anyone!
             </li>
-            <li
-              className="item"
-              style={{ listStyleType: 'none', fontWeight: 'normal' }}
-            >
-              Because others can use mnemonic words to open wallets and steal
-              assets
-            </li>
           </ul>
 
           <div
