@@ -28,13 +28,13 @@ interface NetworkSelectionItemProps {
   draggableProps: DraggableProvidedDraggableProps;
   dragHandleProps?: DraggableProvidedDragHandleProps;
   innerRef: any;
+  isDragging?: boolean;
 }
 
 export function NetworkSelectionItem({
   network,
-  draggableProps,
-  dragHandleProps,
   innerRef,
+  ...props
 }: NetworkSelectionItemProps) {
   /**
    * Some data source hooks
@@ -68,17 +68,20 @@ export function NetworkSelectionItem({
   );
   return (
     <div
-      {...draggableProps}
+      {...props.draggableProps}
       ref={innerRef}
       key={network.chainId}
       className={clsx('flex items-center network-item', {
         'network-item-active': isSelectedNetwork,
+        'is-dragging': props.isDragging,
       })}
       onClick={() => selectProvider(network)}
     >
       <div
-        className="drag-handle"
-        {...dragHandleProps}
+        className={clsx('drag-handle', {
+          'is-dragging': props.isDragging,
+        })}
+        {...props.dragHandleProps}
         onClick={(e) => e.stopPropagation()}
       >
         <DragHandleIcon />

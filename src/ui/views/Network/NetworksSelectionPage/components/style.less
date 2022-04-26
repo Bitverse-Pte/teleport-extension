@@ -30,6 +30,10 @@
     .drag-handle:hover {
         background: #E1E8F0;
     }
+    .drag-handle.is-dragging {
+      // display the icon while dragging too.
+      visibility: inherit;
+    }
 }
 .network-item:hover {
     background-color: #F8FAFC;
@@ -45,4 +49,8 @@
 }
 .network-item.network-item-active {
   background-color: #D6EFFF;
+}
+.network-item.is-dragging {
+  border-top: 4px solid #1484F5;
+  opacity: 0.3;
 }

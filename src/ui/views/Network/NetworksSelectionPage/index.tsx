@@ -121,12 +121,13 @@ const NetworksSelectionContainer = () => {
                   index={idx}
                   key={network.id}
                 >
-                  {(provided) => (
+                  {(provided, snapshot) => (
                     <NetworkSelectionItem
                       network={network}
                       draggableProps={provided.draggableProps}
                       dragHandleProps={provided.dragHandleProps}
                       innerRef={provided.innerRef}
+                      isDragging={snapshot.isDragging}
                     />
                   )}
                 </Draggable>
