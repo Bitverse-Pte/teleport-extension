@@ -63,7 +63,8 @@ class TokenService {
 
   private _checkDuplicateToken(chainCustomId, contractAddress): boolean {
     return !!this.getAllTokens(chainCustomId).find(
-      (t: Token) => t.contractAddress === contractAddress
+      (t: Token) =>
+        t.contractAddress.toLowerCase() === contractAddress.toLowerCase()
     );
   }
 
