@@ -32,7 +32,9 @@ const NetworksSelectionContainer = () => {
       [key]: !activeKeys[key],
     }));
   const providerContext = useContext(NetworkProviderContext);
-  const { networkList, currentSelectedCategory } = useProviderList();
+  const { networkList: _rawNetworkList, currentSelectedCategory } =
+    useProviderList();
+  const [networkList, setOrderedNetworkList] = useState(_rawNetworkList);
   const toExpanedView = useJumpToExpandedView();
 
   useEffect(() => {
@@ -43,6 +45,44 @@ const NetworksSelectionContainer = () => {
   }, []);
 
   const onDragEnd: DragDropContextProps['onDragEnd'] = (res, provided) => {
+    const { destination, source, draggableId } = res;
+    /** ignore if destination not exist */
+    if (!destination) return;
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      /**
+       * ignore if item is not moving
+       */
+      return;
+    }
+    if (source.droppableId !== destination.droppableId) {
+      console.error('Error: You can not drag into another network category.');
+    }
+
+    const column = networkList[source.droppableId];
+
+    const reorderedNetworks = Array.from(column.networks);
+
+    const tmpNetwork = reorderedNetworks[source.index];
+    // reorderedNetworks[source.index] = reorderedNetworks[destination.index];
+    // reorderedNetworks[destination.index] = tmpNetwork;
+
+    reorderedNetworks.splice(source.index, 1);
+    reorderedNetworks.splice(destination.index, 0, tmpNetwork);
+
+    const newColumn = {
+      ...column,
+      networks: reorderedNetworks,
+    };
+
+    setOrderedNetworkList((prevState) => ({
+      ...prevState,
+      [source.droppableId]: newColumn,
+    }));
+
     console.debug('DragDropContext::onDragEnd::res', res);
     console.debug('DragDropContext::onDragEnd::provided', provided);
   };
