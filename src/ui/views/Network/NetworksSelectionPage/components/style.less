@@ -23,6 +23,7 @@
     }
 
     .drag-handle {
+        visibility: hidden;
         margin-right: 16px;
         border-radius: 4px;
     }
@@ -36,6 +37,10 @@
       .actions-not-selected {
         display: flex;
       }
+    }
+    .drag-handle {
+      // hover to display the icon
+      visibility: inherit;
     }
 }
 .network-item.network-item-active {
