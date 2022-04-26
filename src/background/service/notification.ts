@@ -35,7 +35,11 @@ class NotificationService {
       if (this.notifiWindowId && winId !== this.notifiWindowId) {
         console.info('winId:', winId);
         console.info('notifiWindowId:', this.notifiWindowId);
-        if (winId === chrome.windows.WINDOW_ID_NONE) {
+        if (
+          winId === chrome.windows.WINDOW_ID_NONE ||
+          // for dev debug use
+          process.env.BUILD_ENV === 'DEV'
+        ) {
           // Wired issue: When notification popuped, will focus to -1 first then focus on notification
           return;
         }
