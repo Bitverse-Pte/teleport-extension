@@ -5,6 +5,7 @@ import { TransactionEnvelopeTypes } from 'constants/transaction';
 import { addHexPrefix } from 'ethereumjs-util';
 import { stat } from 'fs';
 import { slice } from 'lodash';
+import { Token } from 'types/token';
 import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
 import { addGasBuffer, calcGasTotal } from 'ui/context/send.utils';
 import {
@@ -12,7 +13,11 @@ import {
   getCurrentChainId,
   getIsNonStandardEthChain,
 } from 'ui/selectors/selectors';
-import { estimateGas, fetchGasFeeEstimates } from 'ui/state/actions';
+import {
+  estimateGas,
+  fetchGasFeeEstimates,
+  getTokenBalancesSync,
+} from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
 import {
   generateERC20TransferData,
@@ -156,6 +161,7 @@ export const initialState = {
     error: null,
   },
   asset: {
+    id: null,
     // type can be either NATIVE such as ETH or TOKEN for ERC20 tokens
     type: ASSET_TYPES.NATIVE,
     // the balance the user holds at the from address for this asset
@@ -350,18 +356,18 @@ async function estimateGasLimitForSend({
  * those values are written to the slice in the `initializeSendState.fulfilled`
  * action handler.
  */
-export const initializeSendState = createAsyncThunk(
+export const initializeSendState = createAsyncThunk<any, any>(
   'send/initializeSendState',
   async (_, thunkApi) => {
+    const { assetId } = _;
     const state: RootState = thunkApi.getState() as RootState;
     const isNonStandardEthChain = getIsNonStandardEthChain(state);
     const chainId = getCurrentChainId(state);
     const eip1559support = isEIP1559Network(state);
     console.log('===========[eip1559support]=============', eip1559support);
-    const {
-      send: { draftTransaction, asset, amount },
-      preference,
-    } = state;
+    const { send, preference } = state;
+
+    const { draftTransaction, asset, amount } = send;
 
     let gasPrice = '0x1';
     /**
@@ -369,6 +375,9 @@ export const initializeSendState = createAsyncThunk(
      * avoid user to click next without gas estimation
      */
     thunkApi.dispatch(showLoadingIndicator());
+    const balances = await getTokenBalancesSync();
+    const selectedAsset: Token =
+      assetId && balances.find((t: Token) => assetId === t.tokenId);
     const { gasEstimateType, gasFeeEstimates } = await fetchGasFeeEstimates();
     console.log('===========[gasEstimateType]=============', gasEstimateType);
     console.log('===========[gasFeeEstimates]=============', gasFeeEstimates);
@@ -385,22 +394,23 @@ export const initializeSendState = createAsyncThunk(
         ? getRoundedGasPrice(gasFeeEstimates.gasPrice)
         : '0x0';
     }
-    console.log('===========[gasPrice]=============', gasPrice);
     // Set a basic gasLimit in the event that other estimation fails
-    let gasLimit = GAS_LIMITS.SIMPLE;
+    const gasLimit = selectedAsset.isNative
+      ? GAS_LIMITS.SIMPLE
+      : GAS_LIMITS.BASE_TOKEN_ESTIMATE;
     try {
-      const estimatedGasLimit = await estimateGasLimitForSend({
-        gasPrice,
-        blockGasLimit: getCurrentBlockGasLimit(state),
-        selectedAddress: preference.currentAccount?.address,
-        sendToken: asset.details,
-        to: '0x8920df9c52b63d81efb8edea8173481b73a6d66c',
-        value: amount.value,
-        data: draftTransaction.userInputHexData,
-        isNonStandardEthChain,
-        chainId,
-      });
-      gasLimit = estimatedGasLimit;
+      // const estimatedGasLimit = await estimateGasLimitForSend({
+      //   gasPrice,
+      //   blockGasLimit: getCurrentBlockGasLimit(state),
+      //   selectedAddress: preference.currentAccount?.address,
+      //   sendToken: asset.details,
+      //   to: send.recipient.address?.toLowerCase(),
+      //   value: amount.value,
+      //   data: draftTransaction.userInputHexData,
+      //   isNonStandardEthChain,
+      //   chainId,
+      // });
+      // gasLimit = estimatedGasLimit;
     } catch (error) {
       console.error(
         'estimateGasLimitForSend failed, this tx will probably not success'
@@ -411,8 +421,7 @@ export const initializeSendState = createAsyncThunk(
     }
     return {
       address: null,
-      nativeBalance: '0x0',
-      assetBalance: '0x0',
+      selectedAsset,
       chainId: getCurrentChainId(state),
       gasLimit,
       gasPrice,
@@ -479,6 +488,11 @@ export const sendSlice = createSlice<
       state.eip1559support = action.payload.eip1559support;
       state.gas.gasLimit = action.payload.gasLimit;
       state.gas.gasPrice = action.payload.gasPrice;
+      state.asset.id = action.payload.selectedAsset.tokenId;
+      state.asset.type = action.payload.selectedAsset.isNative
+        ? ASSET_TYPES.NATIVE
+        : ASSET_TYPES.TOKEN;
+      state.asset.balance = action.payload.selectedAsset.amount;
       sendSlice.caseReducers.updateDraftTransaction(state);
     });
   },
