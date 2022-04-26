@@ -314,6 +314,28 @@ class ProviderController extends BaseController {
   }) => this._signTypedData(from, data, 'V4', approvalRes?.extra);
 
   @Reflect.metadata('APPROVAL', [
+    'AddToken',
+    ({ data: { params }, session: { origin } }) => {
+      return null;
+    },
+    { height: 390 },
+  ])
+  walletWatchAsset = async ({ data: { params }, session: { origin } }) => {
+    console.debug('walletWatchAsset::tokenParams:', params);
+    const { symbol, address, decimals, image } = params.options;
+    const currentProvider = networkPreferenceService.getProviderConfig();
+    await TokenService.addCustomToken({
+      symbol,
+      name: '',
+      decimal: decimals,
+      chainCustomId: currentProvider.id,
+      contractAddress: address,
+      isNative: false,
+    });
+    return null;
+  };
+
+  @Reflect.metadata('APPROVAL', [
     'AddChain',
     ({
       data: {

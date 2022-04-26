@@ -36,6 +36,7 @@ const { sensors } = skynet;
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
+import ConnectedSites from '../ConnectedSites';
 
 const onCopy = () => {
   sensors.track('teleport_home_copy_account', { page: location.pathname });
@@ -45,9 +46,13 @@ const Home = () => {
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
+  const [account2ConnectedSite, setAccount2ConnectedSite] =
+    useState<BaseAccount>();
   //const [accountList, setAccountList] = useState<DisplayWalletManage>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
+  const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
+    useState(false);
   const [tabType, setTabType] = useState(Tabs.FIRST);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
@@ -61,7 +66,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const timer = setInterval(getTokenBalancesAsync, 5000);
+    const timer = setInterval(getTokenBalancesAsync, 15000);
     return () => clearInterval(timer);
   }, []);
 
@@ -128,7 +133,8 @@ const Home = () => {
   };
 
   const handleSiteClick = async (account: BaseAccount) => {
-    setPopupVisible(false);
+    setAccount2ConnectedSite(account);
+    setConnectedSitePopupVisible(true);
     console.log(account);
   };
 
@@ -204,8 +210,6 @@ const Home = () => {
           <div
             className="home-preview-top-container flexR"
             onClick={() => {
-              if (account?.accountCreateType !== AccountCreateType.MNEMONIC)
-                return;
               sensors.track('teleport_home_accounts', {
                 page: location.pathname,
               });
@@ -223,9 +227,7 @@ const Home = () => {
                   : account?.hdWalletName}
               </span>
             </div>
-            {account?.accountCreateType === AccountCreateType.MNEMONIC ? (
-              <IconComponent name="chevron-down" cls="chevron-down" />
-            ) : null}
+            <IconComponent name="chevron-down" cls="chevron-down" />
           </div>
           <div className="home-preview-address-container flexR">
             <span className="home-preview-address">
@@ -395,25 +397,27 @@ const Home = () => {
           </div>
           <div className="account-switch-accounts flexR content-wrap-padding">
             <span className="account-switch-accounts-title">Accounts</span>
-            <span
-              className="account-switch-accounts-manage-wallet-container cursor flexR"
-              onClick={() => {
-                sensors.track('teleport_home_account_manage', {
-                  page: location.pathname,
-                });
-                history.push({
-                  pathname: '/account-manage',
-                  state: {
-                    hdWalletId: account?.hdWalletId,
-                    hdWalletName: account?.hdWalletName,
-                    accountCreateType: account?.accountCreateType,
-                  },
-                });
-              }}
-            >
-              Manage Account
-              <IconComponent name="chevron-right" cls="icon chevron-right" />
-            </span>
+            {account?.accountCreateType === AccountCreateType.MNEMONIC ? (
+              <span
+                className="account-switch-accounts-manage-wallet-container cursor flexR"
+                onClick={() => {
+                  sensors.track('teleport_home_account_manage', {
+                    page: location.pathname,
+                  });
+                  history.push({
+                    pathname: '/account-manage',
+                    state: {
+                      hdWalletId: account?.hdWalletId,
+                      hdWalletName: account?.hdWalletName,
+                      accountCreateType: account?.accountCreateType,
+                    },
+                  });
+                }}
+              >
+                Manage Account
+                <IconComponent name="chevron-right" cls="icon chevron-right" />
+              </span>
+            ) : null}
           </div>
 
           <CurrentWalletAccountSwitch
@@ -422,6 +426,34 @@ const Home = () => {
             handleSiteClick={handleSiteClick}
           />
         </div>
+        <Drawer
+          placement="top"
+          closable={true}
+          closeIcon={<IconComponent name="back" cls="icon back-icon" />}
+          onClose={() => {
+            setConnectedSitePopupVisible(false);
+          }}
+          height="76vh"
+          bodyStyle={{
+            padding: 0,
+          }}
+          contentWrapperStyle={{
+            borderRadius: '0 0 23px 23px',
+            overflow: 'hidden',
+          }}
+          visible={connectedSitePopupVisible}
+          key="inside"
+        >
+          <div style={{ width: '100%', height: '100%' }}>
+            <ConnectedSites
+              account={account2ConnectedSite}
+              visible={connectedSitePopupVisible}
+              handleOnClose={() => {
+                setConnectedSitePopupVisible(false);
+              }}
+            />
+          </div>
+        </Drawer>
       </Drawer>
       <Drawer
         placement="top"

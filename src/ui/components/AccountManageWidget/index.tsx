@@ -21,7 +21,7 @@ import {
 } from 'ui/utils/networkCategoryToIcon';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { CoinTypeEcosystemMapping } from 'constants/wallet';
-import selectedIcon from '../../../assets/accountSelected.svg';
+import classnames from 'classnames';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -46,7 +46,7 @@ interface IDisplayAccountManage {
 }
 
 const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
-  const [tempAccounts, setTempAccounts] = useState<IDisplayAccountManage[]>();
+  const [tempAccounts, setTempAccounts] = useState<any[]>();
   const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
 
   const wallet = useWallet();
@@ -147,8 +147,11 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
 
   useAsyncEffect(queryAccounts, []);
 
-  const handleAccountClick = async (a: IDisplayAccountManage) => {
-    if (a.ethAddress === currentAccount) return;
+  const handleAccountClick = async (
+    a: IDisplayAccountManage,
+    isEmpty: boolean
+  ) => {
+    if (a.ethAddress === currentAccount || isEmpty) return;
     let coinType: CoinType, account;
     const currentChain: Provider | null = await wallet.getCurrentChain();
     if (currentChain) {
@@ -173,27 +176,33 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
   return (
     <div className="account-manage-widget flexR">
       <div className="side-bar flexCol">
-        {tempAccounts?.map((account: IDisplayAccountManage, i) => {
+        {tempAccounts?.concat([{}])?.map((account: any, i) => {
           return (
             <div
               className={clsx('flexR id-item', {
                 'id-item-selected': account.selected,
                 'id-item-selected-previous': i === (selectedIndex || 0) - 1,
                 'id-item-selected-after': i === (selectedIndex || 0) + 1,
+                cursor: i !== tempAccounts.length,
               })}
-              onClick={() => handleAccountClick(account)}
+              onClick={() =>
+                handleAccountClick(account, i === tempAccounts.length)
+              }
               key={i}
             >
-              <div className="id-item-wrap flexR">
-                <Jazzicon
-                  diameter={account.selected ? 40 : 30}
-                  seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
-                />
-                {/*  <img
-                  src={selectedIcon}
-                  className="account-manage-selected-icon"
-                  style={{ display: account.selected ? 'block' : 'none' }}
-                /> */}
+              <div className="id-item-wrap-wrap flexR">
+                <div
+                  className={classnames('id-item-wrap flexR', {
+                    'first-id-item-wrap': i === 0 && !account.selected,
+                  })}
+                >
+                  {account?.ethAddress ? (
+                    <Jazzicon
+                      diameter={account.selected ? 40 : 30}
+                      seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
+                    />
+                  ) : null}
+                </div>
               </div>
             </div>
           );

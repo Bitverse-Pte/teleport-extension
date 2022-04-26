@@ -528,8 +528,11 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
           }}
         />
         <div className="popup-delete-notice">
-          Make sure you’ve backed up this wallet,all accounts belonging to this
-          wallet will be deleted,and the operation can’t reverse.
+          {props.title === 'Delete Account'
+            ? ` Make sure you’ve backed up this account’s private key, or you’ll lose
+          access of it.`
+            : `Make sure you’ve backed up this wallet,all accounts belonging to this
+          wallet will be deleted,and the operation can’t reverse.`}
         </div>
         <span className="popup-item-title">Input password to delete</span>
         <CustomPasswordInput

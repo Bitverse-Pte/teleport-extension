@@ -19,6 +19,12 @@
   "loading": {
     "message": "Loading"
   },
+  "txFee": {
+    "message": "Transaction Fee"
+  },
+  "newContract": {
+    "message": "New Contract"
+  },
   "network_loading_message": {
     "message": "If you see this page for more than 30s, your custom network may broken. Please remove the broken custom network and add it once again."
   },
@@ -40,6 +46,35 @@
   },
   "add": {
     "message": "Add"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "cancelEdit": {
+    "message": "Cancel Edit"
+  },
+  "cancelPopoverTitle": {
+    "message": "Cancel transaction"
+  },
+  "cancelSpeedUp": {
+    "message": "cancel or speed up a tranaction."
+  },
+  "cancelSpeedUpLabel": {
+    "message": "This gas fee will {{$1}} the original.",
+    "description": "$1 is text 'replace' in bold"
+  },
+  "cancelSpeedUpTransactionTooltip": {
+    "message": "To {{$1}} a transaction the gas fee must be increased by at least 10% for it to be recognized by the network.",
+    "description": "$1 is string 'cancel' or 'speed up'"
+  },
+  "cancelSwap": {
+    "message": "Cancel swap"
+  },
+  "cancellationGasFee": {
+    "message": "Cancellation Gas Fee"
+  },
+  "cancelled": {
+    "message": "Cancelled"
   },
   "Bad_URL": {
     "message": "Bad URL format, please check your input."
@@ -636,6 +671,9 @@
     "message": "{{$1}} seconds",
     "description": "{{$1}} represents a number of seconds"
   },
+  "addTenPercent": {
+    "message": "Add 10%"
+  },
   "gasTimingSecondsShort": {
     "message": "{{$1}} sec",
     "description": "{{$1}} represents a number of seconds"
@@ -771,6 +809,9 @@
   },
   "speedUp": {
     "message": "Speed Up"
+  },
+  "speedUpCancellation": {
+    "message": "Speed up this cancellation"
   },
   "mismatched_chain_id": {
     "message": "The RPC URL you have entered returned a different chain ID ({{got}}). Please update the Chain ID to match the RPC URL of the network you are trying to add."

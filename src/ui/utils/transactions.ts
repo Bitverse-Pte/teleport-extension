@@ -13,7 +13,7 @@ import {
   TransactionTypes,
 } from 'constants/transaction';
 import { TOKEN_TRANSFER_FUNCTION_SIGNATURE } from 'ui/context/send.constants';
-import { multiplyCurrencies } from './conversion';
+import { addCurrencies, multiplyCurrencies } from './conversion';
 import { conversionGreaterThan, conversionLessThan } from 'utils/conversion';
 import abi from 'utils/human-standard-token-abi-extended';
 
@@ -277,6 +277,34 @@ export function generateERC20TransferData({
         (x) => `00${x.toString(16)}`.slice(-2)
       )
       .join('')
+  );
+}
+
+export function sumHexes(...args) {
+  const total = args.reduce((acc, hexAmount) => {
+    return addCurrencies(acc, hexAmount, {
+      toNumericBase: 'hex',
+      aBase: 16,
+      bBase: 16,
+    });
+  });
+
+  return addHexPrefix(total);
+}
+
+export function getHexGasTotal({
+  gasLimit,
+  gasPrice,
+}: {
+  gasLimit: string;
+  gasPrice: string;
+}) {
+  return addHexPrefix(
+    multiplyCurrencies(gasLimit || '0x0', gasPrice || '0x0', {
+      toNumericBase: 'hex',
+      multiplicandBase: 16,
+      multiplierBase: 16,
+    })
   );
 }
 

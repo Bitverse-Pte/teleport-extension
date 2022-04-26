@@ -13,7 +13,7 @@ export interface ConnectedSite {
   accounts: string[];
 }
 
-type PermissionStore = {
+export type PermissionStore = {
   dumpCache: ReadonlyArray<LRU.Entry<string, ConnectedSite>>;
 };
 
@@ -132,66 +132,81 @@ class PermissionService {
     return this.lruCache.has(origin);
   };
 
-  getRecentConnectSites = (max = 12) => {
-    const values = this.lruCache?.values() || [];
-    const topSites: ConnectedSite[] = [];
-    const signedSites: ConnectedSite[] = [];
-    const connectedSites: ConnectedSite[] = [];
-
-    for (let i = 0; i < values.length; i++) {
-      const item = values[i];
-      if (item.isTop) {
-        topSites.push(item);
-      } else if (item.isSigned) {
-        signedSites.push(item);
-      } else {
-        connectedSites.push(item);
-      }
-    }
-    return [...topSites, ...signedSites, ...connectedSites].slice(0, max) || [];
-  };
-
-  getConnectedSites = () => {
-    return this.lruCache?.values() || [];
-  };
-
-  getConnectedSite = (key: string) => {
-    return this.lruCache?.get(key);
-  };
-
-  topConnectedSite = (origin: string) => {
-    const site = this.getConnectedSite(origin);
-    if (!site || !this.lruCache) return;
-    this.updateConnectSite(origin, {
-      ...site,
-      isTop: true,
-    });
-  };
-
-  unpinConnectedSite = (origin: string) => {
-    const site = this.getConnectedSite(origin);
-    if (!site || !this.lruCache) return;
-    this.updateConnectSite(origin, {
-      ...site,
-      isTop: false,
-    });
-  };
-
-  removeConnectedSite = (origin: string) => {
+  removeConnectedSite = (origin: string, account: string) => {
     if (!this.lruCache) return;
-
-    this.lruCache.del(origin);
+    const site = this.lruCache.get(origin);
+    if (!site) {
+      return;
+    }
+    const i = site.accounts.indexOf(account);
+    if (i > -1) {
+      site.accounts.splice(i, 1);
+    }
+    if (!site.accounts?.length) {
+      this.lruCache.del(origin);
+    } else {
+      this.lruCache.set(origin, site);
+    }
     this.sync();
   };
 
-  getSitesByDefaultChain = (chain: CHAINS_ENUM) => {
-    if (!this.lruCache) return [];
-    return this.lruCache.values().filter((item) => item.chain === chain);
+  getConnectedSite = (origin: string) => {
+    return this.lruCache?.get(origin);
   };
 
-  isInternalOrigin = (origin: string) => {
-    return origin === INTERNAL_REQUEST_ORIGIN;
+  getConnectedSitesByAccount = (account: string): ConnectedSite[] => {
+    const values = this.lruCache?.values() || [];
+    return values.filter((item) => item.accounts.includes(account));
   };
+
+  // getRecentConnectSites = (max = 12) => {
+  //   const values = this.lruCache?.values() || [];
+  //   const topSites: ConnectedSite[] = [];
+  //   const signedSites: ConnectedSite[] = [];
+  //   const connectedSites: ConnectedSite[] = [];
+  //   for (let i = 0; i < values.length; i++) {
+  //     const item = values[i];
+  //     if (item.isTop) {
+  //       topSites.push(item);
+  //     } else if (item.isSigned) {
+  //       signedSites.push(item);
+  //     } else {
+  //       connectedSites.push(item);
+  //     }
+  //   }
+  //   return [...topSites, ...signedSites, ...connectedSites].slice(0, max) || [];
+  // };
+
+  // getConnectedSites = () => {
+  //   return this.lruCache?.values() || [];
+  // };
+
+  // topConnectedSite = (origin: string) => {
+  //   const site = this.getConnectedSite(origin);
+  //   if (!site || !this.lruCache) return;
+  //   this.updateConnectSite(origin, {
+  //     ...site,
+  //     isTop: true,
+  //   });
+  // };
+
+  // unpinConnectedSite = (origin: string) => {
+  //   const site = this.getConnectedSite(origin);
+  //   if (!site || !this.lruCache) return;
+  //   this.updateConnectSite(origin, {
+  //     ...site,
+  //     isTop: false,
+  //   });
+  // };
+
+  // getSitesByDefaultChain = (chain: CHAINS_ENUM) => {
+  //   if (!this.lruCache) return [];
+  //   return this.lruCache.values().filter((item) => item.chain === chain);
+  // };
+
+  // isInternalOrigin = (origin: string) => {
+  //   return origin === INTERNAL_REQUEST_ORIGIN;
+  // };
 }
 
 export default new PermissionService();
