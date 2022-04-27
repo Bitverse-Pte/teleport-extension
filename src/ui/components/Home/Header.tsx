@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Button } from 'antd';
-import walletLogo from 'assets/logoBeta.png';
+import walletLogo from 'assets/walletLogo.svg';
 import './style.less';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { IconComponent } from '../IconComponents';

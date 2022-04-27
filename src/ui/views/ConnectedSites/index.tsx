@@ -9,7 +9,6 @@ import { TipButton, WalletName } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
 import { stat } from 'fs';
-import { BetaIcon } from 'ui/components/Widgets';
 
 import disconnectDefaultIcon from 'assets/disconnectDefault.svg';
 import disconnectActiveIcon from 'assets/disconnectActive.svg';

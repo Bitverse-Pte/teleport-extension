@@ -18,7 +18,6 @@ import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
 import { IconComponent } from 'ui/components/IconComponents';
 import { NetworkSelectionItem } from 'ui/components/Network/NetworkSelection/NetworkSelectionItem.component';
-import { BetaIcon } from 'ui/components/Widgets';
 import { ReactComponent as TLPText } from 'assets/teleportText.svg';
 import skynet from 'utils/skynet';
 import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
@@ -114,7 +113,6 @@ const NetworksSelectionContainer = () => {
         title={
           <span className="title flex">
             <TLPText style={{ marginRight: 4 }} />
-            <BetaIcon />
           </span>
         }
         onXButtonClick={() => history.push('/home')}
