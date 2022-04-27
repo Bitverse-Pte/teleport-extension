@@ -23,6 +23,7 @@ import { toHumanReadableTime } from 'ui/utils/utils';
 import clsx from 'clsx';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { MIN_GAS_LIMIT_DEC } from 'ui/context/send.constants';
+import { useSetState } from 'react-use';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -159,6 +160,10 @@ const CancelSpeedupPopoverImplementation = ({
     maxPriorityFeePerGas: add10PercentTxParams.maxPriorityFeePerGas,
     gasPrice: add10PercentTxParams.gasPrice,
   });
+
+  const [customTxParamsError, setCustomTxParamsError] = useSetState<
+    Partial<Transaction['txParams']>
+  >({});
 
   useEffect(() => {
     console.debug('gasFeeEstimates::updated:', gasFeeEstimates);
@@ -356,10 +361,16 @@ const CancelSpeedupPopoverImplementation = ({
               stringMode
               value={Number(gasLimit || 21000).toString()}
               min="21000"
-              max={BigNumber.from(currentBlockMaxGasLimit).toString()}
               controls={false}
               onBlur={({ target }) => {
-                setGasLimit(BigNumber.from(target.value).toHexString());
+                try {
+                  setGasLimit(BigNumber.from(target.value).toHexString());
+                } catch (error) {
+                  console.error('setGasLimit::error:', error);
+                  setCustomTxParamsError({
+                    gasLimit: 'bad input',
+                  });
+                }
               }}
             />
           </div>
@@ -377,10 +388,20 @@ const CancelSpeedupPopoverImplementation = ({
                 )}
                 controls={false}
                 onBlur={({ target: { value } }) => {
-                  setCustomGasPrice((prevState) => ({
-                    ...prevState,
-                    gasPrice: utils.parseUnits(value, 'gwei').toHexString(),
-                  }));
+                  try {
+                    const gasPrice = utils
+                      .parseUnits(value, 'gwei')
+                      .toHexString();
+                    setCustomGasPrice((prevState) => ({
+                      ...prevState,
+                      gasPrice,
+                    }));
+                  } catch (error) {
+                    console.error('setCustomGasPrice::error', error);
+                    setCustomTxParamsError({
+                      gasPrice: 'bad input',
+                    });
+                  }
                 }}
               />
             </div>
@@ -396,10 +417,20 @@ const CancelSpeedupPopoverImplementation = ({
                 )}
                 controls={false}
                 onBlur={({ target: { value } }) => {
-                  setCustomGasPrice((prevState) => ({
-                    ...prevState,
-                    maxFeePerGas: utils.parseUnits(value, 'gwei').toHexString(),
-                  }));
+                  try {
+                    const maxFeePerGas = utils
+                      .parseUnits(value, 'gwei')
+                      .toHexString();
+                    setCustomGasPrice((prevState) => ({
+                      ...prevState,
+                      maxFeePerGas,
+                    }));
+                  } catch (error) {
+                    console.error('setCustomGasPrice::error', error);
+                    setCustomTxParamsError({
+                      maxFeePerGas: 'bad input',
+                    });
+                  }
                 }}
                 addonAfter="Gwei"
                 stringMode
@@ -417,12 +448,20 @@ const CancelSpeedupPopoverImplementation = ({
                 )}
                 controls={false}
                 onBlur={({ target: { value } }) => {
-                  setCustomGasPrice((prevState) => ({
-                    ...prevState,
-                    maxPriorityFeePerGas: utils
+                  try {
+                    const maxPriorityFeePerGas = utils
                       .parseUnits(value, 'gwei')
-                      .toHexString(),
-                  }));
+                      .toHexString();
+                    setCustomGasPrice((prevState) => ({
+                      ...prevState,
+                      maxPriorityFeePerGas,
+                    }));
+                  } catch (error) {
+                    console.error('setCustomGasPrice::error', error);
+                    setCustomTxParamsError({
+                      maxPriorityFeePerGas: 'bad input',
+                    });
+                  }
                 }}
                 addonAfter="Gwei"
                 stringMode
