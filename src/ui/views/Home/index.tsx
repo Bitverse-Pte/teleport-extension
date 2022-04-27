@@ -142,7 +142,7 @@ const Home = () => {
     sensors.track('teleport_home_receive_click', {
       page: location.pathname,
     });
-    history.push('/receive');
+    history.push(`/receive/${nativeToken!.symbol}`);
   };
   const handleAddTokenBtnClick = (e) => {
     e.stopPropagation();

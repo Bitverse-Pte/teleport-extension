@@ -107,7 +107,6 @@ function TransactionItem({
   transactionGroup,
   idx,
   style,
-  isEarliestNonce = false,
 }: TransactionItemParams) {
   const {
     title,
@@ -385,9 +384,7 @@ export function TransactionsList({
         // simple pagination like MetaMask
         .slice(0, limit)
     );
-  }, [rawTransactionsGroup, otherFilter]);
-
-  const pendingLength = pendingTransactions.length;
+  }, [rawTransactionsGroup, txgFilter, limit]);
 
   if (transactions.length === 0) {
     return <NoContent title="activity" />;
@@ -415,7 +412,7 @@ export function TransactionsList({
         <TransactionItem
           transactionGroup={tx}
           idx={idx}
-          key={idx}
+          key={tx.initialTransaction.id}
           // style={args.style}
         />
       ))}

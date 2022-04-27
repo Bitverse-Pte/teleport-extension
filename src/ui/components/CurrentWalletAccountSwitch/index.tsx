@@ -5,13 +5,15 @@ import { AccountCreateType, BaseAccount } from 'types/extend';
 import { Object } from 'ts-toolbelt';
 import Jazzicon from 'react-jazzicon';
 import { WalletName } from '../Widgets';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Tabs } from 'constants/wallet';
 import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
 import siteDefaultIcon from 'assets/siteDefault.svg';
 import siteActiveIcon from 'assets/siteActive.svg';
 import classnames from 'classnames';
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 
 interface AccountSwitchProps {
   handleAccountClick?: (account: BaseAccount) => void;
@@ -24,6 +26,7 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
 ) => {
   const wallet = useWallet();
   const history = useHistory();
+  const location = useLocation();
   const [accountList, setAccountList] =
     useState<Object.Merge<BaseAccount, { selected?: boolean }>[]>();
   const [walletName, setWalletName] = useState('');
@@ -70,6 +73,9 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
                 })}
                 onClick={() => {
                   if (props.handleAccountClick) {
+                    sensors.track('teleport_account_switch_export', {
+                      page: location.pathname,
+                    });
                     props.handleAccountClick(a);
                   }
                 }}
@@ -118,6 +124,12 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
                     onClick={(e) => {
                       e.stopPropagation();
                       if (props.handleSiteClick) {
+                        sensors.track(
+                          'teleport_account_switch_connected_sites',
+                          {
+                            page: location.pathname,
+                          }
+                        );
                         props.handleSiteClick(a);
                       }
                     }}

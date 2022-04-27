@@ -90,7 +90,7 @@ const Send = () => {
 
   useEffect(() => {
     if (chainId !== undefined) {
-      dispatch(initializeSendState());
+      dispatch(initializeSendState({ assetId: tokenId }));
     }
   }, [chainId, dispatch, cleanup]);
 
@@ -232,6 +232,7 @@ const Send = () => {
   const handleTokenSelect = (val) => {
     const selected = tokens.find((t: Token) => t.symbol === val);
     setSelectedToken(selected);
+    dispatch(initializeSendState({ assetId: selected?.tokenId }));
   };
 
   const addonSymbol = (

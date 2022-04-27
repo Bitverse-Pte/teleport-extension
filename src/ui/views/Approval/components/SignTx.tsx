@@ -139,14 +139,16 @@ const SignTx = ({ params, origin }) => {
         gasState.gasType === 'custom'
           ? gasState.customData
           : gasFeeEstimates[gasState.gasType];
-      setMaxFeePerGas(
-        addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
+      const _maxFeePerGas = addHexPrefix(
+        decGWEIToHexWEI(suggestedMaxFeePerGas).toString()
       );
-      setMaxPriorityFeePerGas(
-        addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
+      setMaxFeePerGas(_maxFeePerGas);
+      const _maxPriorityFeePerGas = addHexPrefix(
+        decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString()
       );
-      const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
-      const total = multipyHexes(a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
+      setMaxPriorityFeePerGas(_maxPriorityFeePerGas);
+      const _a = addHexes(_maxFeePerGas, _maxPriorityFeePerGas).toString();
+      const total = multipyHexes(_a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
       setTotalGasFee(addHexPrefix(total));
     }
   };

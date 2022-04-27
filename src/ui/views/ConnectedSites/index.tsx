@@ -9,7 +9,6 @@ import { TipButton, WalletName } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
 import { stat } from 'fs';
-import { BetaIcon } from 'ui/components/Widgets';
 
 import disconnectDefaultIcon from 'assets/disconnectDefault.svg';
 import disconnectActiveIcon from 'assets/disconnectActive.svg';
@@ -17,7 +16,8 @@ import accountSwitch from 'assets/accountSwitch.svg';
 import { useTranslation } from 'react-i18next';
 import { ConnectedSite } from 'background/service/permission';
 import { NoContent } from 'ui/components/universal/NoContent';
-
+import skynet from 'utils/skynet';
+const { sensors } = skynet;
 interface IConnectedSitesProps {
   account?: BaseAccount;
   visible?: boolean;
@@ -69,8 +69,16 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
         alignItems: 'center',
       },
       async onOk() {
+        sensors.track('teleport_connected_sites_confirm_ok', {
+          page: location.pathname,
+        });
         await wallet.removeConnectedSite(site.origin, account?.address);
         init();
+      },
+      async onCancel() {
+        sensors.track('teleport_connected_sites_confirm_cancel', {
+          page: location.pathname,
+        });
       },
     });
   };
@@ -100,6 +108,9 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
             onClick={(e) => {
               e.stopPropagation();
               if (props.handleOnClose) {
+                sensors.track('teleport_connected_sites_switch', {
+                  page: location.pathname,
+                });
                 props.handleOnClose();
               }
             }}
@@ -130,6 +141,10 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
                 className="site-item-right cursor flexR"
                 onClick={(e) => {
                   e.stopPropagation();
+                  sensors.track('teleport_connected_sites_remove', {
+                    page: location.pathname,
+                    site: a.origin,
+                  });
                   handleRemoveSiteClick(a);
                 }}
               >

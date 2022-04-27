@@ -62,7 +62,7 @@ const Main = () => {
         <LazyPrivateRoute exact path="/about">
           <AboutSoftware />
         </LazyPrivateRoute>
-        <LazyPrivateRoute exact path="/receive">
+        <LazyPrivateRoute exact path="/receive/:symbol">
           <Receive />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/wallet-manage">
@@ -141,7 +141,7 @@ const Main = () => {
         <LazyPrivateRoute exact path="/send/:tokenId">
           <Send />
         </LazyPrivateRoute>
-        <LazyPrivateRoute exact path="/receive">
+        <LazyPrivateRoute exact path="/receive/:symbol">
           <Receive />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/confirm-transaction">

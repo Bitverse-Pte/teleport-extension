@@ -273,3 +273,7 @@ export function fetchGasFeeEstimates(): any {
 export function closeNotificationPopup() {
   return background.setPopupOpen(false);
 }
+
+export function getTokenBalancesSync() {
+  return background.getTokenBalancesSync(true);
+}

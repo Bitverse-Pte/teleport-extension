@@ -128,7 +128,7 @@ const SingleToken = () => {
           title="Receive"
           type={TipButtonEnum.RECEIVE}
           handleClick={() => {
-            history.push('/receive');
+            history.push(`/receive/${updatedToken?.symbol}`);
           }}
         />
       </div>
