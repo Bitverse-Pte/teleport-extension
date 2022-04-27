@@ -483,7 +483,3 @@ export const TipButton = (props: TipButtonProps) => {
     </div>
   );
 };
-
-export const BetaIcon = () => {
-  return <span className="beta-icon">Beta</span>;
-};
