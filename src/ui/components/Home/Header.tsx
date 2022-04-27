@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import { Button } from 'antd';
-import walletLogo from 'assets/logoBeta.png';
+import walletLogo from 'assets/walletLogo.svg';
 import './style.less';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
+import SettingIcon from 'assets/settingIcon.svg';
 export function HomeHeader({
   menuOnClick,
   networkOnClick,
@@ -34,12 +35,18 @@ export function HomeHeader({
         </span>
         <IconComponent name="chevron-down" cls="expand-list base-text-color" />
       </button>
-      <Button type="text" className="expand-menu-btn" onClick={menuOnClick}>
+      <img
+        src={SettingIcon}
+        style={{ transform: 'scale(1.5)' }}
+        className="expand-menu-btn cursor"
+        onClick={menuOnClick}
+      />
+      {/* <Button type="text" className="expand-menu-btn" >
         <IconComponent
           name="menu"
           cls="expand-menu-btn-icon base-text-color "
         />
-      </Button>
+      </Button> */}
     </div>
   );
 }

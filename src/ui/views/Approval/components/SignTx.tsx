@@ -21,8 +21,9 @@ import {
   multipyHexes,
   decGWEIToHexWEI,
   addCurrencies,
+  conversionUtil,
 } from 'ui/utils/conversion';
-import { TransactionEnvelopeTypes } from 'constants/transaction';
+import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
 import { CustomButton } from 'ui/components/Widgets';
 import { useDispatch, useSelector } from 'react-redux';
@@ -138,14 +139,16 @@ const SignTx = ({ params, origin }) => {
         gasState.gasType === 'custom'
           ? gasState.customData
           : gasFeeEstimates[gasState.gasType];
-      setMaxFeePerGas(
-        addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas).toString())
+      const _maxFeePerGas = addHexPrefix(
+        decGWEIToHexWEI(suggestedMaxFeePerGas).toString()
       );
-      setMaxPriorityFeePerGas(
-        addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString())
+      setMaxFeePerGas(_maxFeePerGas);
+      const _maxPriorityFeePerGas = addHexPrefix(
+        decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString()
       );
-      const a = addHexes(maxFeePerGas, maxPriorityFeePerGas).toString();
-      const total = multipyHexes(a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
+      setMaxPriorityFeePerGas(_maxPriorityFeePerGas);
+      const _a = addHexes(_maxFeePerGas, _maxPriorityFeePerGas).toString();
+      const total = multipyHexes(_a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
       setTotalGasFee(addHexPrefix(total));
     }
   };
@@ -342,9 +345,13 @@ const TxDetailComponent = ({
       });
       return `${total} ${currency || ''}`;
     }
-    const transferDec = getValueFromWeiHex({
-      value: valueToDisplay(tx),
-      numberOfDecimals: 10,
+    const multiplier = Math.pow(10, Number(txToken?.decimal || 0));
+    const transferDec = conversionUtil(addHexPrefix(valueToDisplay(tx)), {
+      fromNumericBase: 'hex',
+      toNumericBase: 'dec',
+      toCurrency: txToken?.symbol || ETH,
+      conversionRate: multiplier,
+      invertConversionRate: true,
     });
     const gasDec = getValueFromWeiHex({
       value: totalGasfee,

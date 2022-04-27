@@ -9,7 +9,6 @@ import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
 import { stat } from 'fs';
-import { BetaIcon } from 'ui/components/Widgets';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 interface ISettingFeat {
@@ -62,7 +61,6 @@ export const LogoHeader: React.FC<ILogoHeader> = (props) => {
       <div className="logo-header-left flexR">
         <img src={walletLogo} className="logo-header-left-logo" />
         <img src={TeleportText} className="logo-header-left-title" />
-        <BetaIcon />
       </div>
       <div
         className="logo-header-right flexR"

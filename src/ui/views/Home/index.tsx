@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
-import { message, Drawer } from 'antd';
+import { Drawer } from 'antd';
 import {
   useWallet,
   useAsyncEffect,
@@ -10,16 +10,10 @@ import {
   denom2SymbolRatio,
   getTotalPricesByAmountAndPrice,
 } from 'ui/utils';
-import AccountSwitch from 'ui/components/AccountSwitch';
 import Setting from 'ui/views/Setting';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { HomeHeader } from 'ui/components/Home/Header';
-import {
-  AccountCreateType,
-  BaseAccount,
-  DisplayWalletManage,
-  HdAccountStruct,
-} from 'types/extend';
+import { AccountCreateType, BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Token } from 'types/token';
 import {
@@ -30,19 +24,19 @@ import {
   TokenIcon,
   WalletName,
 } from 'ui/components/Widgets';
-import { Provider } from 'types/network';
 import { TransactionsList } from 'ui/components/TransactionList';
 import './style.less';
 import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
-import WalletManageNewIcon from '../../../assets/walletManageNew.svg';
+import ArrowRight from '../../../assets/arrowRight.svg';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
+import ConnectedSites from '../ConnectedSites';
 
 const onCopy = () => {
   sensors.track('teleport_home_copy_account', { page: location.pathname });
@@ -52,15 +46,17 @@ const Home = () => {
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
-  const [accountList, setAccountList] = useState<DisplayWalletManage>();
+  const [account2ConnectedSite, setAccount2ConnectedSite] =
+    useState<BaseAccount>();
+  //const [accountList, setAccountList] = useState<DisplayWalletManage>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
+  const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
+    useState(false);
   const [tabType, setTabType] = useState(Tabs.FIRST);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
-  const start = new Date().getTime();
-  (window as any).wallet = wallet;
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -70,7 +66,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const timer = setInterval(getTokenBalancesAsync, 5000);
+    const timer = setInterval(getTokenBalancesAsync, 15000);
     return () => clearInterval(timer);
   }, []);
 
@@ -93,12 +89,12 @@ const Home = () => {
     if (account) setAccount(account);
   };
 
-  const getAccountList = async () => {
+  /* const getAccountList = async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList();
     setAccountList(accounts);
-  };
+  }; */
 
-  useAsyncEffect(getAccountList, []);
+  //useAsyncEffect(getAccountList, []);
   useAsyncEffect(updateAccount, []);
   useAsyncEffect(getTokenBalancesAsync, []);
   useAsyncEffect(getTokenBalancesSync, []);
@@ -136,11 +132,17 @@ const Home = () => {
     });
   };
 
+  const handleSiteClick = async (account: BaseAccount) => {
+    setAccount2ConnectedSite(account);
+    setConnectedSitePopupVisible(true);
+    console.log(account);
+  };
+
   const handleReceiveBtnClick = () => {
     sensors.track('teleport_home_receive_click', {
       page: location.pathname,
     });
-    history.push('/receive');
+    history.push(`/receive/${nativeToken!.symbol}`);
   };
   const handleAddTokenBtnClick = (e) => {
     e.stopPropagation();
@@ -195,17 +197,19 @@ const Home = () => {
       />
       <div className="home-bg"></div>
       <div className="home-content">
-        <WalletName width={200} cls="home-wallet-name">
-          {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
-            ? ' '
-            : account?.hdWalletName}
-        </WalletName>
+        <div className="home-content-name-wrap content-wrap-padding flexR">
+          <img src={ArrowRight} className="home-content-name-arrow-right" />
+          <WalletName width={200} cls="home-wallet-name">
+            {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
+              ? 'Normal Wallet'
+              : `ID Wallet: ${account?.hdWalletName}`}
+          </WalletName>
+        </div>
+
         <div className="home-preview-container flexCol content-wrap-padding">
           <div
             className="home-preview-top-container flexR"
             onClick={() => {
-              if (account?.accountCreateType !== AccountCreateType.MNEMONIC)
-                return;
               sensors.track('teleport_home_accounts', {
                 page: location.pathname,
               });
@@ -223,9 +227,7 @@ const Home = () => {
                   : account?.hdWalletName}
               </span>
             </div>
-            {account?.accountCreateType === AccountCreateType.MNEMONIC ? (
-              <IconComponent name="chevron-down" cls="chevron-down" />
-            ) : null}
+            <IconComponent name="chevron-down" cls="chevron-down" />
           </div>
           <div className="home-preview-address-container flexR">
             <span className="home-preview-address">
@@ -395,30 +397,63 @@ const Home = () => {
           </div>
           <div className="account-switch-accounts flexR content-wrap-padding">
             <span className="account-switch-accounts-title">Accounts</span>
-            <img
-              onClick={() => {
-                sensors.track('teleport_home_account_manage', {
-                  page: location.pathname,
-                });
-                history.push({
-                  pathname: '/account-manage',
-                  state: {
-                    hdWalletId: account?.hdWalletId,
-                    hdWalletName: account?.hdWalletName,
-                    accountCreateType: account?.accountCreateType,
-                  },
-                });
-              }}
-              src={WalletManageNewIcon}
-              className="account-switch-accounts-manage-wallet-container cursor"
-            />
+            {account?.accountCreateType === AccountCreateType.MNEMONIC ? (
+              <span
+                className="account-switch-accounts-manage-wallet-container cursor flexR"
+                onClick={() => {
+                  sensors.track('teleport_home_account_manage', {
+                    page: location.pathname,
+                  });
+                  history.push({
+                    pathname: '/account-manage',
+                    state: {
+                      hdWalletId: account?.hdWalletId,
+                      hdWalletName: account?.hdWalletName,
+                      accountCreateType: account?.accountCreateType,
+                    },
+                  });
+                }}
+              >
+                Manage Account
+                <IconComponent name="chevron-right" cls="icon chevron-right" />
+              </span>
+            ) : null}
           </div>
 
           <CurrentWalletAccountSwitch
             visible={accountPopupVisible}
             handleAccountClick={handleAccountClick}
+            handleSiteClick={handleSiteClick}
           />
         </div>
+        <Drawer
+          placement="top"
+          closable={true}
+          closeIcon={<IconComponent name="back" cls="icon back-icon" />}
+          onClose={() => {
+            setConnectedSitePopupVisible(false);
+          }}
+          height="76vh"
+          bodyStyle={{
+            padding: 0,
+          }}
+          contentWrapperStyle={{
+            borderRadius: '0 0 23px 23px',
+            overflow: 'hidden',
+          }}
+          visible={connectedSitePopupVisible}
+          key="inside"
+        >
+          <div style={{ width: '100%', height: '100%' }}>
+            <ConnectedSites
+              account={account2ConnectedSite}
+              visible={connectedSitePopupVisible}
+              handleOnClose={() => {
+                setConnectedSitePopupVisible(false);
+              }}
+            />
+          </div>
+        </Drawer>
       </Drawer>
       <Drawer
         placement="top"

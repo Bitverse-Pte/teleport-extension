@@ -257,7 +257,7 @@ const AccountManage: React.FC = () => {
         />
       )}
       <Add
-        title="Add Account"
+        title="Account name"
         visible={addPopupVisible}
         setVisible={(visible: boolean) => {
           setAddPopupVisible(visible);
@@ -267,7 +267,7 @@ const AccountManage: React.FC = () => {
       />
 
       <Rename
-        title="Rename Account"
+        title="New account name"
         visible={renamePopupVisible}
         defaultValue={currentAccountName}
         setVisible={(visible: boolean) => {
@@ -320,7 +320,7 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
       visible={props.visible}
       placement="bottom"
       closable={false}
-      height="236px"
+      height="208px"
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0 24px 24px 24px',
@@ -336,12 +336,12 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
         <DrawerHeader
           title={props.title}
           handleCloseIconClick={() => {
+            setValue('');
             if (props.setVisible) {
               props.setVisible(false);
             }
           }}
         />
-        <span className="popup-item-title">Account name</span>
         <CustomInput
           value={value}
           cls="popup-container-input"
@@ -427,7 +427,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
       visible={props.visible}
       placement="bottom"
       closable={false}
-      height="236px"
+      height="208px"
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0 24px 24px 24px',
@@ -448,11 +448,6 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
             }
           }}
         />
-        <span className="popup-item-title">
-          {props.title === 'Rename Wallet'
-            ? 'New wallet name'
-            : 'New account name'}
-        </span>
         <CustomInput
           value={value}
           cls="popup-container-input"
@@ -533,8 +528,11 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
           }}
         />
         <div className="popup-delete-notice">
-          Make sure you’ve backed up this wallet,all accounts belonging to this
-          wallet will be deleted,and the operation can’t reverse.
+          {props.title === 'Delete Account'
+            ? ` Make sure you’ve backed up this account’s private key, or you’ll lose
+          access of it.`
+            : `Make sure you’ve backed up this wallet,all accounts belonging to this
+          wallet will be deleted,and the operation can’t reverse.`}
         </div>
         <span className="popup-item-title">Input password to delete</span>
         <CustomPasswordInput

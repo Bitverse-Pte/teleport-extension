@@ -12,10 +12,6 @@ import { useHistory, useParams, useLocation } from 'react-router';
 import axios, { AxiosError } from 'axios';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { Button, Input, Select } from 'antd';
-import Header from 'ui/components/Header';
-// import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
-// import DefaulutIcon from 'assets/tokens/default.svg';
-import { isString } from 'util';
 import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
@@ -23,6 +19,11 @@ import { useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import clsx from 'clsx';
 import skynet from 'utils/skynet';
+import {
+  hideLoadingIndicator,
+  showLoadingIndicator,
+} from 'ui/reducer/appState.reducer';
+import { useChainList } from 'ui/hooks/utils/useChainList';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
@@ -39,9 +40,27 @@ const NetworkEdit = () => {
     return !isNaN(formattedIdx) && Number.isInteger(formattedIdx);
   }, [idx]);
 
-  const customNetworks = useSelector((s) => s.customNetworks);
+  const { providers: customNetworks, isLoaded: isProviderLoaded } = useSelector(
+    (s) => s.customNetworks
+  );
+
+  useEffect(() => {
+    if (!isProviderLoaded) {
+      showLoadingIndicator();
+    } else {
+      hideLoadingIndicator();
+    }
+  }, [isProviderLoaded]);
 
   const [fetchedChainId, setFetchedChainId] = useState<string | undefined>();
+  const chainListData = useChainList();
+  const matchedProvider = useMemo(() => {
+    if (!isEdit) {
+      return undefined;
+    }
+    console.debug('matchedProvider::customNetworks:', customNetworks);
+    return customNetworks[formattedIdx];
+  }, [isEdit, formattedIdx, customNetworks]);
 
   const fieldsPresetValues = useMemo(() => {
     const emptyResult = {
@@ -51,31 +70,24 @@ const NetworkEdit = () => {
       rpcUrl: '',
       symbol: '',
     };
-    const provider = networkContext?.getCustomProvider(formattedIdx);
-    if (!isEdit || !provider) {
+    if (!matchedProvider) {
       return emptyResult;
     } else {
       return {
-        explorerUrl: provider.rpcPrefs.blockExplorerUrl || '',
-        chainId: Number(provider.chainId).toString(10) || '',
-        networkName: provider.nickname || '',
-        rpcUrl: provider.rpcUrl || '',
-        symbol: provider.ticker || '',
+        explorerUrl: matchedProvider.rpcPrefs.blockExplorerUrl || '',
+        chainId: Number(matchedProvider.chainId).toString(10) || '',
+        networkName: matchedProvider.nickname || '',
+        rpcUrl: matchedProvider.rpcUrl || '',
+        symbol: matchedProvider.ticker || '',
       };
     }
-  }, [isEdit, formattedIdx, networkContext]);
+  }, [matchedProvider]);
 
   const checkRpcUrlAndSetChainId = useCallback(
     async (value: string) => {
       console.info(`RPC URL is ${value}`);
       try {
         if (!value) return undefined;
-
-        const isExistedRpc =
-          customNetworks.filter((p) => p.rpcUrl === value).length > 0;
-        if (isExistedRpc && !isEdit) {
-          return t('same_rpc_url');
-        }
 
         type JsonRpcResult = {
           result: string;
@@ -93,6 +105,12 @@ const NetworkEdit = () => {
           return t('Bad_RPC_URL');
         }
         setFetchedChainId(data.result);
+
+        const isExistedRpc =
+          customNetworks.filter((p) => p.rpcUrl === value).length > 0;
+        if (isExistedRpc && !isEdit) {
+          return t('same_rpc_url');
+        }
       } catch (error: any | Error | AxiosError) {
         console.error('checkRpcUrlAndSetChainId::error: ', error);
         let uiErrorMsg = '';
@@ -172,7 +190,7 @@ const NetworkEdit = () => {
       ClickToCloseMessage.success({
         content: t('Custom Provider Saved!'),
       });
-      history.goBack();
+      history.push('/home');
     },
     [history, networkContext, isEdit, formattedIdx]
   );
@@ -204,13 +222,15 @@ const NetworkEdit = () => {
     [customNetworks]
   );
 
+  const [symbolWarningMessage, setSymbolWarningMessage] = useState<string>();
+
   const validateFields = useCallback(
     async (values: typeof fieldsPresetValues) => {
       const errors: any = {};
       const requiredFields = ['networkName', 'rpcUrl', 'chainId'];
       requiredFields.forEach((fName) => {
         if (!values[fName]) {
-          errors[fName] = `${fName} is Required`;
+          errors[fName] = t(`required_field_${fName}`);
         }
       });
       const mustTrimmedFields = [...requiredFields, 'explorerUrl'];
@@ -239,92 +259,154 @@ const NetworkEdit = () => {
         if (fetchedChainId && !chainIdBN.eq(fetchedChainId)) {
           errors.chainId = t('mismatched_chain_id', {
             replace: {
-              expected: values.chainId,
               got: Number(fetchedChainId),
+            },
+          });
+        }
+        /**
+         * Basic chain id validation passed, now looking for existed provider with same chainId
+         */
+        const matchedProvider = customNetworks.find((p) =>
+          chainIdBN.eq(p.chainId)
+        );
+        if (matchedProvider && !isEdit) {
+          errors.chainId = t('chainIdExistsErrorMsg', {
+            replace: {
+              name: matchedProvider.nickname,
             },
           });
         }
       } catch (_) {
         errors.chainId = t('bad_chain_id');
       }
+      /**
+       * validating symbol
+       */
+      if (!chainListData.loading && chainListData.value) {
+        const matchedChain = chainListData.value.find((c) =>
+          BigNumber.from(values.chainId).eq(c.chainId)
+        );
+        if (
+          matchedChain &&
+          matchedChain.nativeCurrency.symbol !== values.symbol
+        ) {
+          setSymbolWarningMessage(
+            t('chainListReturnedDifferentTickerSymbol', {
+              replace: {
+                chainId: values.chainId,
+                returnedNativeCurrencySymbol:
+                  matchedChain.nativeCurrency.symbol,
+              },
+            })
+          );
+        } else {
+          setSymbolWarningMessage(undefined);
+        }
+      }
       Object.keys(errors).forEach((field) => {
         if (!errors[field]) delete errors[field];
       });
       return errors;
     },
-    [fetchedChainId]
+    [checkRpcUrlAndSetChainId, customNetworks, fetchedChainId, chainListData]
   );
 
+  if (!matchedProvider && isEdit) {
+    /**
+     * in edit mode, need to wait for `customNetworks` loaded from service worker
+     * so we can fill the form, so set a loading in the mean time
+     */
+    return (
+      <div className="network-edit h-full">
+        <div className="box">
+          <h1 className="title">{t('loading')}...</h1>
+          <p>{t('network_loading_message')}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flexCol network-page-container network-edit">
-      <Header title={t('CustomizeNetwork')} />
-      <Formik
-        initialValues={fieldsPresetValues}
-        validate={validateFields}
-        onSubmit={async (values, { setSubmitting }) => {
-          await editNetwork(values);
-          setSubmitting(false);
-        }}
-      >
-        {({ isSubmitting, ...formilk }) => {
-          const isFormNotFinished = Object.keys(formilk.errors).length > 0;
-          return (
-            <Form>
-              <div className="form-body content-wrap-padding">
-                <h1 className="required">{t('Network Name')}</h1>
-                <Field name="networkName" placeholder="Enter Network Name" />
-                <ErrorMessage
-                  name="networkName"
-                  component="div"
-                  className="input-error"
-                />
-                <h1 className="required">{t('RPC URL')}</h1>
-                <Field name="rpcUrl" placeholder="Enter RPC URL" />
-                <ErrorMessage
-                  name="rpcUrl"
-                  component="div"
-                  className="input-error"
-                />
-                <h1 className="required">{t('Chain ID')}</h1>
-                <Field
-                  name="chainId"
-                  placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
-                />
-                <ErrorMessage
-                  name="chainId"
-                  component="div"
-                  className="input-error"
-                />
-                <h1>{t('Currency Symbol')}</h1>
-                <Field name="symbol" placeholder={t('Optional')} />
-                <ErrorMessage
-                  name="symbol"
-                  component="div"
-                  className="input-error"
-                />
-                <h1>{t('Block Explorer URL')}</h1>
-                <Field name="explorerUrl" placeholder={t('Optional')} />
-                <ErrorMessage
-                  name="explorerUrl"
-                  component="div"
-                  className="input-error"
-                />
-              </div>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className={clsx({
-                  disabled_button: isFormNotFinished,
-                })}
-                style={{ margin: '24px', width: '312px' }}
-                disabled={isFormNotFinished}
-              >
-                {t('Next')}
-              </Button>
-            </Form>
-          );
-        }}
-      </Formik>
+    <div className="network-edit" style={{ minHeight: '100%' }}>
+      <div className="flexCol network-page-container">
+        <div className="edit-network-header flex justify-center">
+          <h1 className="title">{t('CustomizeNetwork')}</h1>
+        </div>
+        <Formik
+          initialValues={fieldsPresetValues}
+          validate={validateFields}
+          onSubmit={async (values, { setSubmitting }) => {
+            await editNetwork(values);
+            setSubmitting(false);
+          }}
+        >
+          {({ isSubmitting, ...formilk }) => {
+            const isFormNotFinished = Object.keys(formilk.errors).length > 0;
+            return (
+              <Form className="form-deco">
+                <div className="form-body">
+                  <h1 className="required">{t('Network Name')}</h1>
+                  <Field name="networkName" placeholder="Enter Network Name" />
+                  <ErrorMessage
+                    name="networkName"
+                    component="div"
+                    className="input-error"
+                  />
+                  <h1 className="required">{t('RPC URL')}</h1>
+                  <Field name="rpcUrl" placeholder="Enter RPC URL" />
+                  <ErrorMessage
+                    name="rpcUrl"
+                    component="div"
+                    className="input-error"
+                  />
+                  <h1 className="required">{t('Chain ID')}</h1>
+                  <Field
+                    name="chainId"
+                    placeholder={t('CHAIN_ID_INPUT_PLACEHOLDER')}
+                  />
+                  <ErrorMessage
+                    name="chainId"
+                    component="div"
+                    className="input-error"
+                  />
+                  <h1>
+                    {t('Currency Symbol')} <span>({t('Optional')})</span>
+                  </h1>
+                  <Field name="symbol" placeholder={t('Optional')} />
+                  <ErrorMessage
+                    name="symbol"
+                    component="div"
+                    className="input-warning"
+                  />
+                  <div className="input-warning">{symbolWarningMessage}</div>
+                  <h1>
+                    {t('Block Explorer URL')} <span>({t('Optional')})</span>
+                  </h1>
+                  <Field name="explorerUrl" placeholder={t('Optional')} />
+                  <ErrorMessage
+                    name="explorerUrl"
+                    component="div"
+                    className="input-error"
+                  />
+                </div>
+                <div className="flex justify-center">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className={clsx({
+                      disabled_button: isFormNotFinished,
+                    })}
+                    style={{ width: '250px' }}
+                    disabled={isFormNotFinished}
+                  >
+                    {t('Confirm')}
+                  </Button>
+                </div>
+              </Form>
+            );
+          }}
+        </Formik>
+      </div>
     </div>
   );
 };

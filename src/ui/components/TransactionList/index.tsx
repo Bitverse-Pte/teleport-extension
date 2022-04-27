@@ -24,11 +24,13 @@ import {
 import { isEqualCaseInsensitive, shortenAddress } from 'ui/utils/utils';
 import { useShouldShowSpeedUp } from 'ui/hooks/wallet/useShouldShowSpeedUp';
 import { Button, Tooltip } from 'antd';
-import CancelButton from './CancelButton';
 import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
+import CancelSpeedupPopover from './CancelAndSpeedUp/CancelAndSpeedUp.popover';
+import { EDIT_GAS_MODES } from 'constants/gas';
+import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
 
 dayjs.extend(relativeTime);
 
@@ -105,7 +107,6 @@ function TransactionItem({
   transactionGroup,
   idx,
   style,
-  isEarliestNonce = false,
 }: TransactionItemParams) {
   const {
     title,
@@ -126,10 +127,9 @@ function TransactionItem({
     hasCancelled,
   } = transactionGroup;
   const { t } = useTranslation();
-  // @todo: implement button for these status
-  const isSignatureReq =
-    category === TransactionGroupCategories.SIGNATURE_REQUEST;
-  const isApproval = category === TransactionGroupCategories.APPROVAL;
+  // const isSignatureReq =
+  //   category === TransactionGroupCategories.SIGNATURE_REQUEST;
+  // const isApproval = category === TransactionGroupCategories.APPROVAL;
   const isUnapproved = status === TransactionStatuses.UNAPPROVED;
   // const isSwap = category === TransactionGroupCategories.SWAP;
 
@@ -141,16 +141,25 @@ function TransactionItem({
   // );
   const shouldShowSpeedUp = true;
 
-  // @todo: need to implement the cancel and retry
+  const [showCancelPopOver, setShowCancelPopOver] = useState(false);
+  const [currentEditGasMode, setEditGasMode] = useState<EDIT_GAS_MODES>(
+    EDIT_GAS_MODES.MODIFY_IN_PLACE
+  );
+
+  const popupCancelAndSpeedUpWithMode = (mode: EDIT_GAS_MODES) => {
+    setEditGasMode(mode);
+    setShowCancelPopOver(true);
+  };
+
   const cancelTransaction = (e: React.MouseEvent<HTMLButtonElement>) => {
     // stop going to detail page
     e.stopPropagation();
-    alert('Cancel tx, to be implemented...');
+    popupCancelAndSpeedUpWithMode(EDIT_GAS_MODES.CANCEL);
   };
   const retryTransaction = (e: React.MouseEvent<HTMLButtonElement>) => {
     // stop going to detail page
     e.stopPropagation();
-    alert('retry tx to edit, to be implemented...');
+    popupCancelAndSpeedUpWithMode(EDIT_GAS_MODES.SPEED_UP);
   };
 
   const speedUpButton = useMemo(() => {
@@ -163,7 +172,7 @@ function TransactionItem({
         onClick={hasCancelled ? cancelTransaction : retryTransaction}
         style={hasCancelled ? { width: 'auto' } : {}}
       >
-        {t('speedUp')}
+        <RocketIcon /> {t('speedUp')}
       </button>
     );
   }, [
@@ -249,30 +258,18 @@ function TransactionItem({
           </span>
         )}
         {isPending && (
-          <div className="pending-tx-actions ml-auto">
-            {/* @todo: disabled because speedup / cancel is not finish - Frank */}
-            {/* {speedUpButton} */}
-            {/* {!hasCancelled && !isUnapproved && (
-              <CancelButton
-                transaction={transactionGroup.primaryTransaction}
-                cancelTransaction={cancelTransaction}
-              />
-            )} */}
-          </div>
+          <div className="pending-tx-actions ml-auto">{speedUpButton}</div>
         )}
       </div>
+      {isPending && showCancelPopOver && (
+        <CancelSpeedupPopover
+          editGasMode={currentEditGasMode}
+          showPopOver={showCancelPopOver}
+          setShowPopOver={setShowCancelPopOver}
+          transaction={transactionGroup.primaryTransaction}
+        />
+      )}
     </div>
-    // {isPending && (
-    //   <div className={'activity pending-tx-actions ' + isEvenStyle}>
-    //     {speedUpButton}
-    //     {!hasCancelled && !isUnapproved && (
-    //       <CancelButton
-    //         transaction={transactionGroup.primaryTransaction}
-    //         cancelTransaction={cancelTransaction}
-    //       />
-    //     )}
-    //   </div>
-    // )}
   );
 }
 
@@ -387,9 +384,7 @@ export function TransactionsList({
         // simple pagination like MetaMask
         .slice(0, limit)
     );
-  }, [rawTransactionsGroup, otherFilter]);
-
-  const pendingLength = pendingTransactions.length;
+  }, [rawTransactionsGroup, txgFilter, limit]);
 
   if (transactions.length === 0) {
     return <NoContent title="activity" />;
@@ -417,7 +412,7 @@ export function TransactionsList({
         <TransactionItem
           transactionGroup={tx}
           idx={idx}
-          key={idx}
+          key={tx.initialTransaction.id}
           // style={args.style}
         />
       ))}

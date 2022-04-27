@@ -9,14 +9,20 @@ import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
-import { addHexPrefix } from 'ethereumjs-util';
+import { addHexPrefix, isValidAddress } from 'ethereumjs-util';
 
 import {
   EthDenomination,
   getWeiHexFromDecimalValue,
+  multiplyCurrencies,
 } from 'ui/utils/conversion';
 import Header from 'ui/components/Header';
-import { useWallet, useAsyncEffect, denom2SymbolRatio } from 'ui/utils';
+import {
+  useWallet,
+  useAsyncEffect,
+  denom2SymbolRatio,
+  removeCommas,
+} from 'ui/utils';
 import { transferAddress2Display } from 'ui/utils';
 import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
 import AccountSelect from 'ui/components/AccountSelect';
@@ -84,7 +90,7 @@ const Send = () => {
 
   useEffect(() => {
     if (chainId !== undefined) {
-      dispatch(initializeSendState());
+      dispatch(initializeSendState({ assetId: tokenId }));
     }
   }, [chainId, dispatch, cleanup]);
 
@@ -140,13 +146,15 @@ const Send = () => {
       setUnlockPopupVisible(true);
       return;
     }
-    const userInputAmount = addHexPrefix(
-      getWeiHexFromDecimalValue({
-        value: amount,
-        fromCurrency: ETH,
-        fromDenomination: EthDenomination.ETH,
-      }).toString()
+    const multiplier = Math.pow(10, Number(selectedToken?.decimal || 0));
+    const hexAmountValue = addHexPrefix(
+      multiplyCurrencies(amount || 0, multiplier, {
+        multiplicandBase: 10,
+        multiplierBase: 10,
+        toNumericBase: 'hex',
+      })
     );
+
     const type = isSupport1559
       ? TransactionEnvelopeTypes.FEE_MARKET
       : TransactionEnvelopeTypes.LEGACY;
@@ -158,19 +166,19 @@ const Send = () => {
     };
     if (selectedToken?.isNative) {
       params.to = toAddress;
-      params.value = userInputAmount;
+      params.value = hexAmountValue;
     } else {
       // erc-20 tokens
       params.to = selectedToken?.contractAddress;
       params.data = generateTokenTransferData({
         toAddress: toAddress,
-        amount: userInputAmount,
+        amount: hexAmountValue,
       });
     }
     params.txParam = {
       from: fromAccount?.address,
       to: toAddress,
-      value: userInputAmount,
+      value: hexAmountValue,
       type: type,
       symbol: selectedToken?.symbol,
     };
@@ -214,12 +222,17 @@ const Send = () => {
       selectedToken?.amount || 0,
       selectedToken?.decimal || 0
     );
-    setAmount(amountDecimal);
+    /**
+     * we do not need commas in the amount input field
+     */
+    const sanitizedAmount = removeCommas(amountDecimal);
+    setAmount(sanitizedAmount);
   };
 
   const handleTokenSelect = (val) => {
     const selected = tokens.find((t: Token) => t.symbol === val);
     setSelectedToken(selected);
+    dispatch(initializeSendState({ assetId: selected?.tokenId }));
   };
 
   const addonSymbol = (
@@ -307,8 +320,20 @@ const Send = () => {
           addonAfter={addonSymbol}
           value={amount}
           stringMode
-          onChange={(v: string) => {
-            setAmount(v);
+          onBlur={({ target: { value: v } }) => {
+            console.debug(
+              'InputNumber::Token?.decimal',
+              selectedToken?.decimal
+            );
+            let parsedNumber = amount;
+            try {
+              parsedNumber = new BigNumber(v).toFixed(
+                Number(selectedToken?.decimal) || 0
+              );
+            } catch (error) {
+              console.error('input::Not a number: ', v);
+            }
+            setAmount(parsedNumber);
           }}
         />
         <div className="available-container flexR">
@@ -331,25 +356,32 @@ const Send = () => {
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => setToAddress(e.target.value)}
         />
-        {showToList && (
-          <Card title={t('Recent Address')} size="small">
-            {recentAddressList?.map((addr) => (
-              <p
-                onClick={() => {
-                  setToAddress(addr);
-                  setShowToList(false);
-                }}
-                className="recent"
-                key={addr}
-              >
-                {transferAddress2Display(addr)}
-              </p>
-            ))}
-          </Card>
+        {showToList ? (
+          <div className="recent">
+            <div className="recent-title">{t('Recent Address')}</div>
+            <div className="recent-body">
+              {recentAddressList
+                ?.filter((addr) => isValidAddress(addr))
+                .map((addr) => (
+                  <p
+                    onClick={() => {
+                      setToAddress(addr);
+                      setShowToList(false);
+                    }}
+                    className="recent-item"
+                    key={addr}
+                  >
+                    {transferAddress2Display(addr)}
+                  </p>
+                ))}
+            </div>
+          </div>
+        ) : (
+          <span className="tbmy" onClick={myAccountsSelect}>
+            {t('Transfer between my accounts')}
+          </span>
         )}
-        <span className="tbmy" onClick={myAccountsSelect}>
-          {t('Transfer between my accounts')}
-        </span>
+
         <AccountSelect
           currentToAddress={toAddress}
           visible={accountSelectPopupVisible}
@@ -367,7 +399,7 @@ const Send = () => {
         <CustomButton
           type="primary"
           disabled={
-            !toAddress ||
+            !isValidAddress(toAddress || '0x0') ||
             !amount ||
             !selectedToken ||
             (selectedToken.amount &&

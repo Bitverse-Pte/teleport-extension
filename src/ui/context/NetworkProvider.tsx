@@ -74,7 +74,9 @@ export function NetworkStoreProvider({
 
   const currentNetworkController = useSelector((state) => state.network);
 
-  const customProviders = useSelector((state) => state.customNetworks);
+  const customProviders = useSelector(
+    (state) => state.customNetworks.providers
+  );
 
   const getCustomProvider = useCallback(
     (matchedIdx: number) => {
@@ -149,14 +151,22 @@ export function NetworkStoreProvider({
       blockExplorerUrl?: string,
       coinType = CoinType.ETH
     ) => {
-      await wallet.addCustomNetwork(
-        nickname,
-        rpcUrl,
-        chainId,
-        ticker,
-        blockExplorerUrl,
-        coinType
-      );
+      dispatch(showLoadingIndicator());
+      try {
+        await wallet.addCustomNetwork(
+          nickname,
+          rpcUrl,
+          chainId,
+          ticker,
+          blockExplorerUrl,
+          coinType
+        );
+        await wallet.fetchLatestBlockDataNow();
+      } catch (error) {
+        console.error('addCustomProvider::error', error);
+      } finally {
+        dispatch(hideLoadingIndicator());
+      }
     },
     [wallet]
   );

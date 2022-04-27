@@ -5,10 +5,11 @@ import CopyOrOpenInScan from './copyOrOpenInScan';
 import clsx from 'clsx';
 import { Tooltip } from 'antd';
 import skynet from 'utils/skynet';
+import { useTranslation } from 'react-i18next';
 const { sensors } = skynet;
 interface AddressCardParameters extends HTMLAttributes<HTMLDivElement> {
   title: string;
-  address: string;
+  address: string | null | undefined;
 }
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
   `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
@@ -24,6 +25,7 @@ export function AddressCard({
   className,
   ...others
 }: AddressCardParameters) {
+  const { t } = useTranslation();
   const {
     provider: { rpcPrefs },
   } = useSelector((state) => state.network);
@@ -43,15 +45,19 @@ export function AddressCard({
       {...others}
     >
       <h4 className="title">{title}</h4>
-      <CopyOrOpenInScan
-        handleExplorerClick={() => {
-          handleExplorerClick('address', address);
-        }}
-        textToBeCopy={address}
-        className="ml-auto"
-      />
+      {address && (
+        <CopyOrOpenInScan
+          handleExplorerClick={() => {
+            handleExplorerClick('address', address);
+          }}
+          textToBeCopy={address}
+          className="ml-auto"
+        />
+      )}
       <Tooltip placement="top" title={address}>
-        <p className="address">{shortenedStr(address, 4)}</p>
+        <p className="address">
+          {address ? shortenedStr(address, 4) : t('newContract')}
+        </p>
       </Tooltip>
     </div>
   );

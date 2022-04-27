@@ -18,10 +18,9 @@ import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
 import { IconComponent } from 'ui/components/IconComponents';
 import { NetworkSelectionItem } from 'ui/components/Network/NetworkSelection/NetworkSelectionItem.component';
-import { BetaIcon } from 'ui/components/Widgets';
 import { ReactComponent as TLPText } from 'assets/teleportText.svg';
-// import { openInBrowserNewTab } from 'ui/utils';
 import skynet from 'utils/skynet';
+import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
 const { sensors } = skynet;
 
 const ChainCategoryIcon = ({ src = DefaulutIcon }: { src?: string }) => (
@@ -38,7 +37,7 @@ const ChainCategoryIcon = ({ src = DefaulutIcon }: { src?: string }) => (
 );
 
 function useProviderList() {
-  const customProviders = useSelector((s) => s.customNetworks);
+  const { providers: customProviders } = useSelector((s) => s.customNetworks);
   const networkList: NetworksCategories = useMemo(() => {
     const category: NetworksCategories = {
       EVM: {
@@ -95,6 +94,7 @@ const NetworksSelectionContainer = () => {
   const [activeKeys, setActiveKeys] = useState<Record<string, boolean>>({});
   const providerContext = useContext(NetworkProviderContext);
   const { networkList, currentSelectedCategory } = useProviderList();
+  const toExpanedView = useJumpToExpandedView();
 
   useEffect(() => {
     if (currentSelectedCategory)
@@ -113,9 +113,9 @@ const NetworksSelectionContainer = () => {
         title={
           <span className="title flex">
             <TLPText style={{ marginRight: 4 }} />
-            <BetaIcon />
           </span>
         }
+        onXButtonClick={() => history.push('/home')}
         extCls="network-list-header"
       />
       <div className="networkList">
@@ -157,9 +157,7 @@ const NetworksSelectionContainer = () => {
           sensors.track('teleport_network_customize', {
             page: location.pathname,
           });
-          // @todo: enable this line below if add/edit page was redesigned
-          // openInBrowserNewTab('/network/add');
-          history.push('/network/add');
+          toExpanedView('/network/add');
         }}
       >
         <h2 className="category-name">{t('CustomizeNetwork')}</h2>

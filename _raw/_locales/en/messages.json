@@ -19,6 +19,15 @@
   "loading": {
     "message": "Loading"
   },
+  "txFee": {
+    "message": "Transaction Fee"
+  },
+  "newContract": {
+    "message": "New Contract"
+  },
+  "network_loading_message": {
+    "message": "If you see this page for more than 30s, your custom network may broken. Please remove the broken custom network and add it once again."
+  },
   "Set__Unlock__Password": {
     "message": "Set Unlock Password"
   },
@@ -38,6 +47,35 @@
   "add": {
     "message": "Add"
   },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "cancelEdit": {
+    "message": "Cancel Edit"
+  },
+  "cancelPopoverTitle": {
+    "message": "Cancel transaction"
+  },
+  "cancelSpeedUp": {
+    "message": "cancel or speed up a tranaction."
+  },
+  "cancelSpeedUpLabel": {
+    "message": "This gas fee will {{$1}} the original.",
+    "description": "$1 is text 'replace' in bold"
+  },
+  "cancelSpeedUpTransactionTooltip": {
+    "message": "To {{$1}} a transaction the gas fee must be increased by at least 10% for it to be recognized by the network.",
+    "description": "$1 is string 'cancel' or 'speed up'"
+  },
+  "cancelSwap": {
+    "message": "Cancel swap"
+  },
+  "cancellationGasFee": {
+    "message": "Cancellation Gas Fee"
+  },
+  "cancelled": {
+    "message": "Cancelled"
+  },
   "Bad_URL": {
     "message": "Bad URL format, please check your input."
   },
@@ -53,8 +91,17 @@
   "CHAIN_ID_INPUT_PLACEHOLDER": {
     "message": "Enter Chain ID"
   },
+  "required_field_networkName": {
+    "message": "Network Name is required."
+  },
+  "required_field_rpcUrl": {
+    "message": "RPC Url is required."
+  },
+  "required_field_chainId": {
+    "message": "ChainID is required."
+  },
   "bad_chain_id": {
-    "message": " That didn't seems to be a valid ChainID. maybe you should refill RPC url?"
+    "message": "The ChainID is invalid."
   },
   "mismatch_chain_id": {
     "message": "Chain ID doesn’t match with the server,please check it again."
@@ -452,6 +499,9 @@
   "Confirm": {
     "message": "Confirm"
   },
+  "chainIdExistsErrorMsg": {
+    "message": "This Chain ID is currently used by the '{{name}}' network."
+  },
   "Please__enter__the__password": {
     "message": "Please enter the password"
   },
@@ -460,6 +510,10 @@
   },
   "Sign__Text": {
     "message": "Sign Text"
+  },
+  "chainListReturnedDifferentTickerSymbol": {
+    "message": "The network with chain ID {{chainId}} may use a different currency symbol ({{returnedNativeCurrencySymbol}}) than the one you have entered. Please verify before continuing.",
+    "description": "chainId is the chain id currently entered in the network form and returnedNativeCurrencySymbol is the return value of nativeCurrency.symbol from chainlist.network"
   },
   "view__Raw": {
     "message": "view Raw"
@@ -617,6 +671,9 @@
     "message": "{{$1}} seconds",
     "description": "{{$1}} represents a number of seconds"
   },
+  "addTenPercent": {
+    "message": "Add 10%"
+  },
   "gasTimingSecondsShort": {
     "message": "{{$1}} sec",
     "description": "{{$1}} represents a number of seconds"
@@ -753,8 +810,11 @@
   "speedUp": {
     "message": "Speed Up"
   },
+  "speedUpCancellation": {
+    "message": "Speed up this cancellation"
+  },
   "mismatched_chain_id": {
-    "message": "Chain ID doesn’t match with the server, expect: {{expected}} got: {{got}}"
+    "message": "The RPC URL you have entered returned a different chain ID ({{got}}). Please update the Chain ID to match the RPC URL of the network you are trying to add."
   },
   "gasCostTitle": {
     "message": "Est. gas cost"

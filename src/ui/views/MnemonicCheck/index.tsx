@@ -17,6 +17,7 @@ const BackupCheck = () => {
   const { state, pathname } = useLocation<{
     hdWalletId: string;
     accountType: Tabs;
+    address?: string;
   }>();
 
   const [unlocked, setUnlocked] = useState(false);
@@ -58,7 +59,10 @@ const BackupCheck = () => {
   };
 
   const getPrivateKey = async () => {
-    const pk = await wallet.getPrivateKeyByHdWalletId(state.hdWalletId);
+    const pk = await wallet.getPrivateKeyByHdWalletId(
+      state.hdWalletId,
+      state.address
+    );
     if (pk) {
       if (pk.startsWith('0x')) {
         setPrivateKey(pk.replace('0x', ''));
@@ -104,7 +108,8 @@ const BackupCheck = () => {
       />
       <div className="mnemonic-check-content content-wrap-padding">
         <p className="sub-notice">
-          If you switch browsers or computers, you will need to use the mnemonic
+          If you switch browsers or computers, you will need to use the{' '}
+          {state.accountType === Tabs.FIRST ? 'mnemonic' : 'private key '}
           phrase to restore your account.
         </p>
         <ul className="notice">
@@ -113,14 +118,9 @@ const BackupCheck = () => {
             Please keep it in a safe and confidential place.
           </li>
           <li className="item">
-            Do not share the mnemonic phrase with anyone!
-          </li>
-          <li
-            className="item"
-            style={{ listStyleType: 'none', fontWeight: 'normal' }}
-          >
-            Because others can use mnemonic words to open wallets and steal
-            assets
+            Do not share the{' '}
+            {state.accountType === Tabs.FIRST ? 'mnemonic' : 'private key'}{' '}
+            phrase with anyone!
           </li>
         </ul>
 

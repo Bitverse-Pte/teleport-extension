@@ -31,6 +31,7 @@ import { CoinType, Provider } from 'types/network';
 import { AddTokenOpts, Token } from 'types/token';
 import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
+import { CustomGasSettings } from 'types/tx';
 import { BigNumberish } from 'ethers';
 
 export class WalletController extends BaseController {
@@ -114,6 +115,10 @@ export class WalletController extends BaseController {
       isNative: true,
     });
 
+    networkPreferenceService.setProviderConfig({
+      ...network,
+      type: 'rpc',
+    });
     return network;
   };
 
@@ -185,6 +190,12 @@ export class WalletController extends BaseController {
   getCurrentCurrency = () => preferenceService.getCurrentCurrency();
 
   getConnectedSite = (session) => permissionService.getConnectedSite(session);
+
+  getConnectedSitesByAccount = (account: string) =>
+    permissionService.getConnectedSitesByAccount(account);
+
+  removeConnectedSite = (origin: string, account: string) =>
+    permissionService.removeConnectedSite(origin, account);
 
   getPrivateKey = async (password: string, hdWalletId: string) => {
     await this.verifyPassword(password);
@@ -259,8 +270,11 @@ export class WalletController extends BaseController {
     return keyringService.renameHdWalletByHdWalletId(hdWalletId, name);
   }
 
-  public getPrivateKeyByHdWalletId(name: string): Promise<string> {
-    return keyringService.getPrivateKeyByHdWalletId(name);
+  public getPrivateKeyByHdWalletId(
+    hdWalletId: string,
+    address?: string
+  ): Promise<string> {
+    return keyringService.getPrivateKeyByHdWalletId(hdWalletId, address);
   }
 
   public getMnemonicByHdWalletId(name: string): Promise<string> {
@@ -464,6 +478,29 @@ export class WalletController extends BaseController {
   }
   cancelTransaction(txId: string) {
     return txController.cancelTransaction(txId);
+  }
+  updateTransaction = (data: any) => txController.updateTransaction(data);
+  createCancelTransaction(
+    originalTxId: string,
+    customGasSettings: CustomGasSettings,
+    options: any = {}
+  ) {
+    return txController.createCancelTransaction(
+      originalTxId,
+      customGasSettings,
+      options
+    );
+  }
+  createSpeedUpTransaction(
+    originalTxId: string,
+    customGasSettings: CustomGasSettings,
+    options: any = {}
+  ) {
+    return txController.createSpeedUpTransaction(
+      originalTxId,
+      customGasSettings,
+      options
+    );
   }
   setPopupOpen(val: boolean) {
     preferenceService.setPopupOpen(val);

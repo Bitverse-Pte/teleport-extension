@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { PageHeader, Button, message } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import QrCodeView from 'ui/components/QrCode';
-import { useWallet, useAsyncEffect, transferAddress2Display } from 'ui/utils';
+import { useWallet, useAsyncEffect } from 'ui/utils';
 import { BaseAccount } from 'types/extend';
 import './style.less';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
@@ -20,6 +20,10 @@ const SendToken = () => {
   const location = useLocation();
   const wallet = useWallet();
   const history = useHistory();
+  const { symbol } = useParams<{
+    symbol: string;
+  }>();
+  console.log('symbol:------------------------', symbol);
   const { t } = useTranslation();
   const [fromAccount, setFromAccount] = useState<BaseAccount>();
   const currentNetworkController = useSelector((state) => state.network);
@@ -41,7 +45,7 @@ const SendToken = () => {
             alt="Chain Logo"
             className="chain-logo"
           />
-          <h1>{currentNetworkController.provider.chainName} </h1>{' '}
+          <h1>{symbol}</h1>{' '}
           <span className="chain-name">
             ({currentNetworkController.provider.nickname})
           </span>

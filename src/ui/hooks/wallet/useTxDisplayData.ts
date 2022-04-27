@@ -121,14 +121,18 @@ export function useTransactionDisplayData(
   const { t } = useTranslation();
   const { initialTransaction, primaryTransaction } = transactionGroup;
   // initialTransaction contains the data we need to derive the primary purpose of this transaction group
-  // const { type } = initialTransaction;
-  const { type } = primaryTransaction;
+  const { type } = initialTransaction;
 
-  const { from: senderAddress, to } = primaryTransaction.txParams || {};
+  const { from: senderAddress, to } = initialTransaction.txParams || {};
 
-  // for smart contract interactions, methodData can be used to derive the name of the action being taken
-  // const methodData = useMethodData(initialTransaction.txParams.data);
-  const methodData = useMethodData(primaryTransaction.txParams.data);
+  let methodData: ReturnType<typeof useMethodData>;
+  /**
+   * avoid infinite loop when txParams.data is useless
+   */
+  if (type !== TransactionTypes.DEPLOY_CONTRACT) {
+    // for smart contract interactions, methodData can be used to derive the name of the action being taken
+    methodData = useMethodData(initialTransaction.txParams.data);
+  }
 
   const displayedStatusKey = getStatusKey(primaryTransaction);
   const isPending = displayedStatusKey in PENDING_STATUS_HASH;
@@ -162,13 +166,11 @@ export function useTransactionDisplayData(
       )
     : undefined;
   const tokenData = useTokenData(
-    // initialTransaction?.txParams?.data,
-    primaryTransaction?.txParams?.data,
+    initialTransaction?.txParams?.data,
     isTokenCategory
   );
   const tokenDisplayValue = useTokenDisplayValue(
-    // initialTransaction?.txParams?.data,
-    primaryTransaction?.txParams?.data,
+    initialTransaction?.txParams?.data,
     token,
     isTokenCategory
   );
@@ -319,6 +321,9 @@ export function useTransactionDisplayData(
       replace: { $1: shortenAddress(recipientAddress as string) },
     });
   } else {
+    console.warn(
+      `useTransactionDisplayData does not recognize transaction type. Type received is: ${type}`
+    );
     // dispatch(
     //   // captureSingleException(
     //   //   `useTransactionDisplayData does not recognize transaction type. Type received is: ${type}`,

@@ -47,7 +47,6 @@ interface LatestBlockDataHubConstructorParams {
 
 export class LatestBlockDataHubService {
   currentBlockNumber: string | null;
-  gasFeeEstimates: any | null;
   store: ObservableStore<BlockData>;
   private _blockTracker: PollingBlockTracker;
   private _gasFeeTracker: GasFeeController;
