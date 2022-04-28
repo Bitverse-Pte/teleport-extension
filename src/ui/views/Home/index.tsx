@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
-import { Drawer } from 'antd';
+import { Drawer, message } from 'antd';
 import {
   useWallet,
   useAsyncEffect,
@@ -37,6 +37,7 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import ConnectedSites from '../ConnectedSites';
+import { PresetNetworkId } from 'constants/defaultNetwork';
 
 const onCopy = () => {
   sensors.track('teleport_home_copy_account', { page: location.pathname });
@@ -57,6 +58,7 @@ const Home = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
+  const [currentChain, setCurrentChain] = useState('');
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -81,7 +83,12 @@ const Home = () => {
     const balances = await wallet.getTokenBalancesSync().catch((e) => {
       console.error(e);
     });
-    if (balances && balances.length) setTokens(balances);
+
+    if (balances && balances.length) {
+      console.log(balances);
+      setCurrentChain(balances[0]?.chainCustomId);
+      setTokens(balances);
+    }
   };
 
   const updateAccount = async () => {
@@ -146,6 +153,11 @@ const Home = () => {
   };
   const handleAddTokenBtnClick = (e) => {
     e.stopPropagation();
+    if (currentChain === PresetNetworkId.ARBITRUM) {
+      ClickToCloseMessage.warning('Coming soon');
+      return;
+    }
+
     sensors.track('teleport_home_add_token', {
       page: location.pathname,
     });
