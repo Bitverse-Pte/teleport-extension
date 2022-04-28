@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
 import { Tabs, Divider } from 'antd';
@@ -101,6 +101,7 @@ const SignTx = ({ params, origin }) => {
   const gasState: any = useSelector((state) => state.gas);
   const [visible, setVisible] = useState(false);
   const tx = normalizeTxParams(params.data[0]);
+  const gasLimitRef = useRef<string>(tx.gas || addHexPrefix(MIN_GAS_LIMIT_HEX));
   // for 1559 tx
   const [maxFeePerGas, setMaxFeePerGas] = useState<string>(tx.maxFeePerGas);
   const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState<string>(
@@ -119,6 +120,12 @@ const SignTx = ({ params, origin }) => {
       let gasPrice = '0x1';
       if (gasState.gasType == 'custom') {
         gasPrice = getRoundedGasPrice(gasState.legacyGas.gasPrice);
+        gasLimitRef.current = addHexPrefix(
+          conversionUtil(gasState.legacyGas.gasLimit, {
+            fromNumericBase: 'dec',
+            toNumericBase: 'hex',
+          })
+        );
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
         gasPrice = getGasPriceInHexWei(gasFeeEstimates.medium);
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
@@ -129,16 +136,21 @@ const SignTx = ({ params, origin }) => {
           : '0x0';
       }
       setGasPrice(gasPrice);
-      const total = multipyHexes(
-        gasPrice,
-        tx.gas || MIN_GAS_LIMIT_HEX
-      ).toString();
+      const total = multipyHexes(gasPrice, gasLimitRef.current).toString();
       setTotalGasFee(addHexPrefix(total));
     } else {
-      const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
+      const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas, gasLimit } =
         gasState.gasType === 'custom'
           ? gasState.customData
           : gasFeeEstimates[gasState.gasType];
+      if (gasLimit) {
+        gasLimitRef.current = addHexPrefix(
+          conversionUtil(gasLimit, {
+            fromNumericBase: 'dec',
+            toNumericBase: 'hex',
+          })
+        );
+      }
       const _maxFeePerGas = addHexPrefix(
         decGWEIToHexWEI(suggestedMaxFeePerGas).toString()
       );
@@ -148,7 +160,7 @@ const SignTx = ({ params, origin }) => {
       );
       setMaxPriorityFeePerGas(_maxPriorityFeePerGas);
       const _a = addHexes(_maxFeePerGas, _maxPriorityFeePerGas).toString();
-      const total = multipyHexes(_a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
+      const total = multipyHexes(_a, gasLimitRef.current).toString();
       setTotalGasFee(addHexPrefix(total));
     }
   };
@@ -165,6 +177,7 @@ const SignTx = ({ params, origin }) => {
     if (tx.type === TransactionEnvelopeTypes.FEE_MARKET) {
       resolveApproval({
         ...tx,
+        gas: gasLimitRef.current,
         maxFeePerGas: maxFeePerGas,
         maxPriorityFeePerGas: maxPriorityFeePerGas,
       })
@@ -173,6 +186,7 @@ const SignTx = ({ params, origin }) => {
     } else {
       resolveApproval({
         ...tx,
+        gas: gasLimitRef.current,
         gasPrice: gasPrice,
       })
         .then(() => delay(1000))
