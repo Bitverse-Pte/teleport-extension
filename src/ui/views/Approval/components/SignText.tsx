@@ -36,8 +36,8 @@ const SignText = ({ params }) => {
   }, []);
 
   const parsedData = useMemo(() => {
-    return data ? utils.toUtf8String(data): '';
-  }, [data])
+    return data ? utils.toUtf8String(data) : '';
+  }, [data]);
 
   return (
     <div className="approval-sign flexCol">
