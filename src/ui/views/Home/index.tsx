@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
-import { Drawer, message } from 'antd';
+import { Drawer } from 'antd';
 import {
   useWallet,
   useAsyncEffect,
@@ -85,7 +85,6 @@ const Home = () => {
     });
 
     if (balances && balances.length) {
-      console.log(balances);
       setCurrentChain(balances[0]?.chainCustomId);
       setTokens(balances);
     }
