@@ -136,6 +136,7 @@ const CancelSpeedupPopoverImplementation = ({
         transaction.txParams.maxPriorityFeePerGas
       ),
       gasPrice: addTenPercentAndRound(transaction.txParams.gasPrice),
+      gas: gasLimit,
       gasLimit,
     };
   }, [transaction, gasLimit]);
@@ -178,6 +179,8 @@ const CancelSpeedupPopoverImplementation = ({
     }
     let newTxParams = {
       ...transaction.txParams,
+      // it actually use `gas` field
+      gas: gasLimit,
       gasLimit,
     };
     if (
