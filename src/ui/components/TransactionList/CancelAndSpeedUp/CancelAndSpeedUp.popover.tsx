@@ -137,6 +137,7 @@ const CancelSpeedupPopoverImplementation = ({
       ),
       gasPrice: addTenPercentAndRound(transaction.txParams.gasPrice),
       gas: gasLimit,
+      gasLimit,
     };
   }, [transaction, gasLimit]);
   const isEIP1559Tx = isEIP1559Transaction(transaction);
@@ -180,6 +181,7 @@ const CancelSpeedupPopoverImplementation = ({
       ...transaction.txParams,
       // it actually use `gas` field
       gas: gasLimit,
+      gasLimit,
     };
     if (
       [
