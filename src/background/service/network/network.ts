@@ -268,6 +268,28 @@ class NetworkPreferenceService extends EventEmitter {
     return network;
   }
 
+  moveNetwork(
+    ecoSystem: Ecosystem,
+    fromIndex: number,
+    destinationIndex: number
+  ) {
+    const { orderOfNetworks } = this.customNetworksStore.getState();
+    const reorderedNetworkCategory = Array.from(orderOfNetworks[ecoSystem]);
+
+    const tmpNetworkId = reorderedNetworkCategory[fromIndex];
+
+    // remove the source item
+    reorderedNetworkCategory.splice(fromIndex, 1);
+    // and insert after the destination
+    reorderedNetworkCategory.splice(destinationIndex, 0, tmpNetworkId);
+    this.customNetworksStore.updateState({
+      orderOfNetworks: {
+        ...orderOfNetworks,
+        [ecoSystem]: reorderedNetworkCategory,
+      },
+    });
+  }
+
   editCustomNetwork(
     providerId: string,
     newNickname: string,

@@ -27,7 +27,7 @@ import provider from './provider';
 import BitError from 'error';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { ErrorCode } from 'constants/code';
-import { CoinType, Provider } from 'types/network';
+import { CoinType, Ecosystem, Provider } from 'types/network';
 import { AddTokenOpts, Token } from 'types/token';
 import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
@@ -95,6 +95,9 @@ export class WalletController extends BaseController {
       type: 'rpc',
     });
   };
+
+  moveNetwork = (e: Ecosystem, f: number, d: number) =>
+    networkPreferenceService.moveNetwork(e, f, d);
 
   addCustomNetwork = async (
     nickname: string,

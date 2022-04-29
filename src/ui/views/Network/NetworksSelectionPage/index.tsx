@@ -14,16 +14,19 @@ import { ChainCategoryIcon } from './components/ChainCategoryIcon';
 import { useProviderList } from './useProviderList';
 import {
   DragDropContext,
-  DragDropContextProps,
+  DragDropContextProps as DDCP,
   Draggable,
   Droppable,
 } from 'react-beautiful-dnd';
+import { Ecosystem } from 'types/network';
+import { useWallet } from 'ui/utils';
 const { sensors } = skynet;
 
 const NetworksSelectionContainer = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
+  const wallet = useWallet();
   const [activeKeys, setActiveKeys] = useState<Record<string, boolean>>({});
   const toggleForCategory = (key: string) =>
     setActiveKeys((prevActiveKeys) => ({
@@ -31,9 +34,8 @@ const NetworksSelectionContainer = () => {
       [key]: !activeKeys[key],
     }));
   const providerContext = useContext(NetworkProviderContext);
-  const { networkList: _rawNetworkList, currentSelectedCategory } =
+  const { networkList, currentSelectedCategory, orderOfNetworks } =
     useProviderList();
-  const [networkList, setOrderedNetworkList] = useState(_rawNetworkList);
   const toExpanedView = useJumpToExpandedView();
 
   useEffect(() => {
@@ -43,8 +45,10 @@ const NetworksSelectionContainer = () => {
       });
   }, []);
 
-  const onDragEnd: DragDropContextProps['onDragEnd'] = (res, provided) => {
-    const { destination, source, draggableId } = res;
+  const onNetworkItemDragEnd: DDCP['onDragEnd'] = async (res, provided) => {
+    console.debug('onNetworkItemDragEnd::res', res);
+    console.debug('onNetworkItemDragEnd::provided', provided);
+    const { destination, source } = res;
     /** ignore if destination not exist */
     if (!destination) return;
 
@@ -61,29 +65,11 @@ const NetworksSelectionContainer = () => {
       console.error('Error: You can not drag into another network category.');
     }
 
-    const column = networkList[source.droppableId];
-
-    const reorderedNetworks = Array.from(column.networks);
-
-    const tmpNetwork = reorderedNetworks[source.index];
-    // reorderedNetworks[source.index] = reorderedNetworks[destination.index];
-    // reorderedNetworks[destination.index] = tmpNetwork;
-
-    reorderedNetworks.splice(source.index, 1);
-    reorderedNetworks.splice(destination.index, 0, tmpNetwork);
-
-    const newColumn = {
-      ...column,
-      networks: reorderedNetworks,
-    };
-
-    setOrderedNetworkList((prevState) => ({
-      ...prevState,
-      [source.droppableId]: newColumn,
-    }));
-
-    console.debug('DragDropContext::onDragEnd::res', res);
-    console.debug('DragDropContext::onDragEnd::provided', provided);
+    await wallet.moveNetwork(
+      source.droppableId,
+      source.index,
+      destination.index
+    );
   };
 
   if (!providerContext) {
@@ -91,7 +77,7 @@ const NetworksSelectionContainer = () => {
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={onNetworkItemDragEnd}>
       <div className="flexCol network-page-container">
         <GeneralHeader
           title={
@@ -103,7 +89,7 @@ const NetworksSelectionContainer = () => {
           extCls="network-list-header"
         />
         <div className="networkList">
-          {Object.keys(networkList).map((key) => {
+          {(Object.keys(networkList) as Ecosystem[]).map((key) => {
             const { networks, icon, displayName } = networkList[key];
             const isCategoryActive = activeKeys[key];
             // hide if empty

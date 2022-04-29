@@ -3,39 +3,45 @@ import { NetworksCategories } from '../typing';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
+import { Ecosystem, Provider } from 'types/network';
 
 export function useProviderList() {
-  const { networks: customProviders } = useSelector((s) => s.customNetworks);
+  const { networks: customProviders, orderOfNetworks } = useSelector(
+    (s) => s.customNetworks
+  );
   const networkList: NetworksCategories = useMemo(() => {
     const category: NetworksCategories = {
-      EVM: {
+      [Ecosystem.EVM]: {
         displayName: 'EVM Networks',
         icon: categoryToIconSVG('ETH'),
         networks: [],
       },
-      COSMOS: {
+      [Ecosystem.COSMOS]: {
         displayName: 'Cosmos Networks',
         icon: categoryToIconSVG('BSC'),
         networks: [],
       },
-      POLKADOT: {
+      [Ecosystem.POLKADOT]: {
         displayName: 'Polkadot Networks',
         icon: categoryToIconSVG('POLYGON'),
         networks: [],
       },
     };
-    // inject preset providers
-    Object.values(defaultNetworks)
-      .filter((v) => Boolean(v))
-      .forEach((val) => {
-        category['EVM'].networks.push(val);
-      });
-    customProviders.forEach((_pro, idx) => {
-      const withIdx = { ..._pro, idx };
-      category['EVM'].networks.push(withIdx);
+
+    const allProviders: Record<string, Provider> = {};
+
+    [...Object.values(defaultNetworks), ...customProviders].forEach((p) => {
+      allProviders[p.id] = p;
+    });
+
+    (Object.keys(category) as Ecosystem[]).map((key) => {
+      category[key].networks = orderOfNetworks[key]
+        .map((nId) => allProviders[nId])
+        // filter undefined (maybe removed provider) element too
+        .filter((p) => Boolean(p));
     });
     return category;
-  }, [customProviders]);
+  }, [customProviders, orderOfNetworks]);
 
   const currentProviderId = useSelector((s) => s.network.provider.id);
   const currentSelectedCategory: string | undefined = useMemo(() => {
@@ -52,5 +58,5 @@ export function useProviderList() {
     }
   }, [currentProviderId]);
 
-  return { networkList, currentSelectedCategory };
+  return { networkList, currentSelectedCategory, orderOfNetworks };
 }
