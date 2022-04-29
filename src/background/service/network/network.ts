@@ -335,10 +335,23 @@ class NetworkPreferenceService extends EventEmitter {
   }
 
   removeCustomNetwork(idToBeRm: string): boolean {
-    const { networks } = this.customNetworksStore.getState();
-    const removedCustomNetworks = networks.filter((n) => n.id !== idToBeRm);
+    const { networks, orderOfNetworks } = this.customNetworksStore.getState();
+    const providerToBeRemoved = this.getCustomNetwork(idToBeRm);
+    if (!providerToBeRemoved) {
+      throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
+    }
+    const removedCustomNetworks = networks.filter(
+      (n) => n.id !== providerToBeRemoved.id
+    );
+    const removedCustomOrdering = orderOfNetworks[
+      providerToBeRemoved.ecosystem
+    ].filter((nId) => nId !== providerToBeRemoved.id);
     this.customNetworksStore.updateState({
       networks: removedCustomNetworks,
+      orderOfNetworks: {
+        ...orderOfNetworks,
+        [providerToBeRemoved.ecosystem]: removedCustomOrdering,
+      },
     });
     // is rm successful
     return networks.length > removedCustomNetworks.length;

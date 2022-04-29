@@ -160,9 +160,8 @@ export class WalletController extends BaseController {
     );
   };
 
-  removeCustomNetwork = (idToBeRm: string) => {
+  removeCustomNetwork = (idToBeRm: string) =>
     networkPreferenceService.removeCustomNetwork(idToBeRm);
-  };
 
   getCurrentNetwork = () => {
     return networkPreferenceService.networkStore.getState();
