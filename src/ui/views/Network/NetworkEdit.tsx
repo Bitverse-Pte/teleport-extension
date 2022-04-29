@@ -40,7 +40,7 @@ const NetworkEdit = () => {
     return !isNaN(formattedIdx) && Number.isInteger(formattedIdx);
   }, [idx]);
 
-  const { providers: customNetworks, isLoaded: isProviderLoaded } = useSelector(
+  const { networks: customNetworks, isLoaded: isProviderLoaded } = useSelector(
     (s) => s.customNetworks
   );
 
@@ -276,7 +276,8 @@ const NetworkEdit = () => {
             },
           });
         }
-      } catch (_) {
+      } catch (error) {
+        console.error('validate_chainId::error:', error);
         errors.chainId = t('bad_chain_id');
       }
       /**

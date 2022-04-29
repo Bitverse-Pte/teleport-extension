@@ -74,9 +74,7 @@ export function NetworkStoreProvider({
 
   const currentNetworkController = useSelector((state) => state.network);
 
-  const customProviders = useSelector(
-    (state) => state.customNetworks.providers
-  );
+  const customProviders = useSelector((state) => state.customNetworks.networks);
 
   const getCustomProvider = useCallback(
     (matchedIdx: number) => {

@@ -5,7 +5,7 @@ import { categoryToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { useSelector } from 'react-redux';
 
 export function useProviderList() {
-  const { providers: customProviders } = useSelector((s) => s.customNetworks);
+  const { networks: customProviders } = useSelector((s) => s.customNetworks);
   const networkList: NetworksCategories = useMemo(() => {
     const category: NetworksCategories = {
       EVM: {

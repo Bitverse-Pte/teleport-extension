@@ -107,3 +107,8 @@ export const defaultNetworks: {
     ...EVMProviderSharedProperties,
   },
 };
+
+export const getDefaultNetworkIdsByEcoSystem = (ec: Ecosystem) =>
+  Object.values(defaultNetworks)
+    .filter((n) => n.ecosystem === ec)
+    .map((n) => n.id);

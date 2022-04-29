@@ -142,34 +142,20 @@ export class WalletController extends BaseController {
     coinType = CoinType.ETH,
     chainName = 'ETH'
   ) => {
-    const state = networkPreferenceService.getCustomNetworks();
-    const isSymbolChanged = ticker != state[matchedIdx].ticker;
-    if (isSymbolChanged) {
-      // change symbol of custom token
-      TokenService.changeCustomTokenProfile(state[matchedIdx].id, {
-        symbol: ticker,
-      });
-    }
-    state[matchedIdx] = {
-      ...state[matchedIdx],
-      nickname: newNickname,
+    networkPreferenceService.editCustomNetwork(
+      matchedIdx,
+      newNickname,
       rpcUrl,
       chainId,
-      coinType,
       ticker,
-      chainName,
-      rpcPrefs: {
-        blockExplorerUrl,
-      },
-    };
-    networkPreferenceService.customNetworksStore.putState(state);
+      blockExplorerUrl,
+      coinType,
+      chainName
+    );
   };
 
   removeCustomNetwork = (idxToBeRm: number) => {
-    const originalList = networkPreferenceService.getCustomNetworks();
-    networkPreferenceService.customNetworksStore.putState(
-      originalList.filter((_, idx) => idx !== idxToBeRm)
-    );
+    networkPreferenceService.removeCustomNetwork(idxToBeRm);
   };
 
   getCurrentNetwork = () => {
