@@ -33,12 +33,9 @@ const NetworkEdit = () => {
   const networkContext = useContext(NetworkProviderContext);
   const history = useHistory();
   const location = useLocation();
-  const { idx } = useParams<{ idx: string | undefined }>();
-  const formattedIdx = useMemo(() => Number(idx), [idx]);
+  const { id } = useParams<{ id: string | undefined }>();
 
-  const isEdit = useMemo(() => {
-    return !isNaN(formattedIdx) && Number.isInteger(formattedIdx);
-  }, [idx]);
+  const isEdit = !!id;
 
   const { networks: customNetworks, isLoaded: isProviderLoaded } = useSelector(
     (s) => s.customNetworks
@@ -59,8 +56,8 @@ const NetworkEdit = () => {
       return undefined;
     }
     console.debug('matchedProvider::customNetworks:', customNetworks);
-    return customNetworks[formattedIdx];
-  }, [isEdit, formattedIdx, customNetworks]);
+    return customNetworks.find((n) => n.id === id);
+  }, [isEdit, id, customNetworks]);
 
   const fieldsPresetValues = useMemo(() => {
     const emptyResult = {
@@ -152,9 +149,9 @@ const NetworkEdit = () => {
       [x: string]: string;
     }) => {
       if (isEdit) {
-        console.debug(`Editing Custom Provider Idx ${formattedIdx}`);
+        console.debug(`Editing Custom Provider ID ${id}`);
         await networkContext?.editCustomProvider(
-          formattedIdx,
+          id,
           networkName as string,
           rpcUrl,
           chainId,
@@ -192,7 +189,7 @@ const NetworkEdit = () => {
       });
       history.push('/home');
     },
-    [history, networkContext, isEdit, formattedIdx]
+    [history, networkContext, isEdit, id]
   );
 
   const checkNetworkNickname = useCallback(

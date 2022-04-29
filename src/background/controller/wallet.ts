@@ -85,8 +85,11 @@ export class WalletController extends BaseController {
 
   fetchCustomProviders = () => networkPreferenceService.getCustomNetworks();
 
-  useCustomNetwork = (idx: number) => {
-    const network = networkPreferenceService.getCustomNetworks()[idx];
+  useCustomNetwork = (id: string) => {
+    const network = networkPreferenceService.getCustomNetwork(id);
+    if (!network) {
+      throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
+    }
     return networkPreferenceService.setProviderConfig({
       ...network,
       type: 'rpc',
@@ -133,7 +136,7 @@ export class WalletController extends BaseController {
   };
 
   editCustomNetwork = (
-    matchedIdx: number,
+    id: string,
     newNickname: string,
     rpcUrl: string,
     chainId: string,
@@ -143,7 +146,7 @@ export class WalletController extends BaseController {
     chainName = 'ETH'
   ) => {
     networkPreferenceService.editCustomNetwork(
-      matchedIdx,
+      id,
       newNickname,
       rpcUrl,
       chainId,
@@ -154,8 +157,8 @@ export class WalletController extends BaseController {
     );
   };
 
-  removeCustomNetwork = (idxToBeRm: number) => {
-    networkPreferenceService.removeCustomNetwork(idxToBeRm);
+  removeCustomNetwork = (idToBeRm: string) => {
+    networkPreferenceService.removeCustomNetwork(idToBeRm);
   };
 
   getCurrentNetwork = () => {

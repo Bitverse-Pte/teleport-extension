@@ -269,7 +269,7 @@ class NetworkPreferenceService extends EventEmitter {
   }
 
   editCustomNetwork(
-    matchedIdx: number,
+    providerId: string,
     newNickname: string,
     rpcUrl: string,
     chainId: string,
@@ -278,16 +278,23 @@ class NetworkPreferenceService extends EventEmitter {
     coinType = CoinType.ETH,
     chainName = 'ETH'
   ) {
-    const { networks } = this.customNetworksStore.getState();
-    const isSymbolChanged = ticker != networks[matchedIdx].ticker;
+    const networks = this.getCustomNetworks();
+    const matchedProvider = this.getCustomNetwork(providerId);
+
+    if (!matchedProvider) {
+      throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
+    }
+    const matchedIdx = networks.findIndex((n) => n.id === matchedProvider.id);
+
+    const isSymbolChanged = ticker != matchedProvider.ticker;
     if (isSymbolChanged) {
       // change symbol of custom token
-      TokenService.changeCustomTokenProfile(networks[matchedIdx].id, {
+      TokenService.changeCustomTokenProfile(matchedProvider.id, {
         symbol: ticker,
       });
     }
     const newSettings = {
-      ...networks[matchedIdx],
+      ...matchedProvider,
       nickname: newNickname,
       rpcUrl,
       chainId,
@@ -305,16 +312,24 @@ class NetworkPreferenceService extends EventEmitter {
     return newSettings;
   }
 
-  removeCustomNetwork(idxToBeRm: number) {
+  removeCustomNetwork(idToBeRm: string): boolean {
     const { networks } = this.customNetworksStore.getState();
+    const removedCustomNetworks = networks.filter((n) => n.id !== idToBeRm);
     this.customNetworksStore.updateState({
-      networks: networks.filter((_, idx) => idx !== idxToBeRm),
+      networks: removedCustomNetworks,
     });
+    // is rm successful
+    return networks.length > removedCustomNetworks.length;
   }
 
   getCustomNetworks(): Network[] {
     const { networks } = this.customNetworksStore.getState();
     return networks;
+  }
+
+  getCustomNetwork(id: string): Network | undefined {
+    const { networks } = this.customNetworksStore.getState();
+    return networks.find((n) => n.id === id);
   }
 
   isChainEnable1559(chainId: string): boolean {

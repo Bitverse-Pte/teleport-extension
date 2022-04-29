@@ -1,14 +1,22 @@
-import { Provider } from 'types/network';
-
-type ProviderWithOptionalTag = Provider & {
-  idx?: number;
-};
+import { Ecosystem, Provider } from 'types/network';
 
 export type NetworksCategories = {
-  [x: string]: {
+  [Ecosystem.EVM]: {
     displayName: string;
     // icon?: React.ReactNode;
     icon?: string;
-    networks: ProviderWithOptionalTag[];
+    networks: Provider[];
+  };
+  [Ecosystem.COSMOS]: {
+    displayName: string;
+    // icon?: React.ReactNode;
+    icon?: string;
+    networks: Provider[];
+  };
+  [Ecosystem.POLKADOT]: {
+    displayName: string;
+    // icon?: React.ReactNode;
+    icon?: string;
+    networks: Provider[];
   };
 };

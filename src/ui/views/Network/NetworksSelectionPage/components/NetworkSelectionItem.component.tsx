@@ -21,10 +21,8 @@ import type {
 } from 'react-beautiful-dnd';
 const { sensors } = skynet;
 
-type NetworkProviderWithOptionalTag = Provider & { idx?: number };
-
 interface NetworkSelectionItemProps {
-  network: NetworkProviderWithOptionalTag;
+  network: Provider;
   draggableProps: DraggableProvidedDraggableProps;
   dragHandleProps?: DraggableProvidedDragHandleProps;
   innerRef: any;
@@ -49,10 +47,10 @@ export function NetworkSelectionItem({
   );
 
   const selectProvider = useCallback(
-    (network: NetworkProviderWithOptionalTag) => {
+    (network: Provider) => {
       console.debug(`Selected Chain ${network.chainId}`);
       if (network.type === 'rpc') {
-        providerContext?.useCustomProvider(network.idx as number);
+        providerContext?.useCustomProvider(network.id);
       } else {
         providerContext?.usePresetProvider(network.type);
       }
@@ -94,11 +92,7 @@ export function NetworkSelectionItem({
   );
 }
 
-const NetworkActions = ({
-  network,
-}: {
-  network: NetworkProviderWithOptionalTag;
-}) => {
+const NetworkActions = ({ network }: { network: Provider }) => {
   const currentProviderId = useSelector((s) => s.network.provider.id);
   const isSelectedNetwork = useMemo(() => {
     return network.id === currentProviderId;
@@ -116,11 +110,7 @@ const NetworkActions = ({
   );
 };
 
-const RpcNetworkOptions = ({
-  network,
-}: {
-  network: NetworkProviderWithOptionalTag;
-}) => {
+const RpcNetworkOptions = ({ network }: { network: Provider }) => {
   const providerContext = useContext(NetworkProviderContext);
   const { t } = useTranslation();
   const jumpToExpandedView = useJumpToExpandedView();
@@ -133,7 +123,7 @@ const RpcNetworkOptions = ({
         title: t('Delete_Provider_Ask_Title'),
         content: t('Delete_Provider_Ask_Content'),
         onOk: async () => {
-          await providerContext?.removeCustomProvider(network.idx as number);
+          await providerContext?.removeCustomProvider(network.id);
           ClickToCloseMessage.success(t('remove_custom_provider_success'));
         },
         onCancel: () => {
@@ -169,7 +159,7 @@ const RpcNetworkOptions = ({
         onClick={(e) => {
           // stop the parent's onClick event
           e.stopPropagation();
-          jumpToExpandedView(`/network/edit/${network.idx}`);
+          jumpToExpandedView(`/network/edit/${network.id}`);
         }}
       />
     </div>
