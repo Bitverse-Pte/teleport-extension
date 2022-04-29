@@ -9,6 +9,7 @@ import { TOKEN_THEME_COLOR } from 'constants/wallet';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { ObservableStorage } from 'background/utils/obsStorage';
+import { PresetNetworkId } from 'constants/defaultNetwork';
 
 class TokenService {
   store: ObservableStorage<ITokenStore>;
@@ -135,7 +136,9 @@ class TokenService {
       const clonedBalances = cloneDeep(this.store.getState().balances);
       if (clonedBalances && clonedBalances[address]) {
         tokens = clonedBalances[address].filter(
-          (t: Token) => t.chainCustomId === chainCustomId //&&
+          (t: Token) =>
+            t.chainCustomId === chainCustomId &&
+            !(t.chainCustomId === PresetNetworkId.ARBITRUM && !t.isNative)
           //(showHideToken ? true : t.display)
         );
       }

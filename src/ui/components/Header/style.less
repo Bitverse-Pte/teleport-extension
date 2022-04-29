@@ -67,6 +67,7 @@
   min-width: 360px;
   height: 64px;
   padding: 20px 24px;
+  justify-content: space-between;
   .back-icon {
     cursor: pointer;
     fill: #798CAD;
@@ -74,7 +75,15 @@
     height: 24px;
   }
   .content {
-    margin-left: 72.5px;
+    max-width: 240px;
+    * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .placeholder-block {
+    width: 24px;
+    height: 24px;
   }
 }
 
