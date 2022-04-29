@@ -327,9 +327,13 @@ const Send = () => {
             );
             let parsedNumber = amount;
             try {
-              parsedNumber = new BigNumber(v).toFixed(
-                Number(selectedToken?.decimal) || 0
-              );
+              const inputedNumber = new BigNumber(v);
+              if (inputedNumber.gte(0)) {
+                parsedNumber = inputedNumber.toFixed(
+                  Number(selectedToken?.decimal) || 0
+                );
+              }
+              console.debug('inputedNumber', inputedNumber);
             } catch (error) {
               console.error('input::Not a number: ', v);
             }

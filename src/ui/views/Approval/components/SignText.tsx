@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BaseAccount } from 'types/extend';
 import { NetworkDisplay } from 'ui/components';
@@ -11,6 +11,7 @@ import { FallbackSiteLogo } from 'ui/components';
 import * as ethUtil from 'ethereumjs-util';
 
 import './signTypedData.less';
+import { utils } from 'ethers';
 const itemsCenteredCls = 'flex items-center justify-center';
 
 const SignText = ({ params }) => {
@@ -33,6 +34,10 @@ const SignText = ({ params }) => {
   useEffect(() => {
     init();
   }, []);
+
+  const parsedData = useMemo(() => {
+    return data ? utils.toUtf8String(data) : '';
+  }, [data]);
 
   return (
     <div className="approval-sign flexCol">
@@ -69,7 +74,7 @@ const SignText = ({ params }) => {
       </div>
       <div className="sign-body flexCol">
         <div className="sign-data-title">{`${t('Message')}:`}</div>
-        <div className="sign-data">{JSON.stringify(data, null, 2)}</div>
+        <pre className="sign-data">{parsedData}</pre>
       </div>
       <footer className="connect-footer">
         <div className={clsx(['action-buttons mt-4'])}>

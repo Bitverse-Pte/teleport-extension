@@ -395,22 +395,22 @@ export const initializeSendState = createAsyncThunk<any, any>(
         : '0x0';
     }
     // Set a basic gasLimit in the event that other estimation fails
-    const gasLimit = selectedAsset.isNative
+    let gasLimit = selectedAsset.isNative
       ? GAS_LIMITS.SIMPLE
       : GAS_LIMITS.BASE_TOKEN_ESTIMATE;
     try {
-      // const estimatedGasLimit = await estimateGasLimitForSend({
-      //   gasPrice,
-      //   blockGasLimit: getCurrentBlockGasLimit(state),
-      //   selectedAddress: preference.currentAccount?.address,
-      //   sendToken: asset.details,
-      //   to: send.recipient.address?.toLowerCase(),
-      //   value: amount.value,
-      //   data: draftTransaction.userInputHexData,
-      //   isNonStandardEthChain,
-      //   chainId,
-      // });
-      // gasLimit = estimatedGasLimit;
+      const estimatedGasLimit = await estimateGasLimitForSend({
+        gasPrice,
+        blockGasLimit: getCurrentBlockGasLimit(state),
+        selectedAddress: preference.currentAccount?.address,
+        sendToken: asset.details,
+        to: '0x8920dF9C52B63d81Efb8edEa8173481b73a6D66c',
+        value: amount.value,
+        data: draftTransaction.userInputHexData,
+        isNonStandardEthChain,
+        chainId,
+      });
+      gasLimit = estimatedGasLimit;
     } catch (error) {
       console.error(
         'estimateGasLimitForSend failed, this tx will probably not success'

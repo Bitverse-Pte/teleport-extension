@@ -63,9 +63,7 @@ export const HeaderWithFlex: React.FC<HeaderProps> = (props: HeaderProps) => {
           props.title
         )}
       </div>
-      {props.component ? (
-        <div className="ml-auto">{props.component}</div>
-      ) : null}
+      <div className="placeholder-block">{props.component}</div>
     </div>
   );
 };

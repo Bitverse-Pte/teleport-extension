@@ -79,7 +79,7 @@ const NetworkActions = ({
     return network.id === currentProviderId;
   }, [network, currentProviderId]);
   return (
-    <span className="actions flex justify-center items-center">
+    <span className="actions flex">
       {isSelectedNetwork ? (
         <IconComponent name="check" />
       ) : (

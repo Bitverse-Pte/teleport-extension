@@ -344,7 +344,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     display: true,
     themeColor: '#000000',
   },
-  {
+  /* {
     symbol: 'USDT',
     decimal: 6,
     name: 'USDT',
@@ -428,7 +428,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     track: '',
     display: true,
     themeColor: '#FFA800',
-  },
+  }, */
 
   {
     symbol: 'FTM',
