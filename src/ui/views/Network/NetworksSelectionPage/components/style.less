@@ -1,0 +1,56 @@
+.narrow-padding {
+    padding: 4px 8px;
+}
+
+
+.network-item {
+    /**
+      * NetworkSelectionItem
+      */
+    padding: 16px 24px 16px 28px;
+    cursor: pointer;
+    .actions {
+      margin-left: auto;
+      height: 16px;
+      min-width: 96px;
+      justify-content: end;
+      .actions-not-selected {
+        // only when .network-item:hover display
+        justify-content: center;
+        align-items: center;
+        display: none;
+      }
+    }
+
+    .drag-handle {
+        visibility: hidden;
+        margin-right: 16px;
+        border-radius: 4px;
+    }
+    .drag-handle:hover {
+        background: #E1E8F0;
+    }
+    .drag-handle.is-dragging {
+      // display the icon while dragging too.
+      visibility: inherit;
+    }
+}
+.network-item:hover {
+    background-color: #F8FAFC;
+    .actions {
+      .actions-not-selected {
+        display: flex;
+      }
+    }
+    .drag-handle {
+      // hover to display the icon
+      visibility: inherit;
+    }
+}
+.network-item.network-item-active {
+  background-color: #D6EFFF;
+}
+.network-item.is-dragging {
+  border-top: 4px solid #1484F5;
+  opacity: 0.3;
+}

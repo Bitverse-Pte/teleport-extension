@@ -1,4 +1,4 @@
-import { Modal, Tooltip } from 'antd';
+import { Button, Modal, Tooltip } from 'antd';
 import clsx from 'clsx';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,15 +14,26 @@ import { IconComponent } from 'ui/components/IconComponents';
 import './style.less';
 import skynet from 'utils/skynet';
 import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
+import { ReactComponent as DragHandleIcon } from 'assets/action-icon/drag-handle.svg';
+import type {
+  DraggableProvidedDraggableProps,
+  DraggableProvidedDragHandleProps,
+} from 'react-beautiful-dnd';
 const { sensors } = skynet;
 
-type NetworkProviderWithOptionalTag = Provider & { idx?: number };
-
 interface NetworkSelectionItemProps {
-  network: NetworkProviderWithOptionalTag;
+  network: Provider;
+  draggableProps: DraggableProvidedDraggableProps;
+  dragHandleProps?: DraggableProvidedDragHandleProps;
+  innerRef: any;
+  isDragging?: boolean;
 }
 
-export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
+export function NetworkSelectionItem({
+  network,
+  innerRef,
+  ...props
+}: NetworkSelectionItemProps) {
   /**
    * Some data source hooks
    */
@@ -36,10 +47,10 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
   );
 
   const selectProvider = useCallback(
-    (network: NetworkProviderWithOptionalTag) => {
+    (network: Provider) => {
       console.debug(`Selected Chain ${network.chainId}`);
       if (network.type === 'rpc') {
-        providerContext?.useCustomProvider(network.idx as number);
+        providerContext?.useCustomProvider(network.id);
       } else {
         providerContext?.usePresetProvider(network.type);
       }
@@ -55,12 +66,24 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
   );
   return (
     <div
+      {...props.draggableProps}
+      ref={innerRef}
       key={network.chainId}
       className={clsx('flex items-center network-item', {
         'network-item-active': isSelectedNetwork,
+        'is-dragging': props.isDragging,
       })}
       onClick={() => selectProvider(network)}
     >
+      <div
+        className={clsx('drag-handle', {
+          'is-dragging': props.isDragging,
+        })}
+        {...props.dragHandleProps}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <DragHandleIcon />
+      </div>
       <Tooltip title={network.nickname}>
         <span className="network-name">{network.nickname}</span>
       </Tooltip>
@@ -69,11 +92,7 @@ export function NetworkSelectionItem({ network }: NetworkSelectionItemProps) {
   );
 }
 
-const NetworkActions = ({
-  network,
-}: {
-  network: NetworkProviderWithOptionalTag;
-}) => {
+const NetworkActions = ({ network }: { network: Provider }) => {
   const currentProviderId = useSelector((s) => s.network.provider.id);
   const isSelectedNetwork = useMemo(() => {
     return network.id === currentProviderId;
@@ -91,11 +110,7 @@ const NetworkActions = ({
   );
 };
 
-const RpcNetworkOptions = ({
-  network,
-}: {
-  network: NetworkProviderWithOptionalTag;
-}) => {
+const RpcNetworkOptions = ({ network }: { network: Provider }) => {
   const providerContext = useContext(NetworkProviderContext);
   const { t } = useTranslation();
   const jumpToExpandedView = useJumpToExpandedView();
@@ -108,7 +123,7 @@ const RpcNetworkOptions = ({
         title: t('Delete_Provider_Ask_Title'),
         content: t('Delete_Provider_Ask_Content'),
         onOk: async () => {
-          await providerContext?.removeCustomProvider(network.idx as number);
+          await providerContext?.removeCustomProvider(network.id);
           ClickToCloseMessage.success(t('remove_custom_provider_success'));
         },
         onCancel: () => {
@@ -144,7 +159,7 @@ const RpcNetworkOptions = ({
         onClick={(e) => {
           // stop the parent's onClick event
           e.stopPropagation();
-          jumpToExpandedView(`/network/edit/${network.idx}`);
+          jumpToExpandedView(`/network/edit/${network.id}`);
         }}
       />
     </div>

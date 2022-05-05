@@ -1,5 +1,9 @@
 import { CHAINS, CHAIN_TO_RPC_URL_MAP } from 'constants/chain';
-import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
+import {
+  getDefaultNetworkIdsByEcoSystem,
+  defaultNetworks,
+  PresetNetworkId,
+} from 'constants/defaultNetwork';
 import { BigNumber } from 'ethers';
 import {
   CoinType,
@@ -77,8 +81,23 @@ export const NETWORK_EVENTS = {
   INFURA_IS_UNBLOCKED: 'infuraIsUnblocked',
 };
 
+interface CustomNetworkList {
+  // ecosystem => list of network
+  networks: Network[];
+
+  // ecosytems => list of network's ID by order
+  orderOfNetworks: Record<Ecosystem, string[]>;
+}
+
+type OldCustomNetworks = Record<number, Network>;
+function isOldCustomNetworksStore(
+  a: CustomNetworkList | OldCustomNetworks
+): a is OldCustomNetworks {
+  return !(a as CustomNetworkList).orderOfNetworks;
+}
+
 interface NetworkPreferenceStore {
-  customNetworks: Record<number, Network>;
+  customNetworks: CustomNetworkList;
   networkController: NetworkController;
 }
 
@@ -89,7 +108,7 @@ class NetworkPreferenceService extends EventEmitter {
   // persistence storage
   // _store!: ObservableStorage<NetworkPreferenceStore>;
   networkStore: ObservableStore<NetworkController>;
-  customNetworksStore: ObservableStore<Record<number, Network>>;
+  customNetworksStore: ObservableStore<CustomNetworkList>;
   impl1559Status!: ObservableStorage<StatusBookFor1559Impl>;
 
   // metamask required
@@ -106,20 +125,34 @@ class NetworkPreferenceService extends EventEmitter {
   constructor() {
     super();
 
-    this.customNetworksStore = new ObservableStore<Record<number, Network>>({
-      0: {
-        id: PresetNetworkId.TELE_TEST,
-        nickname: 'Teleport Testnet',
-        rpcUrl: 'https://evm-rpc.testnet.teleport.network',
-        rpcPrefs: {
-          blockExplorerUrl: 'https://evm-explorer.testnet.teleport.network',
+    this.customNetworksStore = new ObservableStore<CustomNetworkList>({
+      networks: [
+        {
+          id: PresetNetworkId.TELE_TEST,
+          nickname: 'Teleport Testnet',
+          rpcUrl: 'https://evm-rpc.testnet.teleport.network',
+          rpcPrefs: {
+            blockExplorerUrl: 'https://evm-explorer.testnet.teleport.network',
+          },
+          chainId: '0x1f41',
+          ticker: 'TELE',
+          chainName: 'ETH',
+          coinType: CoinType.ETH,
+          ecosystem: Ecosystem.EVM,
+          prefix: '0x',
         },
-        chainId: '0x1f41',
-        ticker: 'TELE',
-        chainName: 'ETH',
-        coinType: CoinType.ETH,
-        ecosystem: Ecosystem.EVM,
-        prefix: '0x',
+      ],
+      orderOfNetworks: {
+        [Ecosystem.EVM]: [
+          ...getDefaultNetworkIdsByEcoSystem(Ecosystem.EVM),
+          PresetNetworkId.TELE_TEST,
+        ],
+        [Ecosystem.COSMOS]: [
+          ...getDefaultNetworkIdsByEcoSystem(Ecosystem.COSMOS),
+        ],
+        [Ecosystem.POLKADOT]: [
+          ...getDefaultNetworkIdsByEcoSystem(Ecosystem.POLKADOT),
+        ],
       },
     });
     this.networkStore = new ObservableStore<NetworkController>({
@@ -159,42 +192,34 @@ class NetworkPreferenceService extends EventEmitter {
    */
   private _customNetworkStoreMigration() {
     console.debug('_customNetworkStoreMigration start');
-    const { customNetworks } = this._store.getState();
-    let isLocalhostNetworkFound = false;
-    Object.keys(customNetworks).forEach((key) => {
-      if (customNetworks[key].nickname === 'localhost:8545') {
-        isLocalhostNetworkFound = true;
-        customNetworks[key] = {
-          id: nanoid(),
-          nickname: 'Teleport Testnet',
-          rpcUrl: 'https://evm-rpc.testnet.teleport.network',
-          rpcPrefs: {
-            blockExplorerUrl: 'https://evm-explorer.testnet.teleport.network',
-          },
-          chainId: '0x1f41',
-          ticker: 'TELE',
-          chainName: 'ETH',
-          coinType: CoinType.ETH,
-          ecosystem: Ecosystem.EVM,
-          prefix: '0x',
-        };
-        TokenService.addCustomToken({
-          symbol: 'TELE',
-          name: 'TELE',
-          decimal: 18,
-          chainCustomId: customNetworks[key].id,
-          isNative: true,
-        });
-      }
-    });
-    if (isLocalhostNetworkFound) {
-      this._store.updateState({
-        customNetworks,
+    const customNetworks = this.customNetworksStore.getState() as
+      | CustomNetworkList
+      | OldCustomNetworks;
+    if (isOldCustomNetworksStore(customNetworks)) {
+      const networks = Object.values(customNetworks);
+      this.customNetworksStore.updateState({
+        networks: networks,
+        orderOfNetworks: {
+          [Ecosystem.EVM]: [
+            ...getDefaultNetworkIdsByEcoSystem(Ecosystem.EVM),
+            ...networks.map((n) => n.id),
+          ],
+          [Ecosystem.COSMOS]: [
+            ...getDefaultNetworkIdsByEcoSystem(Ecosystem.COSMOS),
+          ],
+          [Ecosystem.POLKADOT]: [
+            ...getDefaultNetworkIdsByEcoSystem(Ecosystem.POLKADOT),
+          ],
+        },
       });
-      console.debug('_customNetworkStoreMigration end', customNetworks);
     } else {
       console.debug('No more migration');
     }
+
+    /**
+     * @TODO new preset network migration need to implement
+     * migration on `orderOfNetworks` too
+     */
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
@@ -230,29 +255,114 @@ class NetworkPreferenceService extends EventEmitter {
       ecosystem,
       prefix,
     };
-    this.customNetworksStore.updateState([
-      ...this.getCustomNetworks(),
-      network,
-    ]);
+    const { networks, orderOfNetworks } = this.customNetworksStore.getState();
+    this.customNetworksStore.updateState({
+      networks: [...networks, network],
+      orderOfNetworks: {
+        ...orderOfNetworks,
+        [ecosystem]: [...orderOfNetworks[ecosystem], network.id],
+      },
+    });
     return network;
   }
 
-  getCustomNetworks(): Network[] {
-    // we only cares the values
-    let networks = Object.values(this.customNetworksStore.getState());
+  moveNetwork(
+    ecoSystem: Ecosystem,
+    fromIndex: number,
+    destinationIndex: number
+  ) {
+    const { orderOfNetworks } = this.customNetworksStore.getState();
+    const reorderedNetworkCategory = Array.from(orderOfNetworks[ecoSystem]);
 
-    // append missing `id`
-    networks = networks.map((n) => {
-      if (n.id) return n;
-      else {
-        console.debug(`Appending "id" for ChainID: ${n.chainId}`);
-        return { ...n, id: nanoid() };
-      }
+    const tmpNetworkId = reorderedNetworkCategory[fromIndex];
+
+    // remove the source item
+    reorderedNetworkCategory.splice(fromIndex, 1);
+    // and insert after the destination
+    reorderedNetworkCategory.splice(destinationIndex, 0, tmpNetworkId);
+    this.customNetworksStore.updateState({
+      orderOfNetworks: {
+        ...orderOfNetworks,
+        [ecoSystem]: reorderedNetworkCategory,
+      },
     });
+  }
 
-    this.customNetworksStore.putState(networks);
+  editCustomNetwork(
+    providerId: string,
+    newNickname: string,
+    rpcUrl: string,
+    chainId: string,
+    ticker?: string,
+    blockExplorerUrl?: string,
+    coinType = CoinType.ETH,
+    chainName = 'ETH'
+  ) {
+    const networks = this.getCustomNetworks();
+    const matchedProvider = this.getCustomNetwork(providerId);
 
+    if (!matchedProvider) {
+      throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
+    }
+    const matchedIdx = networks.findIndex((n) => n.id === matchedProvider.id);
+
+    const isSymbolChanged = ticker != matchedProvider.ticker;
+    if (isSymbolChanged) {
+      // change symbol of custom token
+      TokenService.changeCustomTokenProfile(matchedProvider.id, {
+        symbol: ticker,
+      });
+    }
+    const newSettings = {
+      ...matchedProvider,
+      nickname: newNickname,
+      rpcUrl,
+      chainId,
+      coinType,
+      ticker,
+      chainName,
+      rpcPrefs: {
+        blockExplorerUrl,
+      },
+    };
+    networks[matchedIdx] = newSettings;
+    this.customNetworksStore.updateState({
+      networks,
+    });
+    return newSettings;
+  }
+
+  removeCustomNetwork(idToBeRm: string): boolean {
+    const { networks, orderOfNetworks } = this.customNetworksStore.getState();
+    const providerToBeRemoved = this.getCustomNetwork(idToBeRm);
+    if (!providerToBeRemoved) {
+      throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
+    }
+    const removedCustomNetworks = networks.filter(
+      (n) => n.id !== providerToBeRemoved.id
+    );
+    const removedCustomOrdering = orderOfNetworks[
+      providerToBeRemoved.ecosystem
+    ].filter((nId) => nId !== providerToBeRemoved.id);
+    this.customNetworksStore.updateState({
+      networks: removedCustomNetworks,
+      orderOfNetworks: {
+        ...orderOfNetworks,
+        [providerToBeRemoved.ecosystem]: removedCustomOrdering,
+      },
+    });
+    // is rm successful
+    return networks.length > removedCustomNetworks.length;
+  }
+
+  getCustomNetworks(): Network[] {
+    const { networks } = this.customNetworksStore.getState();
     return networks;
+  }
+
+  getCustomNetwork(id: string): Network | undefined {
+    const { networks } = this.customNetworksStore.getState();
+    return networks.find((n) => n.id === id);
   }
 
   isChainEnable1559(chainId: string): boolean {

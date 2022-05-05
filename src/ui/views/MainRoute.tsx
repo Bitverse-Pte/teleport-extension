@@ -46,7 +46,7 @@ const Main = () => {
         <LazyPrivateRoute exact path="/network">
           <NetworkSelection />
         </LazyPrivateRoute>
-        <LazyPrivateRoute exact path="/network/edit/:idx">
+        <LazyPrivateRoute exact path="/network/edit/:id">
           <NetworkEdit />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/network/add">

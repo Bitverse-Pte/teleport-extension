@@ -10,7 +10,7 @@ import { KnownMethodDict } from 'background/service/knownMethod';
 import { updateKnownMethods } from 'ui/reducer/knownMethod.reducer';
 import { updatePreferences } from 'ui/reducer/preference.reducer';
 import { PreferenceStore } from 'background/service/preference';
-import { Network, NetworkController } from 'types/network';
+import { Ecosystem, Network, NetworkController, Provider } from 'types/network';
 import { updateNetworkController } from 'ui/reducer/network.reducer';
 import { setCustomNetworks } from 'ui/reducer/customNetwork.reducer';
 import { setCurrentGasLimit, setGasEstimates } from 'ui/reducer/block.reducer';
@@ -53,14 +53,16 @@ export function BackgroundDataSyncMiddleware() {
     const onNetworkStore = (s: NetworkController) => {
       dispatch(updateNetworkController(s));
     };
-    const onCustomNetworksStore = (s: Record<number, Network>) => {
+    const onCustomNetworksStore = (s: {
+      networks: Network[];
+      // ecosytems => list of network's ID by order
+      orderOfNetworks: Record<Ecosystem, string[]>;
+    }) => {
       dispatch(
-        setCustomNetworks(
-          Object.values(s).map((v) => ({
-            ...v,
-            type: 'rpc',
-          }))
-        )
+        setCustomNetworks({
+          ...s,
+          networks: s.networks.map((n) => ({ ...n, type: 'rpc' })),
+        })
       );
     };
     const onCurrentBlockStore = (s: BlockData) => {
