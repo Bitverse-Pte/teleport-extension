@@ -3,11 +3,9 @@ import { GAS_ESTIMATE_TYPES, GAS_LIMITS } from 'constants/gas';
 import { CHAIN_ID_TO_GAS_LIMIT_BUFFER_MAP } from 'constants/network';
 import { TransactionEnvelopeTypes } from 'constants/transaction';
 import { addHexPrefix } from 'ethereumjs-util';
-import { stat } from 'fs';
-import { slice } from 'lodash';
 import { Token } from 'types/token';
 import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
-import { addGasBuffer, calcGasTotal } from 'ui/context/send.utils';
+import { addGasBuffer, generateTokenTransferData } from 'ui/context/send.utils';
 import {
   isEIP1559Network,
   getCurrentChainId,
@@ -18,11 +16,6 @@ import {
   fetchGasFeeEstimates,
   getTokenBalancesSync,
 } from 'ui/state/actions';
-import { useWallet } from 'ui/utils';
-import {
-  generateERC20TransferData,
-  readAddressAsContract,
-} from 'ui/utils/transactions';
 import { multiplyCurrencies } from 'utils/conversion';
 import { RootState } from '.';
 import { hideLoadingIndicator, showLoadingIndicator } from './appState.reducer';
@@ -246,7 +239,7 @@ async function estimateGasLimitForSend({
     data,
   };
 
-  if (sendToken) {
+  if (sendToken && !sendToken.isNative) {
     if (!to) {
       // if no to address is provided, we cannot generate the token transfer
       // hexData. hexData in a transaction largely dictates how much gas will
@@ -258,13 +251,12 @@ async function estimateGasLimitForSend({
 
     // We have to generate the erc20/erc721 contract call to transfer tokens in
     // order to get a proper estimate for gasLimit.
-    paramsForGasEstimate.data = generateERC20TransferData({
-      sendToken,
+    paramsForGasEstimate.data = generateTokenTransferData({
       toAddress: to,
       amount: value,
     });
 
-    paramsForGasEstimate.to = sendToken.address;
+    paramsForGasEstimate.to = sendToken.contractAddress?.toLowerCase();
   } else {
     if (!data) {
       // eth.getCode will return the compiled smart contract code at the
@@ -346,6 +338,74 @@ async function estimateGasLimitForSend({
   }
 }
 
+// After modification of specific fields in specific circumstances we must
+// recompute the gasLimit estimate to be as accurate as possible. the cases
+// that necessitate this logic are listed below:
+// 1. when the amount sent changes when sending a token due to the amount being
+//    part of the hex encoded data property of the transaction.
+// 2. when updating the data property while sending NATIVE currency (ex: ETH)
+//    because the data parameter defines function calls that the EVM will have
+//    to execute which is where a large chunk of gas is potentially consumed.
+// 3. when the recipient changes while sending a token due to the recipient's
+//    address being included in the hex encoded data property of the
+//    transaction
+// 4. when the asset being sent changes due to the contract address and details
+//    of the token being included in the hex encoded data property of the
+//    transaction. If switching to NATIVE currency (ex: ETH), the gasLimit will
+//    change due to hex data being removed (unless supplied by user).
+// This method computes the gasLimit estimate which is written to state in an
+// action handler in extraReducers.
+export const computeEstimatedGasLimit = createAsyncThunk(
+  'send/computeEstimatedGasLimit',
+  async (_, thunkApi) => {
+    const state: RootState = thunkApi.getState() as RootState;
+    const { send, preference } = state;
+    //const isMultiLayerFeeNetwork = getIsMultiLayerFeeNetwork(state);
+    const isNonStandardEthChain = getIsNonStandardEthChain(state);
+    const chainId = getCurrentChainId(state);
+
+    let layer1GasTotal;
+    /** 
+     * here to calc optimism
+    if (isMultiLayerFeeNetwork) {
+      layer1GasTotal = await fetchEstimatedL1Fee(global.eth, {
+        txParams: {
+          gasPrice: send.gas.gasPrice,
+          gas: send.gas.gasLimit,
+          to: send.recipient.address?.toLowerCase(),
+          value:
+            send.amount.mode === 'MAX'
+              ? send.account.balance
+              : send.amount.value,
+          from: send.account.address,
+          data: send.draftTransaction.userInputHexData,
+          type: '0x0',
+        },
+      });
+    }
+    */
+
+    const gasLimit = await estimateGasLimitForSend({
+      gasPrice: send.gas.gasPrice,
+      blockGasLimit: getCurrentBlockGasLimit(state),
+      selectedAddress: preference.currentAccount?.address,
+      sendToken: send.asset.details,
+      to: send.recipient.address?.toLowerCase(),
+      value: send.amount.value,
+      data: send.draftTransaction.userInputHexData,
+      isNonStandardEthChain,
+      chainId,
+      gasLimit: send.gas.gasLimit,
+    });
+    //await thunkApi.dispatch(setCustomGasLimit(gasLimit));
+    console.log('============[gasLimit]==============', gasLimit);
+    return {
+      gasLimit,
+      layer1GasTotal,
+    };
+  }
+);
+
 /**
  * Responsible for initializing required state for the send slice.
  * This method is dispatched from the send page in the componentDidMount
@@ -361,13 +421,8 @@ export const initializeSendState = createAsyncThunk<any, any>(
   async (_, thunkApi) => {
     const { assetId } = _;
     const state: RootState = thunkApi.getState() as RootState;
-    const isNonStandardEthChain = getIsNonStandardEthChain(state);
-    const chainId = getCurrentChainId(state);
     const eip1559support = isEIP1559Network(state);
     console.log('===========[eip1559support]=============', eip1559support);
-    const { send, preference } = state;
-
-    const { draftTransaction, asset, amount } = send;
 
     let gasPrice = '0x1';
     /**
@@ -395,30 +450,10 @@ export const initializeSendState = createAsyncThunk<any, any>(
         : '0x0';
     }
     // Set a basic gasLimit in the event that other estimation fails
-    let gasLimit = selectedAsset.isNative
+    const gasLimit = selectedAsset.isNative
       ? GAS_LIMITS.SIMPLE
       : GAS_LIMITS.BASE_TOKEN_ESTIMATE;
-    try {
-      const estimatedGasLimit = await estimateGasLimitForSend({
-        gasPrice,
-        blockGasLimit: getCurrentBlockGasLimit(state),
-        selectedAddress: preference.currentAccount?.address,
-        sendToken: asset.details,
-        to: '0x8920dF9C52B63d81Efb8edEa8173481b73a6D66c',
-        value: amount.value,
-        data: draftTransaction.userInputHexData,
-        isNonStandardEthChain,
-        chainId,
-      });
-      gasLimit = estimatedGasLimit;
-    } catch (error) {
-      console.error(
-        'estimateGasLimitForSend failed, this tx will probably not success'
-      );
-    } finally {
-      // loaded, unblock user from interacting
-      thunkApi.dispatch(hideLoadingIndicator());
-    }
+    thunkApi.dispatch(hideLoadingIndicator());
     return {
       address: null,
       selectedAsset,
@@ -433,8 +468,12 @@ export const initializeSendState = createAsyncThunk<any, any>(
 export const sendSlice = createSlice<
   any,
   {
-    updateDraftTransaction: (state: any) => any;
+    updateDraftTransaction: (state: any) => void;
     resetSendState: () => any;
+    updateGasLimit: (state: any, action: any) => void;
+    updateAsset: (state: any, action: any) => void;
+    updateSendAmount: (state: any, action: any) => void;
+    updateRecipient: (state: any, action: any) => void;
   }
 >({
   name: 'send',
@@ -482,26 +521,87 @@ export const sendSlice = createSlice<
       }
     },
     resetSendState: () => initialState,
-  },
-  extraReducers: (builder) => {
-    builder.addCase(initializeSendState.fulfilled, (state, action) => {
-      state.eip1559support = action.payload.eip1559support;
-      state.gas.gasLimit = action.payload.gasLimit;
-      state.gas.gasPrice = action.payload.gasPrice;
-      state.asset.id = action.payload.selectedAsset.tokenId;
-      state.asset.type = action.payload.selectedAsset.isNative
+    updateGasLimit: (state, action) => {
+      state.gas.gasLimit = addHexPrefix(action.payload);
+    },
+    updateAsset: (state, action) => {
+      state.asset.id = action.payload.tokenId;
+      state.asset.type = action.payload.isNative
         ? ASSET_TYPES.NATIVE
         : ASSET_TYPES.TOKEN;
-      state.asset.balance = action.payload.selectedAsset.amount;
-      sendSlice.caseReducers.updateDraftTransaction(state);
-    });
+      state.asset.balance = action.payload.amount;
+      state.asset.details = action.payload;
+    },
+    updateSendAmount: (state, action) => {
+      state.amount.value = addHexPrefix(action.payload);
+    },
+    updateRecipient: (state, action) => {
+      state.recipient.address = action.payload.address ?? '';
+      state.recipient.nickname = action.payload.nickname ?? '';
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(initializeSendState.fulfilled, (state, action) => {
+        state.eip1559support = action.payload.eip1559support;
+        state.gas.gasLimit = action.payload.gasLimit;
+        state.gas.gasPrice = action.payload.gasPrice;
+        sendSlice.caseReducers.updateAsset(state, {
+          payload: action.payload.selectedAsset,
+        });
+        sendSlice.caseReducers.updateDraftTransaction(state);
+      })
+      .addCase(computeEstimatedGasLimit.fulfilled, (state, action) => {
+        state.gas.isGasEstimateLoading = false;
+        if (action.payload?.gasLimit) {
+          sendSlice.caseReducers.updateGasLimit(state, {
+            payload: action.payload.gasLimit,
+          });
+        }
+        sendSlice.caseReducers.updateDraftTransaction(state);
+      })
+      .addCase(computeEstimatedGasLimit.pending, (state) => {
+        // When we begin to fetch gasLimit we should indicate we are loading
+        // a gas estimate.
+        state.gas.isGasEstimateLoading = true;
+      })
+      .addCase(computeEstimatedGasLimit.rejected, (state) => {
+        // If gas estimation fails, we should set the loading state to false,
+        // because it is no longer loading
+        state.gas.isGasEstimateLoading = false;
+      });
   },
 });
 
 export function resetSendState() {
-  return async (dispatch, getState) => {
-    const state = getState();
+  return async (dispatch) => {
     dispatch(actions.resetSendState());
+  };
+}
+
+export function updateSendAsset(asset: Token) {
+  return async (dispatch) => {
+    await dispatch(actions.updateAsset(asset));
+    await dispatch(computeEstimatedGasLimit());
+  };
+}
+
+export function updateSendAmount(amount) {
+  return async (dispatch) => {
+    await dispatch(actions.updateSendAmount(amount));
+    await dispatch(computeEstimatedGasLimit());
+  };
+}
+
+export function updateRecipient({ address, nickname }) {
+  return async (dispatch) => {
+    await dispatch(
+      actions.updateRecipient({
+        address,
+        nickname: nickname,
+      })
+    );
+    await dispatch(computeEstimatedGasLimit());
   };
 }
 
