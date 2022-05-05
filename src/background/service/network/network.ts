@@ -192,26 +192,24 @@ class NetworkPreferenceService extends EventEmitter {
    */
   private _customNetworkStoreMigration() {
     console.debug('_customNetworkStoreMigration start');
-    const customNetworks = this._store.getState().customNetworks as
+    const customNetworks = this.customNetworksStore.getState() as
       | CustomNetworkList
       | OldCustomNetworks;
     if (isOldCustomNetworksStore(customNetworks)) {
       const networks = Object.values(customNetworks);
-      this._store.updateState({
-        customNetworks: {
-          networks: networks,
-          orderOfNetworks: {
-            [Ecosystem.EVM]: [
-              ...getDefaultNetworkIdsByEcoSystem(Ecosystem.EVM),
-              ...networks.map((n) => n.id),
-            ],
-            [Ecosystem.COSMOS]: [
-              ...getDefaultNetworkIdsByEcoSystem(Ecosystem.COSMOS),
-            ],
-            [Ecosystem.POLKADOT]: [
-              ...getDefaultNetworkIdsByEcoSystem(Ecosystem.POLKADOT),
-            ],
-          },
+      this.customNetworksStore.updateState({
+        networks: networks,
+        orderOfNetworks: {
+          [Ecosystem.EVM]: [
+            ...getDefaultNetworkIdsByEcoSystem(Ecosystem.EVM),
+            ...networks.map((n) => n.id),
+          ],
+          [Ecosystem.COSMOS]: [
+            ...getDefaultNetworkIdsByEcoSystem(Ecosystem.COSMOS),
+          ],
+          [Ecosystem.POLKADOT]: [
+            ...getDefaultNetworkIdsByEcoSystem(Ecosystem.POLKADOT),
+          ],
         },
       });
     } else {
