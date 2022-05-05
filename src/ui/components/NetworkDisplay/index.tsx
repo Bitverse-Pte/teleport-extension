@@ -2,11 +2,13 @@ import React, { useContext } from 'react';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { Card } from 'antd';
 import './index.less';
+import { useSelector } from 'react-redux';
+import { getProvider } from 'ui/selectors/selectors';
 
 export default function NetworkDisplay() {
-  const networkContext = useContext(NetworkProviderContext);
+  const currentProvider = useSelector(getProvider);
 
-  const label = networkContext?.currentNetworkController?.provider.nickname;
+  const label = currentProvider.nickname;
 
   return <div className="network">{label}</div>;
 }

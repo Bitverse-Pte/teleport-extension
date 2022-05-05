@@ -366,12 +366,8 @@ class ProviderController extends BaseController {
        * If these are matched at the same time,
        * then they are treated as existed provider:
        * - Chain ID
-       * - The Nickname
        */
-      return (
-        BigNumber.from(p.chainId).eq(chainParams.chainId) &&
-        p.nickname === chainParams.chainName
-      );
+      return BigNumber.from(p.chainId).eq(chainParams.chainId);
     });
 
     if (matchedProvider) {

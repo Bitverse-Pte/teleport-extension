@@ -8,6 +8,10 @@ import {
   hideLoadingIndicator,
   showLoadingIndicator,
 } from 'ui/reducer/appState.reducer';
+import {
+  getCustomProvidersSelector,
+  getEnabledProvidersSelector,
+} from 'ui/selectors/network.selector';
 
 /**
  * Design was based on MetaMask
@@ -70,7 +74,7 @@ export function NetworkStoreProvider({
 
   const currentNetworkController = useSelector((state) => state.network);
 
-  const customProviders = useSelector((state) => state.customNetworks.networks);
+  const customProviders = useSelector(getCustomProvidersSelector);
 
   const useCustomProvider = useCallback(
     async (networkId: string) => {
@@ -165,13 +169,7 @@ export function NetworkStoreProvider({
     [wallet]
   );
 
-  const enabledProviders = useMemo(() => {
-    const presetProviders = Object.values(defaultNetworks).filter((val) => {
-      // no null, undefined and no empty object
-      return Boolean(val) && Object.keys(val).length > 0;
-    });
-    return [...presetProviders, ...customProviders];
-  }, [customProviders]);
+  const enabledProviders = useSelector(getEnabledProvidersSelector);
 
   const store = useMemo(
     () => ({
