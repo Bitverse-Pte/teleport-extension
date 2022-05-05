@@ -34,8 +34,7 @@ const NetworksSelectionContainer = () => {
       [key]: !activeKeys[key],
     }));
   const providerContext = useContext(NetworkProviderContext);
-  const { networkList, currentSelectedCategory, orderOfNetworks } =
-    useProviderList();
+  const { networkList, currentSelectedCategory } = useProviderList();
   const toExpanedView = useJumpToExpandedView();
 
   useEffect(() => {
@@ -64,6 +63,14 @@ const NetworksSelectionContainer = () => {
     if (source.droppableId !== destination.droppableId) {
       console.error('Error: You can not drag into another network category.');
     }
+    const sourceNetwork =
+      networkList[source.droppableId as Ecosystem].networks[source.index];
+    sensors.track('teleport_network_onDrag', {
+      page: location.pathname,
+      chainId: sourceNetwork.chainId,
+      chainName: sourceNetwork.chainName,
+      toIndex: destination.index,
+    });
 
     await wallet.moveNetwork(
       source.droppableId,
