@@ -257,29 +257,6 @@ export function getTransactionTypeTitle(
   }
 }
 
-export function generateERC20TransferData({
-  toAddress = '0x0',
-  amount = '0x0',
-  sendToken,
-}) {
-  if (!sendToken) {
-    return undefined;
-  }
-  return (
-    TOKEN_TRANSFER_FUNCTION_SIGNATURE +
-    Array.prototype.map
-      .call(
-        hstInterface.encodeFunctionData(
-          // ['address', 'uint256'],
-          hstInterface.getFunction('transfer'),
-          [toAddress, addHexPrefix(amount)]
-        ),
-        (x) => `00${x.toString(16)}`.slice(-2)
-      )
-      .join('')
-  );
-}
-
 export function sumHexes(...args) {
   const total = args.reduce((acc, hexAmount) => {
     return addCurrencies(acc, hexAmount, {
