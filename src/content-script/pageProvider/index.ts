@@ -69,7 +69,7 @@ export class EthereumProvider extends EventEmitter {
   ]);
   private _bcm: BroadcastChannelMessage;
 
-  constructor({ channelName = '', maxListeners = 100 } = {}) {
+  constructor({ channelName = '', maxListeners = 200 } = {}) {
     super();
     this._bcm = new BroadcastChannelMessage(channelName);
     this.setMaxListeners(maxListeners);
