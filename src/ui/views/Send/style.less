@@ -41,12 +41,19 @@
             
         }
 
+        .ant-select-selector {
+            border-radius: 8px;
+            height: 38px;
+        }
+
         .ant-input-number {
             /**
               * Override default style
               */
             border: 0 !important;
             background-color: #F8FAFC !important;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
         }
         .ant-input-number-lgs {
             /**
@@ -54,6 +61,8 @@
               */
             border: 0 !important;
             background-color: #F8FAFC !important;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
         }
         .ant-input-number-group-addon {
             /**
@@ -62,6 +71,8 @@
             border: 0 !important;
             background-color: #F8FAFC !important;
             font-family: MontserratBold;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
         }
         .ant-select-selector {
             border: 0 !important;
@@ -70,6 +81,8 @@
         .customInputStyle {
             border: 0 !important;
             background-color: #F8FAFC !important;
+            border-radius: 8px;
+            height: 38px;
         }
         .tbmy {
             margin-top: 10px;
@@ -160,10 +173,14 @@
 
 .assets-option {
     width: 100%;
+    display: flex;
     justify-content: space-between;
+    align-items: center;
     .assets-option-symbol {
         margin-left: 10px;
         color: #364361;
+        font-family: MontserratBold;
+        font-weight: bolder;
     }
     .assets-option-symbol-name {
         margin-left: 10px;
@@ -171,6 +188,7 @@
     }
     .assets-option-left {
         align-items: center;
+        line-height: 38px;
     }
     .assets-option-right {
        float: right;
