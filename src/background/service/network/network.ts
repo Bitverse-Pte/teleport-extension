@@ -4,7 +4,7 @@ import {
   defaultNetworks,
   PresetNetworkId,
 } from 'constants/defaultNetwork';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import {
   CoinType,
   Ecosystem,
@@ -248,7 +248,7 @@ class NetworkPreferenceService extends EventEmitter {
         blockExplorerUrl,
       },
       rpcUrl,
-      chainId: BigNumber.from(chainId).toHexString(),
+      chainId: utils.hexValue(BigNumber.from(chainId).toHexString()),
       coinType,
       chainName,
       ticker,
@@ -317,7 +317,7 @@ class NetworkPreferenceService extends EventEmitter {
       ...matchedProvider,
       nickname: newNickname,
       rpcUrl,
-      chainId,
+      chainId: utils.hexValue(BigNumber.from(chainId).toHexString()),
       coinType,
       ticker,
       chainName,
