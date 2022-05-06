@@ -53,10 +53,10 @@ function FeeItem(props: FeeItemPropsType) {
         </div>
         <div className="fee-selector-item-content-right">
           <div className="fee-selector-item-content-right-title">
-            {gas.toFixed(6)} {symbol}
+            {gas ? `${gas.toFixed(6)} ${symbol}` : '-'}
           </div>
           <div className="fee-selector-item-content-right-subtitle">
-            ≈${(gas * Number(price)).toFixed(4)} USD
+            {gas ? `≈$${(gas * Number(price)).toFixed(4)} USD` : '-'}
           </div>
         </div>
       </div>
