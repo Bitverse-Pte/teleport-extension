@@ -217,6 +217,19 @@ class NetworkPreferenceService extends EventEmitter {
     }
 
     /**
+     * Fix `chainId` issues with
+     * - uncessary padding 0
+     * - pure decimal number
+     */
+    const { networks } = this.customNetworksStore.getState();
+    this.customNetworksStore.updateState({
+      networks: networks.map((n) => ({
+        ...n,
+        chainId: utils.hexValue(BigNumber.from(n.chainId).toHexString()),
+      })),
+    });
+
+    /**
      * @TODO new preset network migration need to implement
      * migration on `orderOfNetworks` too
      */
