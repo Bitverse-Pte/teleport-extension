@@ -269,6 +269,7 @@ const Send = () => {
       !isValidAddress(toAddress || '0x0') ||
       !amount ||
       !selectedToken ||
+      isGasEstimateLoading ||
       (selectedToken.amount &&
         new BigNumber(
           utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
