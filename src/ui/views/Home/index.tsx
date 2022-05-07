@@ -152,11 +152,6 @@ const Home = () => {
   };
   const handleAddTokenBtnClick = (e) => {
     e.stopPropagation();
-    if (currentChain === PresetNetworkId.ARBITRUM) {
-      ClickToCloseMessage.warning('Coming soon');
-      return;
-    }
-
     sensors.track('teleport_home_add_token', {
       page: location.pathname,
     });
