@@ -5,12 +5,12 @@
     box-sizing: border-box;
 
     .send-container {
-        width: 90%;
+        width: 100%;
         flex: 1;
-        margin-top: 0;
-        margin-left: 5%;
-        padding-right: 5px;
+        margin: 0;
         z-index: 9;
+        padding: 0 24px;
+        box-sizing: border-box;
 
         .from-container {
             width: 100%;
@@ -43,8 +43,8 @@
         }
 
         .ant-select-selector {
-            border-radius: 8px;
-            height: 38px;
+            border-radius: 8px!important;
+            height: 38px!important;
         }
 
         .ant-input-number {
@@ -151,6 +151,11 @@
         height: 80px;
         flex: 0 0 80px;
         margin-bottom: 10px;
+        text-align: center;
+        padding: 0 24px;
+        .button-inner {
+            width: 100%;
+        }
         .gas-limit-container {
             margin-bottom: 5px;
             .gas-limit-title {
