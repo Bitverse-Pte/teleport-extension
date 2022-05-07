@@ -439,28 +439,28 @@ const Send = () => {
             setAccountSelectPopupVisible(false);
           }}
         />
-      </div>
-      <div className="button-container">
-        <div className="button-inner">
-          <div className="gas-limit-container flexR">
-            <div className="gas-limit-title">Estimated Gas Limit:</div>
-            {isGasEstimateLoading ? (
-              <Spin size="small" />
-            ) : (
-              <div className="gas-limit-value">
-                {Number(draftTransaction.gas)}
-              </div>
-            )}
+        <div className="button-container">
+          <div className="button-inner">
+            <div className="gas-limit-container flexR">
+              <div className="gas-limit-title">Estimated Gas Limit:</div>
+              {isGasEstimateLoading ? (
+                <Spin size="small" />
+              ) : (
+                <div className="gas-limit-value">
+                  {Number(draftTransaction.gas)}
+                </div>
+              )}
+            </div>
+            <CustomButton
+              type="primary"
+              disabled={invalidate()}
+              onClick={next}
+              cls="theme"
+              block
+            >
+              {t('Next')}
+            </CustomButton>
           </div>
-          <CustomButton
-            type="primary"
-            disabled={invalidate()}
-            onClick={next}
-            cls="theme"
-            block
-          >
-            {t('Next')}
-          </CustomButton>
         </div>
       </div>
     </div>
