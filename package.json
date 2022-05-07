@@ -23,6 +23,7 @@
   "dependencies": {
     "@ethereumjs/common": "^2.5.0",
     "@ethereumjs/tx": "^3.3.2",
+    "@keplr-wallet/cosmos": "^0.10.3",
     "@ledgerhq/hw-app-eth": "^6.0.2",
     "@ledgerhq/hw-transport-webusb": "^6.0.2",
     "@metamask/controllers": "^20.1.0",
