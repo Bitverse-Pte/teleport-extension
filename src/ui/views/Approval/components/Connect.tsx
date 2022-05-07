@@ -91,7 +91,7 @@ const Connect = ({ params: { icon, origin } }: ConnectProps) => {
         {/* <div className="account-title">{t('Connected Account')}</div>
         <div></div> */}
       </div>
-      <div className="button-container flexCol content-wrap-padding">
+      <div className="button-container flexCol">
         <CustomButton
           type="primary"
           onClick={handleAllow}

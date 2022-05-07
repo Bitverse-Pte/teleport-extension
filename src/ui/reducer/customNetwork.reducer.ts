@@ -1,10 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Provider } from 'types/network';
+import { Ecosystem, Provider } from 'types/network';
 
-type CustomNetworkStoreState = {
-  providers: Provider[];
+interface CustomNetworkStoreState {
+  // ecosystem => list of network
+  networks: Provider[];
+
+  // ecosytems => list of network's ID by order
+  orderOfNetworks: Record<Ecosystem, string[]>;
+
   isLoaded: boolean;
-};
+}
+
+type CustomNetworkStore = Omit<CustomNetworkStoreState, 'isLoaded'>;
 
 export const customNetworkSlice = createSlice<
   CustomNetworkStoreState,
@@ -13,26 +20,25 @@ export const customNetworkSlice = createSlice<
       state: CustomNetworkStoreState,
       action: {
         type: string;
-        payload: Provider[];
+        payload: CustomNetworkStore;
       }
     ) => any;
   }
 >({
   name: 'customNetworks',
   initialState: {
-    providers: [],
+    networks: [],
+    orderOfNetworks: {
+      [Ecosystem.EVM]: [],
+      [Ecosystem.COSMOS]: [],
+      [Ecosystem.POLKADOT]: [],
+    },
     isLoaded: false,
   },
   reducers: {
-    setCustomNetworks(
-      _,
-      action: {
-        type: string;
-        payload: Provider[];
-      }
-    ) {
+    setCustomNetworks(_, action) {
       return {
-        providers: action.payload,
+        ...action.payload,
         isLoaded: true,
       };
     },

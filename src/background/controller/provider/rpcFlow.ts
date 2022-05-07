@@ -5,12 +5,15 @@ import {
   notificationService,
   permissionService,
   preferenceService,
+  txController,
 } from 'background/service';
 import { PromiseFlow, underline2Camelcase } from 'background/utils';
 import { EVENTS } from 'constants/index';
 import providerController from './controller';
 import eventBus from 'eventBus';
 import { TransactionEnvelopeTypes } from 'constants/transaction';
+import TransactionController from 'background/service/transactions';
+import { clone, cloneDeep } from 'lodash';
 
 const isSignApproval = (type: string) => {
   const SIGN_APPROVALS = ['SignText', 'SignTypedData', 'SignTx'];
@@ -97,17 +100,39 @@ const flowContext = flow
       ctx.request.requestedApproval = true;
       // fix the request param from dapp, should compatiable with send from app.
       if (approvalType === 'SignTx' && !params[0].txParam) {
+        if (!params[0].type) {
+          params[0].type =
+            (await networkPreferenceService.getEIP1559Compatibility())
+              ? TransactionEnvelopeTypes.FEE_MARKET
+              : TransactionEnvelopeTypes.LEGACY;
+        }
+        // the .txParam is used for display origin info in SignTx page
         params[0].txParam = {
           from: params[0].from,
           to: params[0].to,
           value: params[0].value,
           type: params[0].type,
         };
-        if (!params[0].type) {
-          params[0].type =
-            (await networkPreferenceService.getEIP1559Compatibility())
-              ? TransactionEnvelopeTypes.FEE_MARKET
-              : TransactionEnvelopeTypes.LEGACY;
+        if (!params[0].gas) {
+          const txMeta = cloneDeep(params[0]);
+          txMeta.txParams = {
+            from: txMeta.from,
+            to: txMeta.to,
+            value: txMeta.value,
+            type: txMeta.type,
+            data: txMeta.data,
+          };
+          delete txMeta.txParam;
+          const { gasLimit: defaultGasLimit } =
+            await txController._getDefaultGasLimit(txMeta, '0x0');
+          console.info(
+            'no gas set from dapp, generated default gas limit:',
+            defaultGasLimit
+          );
+          if (defaultGasLimit) {
+            params[0].gas = defaultGasLimit;
+            params[0].txParam.gas = defaultGasLimit;
+          }
         }
       }
       ctx.approvalRes = await notificationService.requestApproval({

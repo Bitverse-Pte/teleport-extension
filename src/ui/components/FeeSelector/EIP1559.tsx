@@ -58,23 +58,23 @@ function FeeSelector(props) {
   const fetchGasFeeEstimates = async () => {
     const res = await wallet.fetchGasFeeEstimates();
     const { estimatedBaseFee, high, low, medium } = res.gasFeeEstimates;
-    setBaseFee(Number(estimatedBaseFee));
+    setBaseFee(Number(estimatedBaseFee || 0));
     setFeeList([
       {
         type: 'high',
-        gasPrice: Number(high.suggestedMaxFeePerGas),
+        gasPrice: Number(high?.suggestedMaxFeePerGas || 0),
         time: 30,
         ...high,
       },
       {
         type: 'medium',
-        gasPrice: Number(medium.suggestedMaxFeePerGas),
+        gasPrice: Number(medium?.suggestedMaxFeePerGas),
         time: 30,
         ...medium,
       },
       {
         type: 'low',
-        gasPrice: Number(low.suggestedMaxFeePerGas),
+        gasPrice: Number(low?.suggestedMaxFeePerGas),
         time: 30,
         ...low,
       },
