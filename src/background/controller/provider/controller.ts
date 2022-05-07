@@ -401,7 +401,9 @@ class ProviderController extends BaseController {
       chainParams.rpcUrls[0],
       chainParams.chainId,
       chainParams.nativeCurrency.symbol,
-      chainParams.blockExplorerUrls[0],
+      chainParams.blockExplorerUrls
+        ? chainParams.blockExplorerUrls[0]
+        : undefined,
       CoinType.ETH,
       'ETH',
       Ecosystem.EVM,
