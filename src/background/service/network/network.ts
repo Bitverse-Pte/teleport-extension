@@ -4,7 +4,6 @@ import {
   defaultNetworks,
   PresetNetworkId,
 } from 'constants/defaultNetwork';
-import { BigNumber, utils } from 'ethers';
 import {
   CoinType,
   Ecosystem,
@@ -16,7 +15,6 @@ import {
 import { ErrorCode } from 'constants/code';
 import BitError from 'error';
 import { providerFromEngine } from 'eth-json-rpc-middleware';
-import { ethers } from 'ethers';
 import Eth from 'ethjs';
 import { sessionService, TokenService } from '../index';
 import { ObservableStorage } from '../../utils/obsStorage';
@@ -55,6 +53,10 @@ import { ComposedStore, ObservableStore } from '@metamask/obs-store';
 import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
 import { parseStringTemplate } from 'utils/string';
+import { addHexPrefix } from 'ethereumjs-util';
+
+const toHexString = (val: string | number) =>
+  addHexPrefix(Number(val).toString(16));
 
 let defaultProviderConfigOpts = defaultNetworks['ethereum'] as Provider;
 if (process.env.IN_TEST === 'true') {
@@ -225,7 +227,7 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       networks: networks.map((n) => ({
         ...n,
-        chainId: utils.hexValue(BigNumber.from(n.chainId).toHexString()),
+        chainId: toHexString(n.chainId),
       })),
     });
 
@@ -261,7 +263,7 @@ class NetworkPreferenceService extends EventEmitter {
         blockExplorerUrl,
       },
       rpcUrl,
-      chainId: utils.hexValue(BigNumber.from(chainId).toHexString()),
+      chainId: toHexString(chainId),
       coinType,
       chainName,
       ticker,
@@ -330,7 +332,7 @@ class NetworkPreferenceService extends EventEmitter {
       ...matchedProvider,
       nickname: newNickname,
       rpcUrl,
-      chainId: utils.hexValue(BigNumber.from(chainId).toHexString()),
+      chainId: toHexString(chainId),
       coinType,
       ticker,
       chainName,
