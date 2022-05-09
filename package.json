@@ -1,6 +1,6 @@
 {
   "name": "teleport-wallet",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A multi-chain & multi-ID Wallet",
   "scripts": {
     "clean": "rm -rf dist && mkdir dist && cp -r _raw/* dist",
