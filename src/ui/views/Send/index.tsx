@@ -440,7 +440,7 @@ const Send = () => {
             setAccountSelectPopupVisible(false);
           }}
         />
-        <div className="button-container">
+        <div className="button-container send-btn-con">
           <div className="button-inner">
             <div className="gas-limit-container flexR">
               <div className="gas-limit-title">Estimated Gas Limit:</div>
