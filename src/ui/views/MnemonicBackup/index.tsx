@@ -141,7 +141,7 @@ const MnemonicBackup = () => {
           </p>
         </div>
       </div>
-      <div className="button-container">
+      <div className="backup-button-container">
         <CopyToClipboard
           text={mnemonic}
           onCopy={() => {
