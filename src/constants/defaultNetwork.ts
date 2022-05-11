@@ -1,4 +1,5 @@
 import { CoinType, Ecosystem, Provider } from 'types/network';
+import { Bech32Address } from 'utils/cosmos/bech32';
 import { CHAINS } from './chain';
 
 export enum PresetNetworkId {
@@ -10,6 +11,7 @@ export enum PresetNetworkId {
   AVAX = 'avax',
   OP = 'op',
   TELE_TEST = 'teleport_testnet',
+  COSMOS_HUB = 'cosmos_hub',
 }
 
 const EVMProviderSharedProperties = {
@@ -105,6 +107,21 @@ export const defaultNetworks: {
       blockExplorerUrl: 'https://optimistic.ethereum.io',
     },
     ...EVMProviderSharedProperties,
+  },
+  [CHAINS.COSMOS_HUB]: {
+    id: PresetNetworkId.COSMOS_HUB,
+    type: CHAINS.COSMOS_HUB,
+    rpcUrl: 'https://rpc-cosmoshub.keplr.app',
+    chainId: 'cosmoshub_4',
+    ticker: 'ATOM',
+    nickname: 'Cosmos Hub',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+    },
+    chainName: 'COSMOS',
+    coinType: CoinType.COSMOS,
+    ecosystem: Ecosystem.COSMOS,
+    prefix: Bech32Address.defaultBech32Config('cosmos'),
   },
 };
 
