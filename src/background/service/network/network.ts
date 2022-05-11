@@ -232,9 +232,29 @@ class NetworkPreferenceService extends EventEmitter {
     });
 
     /**
-     * @TODO new preset network migration need to implement
+     * new preset network migration need to implement
      * migration on `orderOfNetworks` too
      */
+    const { orderOfNetworks } = this.customNetworksStore.getState();
+    const presetNids: Record<Ecosystem, string[]> = {
+      [Ecosystem.EVM]: getDefaultNetworkIdsByEcoSystem(Ecosystem.EVM),
+      [Ecosystem.COSMOS]: getDefaultNetworkIdsByEcoSystem(Ecosystem.COSMOS),
+      [Ecosystem.POLKADOT]: getDefaultNetworkIdsByEcoSystem(Ecosystem.POLKADOT),
+    };
+    const _tmpNetworkOrder = { ...orderOfNetworks };
+    (Object.keys(orderOfNetworks) as Ecosystem[]).map((ecoSystem) => {
+      const notInList = presetNids[ecoSystem].filter(
+        (n) => !orderOfNetworks[ecoSystem].includes(n)
+      );
+      if (notInList.length > 0)
+        _tmpNetworkOrder[ecoSystem] = [
+          ..._tmpNetworkOrder[ecoSystem],
+          ...notInList,
+        ];
+    });
+    this.customNetworksStore.updateState({
+      orderOfNetworks: _tmpNetworkOrder,
+    });
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
