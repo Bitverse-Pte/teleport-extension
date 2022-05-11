@@ -328,6 +328,9 @@ const SignTx = ({ params, origin }) => {
         supportsEIP1559={supportsEIP1559}
         visible={visible}
         onClose={() => setVisible(false)}
+        gasPrice={gasPrice}
+        maxFeePerGas={maxFeePerGas}
+        maxPriorityFeePerGas={maxPriorityFeePerGas}
       />
       <div className="tx-button-container flexCol">
         <CustomButton
