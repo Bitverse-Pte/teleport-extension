@@ -122,6 +122,40 @@ export const defaultNetworks: {
     coinType: CoinType.COSMOS,
     ecosystem: Ecosystem.COSMOS,
     prefix: Bech32Address.defaultBech32Config('cosmos'),
+    ecoSystemParams: {
+      rest: 'https://lcd-cosmoshub.keplr.app',
+      stakeCurrency: {
+        coinDenom: 'ATOM',
+        coinMinimalDenom: 'uatom',
+        coinDecimals: 6,
+        coinGeckoId: 'cosmos',
+      },
+      walletUrl:
+        process.env.NODE_ENV === 'production'
+          ? 'https://wallet.keplr.app/#/cosmoshub/stake'
+          : 'http://localhost:8080/#/cosmoshub/stake',
+      walletUrlForStaking:
+        process.env.NODE_ENV === 'production'
+          ? 'https://wallet.keplr.app/#/cosmoshub/stake'
+          : 'http://localhost:8080/#/cosmoshub/stake',
+      currencies: [
+        {
+          coinDenom: 'ATOM',
+          coinMinimalDenom: 'uatom',
+          coinDecimals: 6,
+          coinGeckoId: 'cosmos',
+        },
+      ],
+      feeCurrencies: [
+        {
+          coinDenom: 'ATOM',
+          coinMinimalDenom: 'uatom',
+          coinDecimals: 6,
+          coinGeckoId: 'cosmos',
+        },
+      ],
+      features: ['ibc-transfer', 'ibc-go'],
+    },
   },
 };
 
