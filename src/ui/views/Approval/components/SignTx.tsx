@@ -22,6 +22,7 @@ import {
   decGWEIToHexWEI,
   addCurrencies,
   conversionUtil,
+  hexWeiToDecGWEI,
 } from 'ui/utils/conversion';
 import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
@@ -71,6 +72,15 @@ const normalizeTxParams = (tx) => {
   if ('gasLimit' in copy) {
     copy.gas = normalizeHex(copy.gas);
   }
+  if ('gasPrice' in copy) {
+    copy.gasPrice = normalizeHex(copy.gasPrice);
+  }
+  if ('maxFeePerGas' in copy) {
+    copy.maxFeePerGas = normalizeHex(copy.maxFeePerGas);
+  }
+  if ('maxPriorityFeePerGas' in copy) {
+    copy.maxPriorityFeePerGas = normalizeHex(copy.maxPriorityFeePerGas);
+  }
   if ('value' in copy) {
     copy.value = addHexPrefix(copy.value || '0x0');
   }
@@ -115,7 +125,7 @@ const SignTx = ({ params, origin }) => {
     if (tx.type === TransactionEnvelopeTypes.LEGACY) {
       let gasPrice = '0x1';
       if (tx.gasPrice) {
-        gasPrice = getRoundedGasPrice(tx.gasPrice);
+        gasPrice = tx.gasPrice;
         delete tx.gasPrice;
       } else if (gasState.gasType == 'custom') {
         gasPrice = getRoundedGasPrice(gasState.legacyGas.gasPrice);
@@ -152,8 +162,10 @@ const SignTx = ({ params, origin }) => {
         );
       }
       if (tx.maxFeePerGas || tx.maxPriorityFeePerGas) {
-        suggestedMaxFeePerGas = tx.maxFeePerGas;
-        suggestedMaxPriorityFeePerGas = tx.maxPriorityFeePerGas;
+        suggestedMaxFeePerGas = hexWeiToDecGWEI(tx.maxFeePerGas);
+        suggestedMaxPriorityFeePerGas = hexWeiToDecGWEI(
+          tx.maxPriorityFeePerGas
+        );
         delete tx.maxFeePerGas;
         delete tx.maxPriorityFeePerGas;
       }
