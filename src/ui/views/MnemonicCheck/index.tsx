@@ -160,7 +160,7 @@ const BackupCheck = () => {
           <span className="private-key">{privateKey}</span>
         </div>
       </div>
-      <div className="button-container content-wrap-padding flexCol">
+      <div className="backup-button-container content-wrap-padding flexCol">
         <CustomButton
           type="primary"
           cls="theme"

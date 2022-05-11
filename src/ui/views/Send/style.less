@@ -5,11 +5,11 @@
     box-sizing: border-box;
 
     .send-container {
-        width: 90%;
+        width: 100%;
         flex: 1;
-        margin-top: 0;
-        margin-left: 5%;
-        padding-right: 5px;
+        margin: 0;
+        padding: 0 24px;
+        box-sizing: border-box;
 
         .from-container {
             width: 100%;
@@ -41,12 +41,19 @@
             
         }
 
+        .ant-select-selector {
+            border-radius: 8px!important;
+            height: 38px!important;
+        }
+
         .ant-input-number {
             /**
               * Override default style
               */
             border: 0 !important;
             background-color: #F8FAFC !important;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
         }
         .ant-input-number-lgs {
             /**
@@ -54,6 +61,8 @@
               */
             border: 0 !important;
             background-color: #F8FAFC !important;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
         }
         .ant-input-number-group-addon {
             /**
@@ -62,6 +71,8 @@
             border: 0 !important;
             background-color: #F8FAFC !important;
             font-family: MontserratBold;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
         }
         .ant-select-selector {
             border: 0 !important;
@@ -70,6 +81,8 @@
         .customInputStyle {
             border: 0 !important;
             background-color: #F8FAFC !important;
+            border-radius: 8px;
+            height: 38px;
         }
         .tbmy {
             margin-top: 10px;
@@ -99,6 +112,9 @@
             box-sizing: border-box;
             box-shadow: 0px 4px 8px rgba(94, 139, 255, 0.2);
             border-radius: 8px;
+            z-index: 2;
+            position: relative;
+            background-color: #fff;
             .recent-title {
                 align-items: flex-start;
                 padding: 4px 4px 4px 16px;
@@ -122,28 +138,59 @@
                     line-height: 100%;
                     color: #364361;
                     align-items: flex-start;
-                    margin: 0px 10px;
-                    padding: 12px 16px;
+                    margin: 0 16px;
+                    padding: 12px 0;
                 }
 
             }
         }
-    }
         
+        
+    }
 
-    .button-container {
+    .send-btn-con {
         height: 80px;
         flex: 0 0 80px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+        text-align: center;
+        padding: 0 24px;
+        left: 0;
+        z-index: 1;
+        .button-inner {
+            width: 100%;
+        }
+        .gas-limit-container {
+            margin-bottom: 5px;
+            .gas-limit-title {
+                margin-right: 5px;
+                font-family: 'Montserrat';
+                font-style: normal;
+                font-weight: 400;
+                font-size: 14px;
+                color: #364361;
+            }
+            .gas-limit-value {
+                font-family: 'Montserrat';
+                font-style: normal;
+                font-weight: 500;
+                font-size: 14px;
+                color: #364361;
+            }
+        }
+        
     }
 }
 
 .assets-option {
     width: 100%;
+    display: flex;
     justify-content: space-between;
+    align-items: center;
     .assets-option-symbol {
         margin-left: 10px;
         color: #364361;
+        font-family: MontserratBold;
+        font-weight: bolder;
     }
     .assets-option-symbol-name {
         margin-left: 10px;
@@ -151,6 +198,7 @@
     }
     .assets-option-left {
         align-items: center;
+        line-height: 38px;
     }
     .assets-option-right {
        float: right;

@@ -16,6 +16,9 @@ const config = {
       'process.env.INFURA_PROJECT_ID': JSON.stringify(
         process.env.INFURA_PROJECT_ID
       ),
+      'process.env.REDUX_DEVTOOL_ENABLED': JSON.stringify(
+        process.env.REDUX_DEVTOOL_ENABLED
+      ),
     }),
     // new BundleAnalyzerPlugin(),
   ],

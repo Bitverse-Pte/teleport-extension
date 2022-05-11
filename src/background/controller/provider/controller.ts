@@ -69,6 +69,7 @@ const switchChainValidation = ({
   data: {
     params: [chainParams],
   },
+  session,
 }) => {
   const providers = networkPreferenceService.getAllProviders();
   const matchedProvider = providers.find((p) => {
@@ -79,6 +80,14 @@ const switchChainValidation = ({
       code: 4902, // To-be-standardized "unrecognized chain ID" error
       message: `Unrecognized chain ID "${chainParams.chainId}". Try adding the chain using ${MESSAGE_TYPE.ADD_ETHEREUM_CHAIN} first.`,
     });
+  }
+  const connected = permissionService.getConnectedSite(session.origin);
+  const { chainId: currentChainId } =
+    networkPreferenceService.getProviderConfig();
+  if (connected) {
+    if (BigNumber.from(chainParams.chainId).eq(currentChainId)) {
+      return true;
+    }
   }
 };
 
@@ -341,9 +350,16 @@ class ProviderController extends BaseController {
       data: {
         params: [chainParams],
       },
-      session: { origin },
+      session,
     }) => {
-      return null;
+      const connected = permissionService.getConnectedSite(session.origin);
+      const { chainId: currentChainId } =
+        networkPreferenceService.getProviderConfig();
+      if (connected) {
+        if (BigNumber.from(chainParams.chainId).eq(currentChainId)) {
+          return true;
+        }
+      }
     },
     { height: 390 },
   ])
@@ -366,12 +382,8 @@ class ProviderController extends BaseController {
        * If these are matched at the same time,
        * then they are treated as existed provider:
        * - Chain ID
-       * - The Nickname
        */
-      return (
-        BigNumber.from(p.chainId).eq(chainParams.chainId) &&
-        p.nickname === chainParams.chainName
-      );
+      return BigNumber.from(p.chainId).eq(chainParams.chainId);
     });
 
     if (matchedProvider) {
@@ -389,7 +401,9 @@ class ProviderController extends BaseController {
       chainParams.rpcUrls[0],
       chainParams.chainId,
       chainParams.nativeCurrency.symbol,
-      chainParams.blockExplorerUrls[0],
+      chainParams.blockExplorerUrls
+        ? chainParams.blockExplorerUrls[0]
+        : undefined,
       CoinType.ETH,
       'ETH',
       Ecosystem.EVM,

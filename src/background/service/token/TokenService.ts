@@ -136,9 +136,7 @@ class TokenService {
       const clonedBalances = cloneDeep(this.store.getState().balances);
       if (clonedBalances && clonedBalances[address]) {
         tokens = clonedBalances[address].filter(
-          (t: Token) =>
-            t.chainCustomId === chainCustomId &&
-            !(t.chainCustomId === PresetNetworkId.ARBITRUM && !t.isNative)
+          (t: Token) => t.chainCustomId === chainCustomId
           //(showHideToken ? true : t.display)
         );
       }

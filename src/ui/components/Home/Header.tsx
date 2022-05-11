@@ -6,6 +6,8 @@ import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
 import SettingIcon from 'assets/settingIcon.svg';
+import { useSelector } from 'react-redux';
+import { getProvider } from 'ui/selectors/selectors';
 export function HomeHeader({
   menuOnClick,
   networkOnClick,
@@ -13,7 +15,7 @@ export function HomeHeader({
   menuOnClick: React.MouseEventHandler;
   networkOnClick: React.MouseEventHandler;
 }) {
-  const networkContext = useContext(NetworkProviderContext);
+  const currentProvider = useSelector(getProvider);
   return (
     <div className="flex headerOfMenu justify-between items-center">
       <div className="logo-container">
@@ -31,7 +33,7 @@ export function HomeHeader({
         aria-labelledby="listbox-label"
       >
         <span className="block truncate network-nickname">
-          {networkContext?.currentNetworkController?.provider.nickname}
+          {currentProvider.nickname}
         </span>
         <IconComponent name="chevron-down" cls="expand-list base-text-color" />
       </button>

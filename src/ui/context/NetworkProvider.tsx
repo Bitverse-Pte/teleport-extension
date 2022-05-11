@@ -8,6 +8,10 @@ import {
   hideLoadingIndicator,
   showLoadingIndicator,
 } from 'ui/reducer/appState.reducer';
+import {
+  getCustomProvidersSelector,
+  getEnabledProvidersSelector,
+} from 'ui/selectors/network.selector';
 
 /**
  * Design was based on MetaMask
@@ -28,11 +32,7 @@ export const NetworkProviderContext = React.createContext<{
   /**
    * useCustomProvider can switch the selected network to provided CustomProvider
    */
-  useCustomProvider: (matchedIdx: number) => Promise<any>;
-  /**
-   * `getCustomProvider` can give you access to the Provider's data
-   */
-  getCustomProvider: (matchedIdx: number) => Provider;
+  useCustomProvider: (matchedId: string) => Promise<any>;
   /**
    * use this to switch preset networks
    */
@@ -47,14 +47,14 @@ export const NetworkProviderContext = React.createContext<{
     blockExplorerUrl?: string
   ) => Promise<any>;
   editCustomProvider: (
-    matchedIdx: number,
+    providerId: string,
     newNickname: string,
     rpcUrl: string,
     chainId: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => Promise<any>;
-  removeCustomProvider: (idxToBeRemoved: number) => Promise<any>;
+  removeCustomProvider: (idToBeRemoved: string) => Promise<any>;
   getAllProviders: () => Promise<Provider[]>;
 } | null>(null);
 
@@ -74,22 +74,13 @@ export function NetworkStoreProvider({
 
   const currentNetworkController = useSelector((state) => state.network);
 
-  const customProviders = useSelector(
-    (state) => state.customNetworks.providers
-  );
-
-  const getCustomProvider = useCallback(
-    (matchedIdx: number) => {
-      return customProviders[matchedIdx];
-    },
-    [customProviders]
-  );
+  const customProviders = useSelector(getCustomProvidersSelector);
 
   const useCustomProvider = useCallback(
-    async (matchedIdx: number) => {
+    async (networkId: string) => {
       dispatch(showLoadingIndicator());
       try {
-        await wallet.useCustomNetwork(matchedIdx);
+        await wallet.useCustomNetwork(networkId);
         await wallet.fetchLatestBlockDataNow();
       } catch (error) {
         console.error('useCustomProvider::error', error);
@@ -102,7 +93,7 @@ export function NetworkStoreProvider({
 
   const editCustomProvider = useCallback(
     async (
-      matchedIdx: number,
+      networkId: string,
       newNickname: string,
       rpcUrl: string,
       chainId: string,
@@ -111,7 +102,7 @@ export function NetworkStoreProvider({
       coinType = CoinType.ETH
     ) => {
       await wallet.editCustomNetwork(
-        matchedIdx,
+        networkId,
         newNickname,
         rpcUrl,
         chainId,
@@ -172,19 +163,13 @@ export function NetworkStoreProvider({
   );
 
   const removeCustomProvider = useCallback(
-    async (idxToBeRemoved: number) => {
-      await wallet.removeCustomNetwork(idxToBeRemoved);
+    async (idToBeRemoved: string) => {
+      await wallet.removeCustomNetwork(idToBeRemoved);
     },
     [wallet]
   );
 
-  const enabledProviders = useMemo(() => {
-    const presetProviders = Object.values(defaultNetworks).filter((val) => {
-      // no null, undefined and no empty object
-      return Boolean(val) && Object.keys(val).length > 0;
-    });
-    return [...presetProviders, ...customProviders];
-  }, [customProviders]);
+  const enabledProviders = useSelector(getEnabledProvidersSelector);
 
   const store = useMemo(
     () => ({
@@ -192,7 +177,6 @@ export function NetworkStoreProvider({
       customProviders,
       useCustomProvider,
       usePresetProvider,
-      getCustomProvider,
       removeCustomProvider,
       editCustomProvider,
       enabledProviders,
@@ -204,7 +188,6 @@ export function NetworkStoreProvider({
       customProviders,
       useCustomProvider,
       usePresetProvider,
-      getCustomProvider,
       enabledProviders,
       editCustomProvider,
       removeCustomProvider,

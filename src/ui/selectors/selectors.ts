@@ -535,7 +535,7 @@ export function getCurrentCurrency(state: RootState) {
 // }
 
 export function getIsNonStandardEthChain(state) {
-  return !(getIsMainnet(state) || getIsTestnet(state) || process.env.IN_TEST);
+  return !(getIsMainnet(state) || getIsTestnet(state));
 }
 
 export function getIsMainnet(state: RootState) {

@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import { Input, InputNumber, Form, Select, Button, Card, Space } from 'antd';
+import { Input, InputNumber, Select, Spin } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
@@ -28,6 +28,7 @@ import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
 import AccountSelect from 'ui/components/AccountSelect';
 import {
   ETH,
+  HexString,
   Transaction,
   TransactionEnvelopeTypes,
 } from 'constants/transaction';
@@ -41,7 +42,13 @@ import BigNumber from 'bignumber.js';
 import { utils } from 'ethers';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentChainId } from 'ui/selectors/selectors';
-import { initializeSendState, resetSendState } from 'ui/reducer/send.reducer';
+import {
+  initializeSendState,
+  resetSendState,
+  updateRecipient,
+  updateSendAsset,
+  updateSendAmount,
+} from 'ui/reducer/send.reducer';
 import { shortenAddress } from 'ui/utils/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
@@ -83,6 +90,9 @@ const Send = () => {
   );
   const isSupport1559 = useSelector((state) => state.send.eip1559support);
   console.debug('isSupport1559: ', isSupport1559);
+  const isGasEstimateLoading = useSelector(
+    (state) => state.send.gas.isGasEstimateLoading
+  );
 
   const cleanup = useCallback(() => {
     dispatch(resetSendState());
@@ -141,11 +151,7 @@ const Send = () => {
     setRecentAddressList(recentAddress);
   }, []);
 
-  const next = async () => {
-    if (!(await wallet.isUnlocked())) {
-      setUnlockPopupVisible(true);
-      return;
-    }
+  const getHexAmount = (amount: string): HexString => {
     const multiplier = Math.pow(10, Number(selectedToken?.decimal || 0));
     const hexAmountValue = addHexPrefix(
       multiplyCurrencies(amount || 0, multiplier, {
@@ -154,6 +160,15 @@ const Send = () => {
         toNumericBase: 'hex',
       })
     );
+    return hexAmountValue;
+  };
+
+  const next = async () => {
+    if (!(await wallet.isUnlocked())) {
+      setUnlockPopupVisible(true);
+      return;
+    }
+    const hexAmountValue = getHexAmount(amount);
 
     const type = isSupport1559
       ? TransactionEnvelopeTypes.FEE_MARKET
@@ -182,7 +197,8 @@ const Send = () => {
       type: type,
       symbol: selectedToken?.symbol,
     };
-
+    params.gas = draftTransaction.gas;
+    params.txParam.gas = draftTransaction.gas;
     if (isSupport1559) {
       delete params.gasPrice;
       params.maxFeePerGas = draftTransaction.maxFeePerGas;
@@ -194,9 +210,7 @@ const Send = () => {
       delete params.maxFeePerGas;
       delete params.maxPriorityFeePerGas;
       params.gasPrice = draftTransaction.gasPrice;
-      params.gas = draftTransaction.gas;
       params.txParam.gasPrice = draftTransaction.gasPrice;
-      params.txParam.gas = draftTransaction.gas;
     }
     await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({
@@ -226,13 +240,41 @@ const Send = () => {
      * we do not need commas in the amount input field
      */
     const sanitizedAmount = removeCommas(amountDecimal);
-    setAmount(sanitizedAmount);
+    handleAmountChanged(sanitizedAmount);
   };
 
   const handleTokenSelect = (val) => {
     const selected = tokens.find((t: Token) => t.symbol === val);
-    setSelectedToken(selected);
-    dispatch(initializeSendState({ assetId: selected?.tokenId }));
+    if (selected) {
+      setSelectedToken(selected);
+      dispatch(updateSendAsset(selected));
+    }
+  };
+
+  const handleToAddressChanged = (val) => {
+    setToAddress(val);
+    if (isValidAddress(val)) {
+      dispatch(updateRecipient({ address: val, nickname: '' }));
+    }
+  };
+
+  const handleAmountChanged = (val) => {
+    setAmount(val);
+    const hexVal = getHexAmount(val);
+    dispatch(updateSendAmount(hexVal));
+  };
+
+  const invalidate = () => {
+    return (
+      !isValidAddress(toAddress || '0x0') ||
+      !amount ||
+      !selectedToken ||
+      isGasEstimateLoading ||
+      (selectedToken.amount &&
+        new BigNumber(
+          utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
+        ).lessThan(amount))
+    );
   };
 
   const addonSymbol = (
@@ -337,7 +379,7 @@ const Send = () => {
             } catch (error) {
               console.error('input::Not a number: ', v);
             }
-            setAmount(parsedNumber);
+            handleAmountChanged(parsedNumber);
           }}
         />
         <div className="available-container flexR">
@@ -358,7 +400,7 @@ const Send = () => {
           className="customInputStyle"
           onFocus={() => setShowToList(true)}
           onClick={(e) => e.stopPropagation()}
-          onChange={(e) => setToAddress(e.target.value)}
+          onChange={(e) => handleToAddressChanged(e.target.value)}
         />
         {showToList ? (
           <div className="recent">
@@ -369,7 +411,7 @@ const Send = () => {
                 .map((addr) => (
                   <p
                     onClick={() => {
-                      setToAddress(addr);
+                      handleToAddressChanged(addr);
                       setShowToList(false);
                     }}
                     className="recent-item"
@@ -392,31 +434,35 @@ const Send = () => {
           onClose={(selected?: BaseAccount) => {
             if (selected) {
               setSelected(selected);
-              setToAddress(selected.address);
+              handleToAddressChanged(selected.address);
               setShowToList(false);
             }
             setAccountSelectPopupVisible(false);
           }}
         />
-      </div>
-      <div className="button-container content-wrap-padding">
-        <CustomButton
-          type="primary"
-          disabled={
-            !isValidAddress(toAddress || '0x0') ||
-            !amount ||
-            !selectedToken ||
-            (selectedToken.amount &&
-              new BigNumber(
-                utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
-              ).lessThan(amount))
-          }
-          onClick={next}
-          cls="theme"
-          block
-        >
-          {t('Next')}
-        </CustomButton>
+        <div className="button-container send-btn-con">
+          <div className="button-inner">
+            <div className="gas-limit-container flexR">
+              <div className="gas-limit-title">Estimated Gas Limit:</div>
+              {isGasEstimateLoading ? (
+                <Spin size="small" />
+              ) : (
+                <div className="gas-limit-value">
+                  {Number(draftTransaction.gas)}
+                </div>
+              )}
+            </div>
+            <CustomButton
+              type="primary"
+              disabled={invalidate()}
+              onClick={next}
+              cls="theme"
+              block
+            >
+              {t('Next')}
+            </CustomButton>
+          </div>
+        </div>
       </div>
     </div>
   );

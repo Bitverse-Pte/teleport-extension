@@ -19,6 +19,8 @@ import './addChain.less';
 import { AddChainDetailCard } from 'ui/components/AddChain/AddChain';
 import { SwitchChainCard } from 'ui/components/AddChain/SwitchChain';
 import { chainIdToCategory } from 'utils/chain';
+import { useSelector } from 'react-redux';
+import { getEnabledProvidersSelector } from 'ui/selectors/network.selector';
 
 /**
  * @dev according to the spec on MetaMask
@@ -76,7 +78,6 @@ const itemsCenteredCls = 'flex items-center justify-center';
 
 const AddChain = ({ params }: { params: AddChainProps }) => {
   const wallet = useWallet();
-  const networkContext = useContext(NetworkProviderContext);
   const [, resolveApproval, rejectApproval] = useApproval();
   const { t } = useTranslation();
 
@@ -100,29 +101,14 @@ const AddChain = ({ params }: { params: AddChainProps }) => {
     setInited(true);
   };
 
-  const enableChains = useMemo(() => {
-    if (!networkContext) return [];
-    else return networkContext.enabledProviders;
-  }, [networkContext]);
+  const enableChains = useSelector(getEnabledProvidersSelector);
 
+  /**
+   * Is the same provider that depends on:
+   * - is same ChainId
+   */
   const findMatchedChain = useCallback(
-    (chain: Provider) => {
-      /**
-       * Is the same provider that depends on:
-       * - is same RPC URL (if any)
-       * - is same ChainId
-       */
-      if (isDataTypeOfAddEthereumChain(data)) {
-        // is a `AddEthereumChain` request, same provider will be switched
-        return (
-          chain.rpcUrl === data.rpcUrls[0] &&
-          BigNumber.from(chain.chainId).eq(data.chainId)
-        );
-      } else {
-        // is a `SwitchEthereumChain` request
-        return BigNumber.from(chain.chainId).eq(data.chainId);
-      }
-    },
+    (chain: Provider) => BigNumber.from(chain.chainId).eq(data.chainId),
     [data]
   );
 
@@ -215,7 +201,9 @@ const AddChain = ({ params }: { params: AddChainProps }) => {
       <div className="approval-chain">
         {data && (
           <>
-            <h1 className="text-center header">{titleAndContent.title}</h1>
+            <h1 className="text-center addChain-header">
+              {titleAndContent.title}
+            </h1>
             <div className="text-center">
               <div
                 className={clsx(
@@ -239,7 +227,7 @@ const AddChain = ({ params }: { params: AddChainProps }) => {
           </>
         )}
       </div>
-      <footer className="connect-footer">
+      <footer className="addChain-footer">
         <div className={clsx(['action-buttons mt-4'])}>
           <Button
             type="primary"

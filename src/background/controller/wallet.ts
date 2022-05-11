@@ -27,7 +27,7 @@ import provider from './provider';
 import BitError from 'error';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { ErrorCode } from 'constants/code';
-import { CoinType, Provider } from 'types/network';
+import { CoinType, Ecosystem, Provider } from 'types/network';
 import { AddTokenOpts, Token } from 'types/token';
 import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
@@ -85,13 +85,19 @@ export class WalletController extends BaseController {
 
   fetchCustomProviders = () => networkPreferenceService.getCustomNetworks();
 
-  useCustomNetwork = (idx: number) => {
-    const network = networkPreferenceService.getCustomNetworks()[idx];
+  useCustomNetwork = (id: string) => {
+    const network = networkPreferenceService.getCustomNetwork(id);
+    if (!network) {
+      throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
+    }
     return networkPreferenceService.setProviderConfig({
       ...network,
       type: 'rpc',
     });
   };
+
+  moveNetwork = (e: Ecosystem, f: number, d: number) =>
+    networkPreferenceService.moveNetwork(e, f, d);
 
   addCustomNetwork = async (
     nickname: string,
@@ -133,7 +139,7 @@ export class WalletController extends BaseController {
   };
 
   editCustomNetwork = (
-    matchedIdx: number,
+    id: string,
     newNickname: string,
     rpcUrl: string,
     chainId: string,
@@ -142,35 +148,20 @@ export class WalletController extends BaseController {
     coinType = CoinType.ETH,
     chainName = 'ETH'
   ) => {
-    const state = networkPreferenceService.getCustomNetworks();
-    const isSymbolChanged = ticker != state[matchedIdx].ticker;
-    if (isSymbolChanged) {
-      // change symbol of custom token
-      TokenService.changeCustomTokenProfile(state[matchedIdx].id, {
-        symbol: ticker,
-      });
-    }
-    state[matchedIdx] = {
-      ...state[matchedIdx],
-      nickname: newNickname,
+    networkPreferenceService.editCustomNetwork(
+      id,
+      newNickname,
       rpcUrl,
       chainId,
-      coinType,
       ticker,
-      chainName,
-      rpcPrefs: {
-        blockExplorerUrl,
-      },
-    };
-    networkPreferenceService.customNetworksStore.putState(state);
-  };
-
-  removeCustomNetwork = (idxToBeRm: number) => {
-    const originalList = networkPreferenceService.getCustomNetworks();
-    networkPreferenceService.customNetworksStore.putState(
-      originalList.filter((_, idx) => idx !== idxToBeRm)
+      blockExplorerUrl,
+      coinType,
+      chainName
     );
   };
+
+  removeCustomNetwork = (idToBeRm: string) =>
+    networkPreferenceService.removeCustomNetwork(idToBeRm);
 
   getCurrentNetwork = () => {
     return networkPreferenceService.networkStore.getState();

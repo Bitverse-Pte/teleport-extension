@@ -53,14 +53,17 @@
       }
     }
     .tx-details-tab-container {
+      padding: 0 24px;
+      overflow-y: auto;
       flex: 1;
-      margin-bottom: 20px;
+      // padding-bottom: 150px;
     }
 
     .transaction-detail {
       width: 100%;
       .gas-edit-button {
         cursor: pointer;
+        font-family: "MontserratBold";
         justify-content: center;
         align-items: center;
         width: 72px;
@@ -69,7 +72,7 @@
         border-radius: 8px;
         fill: #1484F5;
         color:  #1484F5;
-        margin: 16px 0;
+        margin: 8px 0;
       }
       .transaction-detail-item {
         white-space: pre-line;
@@ -172,10 +175,14 @@
     }
 
     .tx-button-container {
-      height: 80px;
-      flex: 0 0 80px;
-      margin-top: 20px;
-      margin-bottom: 30px;
+      // height: 130px;
+      // flex: 0 0 80px;
+      // padding-top: 20px;
+      // padding-bottom: 10px;
+      // position: fixed;
+      // bottom: 0;
+      padding: 10px 24px;
+      background: white;
       .tx-btn-container-top {
           margin-bottom: 14px;
       }
@@ -196,9 +203,9 @@
 
 footer {
   padding: 20px 20px 24px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
+  // position: fixed;
+  // bottom: 0;
+  // left: 0;
   background-color: #fff;
   border-top: 0.5px solid #D6DFEC;
   width: 100%;

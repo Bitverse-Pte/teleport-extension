@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
-import { Tabs, Divider } from 'antd';
+import { Divider } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
   useWallet,
@@ -25,7 +25,7 @@ import {
 } from 'ui/utils/conversion';
 import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
-import { CustomButton } from 'ui/components/Widgets';
+import { CustomButton, CustomTab } from 'ui/components/Widgets';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   showLoadingIndicator,
@@ -44,9 +44,8 @@ import {
 } from 'ui/reducer/gas.reducer';
 import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
 import skynet from 'utils/skynet';
+import { Tabs } from 'constants/wallet';
 const { sensors } = skynet;
-
-const { TabPane } = Tabs;
 
 const normalizeHex = (value: string | number) => {
   if (typeof value === 'number') {
@@ -101,6 +100,7 @@ const SignTx = ({ params, origin }) => {
   const gasState: any = useSelector((state) => state.gas);
   const [visible, setVisible] = useState(false);
   const tx = normalizeTxParams(params.data[0]);
+  const gasLimitRef = useRef<string>(tx.gas || addHexPrefix(MIN_GAS_LIMIT_HEX));
   // for 1559 tx
   const [maxFeePerGas, setMaxFeePerGas] = useState<string>(tx.maxFeePerGas);
   const [maxPriorityFeePerGas, setMaxPriorityFeePerGas] = useState<string>(
@@ -119,6 +119,12 @@ const SignTx = ({ params, origin }) => {
       let gasPrice = '0x1';
       if (gasState.gasType == 'custom') {
         gasPrice = getRoundedGasPrice(gasState.legacyGas.gasPrice);
+        gasLimitRef.current = addHexPrefix(
+          conversionUtil(gasState.legacyGas.gasLimit, {
+            fromNumericBase: 'dec',
+            toNumericBase: 'hex',
+          })
+        );
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
         gasPrice = getGasPriceInHexWei(gasFeeEstimates.medium);
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
@@ -129,16 +135,21 @@ const SignTx = ({ params, origin }) => {
           : '0x0';
       }
       setGasPrice(gasPrice);
-      const total = multipyHexes(
-        gasPrice,
-        tx.gas || MIN_GAS_LIMIT_HEX
-      ).toString();
+      const total = multipyHexes(gasPrice, gasLimitRef.current).toString();
       setTotalGasFee(addHexPrefix(total));
     } else {
-      const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas } =
+      const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas, gasLimit } =
         gasState.gasType === 'custom'
           ? gasState.customData
           : gasFeeEstimates[gasState.gasType];
+      if (gasLimit) {
+        gasLimitRef.current = addHexPrefix(
+          conversionUtil(gasLimit, {
+            fromNumericBase: 'dec',
+            toNumericBase: 'hex',
+          })
+        );
+      }
       const _maxFeePerGas = addHexPrefix(
         decGWEIToHexWEI(suggestedMaxFeePerGas).toString()
       );
@@ -148,7 +159,7 @@ const SignTx = ({ params, origin }) => {
       );
       setMaxPriorityFeePerGas(_maxPriorityFeePerGas);
       const _a = addHexes(_maxFeePerGas, _maxPriorityFeePerGas).toString();
-      const total = multipyHexes(_a, tx.gas || MIN_GAS_LIMIT_HEX).toString();
+      const total = multipyHexes(_a, gasLimitRef.current).toString();
       setTotalGasFee(addHexPrefix(total));
     }
   };
@@ -165,6 +176,7 @@ const SignTx = ({ params, origin }) => {
     if (tx.type === TransactionEnvelopeTypes.FEE_MARKET) {
       resolveApproval({
         ...tx,
+        gas: gasLimitRef.current,
         maxFeePerGas: maxFeePerGas,
         maxPriorityFeePerGas: maxPriorityFeePerGas,
       })
@@ -173,6 +185,7 @@ const SignTx = ({ params, origin }) => {
     } else {
       resolveApproval({
         ...tx,
+        gas: gasLimitRef.current,
         gasPrice: gasPrice,
       })
         .then(() => delay(1000))
@@ -230,30 +243,34 @@ const SignTx = ({ params, origin }) => {
 
   const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
 
+  const [tabType, setTabType] = useState<Tabs>(Tabs.FIRST);
+
   const renderContent = () => {
     if (tx.data) {
       return (
-        <div className="tx-details-tab-container flex content-wrap-padding">
-          <Tabs defaultActiveKey="1" style={{ width: '100% ' }}>
-            <TabPane tab={t('DETAILS')} key="1">
-              <TxDetailComponent
-                tx={tx}
-                txToken={txToken}
-                nativeToken={nativeToken}
-                setVisible={setVisible}
-                totalGasfee={totalGasfee}
-                currency={nativeToken?.symbol}
-              />
-            </TabPane>
-            <TabPane tab={t('DATA')} key="2">
-              <TxDataComponent tx={tx} />
-            </TabPane>
-          </Tabs>
+        <div className="tx-details-tab-container">
+          <CustomTab
+            tab1="Details"
+            tab2="Data"
+            currentTab={tabType}
+            handleTabClick={setTabType}
+          />
+          {tabType === Tabs.FIRST && (
+            <TxDetailComponent
+              tx={tx}
+              txToken={txToken}
+              nativeToken={nativeToken}
+              setVisible={setVisible}
+              totalGasfee={totalGasfee}
+              currency={nativeToken?.symbol}
+            />
+          )}
+          {tabType === Tabs.SECOND && <TxDataComponent tx={tx} />}
         </div>
       );
     }
     return (
-      <div className="tx-details-tab-container flex content-wrap-padding">
+      <div className="tx-details-tab-container flex">
         <TxDetailComponent
           tx={tx}
           txToken={txToken}
@@ -285,7 +302,6 @@ const SignTx = ({ params, origin }) => {
           token={txToken}
           origin={origin}
         />
-        <Divider style={{ marginTop: 16, marginBottom: 0 }} />
       </div>
       {renderContent()}
       <FeeSelector
@@ -294,7 +310,7 @@ const SignTx = ({ params, origin }) => {
         visible={visible}
         onClose={() => setVisible(false)}
       />
-      <div className="tx-button-container flexCol content-wrap-padding">
+      <div className="tx-button-container flexCol">
         <CustomButton
           type="primary"
           onClick={handleAllow}
@@ -423,7 +439,7 @@ const TxDetailComponent = ({
       </div>
       <TransactionDetailItem
         key="gas-item"
-        detailTitle={t('Referral gas fee')}
+        detailTitle={t('Estimated gas fee')}
         subTitle={undefined}
         detailText={`${renderTotalGasFeeAmount()}`}
         detailSubText={renderTotalGasFeeFiat()}
