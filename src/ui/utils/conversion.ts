@@ -399,6 +399,15 @@ function decGWEIToHexWEI(decGWEI) {
   });
 }
 
+function hexWeiToDecGWEI(hexWei) {
+  return conversionUtil(hexWei, {
+    fromNumericBase: 'hex',
+    toNumericBase: 'dec',
+    fromDenomination: 'WEI',
+    toDenomination: 'GWEI',
+  });
+}
+
 function hexToDecimal(hexValue: string | BigNumber) {
   return conversionUtil(hexValue, {
     fromNumericBase: 'hex',
@@ -429,6 +438,7 @@ export {
   toNegative,
   subtractCurrencies,
   decGWEIToHexWEI,
+  hexWeiToDecGWEI,
   toBigNumber,
   hexToDecimal,
   decimalToHex,
