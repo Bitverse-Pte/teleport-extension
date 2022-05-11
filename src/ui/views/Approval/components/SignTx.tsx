@@ -71,9 +71,6 @@ const normalizeTxParams = (tx) => {
   if ('gasLimit' in copy) {
     copy.gas = normalizeHex(copy.gas);
   }
-  if ('gasPrice' in copy) {
-    copy.gasPrice = normalizeHex(copy.gasPrice);
-  }
   if ('value' in copy) {
     copy.value = addHexPrefix(copy.value || '0x0');
   }
@@ -117,7 +114,10 @@ const SignTx = ({ params, origin }) => {
     //const MIN_GAS_LIMIT_HEX = '0x5208';
     if (tx.type === TransactionEnvelopeTypes.LEGACY) {
       let gasPrice = '0x1';
-      if (gasState.gasType == 'custom') {
+      if (tx.gasPrice) {
+        gasPrice = getRoundedGasPrice(tx.gasPrice);
+        delete tx.gasPrice;
+      } else if (gasState.gasType == 'custom') {
         gasPrice = getRoundedGasPrice(gasState.legacyGas.gasPrice);
         gasLimitRef.current = addHexPrefix(
           conversionUtil(gasState.legacyGas.gasLimit, {
@@ -138,7 +138,8 @@ const SignTx = ({ params, origin }) => {
       const total = multipyHexes(gasPrice, gasLimitRef.current).toString();
       setTotalGasFee(addHexPrefix(total));
     } else {
-      const { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas, gasLimit } =
+      // eslint-disable-next-line prefer-const
+      let { suggestedMaxPriorityFeePerGas, suggestedMaxFeePerGas, gasLimit } =
         gasState.gasType === 'custom'
           ? gasState.customData
           : gasFeeEstimates[gasState.gasType];
@@ -149,6 +150,12 @@ const SignTx = ({ params, origin }) => {
             toNumericBase: 'hex',
           })
         );
+      }
+      if (tx.maxFeePerGas || tx.maxPriorityFeePerGas) {
+        suggestedMaxFeePerGas = tx.maxFeePerGas;
+        suggestedMaxPriorityFeePerGas = tx.maxPriorityFeePerGas;
+        delete tx.maxFeePerGas;
+        delete tx.maxPriorityFeePerGas;
       }
       const _maxFeePerGas = addHexPrefix(
         decGWEIToHexWEI(suggestedMaxFeePerGas).toString()
