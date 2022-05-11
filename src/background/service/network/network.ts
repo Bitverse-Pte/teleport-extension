@@ -678,7 +678,12 @@ class NetworkPreferenceService extends EventEmitter {
       previousProviderStore: this.getProviderConfig(),
       provider: copiedConfig,
     });
-    this._switchNetwork(copiedConfig);
+    if (config.ecosystem === Ecosystem.EVM) {
+      /**
+       * Only trigger this fn when provider is EVM ecosystem
+       */
+      this._switchNetwork(copiedConfig);
+    }
   }
 
   rollbackToPreviousProvider() {
