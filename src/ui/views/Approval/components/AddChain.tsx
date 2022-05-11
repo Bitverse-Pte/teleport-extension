@@ -201,7 +201,9 @@ const AddChain = ({ params }: { params: AddChainProps }) => {
       <div className="approval-chain">
         {data && (
           <>
-            <h1 className="text-center header">{titleAndContent.title}</h1>
+            <h1 className="text-center addChain-header">
+              {titleAndContent.title}
+            </h1>
             <div className="text-center">
               <div
                 className={clsx(
@@ -225,7 +227,7 @@ const AddChain = ({ params }: { params: AddChainProps }) => {
           </>
         )}
       </div>
-      <footer className="connect-footer">
+      <footer className="addChain-footer">
         <div className={clsx(['action-buttons mt-4'])}>
           <Button
             type="primary"

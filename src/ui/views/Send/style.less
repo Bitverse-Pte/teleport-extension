@@ -8,7 +8,6 @@
         width: 100%;
         flex: 1;
         margin: 0;
-        z-index: 9;
         padding: 0 24px;
         box-sizing: border-box;
 
@@ -113,6 +112,9 @@
             box-sizing: border-box;
             box-shadow: 0px 4px 8px rgba(94, 139, 255, 0.2);
             border-radius: 8px;
+            z-index: 2;
+            position: relative;
+            background-color: #fff;
             .recent-title {
                 align-items: flex-start;
                 padding: 4px 4px 4px 16px;
@@ -128,7 +130,6 @@
             .recent-body {
                 max-height: 150px;
                 overflow-y: auto;
-                background-color: #fff;
                 .recent-item {
                     font-family: 'MontserratBold';
                     font-style: normal;
@@ -137,8 +138,8 @@
                     line-height: 100%;
                     color: #364361;
                     align-items: flex-start;
-                    margin: 0px 10px;
-                    padding: 12px 16px;
+                    margin: 0 16px;
+                    padding: 12px 0;
                 }
 
             }
@@ -147,12 +148,17 @@
         
     }
 
-    .button-container {
+    .send-btn-con {
         height: 80px;
         flex: 0 0 80px;
         margin-bottom: 10px;
         text-align: center;
         padding: 0 24px;
+        left: 0;
+        z-index: 1;
+        bottom: 0;
+        position: fixed;
+        width: 100%;
         .button-inner {
             width: 100%;
         }

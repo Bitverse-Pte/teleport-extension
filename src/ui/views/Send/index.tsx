@@ -201,16 +201,9 @@ const Send = () => {
     params.txParam.gas = draftTransaction.gas;
     if (isSupport1559) {
       delete params.gasPrice;
-      params.maxFeePerGas = draftTransaction.maxFeePerGas;
-      params.maxPriorityFeePerGas = draftTransaction.maxPriorityFeePerGas;
-      params.txParam.maxFeePerGas = draftTransaction.maxFeePerGas;
-      params.txParam.maxPriorityFeePerGas =
-        draftTransaction.maxPriorityFeePerGas;
     } else {
       delete params.maxFeePerGas;
       delete params.maxPriorityFeePerGas;
-      params.gasPrice = draftTransaction.gasPrice;
-      params.txParam.gasPrice = draftTransaction.gasPrice;
     }
     await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({
@@ -269,6 +262,7 @@ const Send = () => {
       !isValidAddress(toAddress || '0x0') ||
       !amount ||
       !selectedToken ||
+      isGasEstimateLoading ||
       (selectedToken.amount &&
         new BigNumber(
           utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
@@ -439,28 +433,28 @@ const Send = () => {
             setAccountSelectPopupVisible(false);
           }}
         />
-      </div>
-      <div className="button-container">
-        <div className="button-inner">
-          <div className="gas-limit-container flexR">
-            <div className="gas-limit-title">Estimated Gas Limit:</div>
-            {isGasEstimateLoading ? (
-              <Spin size="small" />
-            ) : (
-              <div className="gas-limit-value">
-                {Number(draftTransaction.gas)}
-              </div>
-            )}
+        <div className="button-container send-btn-con">
+          <div className="button-inner">
+            <div className="gas-limit-container flexR">
+              <div className="gas-limit-title">Estimated Gas Limit:</div>
+              {isGasEstimateLoading ? (
+                <Spin size="small" />
+              ) : (
+                <div className="gas-limit-value">
+                  {Number(draftTransaction.gas)}
+                </div>
+              )}
+            </div>
+            <CustomButton
+              type="primary"
+              disabled={invalidate()}
+              onClick={next}
+              cls="theme"
+              block
+            >
+              {t('Next')}
+            </CustomButton>
           </div>
-          <CustomButton
-            type="primary"
-            disabled={invalidate()}
-            onClick={next}
-            cls="theme"
-            block
-          >
-            {t('Next')}
-          </CustomButton>
         </div>
       </div>
     </div>

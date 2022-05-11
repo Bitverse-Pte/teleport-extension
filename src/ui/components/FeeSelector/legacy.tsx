@@ -10,6 +10,7 @@ import './feeSelector.less';
 import { IconComponent } from 'ui/components/IconComponents';
 import { useLocation } from 'react-router-dom';
 import skynet from 'utils/skynet';
+import { hexWEIToDecGWEI } from '../../../utils/conversion';
 
 const { sensors } = skynet;
 
@@ -36,7 +37,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
 function FeeSelectorLegacy(props) {
   const location = useLocation();
   const dispatch = useDispatch();
-  const { visible, onClose, gasLimit = 21000 } = props;
+  const { visible, onClose, gasLimit = 21000, gasPrice: _gasPrice } = props;
   const wallet = useWallet();
   const [tokens, setTokens] = useState<Token[]>([]);
   const [prices, setPrices] = useState();
@@ -67,7 +68,11 @@ function FeeSelectorLegacy(props) {
     if (tokens) setTokens(tokens);
   };
   useEffect(() => {
-    fetchGasFeeEstimates();
+    if (_gasPrice) {
+      setGasPrice(hexWEIToDecGWEI(_gasPrice));
+    } else {
+      fetchGasFeeEstimates();
+    }
     fetchNativePrice();
   }, []);
   return (

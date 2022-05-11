@@ -10,12 +10,12 @@ export default function configureStore() {
   let storeEnhancers = applyMiddleware(thunkMiddleware);
 
   /**
-   * @todo:
    * Conditional loading redux tool
    */
-  const isLoadingReduxDevtools = true;
+  const shouldLoadReduxDevtools = process.env.REDUX_DEVTOOL_ENABLED;
 
-  if (isLoadingReduxDevtools) {
+  if (shouldLoadReduxDevtools) {
+    console.debug('redux devtools will be loaded at localhost:8001');
     const composeEnhancers = composeWithDevTools({
       name: 'Teleport-Wallet-Extension',
       hostname: 'localhost',
