@@ -1,5 +1,5 @@
-import { CHAINS } from 'constants/chain';
 import type { PresetNetworkId } from 'constants/defaultNetwork';
+import { Bech32Config } from './cosmos';
 
 // just use the enum
 // they are easy to use and never mistaken
@@ -45,8 +45,7 @@ export interface Network {
    */
   ecosystem: Ecosystem;
 
-  // mainly for cosmos / polkadot
-  prefix: string;
+  prefix: string | Bech32Config;
 }
 export interface Provider extends Network {
   type:
@@ -61,6 +60,7 @@ export interface Provider extends Network {
     | 'FANTOM'
     | 'AVAX'
     | 'OP'
+    | 'COSMOS_HUB'
     | 'rpc';
 }
 
