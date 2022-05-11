@@ -23,6 +23,7 @@ import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { nanoid } from 'nanoid';
 import { EthKey } from '../keyManager/eth/EthKey';
+import { CosmosKey } from '../keyManager/cosmos/CosmosKey';
 import { Bip44HdPath, KeyPair, SignatureAlgorithm } from 'types/keyBase';
 import cloneDeep from 'lodash/cloneDeep';
 import { CoinType } from 'types/network';
@@ -383,6 +384,23 @@ class KeyringService extends EventEmitter {
           coinType = p.coinType;
           hdPathCoinType = p.coinType;
           break;
+        case CoinType.COSMOS:
+          hdPath.coinType = CoinType.COSMOS;
+          keyPair = this._createCosmosKeypairByMnemonic(
+            opts.mnemonic,
+            hdPath,
+            p.prefix
+          );
+          if (this._checkDuplicateAccount(keyPair.address)) {
+            return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+          }
+          signatureAlgorithm = SignatureAlgorithm.secp256k1;
+          countOfPhrase = 12;
+          isCompatibleEthereum = false;
+          coinType = p.coinType;
+          hdPathCoinType = p.coinType;
+          break;
+
         default:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
           if (this._checkDuplicateAccount(keyPair.address)) {
@@ -490,6 +508,19 @@ class KeyringService extends EventEmitter {
     hdPath: Bip44HdPath
   ): KeyPair {
     return new EthKey().generateWalletFromMnemonic(mnemonic, hdPath);
+  }
+
+  private _createCosmosKeypairByMnemonic(
+    mnemonic: string,
+    hdPath: Bip44HdPath,
+    prefix: string
+  ): KeyPair {
+    return new CosmosKey().generateWalletFromMnemonic(
+      mnemonic,
+      hdPath,
+      '',
+      prefix
+    );
   }
 
   /**

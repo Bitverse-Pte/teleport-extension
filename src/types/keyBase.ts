@@ -9,11 +9,12 @@ export abstract class KeyBase<T> {
     mnemonic: string,
     hdPath: Bip44HdPath,
     password?: string,
-    addressPrefix?: string,
+    addressPrefix?: string
   ): Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
 
   public abstract generateWalletFromPrivateKey(
-    privateKey: string
+    privateKey: string | Buffer,
+    addressPrefix?: string
   ): Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
 
   public abstract generateSignature(stdTx: T, privateKey: string): string;
