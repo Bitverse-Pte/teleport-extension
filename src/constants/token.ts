@@ -655,4 +655,18 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     display: true,
     themeColor: '#000000',
   },
+  {
+    symbol: 'ATOM',
+    decimal: 6,
+    name: 'ATOM',
+    demon: '',
+    icon: '',
+    chainCustomId: PresetNetworkId.COSMOS_HUB,
+    isNative: true,
+    isCustom: false,
+    contractAddress: '',
+    track: '',
+    display: true,
+    themeColor: '#000000',
+  },
 ];
