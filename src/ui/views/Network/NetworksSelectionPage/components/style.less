@@ -1,25 +1,21 @@
-.narrow-padding {
-    padding: 4px 8px;
-}
-
-
 .network-item {
     /**
       * NetworkSelectionItem
       */
-    padding: 16px 24px 16px 28px;
+    padding: 16px 14px 16px 28px;
     cursor: pointer;
     .actions {
       margin-left: auto;
       height: 16px;
       min-width: 96px;
       justify-content: end;
-      .actions-not-selected {
-        // only when .network-item:hover display
-        justify-content: center;
-        align-items: center;
-        display: none;
+      .display-on-hover {
+        visibility: hidden;
       }
+    }
+
+    button.narrow-padding {
+      padding: 4px 8px !important;
     }
 
     .drag-handle {
@@ -38,8 +34,8 @@
 .network-item:hover {
     background-color: #F8FAFC;
     .actions {
-      .actions-not-selected {
-        display: flex;
+      .display-on-hover {
+        visibility: visible;
       }
     }
     .drag-handle {
