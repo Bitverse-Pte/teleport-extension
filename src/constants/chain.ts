@@ -22,6 +22,8 @@ export enum CHAINS {
   AVAX = 'AVAX',
   OP = 'OP',
   CELO = 'CELO',
+
+  COSMOS_HUB = 'COSMOS_HUB',
 }
 
 export const CHAIN_TO_RPC_URL_MAP = {
