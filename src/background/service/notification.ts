@@ -100,8 +100,9 @@ class NotificationService {
   };
 
   openNotification = (winProps) => {
-    if (this.isLocked) return;
-    this.lock();
+    // remove the isLocked check because we check the lock before, need to check later
+    // if (this.isLocked) return;
+    // this.lock();
     if (this.notifiWindowId) {
       winMgr.remove(this.notifiWindowId);
       this.notifiWindowId = 0;
