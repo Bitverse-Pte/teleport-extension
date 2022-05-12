@@ -18,7 +18,7 @@ export function useProviderList() {
       },
       [Ecosystem.COSMOS]: {
         displayName: 'Cosmos Networks',
-        icon: categoryToIconSVG('BSC'),
+        icon: categoryToIconSVG('COSMOS'),
         networks: [],
       },
       [Ecosystem.POLKADOT]: {

@@ -8,6 +8,7 @@ import FTMIconB from 'assets/chain/with-border/ftm.svg';
 import OPIconB from 'assets/chain/with-border/op.svg';
 import ArbitrumIcon from 'assets/chain/arbitrum.svg';
 import MaticIcon from 'assets/tokens/matic.svg';
+import CosmosAtomIcon from 'assets/tokens/atom.svg';
 import DefaulutIcon from 'assets/tokens/default.svg';
 import { BigNumber } from 'ethers';
 import { PresetNetworkId } from 'constants/defaultNetwork';
@@ -30,6 +31,8 @@ export function categoryToIconSVG(category?: string): string | undefined {
     case 'POLYGON':
     case 'MATIC':
       return MaticIcon;
+    case 'COSMOS':
+      return CosmosAtomIcon;
     // @todo: add new case here
 
     // the fallback icon
