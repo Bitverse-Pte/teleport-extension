@@ -2,6 +2,8 @@ import { ethErrors } from 'eth-rpc-errors';
 import { EthereumProviderError } from 'eth-rpc-errors/dist/classes';
 import { winMgr } from 'background/webapi';
 import { preferenceService } from 'background/service';
+import { browser } from 'webextension-polyfill-ts';
+import EventEmitter from 'events';
 
 interface Approval {
   data?: {
@@ -17,14 +19,16 @@ interface Approval {
   reject?(err: EthereumProviderError<any>): void;
 }
 
+export const UPDATE_BADGE = 'UPDATE_BADGE';
 // something need user approval in window
 // should only open one window, unfocus will close the current notification
-class NotificationService {
+class NotificationService extends EventEmitter {
   approval: Approval | null = null;
   notifiWindowId = 0;
   isLocked = false;
 
   constructor() {
+    super();
     winMgr.event.on('windowRemoved', (winId: number) => {
       if (winId === this.notifiWindowId) {
         this.notifiWindowId = 0;
@@ -54,6 +58,7 @@ class NotificationService {
     console.log('============resolveApproval(data)==========', data);
     this.approval?.resolve && this.approval?.resolve(data);
     this.approval = null;
+    this.emit(UPDATE_BADGE);
   };
 
   rejectApproval = async (err?: string) => {
@@ -61,6 +66,7 @@ class NotificationService {
     this.approval?.reject &&
       this.approval?.reject(ethErrors.provider.userRejectedRequest<any>(err));
     await this.clear();
+    this.emit(UPDATE_BADGE);
   };
 
   // currently it only support one approval at the same time
@@ -79,6 +85,7 @@ class NotificationService {
         resolve,
         reject,
       };
+      this.emit(UPDATE_BADGE);
       !preferenceService.popupOpen && this.openNotification(winProps);
     });
   };
@@ -100,8 +107,9 @@ class NotificationService {
   };
 
   openNotification = (winProps) => {
-    if (this.isLocked) return;
-    this.lock();
+    // remove the isLocked check because we check the lock before, need to check later
+    // if (this.isLocked) return;
+    // this.lock();
     if (this.notifiWindowId) {
       winMgr.remove(this.notifiWindowId);
       this.notifiWindowId = 0;

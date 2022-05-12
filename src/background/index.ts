@@ -16,11 +16,13 @@ import {
   latestBlockDataHub,
   txController,
   contactBookService,
+  notificationService,
 } from './service';
 import { providerController, walletController } from './controller';
 import i18n from './service/i18n';
 import eventBus from 'eventBus';
 import DataSyncService from './service/dataSyncService';
+import { UPDATE_BADGE } from './service/notification';
 
 const { PortMessage } = Message;
 
@@ -76,11 +78,18 @@ async function restoreAppState() {
   });
 
   appStoreLoaded = true;
-
   // initAppMeta();
 }
 
+function updateBadge() {
+  const count = notificationService.getApproval() ? '1' : '';
+  chrome.action.setBadgeText({ text: count });
+  chrome.action.setBadgeBackgroundColor({ color: '#1484F5' });
+}
+
 restoreAppState();
+updateBadge();
+notificationService.on(UPDATE_BADGE, updateBadge);
 
 // for page provider
 browser.runtime.onConnect.addListener((port) => {
