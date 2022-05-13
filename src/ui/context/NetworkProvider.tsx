@@ -12,6 +12,9 @@ import {
   getCustomProvidersSelector,
   getEnabledProvidersSelector,
 } from 'ui/selectors/network.selector';
+import { ErrorCode } from 'constants/code';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Design was based on MetaMask
@@ -72,6 +75,8 @@ export function NetworkStoreProvider({
 
   const dispatch = useDispatch();
 
+  const { t } = useTranslation();
+
   const currentNetworkController = useSelector((state) => state.network);
 
   const customProviders = useSelector(getCustomProvidersSelector);
@@ -82,8 +87,13 @@ export function NetworkStoreProvider({
       try {
         await wallet.useCustomNetwork(networkId);
         await wallet.fetchLatestBlockDataNow();
-      } catch (error) {
+      } catch (error: any) {
         console.error('useCustomProvider::error', error);
+        if (error?.code && error.code === ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+          ClickToCloseMessage.error(
+            t('SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST')
+          );
+        }
       } finally {
         dispatch(hideLoadingIndicator());
       }
@@ -120,8 +130,13 @@ export function NetworkStoreProvider({
       try {
         await wallet.useDefaultNetwork(chain);
         await wallet.fetchLatestBlockDataNow();
-      } catch (error) {
+      } catch (error: any) {
         console.error('usePresetProvider::error:', error);
+        if (error?.code && error.code === ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+          ClickToCloseMessage.error(
+            t('SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST')
+          );
+        }
       } finally {
         dispatch(hideLoadingIndicator());
       }
