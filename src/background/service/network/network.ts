@@ -364,6 +364,10 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       networks,
     });
+    this.setProviderConfig({
+      ...newSettings,
+      type: 'rpc',
+    });
     return newSettings;
   }
 

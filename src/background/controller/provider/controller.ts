@@ -377,7 +377,7 @@ class ProviderController extends BaseController {
      */
 
     const providers = networkPreferenceService.getAllProviders();
-    const matchedProvider = providers.find((p) => {
+    const matchedSameChainIdProvider = providers.find((p) => {
       /**
        * If these are matched at the same time,
        * then they are treated as existed provider:
@@ -386,10 +386,16 @@ class ProviderController extends BaseController {
       return BigNumber.from(p.chainId).eq(chainParams.chainId);
     });
 
-    if (matchedProvider) {
+    if (matchedSameChainIdProvider) {
       // switch instead of add
-      networkPreferenceService.setProviderConfig(matchedProvider);
+      networkPreferenceService.setProviderConfig(matchedSameChainIdProvider);
       return null;
+    }
+    let newChainName: string = chainParams.chainName;
+    if (providers.find((p) => p.nickname === chainParams.chainName)) {
+      newChainName = `${chainParams.chainName} (${Number(
+        chainParams.chainId
+      )})`;
     }
 
     /**
@@ -397,7 +403,7 @@ class ProviderController extends BaseController {
      * so the type of `chainParams` is `AddEthereumChainParameter`
      */
     const network = networkPreferenceService.addCustomNetwork(
-      chainParams.chainName,
+      newChainName,
       chainParams.rpcUrls[0],
       chainParams.chainId,
       chainParams.nativeCurrency.symbol,

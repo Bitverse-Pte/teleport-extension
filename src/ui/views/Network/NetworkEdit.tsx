@@ -15,7 +15,7 @@ import { Button, Input, Select } from 'antd';
 import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import clsx from 'clsx';
 import skynet from 'utils/skynet';
@@ -137,17 +137,21 @@ const NetworkEdit = () => {
     },
     [customNetworks]
   );
-
+  const dispatch = useDispatch();
   const editNetwork = useCallback(
-    async ({
-      chainId,
-      explorerUrl,
-      networkName,
-      rpcUrl,
-      symbol,
-    }: {
-      [x: string]: string;
-    }) => {
+    async (
+      {
+        chainId,
+        explorerUrl,
+        networkName,
+        rpcUrl,
+        symbol,
+      }: {
+        [x: string]: string;
+      },
+      { setSubmitting }: { setSubmitting: (v: boolean) => void }
+    ) => {
+      dispatch(showLoadingIndicator());
       if (isEdit) {
         console.debug(`Editing Custom Provider ID ${id}`);
         await networkContext?.editCustomProvider(
@@ -183,7 +187,8 @@ const NetworkEdit = () => {
           explorerUrl: explorerUrl,
         });
       }
-
+      dispatch(hideLoadingIndicator());
+      setSubmitting(false);
       ClickToCloseMessage.success({
         content: t('Custom Provider Saved!'),
       });
@@ -333,10 +338,7 @@ const NetworkEdit = () => {
         <Formik
           initialValues={fieldsPresetValues}
           validate={validateFields}
-          onSubmit={async (values, { setSubmitting }) => {
-            await editNetwork(values);
-            setSubmitting(false);
-          }}
+          onSubmit={editNetwork}
         >
           {({ isSubmitting, ...formilk }) => {
             const isFormNotFinished = Object.keys(formilk.errors).length > 0;

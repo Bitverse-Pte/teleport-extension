@@ -5,12 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Provider } from 'types/network';
-import { IconButton } from 'ui/components/IconButton';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
-import IconTrash from 'assets/action-icon/trash.svg';
-import IconEdit from 'assets/action-icon/edit.svg';
-import { IconComponent } from 'ui/components/IconComponents';
+import { ReactComponent as IconTrash } from 'assets/action-icon/trash.svg';
+import { ReactComponent as IconEdit } from 'assets/action-icon/edit.svg';
+import { ReactComponent as CheckIcon } from 'assets/action-icon/check.svg';
 import './style.less';
 import skynet from 'utils/skynet';
 import { useJumpToExpandedView } from 'ui/hooks/utils/useJumpToExpandedView';
@@ -94,26 +93,12 @@ export function NetworkSelectionItem({
 
 const NetworkActions = ({ network }: { network: Provider }) => {
   const currentProviderId = useSelector((s) => s.network.provider.id);
+  const jumpToExpandedView = useJumpToExpandedView();
+  const providerContext = useContext(NetworkProviderContext);
+  const { t } = useTranslation();
   const isSelectedNetwork = useMemo(() => {
     return network.id === currentProviderId;
   }, [network, currentProviderId]);
-  return (
-    <span className="actions flex">
-      {isSelectedNetwork ? (
-        <IconComponent name="check" />
-      ) : (
-        <div className="actions-not-selected">
-          <RpcNetworkOptions network={network} />
-        </div>
-      )}
-    </span>
-  );
-};
-
-const RpcNetworkOptions = ({ network }: { network: Provider }) => {
-  const providerContext = useContext(NetworkProviderContext);
-  const { t } = useTranslation();
-  const jumpToExpandedView = useJumpToExpandedView();
 
   const handleRemove = useCallback(
     (e: React.MouseEvent<any>) => {
@@ -134,34 +119,41 @@ const RpcNetworkOptions = ({ network }: { network: Provider }) => {
     [providerContext]
   );
 
-  if (!providerContext) {
-    return <p>{t('loading')}</p>;
-  }
-
-  if (network.type !== 'rpc') {
-    // Only `rpc` type are editable
-    // other type was preset that cannot edit
-    return null;
-  }
+  const hoverToDisplayProperties = {
+    hidden: network.type !== 'rpc',
+    'display-on-hover': !isSelectedNetwork,
+  };
 
   return (
-    <div className="flex justify-center items-center">
-      <IconButton
-        icon={IconTrash}
-        className="narrow-padding"
-        size={16}
-        onClick={handleRemove}
-      />
-      <IconButton
-        icon={IconEdit}
-        size={16}
-        className="narrow-padding"
-        onClick={(e) => {
-          // stop the parent's onClick event
-          e.stopPropagation();
-          jumpToExpandedView(`/network/edit/${network.id}`);
-        }}
-      />
-    </div>
+    <span className="actions flex">
+      <div className="flex justify-center items-center">
+        <Button
+          className={clsx(hoverToDisplayProperties, 'narrow-padding')}
+          onClick={handleRemove}
+          disabled={isSelectedNetwork}
+          type="text"
+        >
+          <IconTrash width={16} fill={isSelectedNetwork ? '#5E6C8A' : '#000'} />
+        </Button>
+
+        <Button
+          className={clsx(hoverToDisplayProperties, 'narrow-padding')}
+          type="text"
+          onClick={(e) => {
+            // stop the parent's onClick event
+            e.stopPropagation();
+            jumpToExpandedView(`/network/edit/${network.id}`);
+          }}
+        >
+          <IconEdit width={16} />
+        </Button>
+        <Button
+          className={clsx('narrow-padding', !isSelectedNetwork && 'hidden')}
+          type="text"
+        >
+          <CheckIcon width={16} />
+        </Button>
+      </div>
+    </span>
   );
 };
