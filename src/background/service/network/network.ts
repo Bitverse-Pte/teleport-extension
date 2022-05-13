@@ -16,7 +16,12 @@ import { ErrorCode } from 'constants/code';
 import BitError from 'error';
 import { providerFromEngine } from 'eth-json-rpc-middleware';
 import Eth from 'ethjs';
-import { sessionService, TokenService } from '../index';
+import {
+  keyringService,
+  preferenceService,
+  sessionService,
+  TokenService,
+} from '../index';
 import { ObservableStorage } from '../../utils/obsStorage';
 import EventEmitter from 'events';
 import log from 'loglevel';
@@ -54,6 +59,7 @@ import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
 import { parseStringTemplate } from 'utils/string';
 import { addHexPrefix } from 'ethereumjs-util';
+import { BaseAccount } from 'types/extend';
 
 const toHexString = (val: string | number) =>
   addHexPrefix(Number(val).toString(16));
@@ -670,6 +676,8 @@ class NetworkPreferenceService extends EventEmitter {
    * Sets the provider config and switches the network.
    */
   setProviderConfig(config: Provider) {
+    if (!this._checkAccountExistWithChain(config))
+      throw new BitError(ErrorCode.ACCOUNT_DOES_NOT_EXIST);
     const copiedConfig = config;
     copiedConfig.rpcUrl = parseStringTemplate(copiedConfig.rpcUrl, {
       INFURA_API_KEY: process.env.INFURA_PROJECT_ID as string,
@@ -678,11 +686,44 @@ class NetworkPreferenceService extends EventEmitter {
       previousProviderStore: this.getProviderConfig(),
       provider: copiedConfig,
     });
+    this._setDestinationChainAccount(config);
     if (config.ecosystem === Ecosystem.EVM) {
       /**
        * Only trigger this fn when provider is EVM ecosystem
        */
       this._switchNetwork(copiedConfig);
+    }
+  }
+
+  private _checkAccountExistWithChain(chain: Provider): boolean {
+    const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
+    return (
+      (chain.coinType === CoinType.ETH &&
+        allAccounts.some((a: BaseAccount) => a.coinType === CoinType.ETH)) ||
+      (chain.coinType === CoinType.ETH &&
+        allAccounts.some((a: BaseAccount) => a.chainCustomId === chain.id))
+    );
+  }
+
+  private _setDestinationChainAccount(chain: Provider) {
+    const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
+    const currentAccount: BaseAccount | null | undefined =
+      preferenceService.getCurrentAccount();
+    if (chain.coinType === CoinType.ETH) {
+      if (currentAccount?.coinType === CoinType.ETH) return;
+      const evmAccounts: BaseAccount[] = allAccounts.filter(
+        (a: BaseAccount) => a.coinType === CoinType.ETH
+      );
+      if (evmAccounts && evmAccounts.length > 0) {
+        preferenceService.setCurrentAccount(evmAccounts[0]);
+      }
+    } else {
+      const accounts: BaseAccount[] = allAccounts.filter(
+        (a: BaseAccount) => a.chainCustomId === chain.id
+      );
+      if (accounts && accounts.length > 0) {
+        preferenceService.setCurrentAccount(accounts[0]);
+      }
     }
   }
 
@@ -729,7 +770,10 @@ class NetworkPreferenceService extends EventEmitter {
     const supportProviders: Provider[] = [];
     presetProviders.forEach((p: Provider) => {
       if (
-        supportProviders.every((subP: Provider) => subP.coinType !== p.coinType)
+        supportProviders.every(
+          (subP: Provider) =>
+            !(subP.coinType === p.coinType && subP.coinType === CoinType.ETH)
+        )
       ) {
         supportProviders.push(p);
       }

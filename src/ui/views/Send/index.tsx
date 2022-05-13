@@ -201,16 +201,9 @@ const Send = () => {
     params.txParam.gas = draftTransaction.gas;
     if (isSupport1559) {
       delete params.gasPrice;
-      params.maxFeePerGas = draftTransaction.maxFeePerGas;
-      params.maxPriorityFeePerGas = draftTransaction.maxPriorityFeePerGas;
-      params.txParam.maxFeePerGas = draftTransaction.maxFeePerGas;
-      params.txParam.maxPriorityFeePerGas =
-        draftTransaction.maxPriorityFeePerGas;
     } else {
       delete params.maxFeePerGas;
       delete params.maxPriorityFeePerGas;
-      params.gasPrice = draftTransaction.gasPrice;
-      params.txParam.gasPrice = draftTransaction.gasPrice;
     }
     await wallet.addContactByDefaultName(toAddress);
     wallet.sendRequest({

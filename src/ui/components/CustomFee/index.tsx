@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { SET_CUSTOM_DATA, SET_CUSTOM_TYPE } from 'ui/reducer/gas.reducer';
 import './customFee.less';
 import { Form, Button } from 'antd';
+import { hexWEIToDecGWEI } from '../../../utils/conversion';
 
 function CustomFee(props) {
   // const gasReducer = useSelector((state) => state.gas);
@@ -10,6 +11,8 @@ function CustomFee(props) {
     onSubmit,
     selectFee: { suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas },
     gasLimit,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
   } = props;
   const [gl, setGl] = useState(gasLimit);
   const [mf, setMf] = useState(suggestedMaxFeePerGas);
@@ -30,8 +33,16 @@ function CustomFee(props) {
   };
   useEffect(() => {
     setGl(gasLimit);
-    setMf(suggestedMaxFeePerGas);
-    setMp(suggestedMaxPriorityFeePerGas);
+    if (maxFeePerGas) {
+      setMf(hexWEIToDecGWEI(maxFeePerGas));
+    } else {
+      setMf(suggestedMaxFeePerGas);
+    }
+    if (maxPriorityFeePerGas) {
+      setMp(hexWEIToDecGWEI(maxPriorityFeePerGas));
+    } else {
+      setMp(suggestedMaxPriorityFeePerGas);
+    }
   }, [gasLimit, suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas]);
   return (
     <div className="custom-fee">

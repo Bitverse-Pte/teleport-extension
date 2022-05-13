@@ -23,10 +23,13 @@ import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { nanoid } from 'nanoid';
 import { EthKey } from '../keyManager/eth/EthKey';
+import { CosmosKey } from '../keyManager/cosmos/CosmosKey';
 import { Bip44HdPath, KeyPair, SignatureAlgorithm } from 'types/keyBase';
 import cloneDeep from 'lodash/cloneDeep';
 import { CoinType } from 'types/network';
 import secp256k1_1 from 'ethereum-cryptography/secp256k1';
+import { Bech32Config } from 'types/cosmos';
+import { PresetNetworkId } from 'constants/defaultNetwork';
 
 export interface IStorageState {
   booted: string;
@@ -224,6 +227,7 @@ class KeyringService extends EventEmitter {
       countOfPhrase,
       signatureAlgorithm,
       accountCreateType: AccountCreateType.PRIVATE_KEY,
+      chainCustomId: opts.chainCustomId,
     };
     const secret: Secret = {
       privateKey: keyPair.privateKey,
@@ -361,6 +365,7 @@ class KeyringService extends EventEmitter {
       countOfPhrase: 0,
       signatureAlgorithm: SignatureAlgorithm.secp256k1,
       accountCreateType: AccountCreateType.MNEMONIC,
+      chainCustomId: '',
     };
     const currentCoinType =
       networkPreferenceService.getProviderConfig().coinType;
@@ -370,7 +375,8 @@ class KeyringService extends EventEmitter {
         countOfPhrase: number,
         isCompatibleEthereum: boolean,
         coinType: CoinType,
-        hdPathCoinType: number;
+        hdPathCoinType: number,
+        chainCustomId: PresetNetworkId | string;
       switch (p.coinType) {
         case CoinType.ETH:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
@@ -382,6 +388,63 @@ class KeyringService extends EventEmitter {
           isCompatibleEthereum = true;
           coinType = p.coinType;
           hdPathCoinType = p.coinType;
+          chainCustomId = PresetNetworkId.ETHEREUM;
+          break;
+        case CoinType.COSMOS:
+          switch (p.id) {
+            case PresetNetworkId.COSMOS_HUB:
+            default:
+              hdPath.coinType = CoinType.COSMOS;
+              keyPair = this._createCosmosKeypairByMnemonic(
+                opts.mnemonic,
+                hdPath,
+                (p.prefix as Bech32Config).bech32PrefixAccAddr
+              );
+              if (this._checkDuplicateAccount(keyPair.address)) {
+                return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+              }
+              signatureAlgorithm = SignatureAlgorithm.secp256k1;
+              countOfPhrase = 12;
+              isCompatibleEthereum = false;
+              coinType = p.coinType;
+              hdPathCoinType = p.coinType;
+              chainCustomId = PresetNetworkId.COSMOS_HUB;
+              break;
+            case PresetNetworkId.OSMOSIS:
+              hdPath.coinType = CoinType.COSMOS;
+              keyPair = this._createCosmosKeypairByMnemonic(
+                opts.mnemonic,
+                hdPath,
+                (p.prefix as Bech32Config).bech32PrefixAccAddr
+              );
+              if (this._checkDuplicateAccount(keyPair.address)) {
+                return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+              }
+              signatureAlgorithm = SignatureAlgorithm.secp256k1;
+              countOfPhrase = 12;
+              isCompatibleEthereum = false;
+              coinType = p.coinType;
+              hdPathCoinType = p.coinType;
+              chainCustomId = PresetNetworkId.OSMOSIS;
+              break;
+          }
+          break;
+        case CoinType.SECRET_NETWORK:
+          hdPath.coinType = CoinType.SECRET_NETWORK;
+          keyPair = this._createCosmosKeypairByMnemonic(
+            opts.mnemonic,
+            hdPath,
+            (p.prefix as Bech32Config).bech32PrefixAccAddr
+          );
+          if (this._checkDuplicateAccount(keyPair.address)) {
+            return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+          }
+          signatureAlgorithm = SignatureAlgorithm.secp256k1;
+          countOfPhrase = 12;
+          isCompatibleEthereum = false;
+          coinType = p.coinType;
+          hdPathCoinType = p.coinType;
+          chainCustomId = PresetNetworkId.SECRET_NETWORK;
           break;
         default:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
@@ -393,6 +456,7 @@ class KeyringService extends EventEmitter {
           isCompatibleEthereum = true;
           coinType = p.coinType;
           hdPathCoinType = p.coinType;
+          chainCustomId = PresetNetworkId.ETHEREUM;
       }
       const account: BaseAccount = {
         address: keyPair.address,
@@ -409,6 +473,7 @@ class KeyringService extends EventEmitter {
         countOfPhrase,
         signatureAlgorithm,
         accountCreateType: AccountCreateType.MNEMONIC,
+        chainCustomId,
       };
       if (coinType === currentCoinType) {
         newDisplayAccount = Object.assign(account, {});
@@ -490,6 +555,19 @@ class KeyringService extends EventEmitter {
     hdPath: Bip44HdPath
   ): KeyPair {
     return new EthKey().generateWalletFromMnemonic(mnemonic, hdPath);
+  }
+
+  private _createCosmosKeypairByMnemonic(
+    mnemonic: string,
+    hdPath: Bip44HdPath,
+    prefix: string
+  ): KeyPair {
+    return new CosmosKey().generateWalletFromMnemonic(
+      mnemonic,
+      hdPath,
+      '',
+      prefix
+    );
   }
 
   /**

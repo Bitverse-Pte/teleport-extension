@@ -7,6 +7,9 @@ interface FeeSelectorProps {
   visible: boolean;
   onClose: (...args: any[]) => void;
   gasLimit: number;
+  gasPrice: string;
+  maxFeePerGas: string;
+  maxPriorityFeePerGas: string;
 }
 
 function FeeSelector(props: FeeSelectorProps) {

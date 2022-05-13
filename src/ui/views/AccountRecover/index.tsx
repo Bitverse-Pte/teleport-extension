@@ -23,6 +23,7 @@ import { useSeedPhraseValidation } from 'ui/hooks/validation/useSeedPhraseValida
 import { usePrivateKeyValidation } from 'ui/hooks/validation/usePrivateKeyValidation';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
+import { PresetNetworkId } from 'constants/defaultNetwork';
 const { sensors } = skynet;
 
 const { TextArea } = Input;
@@ -216,6 +217,7 @@ const AccountRecover = () => {
         privateKey: privateKey.startsWith('0x')
           ? privateKey.trim()
           : `0x${privateKey.trim()}`,
+        chainCustomId: PresetNetworkId.COSMOS_HUB,
       };
       if (policyShow) {
         importAccountOpts.password = psd;
