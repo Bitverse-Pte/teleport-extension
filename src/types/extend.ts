@@ -1,3 +1,4 @@
+import { PresetNetworkId } from 'constants/defaultNetwork';
 import { SignatureAlgorithm } from 'types/keyBase';
 import { CoinType } from 'types/network';
 
@@ -27,6 +28,7 @@ export interface BaseAccount {
   signatureAlgorithm: SignatureAlgorithm;
   accountCreateType: AccountCreateType;
   deletedHdPathIndex?: number[];
+  chainCustomId: PresetNetworkId | string;
 }
 
 export interface Secret {
@@ -47,6 +49,7 @@ export interface ImportAccountOpts {
   privateKey: string;
   coinType: CoinType;
   password?: string;
+  chainCustomId: PresetNetworkId | string;
 }
 
 export interface HdAccountStruct {

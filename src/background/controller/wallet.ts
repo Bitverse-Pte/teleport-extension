@@ -330,12 +330,10 @@ export class WalletController extends BaseController {
     return networkPreferenceService.getProviderConfig();
   }
 
-  // TODO (Jayce) test code  
+  // TODO (Jayce) test code
   getCurrentChains(): Provider[] {
     return networkPreferenceService.getSupportProviders();
   }
-
-
 
   getTokenBalancesAsync = (showHideToken?: boolean): Promise<Token[]> => {
     const account = preferenceService.getCurrentAccount();
