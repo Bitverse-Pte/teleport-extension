@@ -12,6 +12,8 @@ export enum PresetNetworkId {
   OP = 'op',
   TELE_TEST = 'teleport_testnet',
   COSMOS_HUB = 'cosmos_hub',
+  OSMOSIS = 'osmosis',
+  SECRET_NETWORK = 'secret_network',
 }
 
 const EVMProviderSharedProperties = {

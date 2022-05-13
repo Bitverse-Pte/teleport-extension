@@ -8,12 +8,12 @@ import {
 
 // just use the enum
 // they are easy to use and never mistaken
+
 export enum CoinType {
-  ETH = 60, // 0
-  COSMOS = 118, // 1
+  ETH = 60,
+  COSMOS = 118,
   POLKADOT = 354,
-  // SOME_OTHER_CHAIN_COIN // 2 etc...
-  // You can add as you like
+  SECRET_NETWORK = 529,
 }
 
 export enum Ecosystem {
@@ -72,6 +72,8 @@ export interface Provider extends Network {
     | 'AVAX'
     | 'OP'
     | 'COSMOS_HUB'
+    | 'OSMOSIS'
+    | 'SECRET_NETWORK'
     | 'rpc';
 }
 
