@@ -24,6 +24,8 @@ export enum CHAINS {
   CELO = 'CELO',
 
   COSMOS_HUB = 'COSMOS_HUB',
+  OSMOSIS = 'OSMOSIS',
+  SECRET_NETWORK = 'SECRET_NETWORK',
 }
 
 export const CHAIN_TO_RPC_URL_MAP = {

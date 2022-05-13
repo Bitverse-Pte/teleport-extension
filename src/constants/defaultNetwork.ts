@@ -12,6 +12,8 @@ export enum PresetNetworkId {
   OP = 'op',
   TELE_TEST = 'teleport_testnet',
   COSMOS_HUB = 'cosmos_hub',
+  OSMOSIS = 'osmosis',
+  SECRET_NETWORK = 'secret_network',
 }
 
 const EVMProviderSharedProperties = {
@@ -155,6 +157,127 @@ export const defaultNetworks: {
         },
       ],
       features: ['ibc-transfer', 'ibc-go'],
+    },
+  },
+  /** @TODO might need to remove in the future */
+  [CHAINS.OSMOSIS]: {
+    id: PresetNetworkId.OSMOSIS,
+    type: CHAINS.OSMOSIS,
+    rpcUrl: 'https://rpc-osmosis.keplr.app',
+    chainId: 'osmosis-1',
+    ticker: 'OSMO',
+    nickname: 'Osmosis',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://www.mintscan.io/osmosis/',
+    },
+    chainName: 'OSMOSIS',
+    coinType: CoinType.COSMOS,
+    ecosystem: Ecosystem.COSMOS,
+    prefix: Bech32Address.defaultBech32Config('osmo'),
+    ecoSystemParams: {
+      rest: 'https://lcd-osmosis.keplr.app',
+      stakeCurrency: {
+        coinDenom: 'OSMO',
+        coinMinimalDenom: 'uosmo',
+        coinDecimals: 6,
+        coinGeckoId: 'osmosis',
+      },
+      walletUrl:
+        process.env.NODE_ENV === 'production'
+          ? 'https://app.osmosis.zone'
+          : 'https://app.osmosis.zone',
+      walletUrlForStaking:
+        process.env.NODE_ENV === 'production'
+          ? 'https://wallet.keplr.app/#/osmosis/stake'
+          : 'http://localhost:8080/#/osmosis/stake',
+      currencies: [
+        {
+          coinDenom: 'OSMO',
+          coinMinimalDenom: 'uosmo',
+          coinDecimals: 6,
+          coinGeckoId: 'osmosis',
+        },
+        {
+          coinDenom: 'ION',
+          coinMinimalDenom: 'uion',
+          coinDecimals: 6,
+          coinGeckoId: 'ion',
+        },
+      ],
+      feeCurrencies: [
+        {
+          coinDenom: 'OSMO',
+          coinMinimalDenom: 'uosmo',
+          coinDecimals: 6,
+          coinGeckoId: 'osmosis',
+        },
+      ],
+      gasPriceStep: {
+        low: 0,
+        average: 0.025,
+        high: 0.04,
+      },
+      features: ['ibc-transfer', 'ibc-go', 'cosmwasm'],
+    },
+  },
+  [CHAINS.SECRET_NETWORK]: {
+    id: PresetNetworkId.SECRET_NETWORK,
+    type: CHAINS.SECRET_NETWORK,
+    rpcUrl: 'https://rpc-secret.keplr.app',
+    chainId: 'secret-4',
+    ticker: 'SCRT',
+    nickname: 'Secret Network',
+    rpcPrefs: {
+      // did not see any scan for secret network
+      //   blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+    },
+    chainName: 'SECRET',
+    coinType: CoinType.SECRET_NETWORK,
+    ecosystem: Ecosystem.COSMOS,
+    prefix: Bech32Address.defaultBech32Config('secret'),
+    ecoSystemParams: {
+      rest: 'https://lcd-secret.keplr.app',
+      stakeCurrency: {
+        coinDenom: 'SCRT',
+        coinMinimalDenom: 'uscrt',
+        coinDecimals: 6,
+        coinGeckoId: 'secret',
+      },
+      walletUrl:
+        process.env.NODE_ENV === 'production'
+          ? 'https://wallet.keplr.app/#/secret/stake'
+          : 'http://localhost:8080/#/secret/stake',
+      walletUrlForStaking:
+        process.env.NODE_ENV === 'production'
+          ? 'https://wallet.keplr.app/#/secret/stake'
+          : 'http://localhost:8080/#/secret/stake',
+      alternativeBIP44s: [
+        {
+          coinType: 118,
+        },
+      ],
+      currencies: [
+        {
+          coinDenom: 'SCRT',
+          coinMinimalDenom: 'uscrt',
+          coinDecimals: 6,
+          coinGeckoId: 'secret',
+        },
+      ],
+      feeCurrencies: [
+        {
+          coinDenom: 'SCRT',
+          coinMinimalDenom: 'uscrt',
+          coinDecimals: 6,
+          coinGeckoId: 'secret',
+        },
+      ],
+      gasPriceStep: {
+        low: 0.0125,
+        average: 0.1,
+        high: 0.25,
+      },
+      features: ['secretwasm', 'ibc-go', 'ibc-transfer'],
     },
   },
 };
