@@ -410,7 +410,41 @@ class KeyringService extends EventEmitter {
               hdPathCoinType = p.coinType;
               chainCustomId = PresetNetworkId.COSMOS_HUB;
               break;
+            case PresetNetworkId.OSMOSIS:
+              hdPath.coinType = CoinType.COSMOS;
+              keyPair = this._createCosmosKeypairByMnemonic(
+                opts.mnemonic,
+                hdPath,
+                (p.prefix as Bech32Config).bech32PrefixAccAddr
+              );
+              if (this._checkDuplicateAccount(keyPair.address)) {
+                return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+              }
+              signatureAlgorithm = SignatureAlgorithm.secp256k1;
+              countOfPhrase = 12;
+              isCompatibleEthereum = false;
+              coinType = p.coinType;
+              hdPathCoinType = p.coinType;
+              chainCustomId = PresetNetworkId.OSMOSIS;
+              break;
           }
+          break;
+        case CoinType.SECRET_NETWORK:
+          hdPath.coinType = CoinType.SECRET_NETWORK;
+          keyPair = this._createCosmosKeypairByMnemonic(
+            opts.mnemonic,
+            hdPath,
+            (p.prefix as Bech32Config).bech32PrefixAccAddr
+          );
+          if (this._checkDuplicateAccount(keyPair.address)) {
+            return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+          }
+          signatureAlgorithm = SignatureAlgorithm.secp256k1;
+          countOfPhrase = 12;
+          isCompatibleEthereum = false;
+          coinType = p.coinType;
+          hdPathCoinType = p.coinType;
+          chainCustomId = PresetNetworkId.SECRET_NETWORK;
           break;
         default:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);

@@ -56,6 +56,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
     const accounts: ICustomChain[] = await wallet.getAccountListByHdWalletId(
       hdWalletId
     );
+    console.log(accounts);
     const currentAccount: BaseAccount | null = await wallet.getCurrentAccount();
     const displayAccounts: IDisplayAccountManage[] = [];
 
@@ -76,11 +77,16 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
         );
         if (chains?.length) {
           chains.forEach((p: Provider) => {
-            const chainItem = {
-              chainCustomId: p.id,
-              chainName: p.nickname,
-            };
-            a?.chainList?.push(chainItem);
+            if (
+              (a.coinType !== CoinType.ETH && a.chainCustomId === p.id) ||
+              a.coinType === CoinType.ETH
+            ) {
+              const chainItem = {
+                chainCustomId: p.id,
+                chainName: p.nickname,
+              };
+              a?.chainList?.push(chainItem);
+            }
           });
         }
         if (

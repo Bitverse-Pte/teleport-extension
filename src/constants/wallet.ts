@@ -49,7 +49,7 @@ export const CoinTypeEcosystemMapping: {
     ecosystemName: 'EVM Networks',
   },
   [Ecosystem.COSMOS]: {
-    coinType: [CoinType.COSMOS],
+    coinType: [CoinType.COSMOS, CoinType.SECRET_NETWORK],
     ecosystemName: 'Cosmos Networks',
   },
   [Ecosystem.POLKADOT]: {
