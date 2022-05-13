@@ -13,6 +13,9 @@
   "Swap": {
     "message": "Swap"
   },
+  "SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST": {
+    "message": "You do not have account in that network"
+  },
   "History": {
     "message": "History"
   },
