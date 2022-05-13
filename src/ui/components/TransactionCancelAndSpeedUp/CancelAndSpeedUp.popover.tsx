@@ -4,7 +4,7 @@ import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EDIT_GAS_MODES, PRIORITY_LEVELS } from 'constants/gas';
 import { Transaction } from 'constants/transaction';
-import { Button, InputNumber } from 'antd';
+import { Button, Drawer, InputNumber } from 'antd';
 import { addTenPercentAndRound as _addTenPercentAndRound } from 'ui/helpers/utils/gas';
 import { SimpleModal } from 'ui/components/universal/SimpleModal';
 import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
@@ -24,6 +24,7 @@ import clsx from 'clsx';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { MIN_GAS_LIMIT_DEC } from 'ui/context/send.constants';
 import { useSetState } from 'react-use';
+import { IconComponent } from '../IconComponents';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -76,8 +77,8 @@ const TierItem = ({
   gasPrice,
   gasLimit = 21000,
   selected,
-  disabled,
   onClick,
+  ...props
 }: {
   levelName: string;
   estimateTime: string;
@@ -85,6 +86,7 @@ const TierItem = ({
   gasLimit?: string | number;
   selected: boolean;
   disabled?: boolean;
+  fast?: boolean;
   onClick?: (e: any) => void;
 }) => {
   const nativeToken = useSelector(getCurrentProviderNativeToken);
@@ -93,10 +95,10 @@ const TierItem = ({
     <div
       className={clsx('tier', {
         selected: selected,
-        disabled: disabled,
+        disabled: props.disabled,
       })}
       onClick={
-        !disabled
+        !props.disabled
           ? onClick
           : () =>
               ClickToCloseMessage.error(
@@ -105,9 +107,16 @@ const TierItem = ({
       }
     >
       <div className="level-name bold">{levelName}</div>
-      <div className="estimate-time">{estimateTime}</div>
+      <div
+        className={clsx('estimate-time narrow-letter-spacing', {
+          fast: props.fast,
+          bold: props.fast,
+        })}
+      >
+        {estimateTime}
+      </div>
       <div className="maximum-charge">
-        <span className="amount">
+        <span className="amount narrow-letter-spacing">
           {utils.formatEther(gasPrice.mul(gasLimit))}
         </span>
         {nativeToken?.symbol}
@@ -115,6 +124,23 @@ const TierItem = ({
     </div>
   );
 };
+
+const DrawerHeader = (props: {
+  title: string;
+  handleCloseIconClick: () => void;
+}) => {
+  return (
+    <div className="drawer-header-container-common flexR">
+      <span className="drawer-header-title">{props.title}</span>
+      <IconComponent
+        name="close"
+        onClick={props.handleCloseIconClick}
+        cls="drawer-header-close-icon"
+      />
+    </div>
+  );
+};
+
 const CancelSpeedupPopoverImplementation = ({
   editGasMode,
   transaction: _transaction,
@@ -275,6 +301,7 @@ const CancelSpeedupPopoverImplementation = ({
           disabled={BigNumber.from(add10PercentTxParams.maxFeePerGas).gt(
             parsedMFPG('high')
           )}
+          fast
           onClick={() => setGasTier(PRIORITY_LEVELS.HIGH)}
         />
       </Fragment>
@@ -294,18 +321,35 @@ const CancelSpeedupPopoverImplementation = ({
   }, [gasLimit, currentBlockMaxGasLimit]);
 
   return (
-    // <div className="cancel-speedup-popover">
-    <SimpleModal
-      title={editGasMode === EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp')}
-      modalCustomStyle={{
-        marginTop: '10px',
-      }}
+    <Drawer
+      height={422}
       visible={showPopOver}
-      isTitleCentered={false}
       onClose={() => {
         setShowPopOver(false);
       }}
+      placement="bottom"
+      closable={false}
+      bodyStyle={{
+        boxSizing: 'border-box',
+        padding: '0 24px 24px 24px',
+      }}
+      contentWrapperStyle={{
+        borderRadius: '16px 16px 0 0',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
+      key="top"
     >
+      <DrawerHeader
+        title={
+          editGasMode === EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp')
+        }
+        handleCloseIconClick={() => {
+          if (setShowPopOver) {
+            setShowPopOver(false);
+          }
+        }}
+      />
       <div className="cancel-speedup-popover__wrapper">
         <h6
           className="flex items-center flex-wrap"
@@ -325,7 +369,7 @@ const CancelSpeedupPopoverImplementation = ({
         <div className="cancel-speedup-popover__separator" />
 
         <div className="tier-select">
-          <div className="tier">
+          <div className="tier-header">
             <div className="level-name bold">Options</div>
             <div className="estimate-time bold">Time</div>
             <div className="maximum-charge bold">Max. Cost</div>
@@ -475,7 +519,7 @@ const CancelSpeedupPopoverImplementation = ({
         <Button
           type="primary"
           onClick={submitTransactionChange}
-          className="w-full"
+          className="w-full bold"
           style={{
             marginTop: 24,
           }}
@@ -492,7 +536,7 @@ const CancelSpeedupPopoverImplementation = ({
         }}
         unlocked={submitTransactionChange}
       />
-    </SimpleModal>
+    </Drawer>
   );
 };
 
