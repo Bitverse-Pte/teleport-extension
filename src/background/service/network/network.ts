@@ -700,7 +700,7 @@ class NetworkPreferenceService extends EventEmitter {
     return (
       (chain.coinType === CoinType.ETH &&
         allAccounts.some((a: BaseAccount) => a.coinType === CoinType.ETH)) ||
-      (chain.coinType === CoinType.ETH &&
+      (chain.coinType !== CoinType.ETH &&
         allAccounts.some((a: BaseAccount) => a.chainCustomId === chain.id))
     );
   }
