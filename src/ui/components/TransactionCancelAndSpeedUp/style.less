@@ -3,6 +3,13 @@
         // narrower letter spacing
         letter-spacing: -0.5px;
     }
+    .cancel-speedup-popover__wrapper {
+        height: 270px;
+        overflow-y: auto;
+    }
+    .cancel-speedup-popover__wrapper.expanded {
+        height: 385px;
+    }
     .tier-header {
         display: flex;
 
@@ -70,7 +77,41 @@
         width: 100%;
         padding: 9px 18px;
         h1.form-title {
+            font-size: 12px;
+            
+        }
+
+        /** Overriding antd input element */
+        .ant-input-number {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            height: 38px;
+            border: 1px solid #C5D1E0;
+            border-radius: 8px;
             font-size: 14px;
         }
+        .ant-input-number-input-wrap input.ant-input-number-input {
+            padding: 12px 16px;
+            height: 100%;
+            color: #364361;
+        }
+        .ant-input-number-group-wrapper {
+            border: 1px solid #C5D1E0;
+            border-radius: 8px;
+
+            .ant-input-number {
+                border: 0;
+            }
+
+            .ant-input-number-group-addon {
+                background: transparent;
+                border: 0;
+                font-weight: 400;
+                font-size: 14px;
+                color: #A3B4CC;
+            }
+        }
+
     }
 }

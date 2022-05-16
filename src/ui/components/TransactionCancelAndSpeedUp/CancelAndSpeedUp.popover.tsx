@@ -352,7 +352,11 @@ const CancelSpeedupPopoverImplementation = ({
           }
         }}
       />
-      <div className="cancel-speedup-popover__wrapper">
+      <div
+        className={clsx('cancel-speedup-popover__wrapper', {
+          expanded: shouldDrawerExpanded,
+        })}
+      >
         <h6
           className="flex items-center flex-wrap"
           style={{ margin: '0, 0, 2, 0' }}
@@ -362,13 +366,7 @@ const CancelSpeedupPopoverImplementation = ({
               $1: 'replace',
             },
           })}
-          {/* {t('cancelSpeedUpTransactionTooltip', {
-            replace: {
-              $1: EDIT_GAS_MODES.CANCEL ? t('cancel') : t('speedUp'),
-            },
-          })} */}
         </h6>
-        <div className="cancel-speedup-popover__separator" />
 
         <div className="tier-select">
           <div className="tier-header">
@@ -403,26 +401,28 @@ const CancelSpeedupPopoverImplementation = ({
           className="flex items-center flex-col custom-gas"
           style={{ marginTop: 4 }}
         >
-          <div className="field">
-            <h1 className="form-title bold">Gas Limit</h1>
-            <InputNumber<string>
-              style={{ width: '100% ' }}
-              stringMode
-              value={Number(gasLimit || 21000).toString()}
-              min="21000"
-              controls={false}
-              onBlur={({ target }) => {
-                try {
-                  setGasLimit(BigNumber.from(target.value).toHexString());
-                } catch (error) {
-                  console.error('setGasLimit::error:', error);
-                  setCustomTxParamsError({
-                    gasLimit: 'bad input',
-                  });
-                }
-              }}
-            />
-          </div>
+          {selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
+            <div className="field">
+              <h1 className="form-title bold">Gas Limit</h1>
+              <InputNumber<string>
+                style={{ width: '100% ' }}
+                stringMode
+                value={Number(gasLimit || 21000).toString()}
+                min="21000"
+                controls={false}
+                onBlur={({ target }) => {
+                  try {
+                    setGasLimit(BigNumber.from(target.value).toHexString());
+                  } catch (error) {
+                    console.error('setGasLimit::error:', error);
+                    setCustomTxParamsError({
+                      gasLimit: 'bad input',
+                    });
+                  }
+                }}
+              />
+            </div>
+          )}
           {!isEIP1559Tx && selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
             <div className="field">
               <h1 className="form-title bold">Gas Price</h1>
@@ -518,18 +518,18 @@ const CancelSpeedupPopoverImplementation = ({
             </div>
           )}
         </div>
-        <Button
-          type="primary"
-          onClick={submitTransactionChange}
-          className="w-full bold"
-          style={{
-            marginTop: 24,
-          }}
-          disabled={isSubmitDisabled}
-        >
-          {t('Submit')}
-        </Button>
       </div>
+      <Button
+        type="primary"
+        onClick={submitTransactionChange}
+        className="w-full bold"
+        style={{
+          marginTop: 24,
+        }}
+        disabled={isSubmitDisabled}
+      >
+        {t('Submit')}
+      </Button>
       <UnlockModal
         title="Unlock Wallet to continue"
         visible={unlockPopupVisible}
