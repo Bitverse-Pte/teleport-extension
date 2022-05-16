@@ -93,7 +93,10 @@ class NotificationService extends EventEmitter {
   clear = async () => {
     this.approval = null;
     if (this.notifiWindowId) {
-      await winMgr.remove(this.notifiWindowId);
+      try {
+        await winMgr.remove(this.notifiWindowId);
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
       this.notifiWindowId = 0;
     }
   };
