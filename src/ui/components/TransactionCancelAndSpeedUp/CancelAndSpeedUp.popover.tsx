@@ -192,6 +192,8 @@ const CancelSpeedupPopoverImplementation = ({
     Partial<Transaction['txParams']>
   >({});
 
+  const shouldDrawerExpanded = selectedGasTier === PRIORITY_LEVELS.CUSTOM;
+
   useEffect(() => {
     console.debug('gasFeeEstimates::updated:', gasFeeEstimates);
   }, [gasFeeEstimates]);
@@ -322,7 +324,7 @@ const CancelSpeedupPopoverImplementation = ({
 
   return (
     <Drawer
-      height={422}
+      height={shouldDrawerExpanded ? 536 : 422}
       visible={showPopOver}
       onClose={() => {
         setShowPopOver(false);
