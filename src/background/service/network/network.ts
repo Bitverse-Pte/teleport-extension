@@ -60,6 +60,8 @@ import { nanoid } from 'nanoid';
 import { parseStringTemplate } from 'utils/string';
 import { addHexPrefix } from 'ethereumjs-util';
 import { BaseAccount } from 'types/extend';
+// import { ChainUpdaterService, InteractionService } from '../cosmos';
+import { ChainIdHelper } from 'utils/cosmos/chainId';
 
 const toHexString = (val: string | number) =>
   addHexPrefix(Number(val).toString(16));
@@ -131,6 +133,8 @@ class NetworkPreferenceService extends EventEmitter {
   // UI communication
 
   constructor() {
+    // protected readonly interactionKeeper: InteractionService,
+    // protected readonly chainUpdaterKeeper: ChainUpdaterService,
     super();
 
     this.customNetworksStore = new ObservableStore<CustomNetworkList>({
@@ -933,6 +937,66 @@ class NetworkPreferenceService extends EventEmitter {
   }
   getEthByNetwork(rpcUrl: string) {
     return new Eth(new Eth.HttpProvider(rpcUrl));
+  }
+
+  getCosmosChainInfo(cosmosChainId: string): Provider {
+    const chainInfo = this.getAllProviders().find((chainInfo) => {
+      return (
+        ChainIdHelper.parse(chainInfo.chainId).identifier ===
+        ChainIdHelper.parse(cosmosChainId).identifier
+      );
+    });
+
+    if (!chainInfo) {
+      throw new Error(`There is no cosmos chain info for ${cosmosChainId}`);
+    }
+    return chainInfo;
+  }
+
+  /**
+   * extended for cosmos ecosystem
+   */
+  getChainCoinType(chainId: string): number {
+    const chainInfo = this.getCosmosChainInfo(chainId);
+
+    if (!chainInfo) {
+      throw new Error(`There is no chain info for ${chainId}`);
+    }
+
+    return chainInfo.coinType;
+  }
+
+  hasChainInfo(chainId: string): boolean {
+    return (
+      this.getAllProviders().find((chainInfo) => {
+        return (
+          ChainIdHelper.parse(chainInfo.chainId).identifier ===
+          ChainIdHelper.parse(chainId).identifier
+        );
+      }) != null
+    );
+  }
+
+  async suggestCosmosChainInfo(
+    // env: Env,
+    chainInfo: Provider,
+    origin: string
+  ): Promise<void> {
+    /** @TODO implement a schema check with joi for cosmos provider */
+    // chainInfo = await ChainInfoSchema.validateAsync(chainInfo, {
+    //   stripUnknown: true,
+    // });
+    // await this.interactionKeeper.waitApprove(
+    //   // env,
+    //   "/suggest-chain",
+    //   SuggestChainInfoMsg.type(),
+    //   {
+    //     ...chainInfo,
+    //     origin,
+    //   }
+    // );
+    // await this.addChainInfo(chainInfo);
+    /** @TODO use our approval interface to manage dapp request to add cosmos network */
   }
 }
 
