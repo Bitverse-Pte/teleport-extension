@@ -43,7 +43,13 @@ function FeeSelector(props) {
   const location = useLocation();
   const gasState: any = useSelector((state) => state.gas);
   const dispatch = useDispatch();
-  const { visible, onClose, gasLimit = 21000 } = props;
+  const {
+    visible,
+    onClose,
+    gasLimit = 21000,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+  } = props;
   const wallet = useWallet();
   const [selectFee, setSelectFee] = useState('medium');
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -243,6 +249,8 @@ function FeeSelector(props) {
           selectFee={feeList.filter((e) => e.type === selectFee)[0]}
           gasLimit={gasLimit}
           onSubmit={onSaveCustom}
+          maxFeePerGas={maxFeePerGas}
+          maxPriorityFeePerGas={maxPriorityFeePerGas}
         />
       </Drawer>
     </Drawer>
