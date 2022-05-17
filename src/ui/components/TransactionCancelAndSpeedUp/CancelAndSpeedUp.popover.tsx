@@ -354,7 +354,7 @@ const CancelSpeedupPopoverImplementation = ({
         }}
       />
       <div
-        className={clsx('cancel-speedup-popover__wrapper', {
+        className={clsx('cancel-speedup-popover_wrapper', {
           expanded: shouldDrawerExpanded,
         })}
       >
