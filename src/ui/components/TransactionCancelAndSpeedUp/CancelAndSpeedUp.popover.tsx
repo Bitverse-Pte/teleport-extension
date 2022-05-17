@@ -23,7 +23,7 @@ import { toHumanReadableTime } from 'ui/utils/utils';
 import clsx from 'clsx';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { MIN_GAS_LIMIT_DEC } from 'ui/context/send.constants';
-import { useSetState } from 'react-use';
+import { usePrevious, useSetState } from 'react-use';
 import { IconComponent } from '../IconComponents';
 
 interface CancelAndSpeedUpPopoverParams {
@@ -178,6 +178,7 @@ const CancelSpeedupPopoverImplementation = ({
   const [selectedGasTier, setGasTier] = useState<PRIORITY_LEVELS>(
     PRIORITY_LEVELS.TEN_PERCENT_INCREASED
   );
+  const previousSelectedGasTier = usePrevious(selectedGasTier);
 
   const [customGasPrice, setCustomGasPrice] = useState<
     Partial<Transaction['txParams']>
@@ -385,16 +386,35 @@ const CancelSpeedupPopoverImplementation = ({
             onClick={() => setGasTier(PRIORITY_LEVELS.TEN_PERCENT_INCREASED)}
           />
           {tiersForEIP1559Network()}
-          <TierItem
-            levelName={t('Custom')}
-            estimateTime={'--'}
-            gasPrice={BigNumber.from(
-              customGasPrice.maxFeePerGas || customGasPrice.gasPrice
-            )}
-            gasLimit={gasLimit}
-            selected={selectedGasTier == PRIORITY_LEVELS.CUSTOM}
-            onClick={() => setGasTier(PRIORITY_LEVELS.CUSTOM)}
-          />
+          <div
+            className={clsx('tier', {
+              selected: selectedGasTier == PRIORITY_LEVELS.CUSTOM,
+            })}
+            onClick={() => {
+              console.debug(
+                'Custom::previousSelectedGasTier',
+                previousSelectedGasTier
+              );
+              const nextTier =
+                selectedGasTier !== PRIORITY_LEVELS.CUSTOM ||
+                !previousSelectedGasTier
+                  ? PRIORITY_LEVELS.CUSTOM
+                  : previousSelectedGasTier;
+              console.debug('Custom::nextTier:', nextTier);
+              setGasTier(nextTier);
+            }}
+          >
+            <div className="level-name bold">Custom</div>
+            <div className={clsx('estimate-time narrow-letter-spacing')}></div>
+            <div className="maximum-charge">
+              <IconComponent
+                name={`chevron-${
+                  selectedGasTier == PRIORITY_LEVELS.CUSTOM ? 'up' : 'down'
+                }`}
+                cls="base-text-color"
+              />
+            </div>
+          </div>
         </div>
 
         <div
