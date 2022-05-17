@@ -1,4 +1,4 @@
-import { CHAINS_ENUM, CHAINS } from 'constants/index';
+import { CHAINS_ENUM } from 'constants/index';
 import {
   permissionService,
   keyringService,
@@ -24,7 +24,7 @@ const getProviderState = async (req) => {
   const isUnlocked = keyringService.getIsUnlocked();
 
   return {
-    chainId: CHAINS[chainEnum || CHAINS_ENUM.ETH].hex,
+    chainId: providerController.ethChainId(req),
     isUnlocked,
     accounts: isUnlocked ? await providerController.ethAccounts(req) : [],
     networkVersion: await providerController.netVersion(req),
