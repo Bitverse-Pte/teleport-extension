@@ -61,7 +61,7 @@ export class CosmosKey extends Base.KeyBase<Tx.Transaction> {
   }
 
   public generateSignature(msg: any, privateKey: string | Buffer): Buffer {
-    const secp256k1 = new ec("secp256k1");
+    const secp256k1 = new ec('secp256k1');
     let privKey = privateKey;
     if (typeof privKey === 'string') {
       const stripped = ethUtil.stripHexPrefix(privateKey as string);
@@ -69,18 +69,20 @@ export class CosmosKey extends Base.KeyBase<Tx.Transaction> {
     }
     const key = secp256k1.keyFromPrivate(privKey);
 
-    const hash = crypto.SHA256(
-      crypto.lib.WordArray.create(msg as any)
-    ).toString();
+    const hash = crypto
+      .SHA256(crypto.lib.WordArray.create(msg as any))
+      .toString();
 
-    const signature = key.sign(Buffer.from(hash, "hex"), {
+    const signature = key.sign(Buffer.from(hash, 'hex'), {
       canonical: true,
     });
 
-    return Buffer.from(signature.r.toArray("be", 32).concat(signature.s.toArray("be", 32)));
+    return Buffer.from(
+      signature.r.toArray('be', 32).concat(signature.s.toArray('be', 32))
+    );
   }
 
   public signTx(stdTx: Tx.Transaction, privateKey: string): any {
-    
+    throw Error('method not impl');
   }
 }
