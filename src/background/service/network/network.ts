@@ -710,6 +710,9 @@ class NetworkPreferenceService extends EventEmitter {
     return chains;
   }
 
+  /**
+   * @returns all network providers in the extension
+   */
   getAllProviders(): Provider[] {
     const presetProviders = Object.values(defaultNetworks).filter((val) => {
       // no null, undefined and no empty object
@@ -721,6 +724,11 @@ class NetworkPreferenceService extends EventEmitter {
     }));
 
     return [...presetProviders, ...customProviders];
+  }
+
+  getProvider(id: PresetNetworkId | string): Network | undefined {
+    const networks = this.getAllProviders();
+    return networks.find((n) => n.id === id);
   }
 
   getSupportProviders(): Provider[] {
