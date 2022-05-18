@@ -1,6 +1,3 @@
-import type { Chain } from 'types/chain';
-import IconEthLogo from 'assets/create.svg';
-import IconEthWhiteLogo from 'assets/create.svg';
 import IconEN from 'assets/create.svg';
 import IconZH from 'assets/create.svg';
 
@@ -17,24 +14,6 @@ export enum CHAINS_ENUM {
   OP = 'OP',
   CELO = 'CELO',
 }
-
-export const CHAINS: Record<string, Chain> = {
-  [CHAINS_ENUM.ETH]: {
-    id: 1,
-    serverId: 'eth',
-    name: 'Ethereum',
-    hex: '0x1',
-    enum: CHAINS_ENUM.ETH,
-    logo: IconEthLogo,
-    whiteLogo: IconEthWhiteLogo,
-    network: '1',
-    nativeTokenSymbol: 'ETH',
-    nativeTokenLogo:
-      'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png',
-    nativeTokenAddress: 'eth',
-    scanLink: 'https://etherscan.io/tx/_s_',
-  },
-};
 
 export const KEYRING_TYPE = {
   HdKeyring: 'HD Key Tree',
