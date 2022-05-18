@@ -258,7 +258,7 @@ class NetworkPreferenceService extends EventEmitter {
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
-    const nicknames = this.getCustomNetworks().map((n) => n.nickname);
+    const nicknames = this._getCustomNetworks().map((n) => n.nickname);
     if (nicknames.includes(newNickname)) {
       throw new BitError(ErrorCode.CUSTOM_NETWORK_NAME_DUPLICATED);
     }
@@ -333,8 +333,8 @@ class NetworkPreferenceService extends EventEmitter {
     coinType = CoinType.ETH,
     chainName = 'ETH'
   ) {
-    const networks = this.getCustomNetworks();
-    const matchedProvider = this.getCustomNetwork(providerId);
+    const networks = this._getCustomNetworks();
+    const matchedProvider = this._getCustomNetwork(providerId);
 
     if (!matchedProvider) {
       throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
@@ -373,7 +373,7 @@ class NetworkPreferenceService extends EventEmitter {
 
   removeCustomNetwork(idToBeRm: string): boolean {
     const { networks, orderOfNetworks } = this.customNetworksStore.getState();
-    const providerToBeRemoved = this.getCustomNetwork(idToBeRm);
+    const providerToBeRemoved = this._getCustomNetwork(idToBeRm);
     if (!providerToBeRemoved) {
       throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
     }
@@ -394,13 +394,13 @@ class NetworkPreferenceService extends EventEmitter {
     return networks.length > removedCustomNetworks.length;
   }
 
-  getCustomNetworks(): Network[] {
+  private _getCustomNetworks(): Network[] {
     const { networks } = this.customNetworksStore.getState();
     return networks;
   }
 
-  getCustomNetwork(id: string): Network | undefined {
-    const { networks } = this.customNetworksStore.getState();
+  private _getCustomNetwork(id: string): Network | undefined {
+    const networks = this._getCustomNetworks();
     return networks.find((n) => n.id === id);
   }
 
@@ -710,17 +710,25 @@ class NetworkPreferenceService extends EventEmitter {
     return chains;
   }
 
+  /**
+   * @returns all network providers in the extension
+   */
   getAllProviders(): Provider[] {
     const presetProviders = Object.values(defaultNetworks).filter((val) => {
       // no null, undefined and no empty object
       return Boolean(val) && Object.keys(val).length > 0;
     });
-    const customProviders: Provider[] = this.getCustomNetworks().map((p) => ({
+    const customProviders: Provider[] = this._getCustomNetworks().map((p) => ({
       ...p,
       type: 'rpc',
     }));
 
     return [...presetProviders, ...customProviders];
+  }
+
+  getProvider(id: PresetNetworkId | string): Network | undefined {
+    const networks = this.getAllProviders();
+    return networks.find((n) => n.id === id);
   }
 
   getSupportProviders(): Provider[] {

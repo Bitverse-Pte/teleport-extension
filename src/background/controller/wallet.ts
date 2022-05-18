@@ -25,7 +25,7 @@ import {
 } from 'types/extend';
 import provider from './provider';
 import BitError from 'error';
-import { defaultNetworks } from 'constants/defaultNetwork';
+import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
 import { ErrorCode } from 'constants/code';
 import { CoinType, Ecosystem, Provider } from 'types/network';
 import { AddTokenOpts, Token } from 'types/token';
@@ -73,22 +73,16 @@ export class WalletController extends BaseController {
     sessionService.broadcastEvent('lock');
   };
 
-  useDefaultNetwork = (chain: string) => {
-    const network = defaultNetworks[chain];
-    if (!network) {
-      throw new BitError(ErrorCode.DEFAULT_NETWORK_PROVIDER_PRESET_MISSING);
-    }
-    return networkPreferenceService.setProviderConfig(network);
-  };
-
   getAllProviders = () => networkPreferenceService.getAllProviders();
 
-  fetchCustomProviders = () => networkPreferenceService.getCustomNetworks();
-
-  useCustomNetwork = (id: string) => {
-    const network = networkPreferenceService.getCustomNetwork(id);
+  useProviderById = (id: PresetNetworkId | string) => {
+    const network = networkPreferenceService.getProvider(id);
     if (!network) {
-      throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
+      throw new BitError(
+        Object.values(PresetNetworkId).includes(id as PresetNetworkId)
+          ? ErrorCode.DEFAULT_NETWORK_PROVIDER_PRESET_MISSING
+          : ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING
+      );
     }
     return networkPreferenceService.setProviderConfig({
       ...network,
@@ -126,16 +120,6 @@ export class WalletController extends BaseController {
       type: 'rpc',
     });
     return network;
-  };
-
-  findCustomNetwork = (nickname: string) => {
-    const matchedIdx = networkPreferenceService
-      .getCustomNetworks()
-      .findIndex((n) => n.nickname === nickname);
-    if (matchedIdx === -1) {
-      throw new BitError(ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING);
-    }
-    return matchedIdx;
   };
 
   editCustomNetwork = (
