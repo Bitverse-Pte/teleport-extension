@@ -1,4 +1,4 @@
-import { defaultNetworks } from 'constants/defaultNetwork';
+import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
 import { CoinType, NetworkController, Provider } from 'types/network';
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,13 +33,9 @@ export const NetworkProviderContext = React.createContext<{
    */
   enabledProviders: Provider[];
   /**
-   * useCustomProvider can switch the selected network to provided CustomProvider
+   * useProviderById can switch the selected network to the specific provider
    */
-  useCustomProvider: (matchedId: string) => Promise<any>;
-  /**
-   * use this to switch preset networks
-   */
-  usePresetProvider: (chain: string) => Promise<any>;
+  useProviderById: (networkId: PresetNetworkId | string) => Promise<any>;
 
   // you can create / edit / remove custom network
   addCustomProvider: (
@@ -81,14 +77,14 @@ export function NetworkStoreProvider({
 
   const customProviders = useSelector(getCustomProvidersSelector);
 
-  const useCustomProvider = useCallback(
+  const useProviderById = useCallback(
     async (networkId: string) => {
       dispatch(showLoadingIndicator());
       try {
-        await wallet.useCustomNetwork(networkId);
+        await wallet.useProviderById(networkId);
         await wallet.fetchLatestBlockDataNow();
       } catch (error: any) {
-        console.error('useCustomProvider::error', error);
+        console.error('useProviderById::error', error);
         if (error?.code && error.code === ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
           ClickToCloseMessage.error(
             t('SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST')
@@ -120,26 +116,6 @@ export function NetworkStoreProvider({
         blockExplorerUrl,
         coinType
       );
-    },
-    [wallet]
-  );
-
-  const usePresetProvider = useCallback(
-    async (chain: string) => {
-      dispatch(showLoadingIndicator());
-      try {
-        await wallet.useDefaultNetwork(chain);
-        await wallet.fetchLatestBlockDataNow();
-      } catch (error: any) {
-        console.error('usePresetProvider::error:', error);
-        if (error?.code && error.code === ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
-          ClickToCloseMessage.error(
-            t('SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST')
-          );
-        }
-      } finally {
-        dispatch(hideLoadingIndicator());
-      }
     },
     [wallet]
   );
@@ -190,8 +166,7 @@ export function NetworkStoreProvider({
     () => ({
       currentNetworkController,
       customProviders,
-      useCustomProvider,
-      usePresetProvider,
+      useProviderById,
       removeCustomProvider,
       editCustomProvider,
       enabledProviders,
@@ -201,8 +176,7 @@ export function NetworkStoreProvider({
     [
       currentNetworkController,
       customProviders,
-      useCustomProvider,
-      usePresetProvider,
+      useProviderById,
       enabledProviders,
       editCustomProvider,
       removeCustomProvider,
