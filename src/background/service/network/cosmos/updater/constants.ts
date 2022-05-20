@@ -1,1 +1,1 @@
-export const ROUTE = "chain-updator";
+export const ROUTE = 'chain-updator';

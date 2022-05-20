@@ -1,15 +1,15 @@
 // The JSON encoder that supports the `Uint8Array`.
-import { fromHex, toHex } from "./hex";
+import { fromHex, toHex } from './hex';
 
 export class JSONUint8Array {
   static parse(text: string) {
     return JSON.parse(text, (_, value) => {
       if (
         value &&
-        typeof value === "string" &&
-        value.startsWith("__uint8array__")
+        typeof value === 'string' &&
+        value.startsWith('__uint8array__')
       ) {
-        return fromHex(value.replace("__uint8array__", ""));
+        return fromHex(value.replace('__uint8array__', ''));
       }
 
       return value;
@@ -21,10 +21,10 @@ export class JSONUint8Array {
       if (
         value &&
         (value instanceof Uint8Array ||
-          (typeof value === "object" &&
-            "type" in value &&
-            "data" in value &&
-            value.type === "Buffer" &&
+          (typeof value === 'object' &&
+            'type' in value &&
+            'data' in value &&
+            value.type === 'Buffer' &&
             Array.isArray(value.data)))
       ) {
         const array =

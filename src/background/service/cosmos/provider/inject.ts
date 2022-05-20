@@ -6,7 +6,7 @@ import {
   KeplrMode,
   KeplrSignOptions,
   Key,
-} from "@keplr-wallet/types";
+} from '@keplr-wallet/types';
 export interface Result {
   error?: string;
   return?: any;
@@ -18,26 +18,26 @@ import {
   StdTx,
   OfflineSigner,
   StdSignature,
-} from "@cosmjs/launchpad";
-import { SecretUtils } from "secretjs/types/enigmautils";
+} from '@cosmjs/launchpad';
+import { SecretUtils } from 'secretjs/types/enigmautils';
 
-import { KeplrEnigmaUtils } from "./enigma";
-import { DirectSignResponse, OfflineDirectSigner } from "@cosmjs/proto-signing";
+import { KeplrEnigmaUtils } from './enigma';
+import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 
-import { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } from "./cosmjs";
-import deepmerge from "deepmerge";
-import Long from "long";
-import { JSONUint8Array } from "utils/cosmos/json-uint8-array";
+import { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } from './cosmjs';
+import deepmerge from 'deepmerge';
+import Long from 'long';
+import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
 
 export interface ProxyRequest {
-  type: "proxy-request";
+  type: 'proxy-request';
   id: string;
   method: keyof Keplr;
   args: any[];
 }
 
 export interface ProxyRequestResponse {
-  type: "proxy-request-response";
+  type: 'proxy-request-response';
   id: string;
   result: Result | undefined;
 }
@@ -56,7 +56,7 @@ export class InjectedKeplr implements IKeplr {
       postMessage: (message: any) => void;
     } = {
       addMessageListener: (fn: (e: any) => void) =>
-        window.addEventListener("message", fn),
+        window.addEventListener('message', fn),
       postMessage: (message) =>
         window.postMessage(message, window.location.origin),
     },
@@ -66,54 +66,54 @@ export class InjectedKeplr implements IKeplr {
       const message: ProxyRequest = parseMessage
         ? parseMessage(e.data)
         : e.data;
-      if (!message || message.type !== "proxy-request") {
+      if (!message || message.type !== 'proxy-request') {
         return;
       }
 
       try {
         if (!message.id) {
-          throw new Error("Empty id");
+          throw new Error('Empty id');
         }
 
-        if (message.method === "version") {
-          throw new Error("Version is not function");
+        if (message.method === 'version') {
+          throw new Error('Version is not function');
         }
 
-        if (message.method === "mode") {
-          throw new Error("Mode is not function");
+        if (message.method === 'mode') {
+          throw new Error('Mode is not function');
         }
 
-        if (message.method === "defaultOptions") {
-          throw new Error("DefaultOptions is not function");
+        if (message.method === 'defaultOptions') {
+          throw new Error('DefaultOptions is not function');
         }
 
         if (
           !keplr[message.method] ||
-          typeof keplr[message.method] !== "function"
+          typeof keplr[message.method] !== 'function'
         ) {
           throw new Error(`Invalid method: ${message.method}`);
         }
 
-        if (message.method === "getOfflineSigner") {
+        if (message.method === 'getOfflineSigner') {
           throw new Error("GetOfflineSigner method can't be proxy request");
         }
 
-        if (message.method === "getOfflineSignerOnlyAmino") {
+        if (message.method === 'getOfflineSignerOnlyAmino') {
           throw new Error(
             "GetOfflineSignerOnlyAmino method can't be proxy request"
           );
         }
 
-        if (message.method === "getOfflineSignerAuto") {
+        if (message.method === 'getOfflineSignerAuto') {
           throw new Error("GetOfflineSignerAuto method can't be proxy request");
         }
 
-        if (message.method === "getEnigmaUtils") {
+        if (message.method === 'getEnigmaUtils') {
           throw new Error("GetEnigmaUtils method can't be proxy request");
         }
 
         const result =
-          message.method === "signDirect"
+          message.method === 'signDirect'
             ? await (async () => {
                 const receivedSignDoc: {
                   bodyBytes?: Uint8Array | null;
@@ -153,7 +153,7 @@ export class InjectedKeplr implements IKeplr {
               );
 
         const proxyResponse: ProxyRequestResponse = {
-          type: "proxy-request-response",
+          type: 'proxy-request-response',
           id: message.id,
           result: {
             return: JSONUint8Array.wrap(result),
@@ -163,7 +163,7 @@ export class InjectedKeplr implements IKeplr {
         eventListener.postMessage(proxyResponse);
       } catch (e: any) {
         const proxyResponse: ProxyRequestResponse = {
-          type: "proxy-request-response",
+          type: 'proxy-request-response',
           id: message.id,
           result: {
             error: e.message || e.toString(),
@@ -181,10 +181,10 @@ export class InjectedKeplr implements IKeplr {
       .map((value) => {
         return value.toString(16);
       })
-      .join("");
+      .join('');
 
     const proxyMessage: ProxyRequest = {
-      type: "proxy-request",
+      type: 'proxy-request',
       id,
       method,
       args: JSONUint8Array.wrap(args),
@@ -196,7 +196,7 @@ export class InjectedKeplr implements IKeplr {
           ? this.parseMessage(e.data)
           : e.data;
 
-        if (!proxyResponse || proxyResponse.type !== "proxy-request-response") {
+        if (!proxyResponse || proxyResponse.type !== 'proxy-request-response') {
           return;
         }
 
@@ -209,7 +209,7 @@ export class InjectedKeplr implements IKeplr {
         const result = JSONUint8Array.unwrap(proxyResponse.result);
 
         if (!result) {
-          reject(new Error("Result is null"));
+          reject(new Error('Result is null'));
           return;
         }
 
@@ -240,9 +240,9 @@ export class InjectedKeplr implements IKeplr {
       postMessage: (message: any) => void;
     } = {
       addMessageListener: (fn: (e: any) => void) =>
-        window.addEventListener("message", fn),
+        window.addEventListener('message', fn),
       removeMessageListener: (fn: (e: any) => void) =>
-        window.removeEventListener("message", fn),
+        window.removeEventListener('message', fn),
       postMessage: (message) =>
         window.postMessage(message, window.location.origin),
     },
@@ -250,24 +250,24 @@ export class InjectedKeplr implements IKeplr {
   ) {}
 
   async enable(chainIds: string | string[]): Promise<void> {
-    await this.requestMethod("enable", [chainIds]);
+    await this.requestMethod('enable', [chainIds]);
   }
 
   async experimentalSuggestChain(chainInfo: ChainInfo): Promise<void> {
     if (
-      chainInfo.features?.includes("stargate") ||
-      chainInfo.features?.includes("no-legacy-stdTx")
+      chainInfo.features?.includes('stargate') ||
+      chainInfo.features?.includes('no-legacy-stdTx')
     ) {
       console.log(
-        "“stargate”, “no-legacy-stdTx” feature has been deprecated. The launchpad is no longer supported, thus works without the two features. We would keep the aforementioned two feature for a while, but the upcoming update would potentially cause errors. Remove the two feature."
+        '“stargate”, “no-legacy-stdTx” feature has been deprecated. The launchpad is no longer supported, thus works without the two features. We would keep the aforementioned two feature for a while, but the upcoming update would potentially cause errors. Remove the two feature.'
       );
     }
 
-    await this.requestMethod("experimentalSuggestChain", [chainInfo]);
+    await this.requestMethod('experimentalSuggestChain', [chainInfo]);
   }
 
   async getKey(chainId: string): Promise<Key> {
-    return await this.requestMethod("getKey", [chainId]);
+    return await this.requestMethod('getKey', [chainId]);
   }
 
   async sendTx(
@@ -275,13 +275,13 @@ export class InjectedKeplr implements IKeplr {
     tx: StdTx | Uint8Array,
     mode: BroadcastMode
   ): Promise<Uint8Array> {
-    if (!("length" in tx)) {
+    if (!('length' in tx)) {
       console.log(
-        "Do not send legacy std tx via `sendTx` API. We now only support protobuf tx. The usage of legeacy std tx would throw an error in the near future."
+        'Do not send legacy std tx via `sendTx` API. We now only support protobuf tx. The usage of legeacy std tx would throw an error in the near future.'
       );
     }
 
-    return await this.requestMethod("sendTx", [chainId, tx, mode]);
+    return await this.requestMethod('sendTx', [chainId, tx, mode]);
   }
 
   async signAmino(
@@ -290,7 +290,7 @@ export class InjectedKeplr implements IKeplr {
     signDoc: StdSignDoc,
     signOptions: KeplrSignOptions = {}
   ): Promise<AminoSignResponse> {
-    return await this.requestMethod("signAmino", [
+    return await this.requestMethod('signAmino', [
       chainId,
       signer,
       signDoc,
@@ -309,7 +309,7 @@ export class InjectedKeplr implements IKeplr {
     },
     signOptions: KeplrSignOptions = {}
   ): Promise<DirectSignResponse> {
-    const result = await this.requestMethod("signDirect", [
+    const result = await this.requestMethod('signDirect', [
       chainId,
       signer,
       // We can't send the `Long` with remaing the type.
@@ -350,7 +350,7 @@ export class InjectedKeplr implements IKeplr {
     signer: string,
     data: string | Uint8Array
   ): Promise<StdSignature> {
-    return await this.requestMethod("signArbitrary", [chainId, signer, data]);
+    return await this.requestMethod('signArbitrary', [chainId, signer, data]);
   }
 
   async verifyArbitrary(
@@ -359,7 +359,7 @@ export class InjectedKeplr implements IKeplr {
     data: string | Uint8Array,
     signature: StdSignature
   ): Promise<boolean> {
-    return await this.requestMethod("verifyArbitrary", [
+    return await this.requestMethod('verifyArbitrary', [
       chainId,
       signer,
       data,
@@ -390,7 +390,7 @@ export class InjectedKeplr implements IKeplr {
     contractAddress: string,
     viewingKey?: string
   ): Promise<void> {
-    return await this.requestMethod("suggestToken", [
+    return await this.requestMethod('suggestToken', [
       chainId,
       contractAddress,
       viewingKey,
@@ -401,21 +401,21 @@ export class InjectedKeplr implements IKeplr {
     chainId: string,
     contractAddress: string
   ): Promise<string> {
-    return await this.requestMethod("getSecret20ViewingKey", [
+    return await this.requestMethod('getSecret20ViewingKey', [
       chainId,
       contractAddress,
     ]);
   }
 
   async getEnigmaPubKey(chainId: string): Promise<Uint8Array> {
-    return await this.requestMethod("getEnigmaPubKey", [chainId]);
+    return await this.requestMethod('getEnigmaPubKey', [chainId]);
   }
 
   async getEnigmaTxEncryptionKey(
     chainId: string,
     nonce: Uint8Array
   ): Promise<Uint8Array> {
-    return await this.requestMethod("getEnigmaTxEncryptionKey", [
+    return await this.requestMethod('getEnigmaTxEncryptionKey', [
       chainId,
       nonce,
     ]);
@@ -427,7 +427,7 @@ export class InjectedKeplr implements IKeplr {
     // eslint-disable-next-line @typescript-eslint/ban-types
     msg: object
   ): Promise<Uint8Array> {
-    return await this.requestMethod("enigmaEncrypt", [
+    return await this.requestMethod('enigmaEncrypt', [
       chainId,
       contractCodeHash,
       msg,
@@ -439,7 +439,7 @@ export class InjectedKeplr implements IKeplr {
     ciphertext: Uint8Array,
     nonce: Uint8Array
   ): Promise<Uint8Array> {
-    return await this.requestMethod("enigmaDecrypt", [
+    return await this.requestMethod('enigmaDecrypt', [
       chainId,
       ciphertext,
       nonce,

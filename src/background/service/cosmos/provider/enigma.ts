@@ -1,5 +1,5 @@
-import { SecretUtils } from "secretjs/types/enigmautils";
-import { Keplr } from "@keplr-wallet/types";
+import { SecretUtils } from 'secretjs/types/enigmautils';
+import { Keplr } from '@keplr-wallet/types';
 
 /**
  * KeplrEnigmaUtils duplicates the public methods that are supported on secretjs's EnigmaUtils class.

@@ -1,13 +1,13 @@
 // import { inject, singleton, delay } from "tsyringe";
 // import { TYPES } from "../types";
 
-import Axios from "axios";
+import Axios from 'axios';
 // import { KVStore } from "@keplr-wallet/common";
-import { ChainIdHelper } from "@keplr-wallet/cosmos";
+import { ChainIdHelper } from '@keplr-wallet/cosmos';
 // import { ChainsService } from "../chains";
 import NetworkPreferenceService from '../../network';
-import { Provider } from "types/network";
-import { ObservableStorage } from "background/utils/obsStorage";
+import { Provider } from 'types/network';
+import { ObservableStorage } from 'background/utils/obsStorage';
 
 // @singleton()
 export class CosmosChainUpdaterService {
@@ -21,9 +21,7 @@ export class CosmosChainUpdaterService {
     this.kvStore = new ObservableStorage('cosmos_chain_updated_properties', {});
   }
 
-  async putUpdatedPropertyToProvider(
-    chainInfo: Provider
-  ): Promise<Provider> {
+  async putUpdatedPropertyToProvider(chainInfo: Provider): Promise<Provider> {
     const updatedProperty = await this.getUpdatedChainProperty(
       chainInfo.chainId
     );
@@ -39,7 +37,8 @@ export class CosmosChainUpdaterService {
     }
 
     const features = chainInfo.ecoSystemParams?.features ?? [];
-    for (const updatedFeature of updatedProperty.ecoSystemParams?.features ?? []) {
+    for (const updatedFeature of updatedProperty.ecoSystemParams?.features ??
+      []) {
       if (!features.includes(updatedFeature)) {
         features.push(updatedFeature);
       }
@@ -56,7 +55,7 @@ export class CosmosChainUpdaterService {
 
   async clearUpdatedProperty(chainId: string) {
     this.kvStore.updateState({
-      [ChainIdHelper.parse(chainId).identifier]: undefined
+      [ChainIdHelper.parse(chainId).identifier]: undefined,
     });
 
     // this.chainsService.clearCachedProviders();
@@ -95,7 +94,8 @@ export class CosmosChainUpdaterService {
           chainInfo.chainId
         );
 
-        const updateFeatures = savedChainProperty.ecoSystemParams?.features ?? [];
+        const updateFeatures =
+          savedChainProperty.ecoSystemParams?.features ?? [];
 
         for (const feature of updates.features) {
           if (!updateFeatures.includes(feature)) {
@@ -126,9 +126,10 @@ export class CosmosChainUpdaterService {
 
     this.kvStore.updateState({
       identifier: {
-      ...saved,
-      ...chainInfo,
-    }});
+        ...saved,
+        ...chainInfo,
+      },
+    });
 
     // this.chainsService.clearCachedProviders();
   }
@@ -139,10 +140,12 @@ export class CosmosChainUpdaterService {
   ) {
     const saved = await this.loadChainProperty(identifier);
 
-    this.kvStore.updateState({[identifier]: {
-      ...saved,
-      ...chainInfo,
-    }});
+    this.kvStore.updateState({
+      [identifier]: {
+        ...saved,
+        ...chainInfo,
+      },
+    });
 
     // this.chainsService.clearCachedProviders();
   }
@@ -161,9 +164,7 @@ export class CosmosChainUpdaterService {
    * Currently, only check the chain id has been changed.
    * @param chainInfo Chain information.
    */
-  public static async checkChainUpdate(
-    chainInfo: Readonly<Provider>
-  ): Promise<{
+  public static async checkChainUpdate(chainInfo: Readonly<Provider>): Promise<{
     explicit: boolean;
     slient: boolean;
 
@@ -192,7 +193,7 @@ export class CosmosChainUpdaterService {
           network: string;
         };
       };
-    }>("/status");
+    }>('/status');
 
     const resultChainId = result.data.result.node_info.network;
 
@@ -213,7 +214,10 @@ export class CosmosChainUpdaterService {
 
     let ibcGoUpdates = false;
     try {
-      if (!chainInfo.ecoSystemParams?.features || !chainInfo.ecoSystemParams?.features.includes("ibc-go")) {
+      if (
+        !chainInfo.ecoSystemParams?.features ||
+        !chainInfo.ecoSystemParams?.features.includes('ibc-go')
+      ) {
         // If the chain uses the ibc-go module separated from the cosmos-sdk,
         // we need to check it because the REST API is different.
         const result = await restInstance.get<{
@@ -221,7 +225,7 @@ export class CosmosChainUpdaterService {
             receive_enabled: boolean;
             send_enabled: boolean;
           };
-        }>("/ibc/apps/transfer/v1/params");
+        }>('/ibc/apps/transfer/v1/params');
 
         if (result.status === 200) {
           ibcGoUpdates = true;
@@ -231,10 +235,14 @@ export class CosmosChainUpdaterService {
 
     let ibcTransferUpdate = false;
     try {
-      if (!chainInfo.ecoSystemParams?.features || !chainInfo.ecoSystemParams?.features.includes("ibc-transfer")) {
+      if (
+        !chainInfo.ecoSystemParams?.features ||
+        !chainInfo.ecoSystemParams?.features.includes('ibc-transfer')
+      ) {
         const isIBCGo =
           ibcGoUpdates ||
-          (chainInfo.ecoSystemParams?.features && chainInfo.ecoSystemParams?.features.includes("ibc-go"));
+          (chainInfo.ecoSystemParams?.features &&
+            chainInfo.ecoSystemParams?.features.includes('ibc-go'));
 
         // If the chain doesn't have the ibc transfer feature,
         // try to fetch the params of ibc transfer module.
@@ -246,8 +254,8 @@ export class CosmosChainUpdaterService {
           };
         }>(
           isIBCGo
-            ? "/ibc/apps/transfer/v1/params"
-            : "/ibc/applications/transfer/v1beta1/params"
+            ? '/ibc/apps/transfer/v1/params'
+            : '/ibc/applications/transfer/v1beta1/params'
         );
         if (
           result.data.params.receive_enabled &&
@@ -261,15 +269,15 @@ export class CosmosChainUpdaterService {
     let wasmd24Update = false;
     try {
       if (
-        chainInfo.ecoSystemParams?.features?.includes("cosmwasm") &&
-        !chainInfo.ecoSystemParams?.features.includes("wasmd_0.24+")
+        chainInfo.ecoSystemParams?.features?.includes('cosmwasm') &&
+        !chainInfo.ecoSystemParams?.features.includes('wasmd_0.24+')
       ) {
         // It is difficult to decide which contract address to test on each chain.
         // So it simply sends a query that fails unconditionally.
         // However, if 400 bad request instead of 501 occurs, the url itself exists.
         // In this case, it is assumed that wasmd 0.24+ version.
         const result = await restInstance.get(
-          "/cosmwasm/wasm/v1/contract/test/smart/test",
+          '/cosmwasm/wasm/v1/contract/test/smart/test',
           {
             validateStatus: (status) => {
               return status === 400 || status === 501;
@@ -284,13 +292,13 @@ export class CosmosChainUpdaterService {
 
     const features: string[] = [];
     if (ibcGoUpdates) {
-      features.push("ibc-go");
+      features.push('ibc-go');
     }
     if (ibcTransferUpdate) {
-      features.push("ibc-transfer");
+      features.push('ibc-transfer');
     }
     if (wasmd24Update) {
-      features.push("wasmd_0.24+");
+      features.push('wasmd_0.24+');
     }
 
     return {
