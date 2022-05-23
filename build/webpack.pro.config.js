@@ -18,6 +18,9 @@ const config = {
       'process.env.INFURA_PROJECT_ID': JSON.stringify(process.env.INFURA_PROJECT_ID),
     })
   ],
+  resolve: {
+    fallback: { "path": require.resolve("path-browserify") }
+  },
   optimization: {
     minimize: true,
     minimizer: [
