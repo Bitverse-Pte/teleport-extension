@@ -8,6 +8,7 @@ import NetworkPreferenceService from '../../network';
 import { Ecosystem, Provider } from 'types/network';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { ChainIdHelper } from 'utils/cosmos/chainId';
+import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 
 // @singleton()
 export class CosmosChainUpdaterService {
@@ -200,6 +201,7 @@ export class CosmosChainUpdaterService {
 
     const instance = Axios.create({
       baseURL: chainInfo.rpcUrl,
+      adapter: fetchAdapter,
     });
 
     // Get the status to get the chain id.
@@ -226,6 +228,7 @@ export class CosmosChainUpdaterService {
 
     const restInstance = Axios.create({
       baseURL: chainInfo.ecoSystemParams?.rest,
+      adapter: fetchAdapter,
     });
 
     let ibcGoUpdates = false;
