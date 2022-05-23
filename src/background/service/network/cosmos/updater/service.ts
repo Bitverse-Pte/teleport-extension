@@ -5,7 +5,7 @@ import Axios from 'axios';
 // import { KVStore } from "@keplr-wallet/common";
 // import { ChainsService } from "../chains";
 import NetworkPreferenceService from '../../network';
-import { Provider } from 'types/network';
+import { Ecosystem, Provider } from 'types/network';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { ChainIdHelper } from 'utils/cosmos/chainId';
 
@@ -19,6 +19,11 @@ export class CosmosChainUpdaterService {
     protected readonly chainsService: typeof NetworkPreferenceService
   ) {
     this.kvStore = new ObservableStorage('cosmos_chain_updated_properties', {});
+
+    chainsService.networkStore.subscribe(async ({ provider }) => {
+      if (provider.ecosystem !== Ecosystem.COSMOS) return;
+      await this.tryUpdateChain(provider.chainId);
+    });
   }
 
   async putUpdatedPropertyToProvider(chainInfo: Provider): Promise<Provider> {
@@ -62,15 +67,21 @@ export class CosmosChainUpdaterService {
   }
 
   async tryUpdateChain(chainId: string) {
+    console.debug('CosmosChainUpdate::tryUpdateChain: started');
     const chainInfo = this.chainsService.getCosmosChainInfo(chainId);
 
     // If chain id is not fomatted as {chainID}-{version},
     // there is no way to deal with the updated chain id.
     if (!ChainIdHelper.hasChainVersion(chainInfo.chainId)) {
+      console.debug(
+        'CosmosChainUpdate::tryUpdateChain: exit due to no version in chainId:',
+        chainInfo.chainId
+      );
       return;
     }
 
     const updates = await CosmosChainUpdaterService.checkChainUpdate(chainInfo);
+    console.debug('CosmosChainUpdate::tryUpdateChain::updates:', updates);
 
     if (updates.explicit || updates.slient) {
       const currentVersion = ChainIdHelper.parse(chainInfo.chainId);
@@ -102,6 +113,11 @@ export class CosmosChainUpdaterService {
             updateFeatures.push(feature);
           }
         }
+
+        console.debug(
+          'CosmosChainUpdate::tryUpdateChain::updateFeatures:',
+          updateFeatures
+        );
 
         await this.saveChainEcoSystemProperty(currentVersion.identifier, {
           features: updateFeatures,
