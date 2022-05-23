@@ -3,11 +3,11 @@
 
 import Axios from 'axios';
 // import { KVStore } from "@keplr-wallet/common";
-import { ChainIdHelper } from '@keplr-wallet/cosmos';
 // import { ChainsService } from "../chains";
 import NetworkPreferenceService from '../../network';
 import { Provider } from 'types/network';
 import { ObservableStorage } from 'background/utils/obsStorage';
+import { ChainIdHelper } from 'utils/cosmos/chainId';
 
 // @singleton()
 export class CosmosChainUpdaterService {
