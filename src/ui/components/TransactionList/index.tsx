@@ -1,7 +1,13 @@
 import { utils } from 'ethers';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import React, { MouseEvent, useCallback, useMemo, useState } from 'react';
+import React, {
+  Fragment,
+  MouseEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import './style.less';
 import { TxDirectionLogo } from './TxDirectionLogo';
 import { useSelector } from 'react-redux';
@@ -154,11 +160,13 @@ function TransactionItem({
   const cancelTransaction = (e: React.MouseEvent<HTMLButtonElement>) => {
     // stop going to detail page
     e.stopPropagation();
+    e.preventDefault();
     popupCancelAndSpeedUpWithMode(EDIT_GAS_MODES.CANCEL);
   };
   const retryTransaction = (e: React.MouseEvent<HTMLButtonElement>) => {
     // stop going to detail page
     e.stopPropagation();
+    e.preventDefault();
     popupCancelAndSpeedUpWithMode(EDIT_GAS_MODES.SPEED_UP);
   };
 
@@ -205,61 +213,63 @@ function TransactionItem({
    */
   const isHidingAmount = category !== TransactionGroupCategories.APPROVAL;
   return (
-    <div
-      className={clsx(
-        'activity flex justify-start cursor-pointer items-center',
-        isEvenStyle
-      )}
-      key={id}
-      style={style}
-      onClick={() => history.push(`/activity/${id}`)}
-    >
-      <TxDirectionLogo
-        status={displayedStatusKey}
-        type={
-          category === TransactionGroupCategories.RECEIVE ? 'receive' : 'send'
-        }
-        size={30}
-      />
+    <Fragment>
       <div
-        className="value-n-status-display flex justify-start items-center cursor-pointer flex-wrap"
-        id={`tx-${idx}`}
+        className={clsx(
+          'activity flex justify-start cursor-pointer items-center',
+          isEvenStyle
+        )}
+        key={id}
+        style={style}
+        onClick={() => history.push(`/activity/${id}`)}
       >
-        <p className="tx-title capitalize">{title}</p>
-        {isHidingAmount && (
-          <p className="tx-value ml-auto" title={primaryCurrency}>
-            {addEllipsisToEachWordsInTheEnd(primaryCurrency, 19)}
-          </p>
-        )}
-        {/* hide if recipientAddress not exist e.g contract deploy */}
-        {recipientAddress && (
-          <div className="grey-02 from-and-to flex items-center mr-auto mb-8">
-            <span className="from cursor-default">
-              <Tooltip placement="top" title={senderAddress}>
-                {t('from')}: {shortenedStr(senderAddress, 3)}
-              </Tooltip>
-            </span>
-            <IconComponent name="chevron-right" cls="grey-05" />
-            <span className="to cursor-default">
-              <Tooltip placement="top" title={recipientAddress}>
-                {t('to')}: {shortenedStr(recipientAddress, 3)}
-              </Tooltip>
-            </span>
-          </div>
-        )}
-        <span className={clsx('status capitalize', colorByStatus)}>
-          {t(displayedStatusKey)}
-        </span>
-        {!isPending && (
-          <span className="date">
-            {dayjs(transactionGroup.primaryTransaction.time).format(
-              'YYYY-MM-DD HH:mm:ss'
-            )}
+        <TxDirectionLogo
+          status={displayedStatusKey}
+          type={
+            category === TransactionGroupCategories.RECEIVE ? 'receive' : 'send'
+          }
+          size={30}
+        />
+        <div
+          className="value-n-status-display flex justify-start items-center cursor-pointer flex-wrap"
+          id={`tx-${idx}`}
+        >
+          <p className="tx-title capitalize">{title}</p>
+          {isHidingAmount && (
+            <p className="tx-value ml-auto" title={primaryCurrency}>
+              {addEllipsisToEachWordsInTheEnd(primaryCurrency, 19)}
+            </p>
+          )}
+          {/* hide if recipientAddress not exist e.g contract deploy */}
+          {recipientAddress && (
+            <div className="grey-02 from-and-to flex items-center mr-auto mb-8">
+              <span className="from cursor-default">
+                <Tooltip placement="top" title={senderAddress}>
+                  {t('from')}: {shortenedStr(senderAddress, 3)}
+                </Tooltip>
+              </span>
+              <IconComponent name="chevron-right" cls="grey-05" />
+              <span className="to cursor-default">
+                <Tooltip placement="top" title={recipientAddress}>
+                  {t('to')}: {shortenedStr(recipientAddress, 3)}
+                </Tooltip>
+              </span>
+            </div>
+          )}
+          <span className={clsx('status capitalize', colorByStatus)}>
+            {t(displayedStatusKey)}
           </span>
-        )}
-        {isPending && (
-          <div className="pending-tx-actions ml-auto">{speedUpButton}</div>
-        )}
+          {!isPending && (
+            <span className="date">
+              {dayjs(transactionGroup.primaryTransaction.time).format(
+                'YYYY-MM-DD HH:mm:ss'
+              )}
+            </span>
+          )}
+          {isPending && (
+            <div className="pending-tx-actions ml-auto">{speedUpButton}</div>
+          )}
+        </div>
       </div>
       {isPending && showCancelPopOver && (
         <CancelSpeedupPopover
@@ -269,7 +279,7 @@ function TransactionItem({
           transaction={transactionGroup.primaryTransaction}
         />
       )}
-    </div>
+    </Fragment>
   );
 }
 

@@ -327,7 +327,9 @@ const CancelSpeedupPopoverImplementation = ({
     <Drawer
       height={shouldDrawerExpanded ? 536 : 422}
       visible={showPopOver}
-      onClose={() => {
+      onClose={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
         setShowPopOver(false);
       }}
       placement="bottom"
