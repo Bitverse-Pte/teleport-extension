@@ -47,7 +47,7 @@ import * as txUtils from './lib/util';
 import eventBus from 'eventBus';
 import { EVENTS } from 'constants/index';
 import preferenceService from '../preference';
-import { NetworkController } from 'types/network';
+import { Ecosystem, NetworkController } from 'types/network';
 import { CustomGasSettings } from 'types/tx';
 import ns from '../network';
 import { purifyTxParamsGasFields } from 'utils/transaction.utils';
@@ -192,8 +192,11 @@ export default class TransactionController extends EventEmitter {
     );
     this._setupListeners();
     // memstore is computed from a few different stores
-    this.networkStore.subscribe(() => {
-      this._onBootCleanUp();
+    this.networkStore.subscribe((updatedNetwork) => {
+      if (updatedNetwork.provider.ecosystem === Ecosystem.EVM) {
+        /** Only trigger when new provider belongs to EVM ecosystem */
+        this._onBootCleanUp();
+      }
     });
 
     // request state update to finalize initialization

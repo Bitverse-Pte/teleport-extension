@@ -566,6 +566,13 @@ class NetworkPreferenceService extends EventEmitter {
       );
       return;
     }
+    const { type, ecosystem } = this.getProviderConfig();
+    if (ecosystem !== Ecosystem.EVM) {
+      console.warn(
+        'Skipped lookupNetwork, because it is designed for EVM provider'
+      );
+      return;
+    }
 
     const chainId = this.getCurrentChainId();
     if (!chainId) {
@@ -581,7 +588,6 @@ class NetworkPreferenceService extends EventEmitter {
     // Ping the RPC endpoint so we can confirm that it works
     const ethQuery = new EthQuery(this._provider);
     const initialNetwork = this.getNetworkState();
-    const { type } = this.getProviderConfig();
     const isInfura = INFURA_PROVIDER_TYPES.includes(type);
 
     if (isInfura) {
