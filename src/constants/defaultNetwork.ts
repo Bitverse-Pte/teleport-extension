@@ -114,7 +114,7 @@ export const defaultNetworks: {
     id: PresetNetworkId.COSMOS_HUB,
     type: CHAINS.COSMOS_HUB,
     rpcUrl: 'https://rpc-cosmoshub.keplr.app',
-    chainId: 'cosmoshub_4',
+    chainId: 'cosmoshub-4',
     ticker: 'ATOM',
     nickname: 'Cosmos Hub',
     rpcPrefs: {
