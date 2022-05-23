@@ -785,7 +785,7 @@ class NetworkPreferenceService extends EventEmitter {
     return [...presetProviders, ...customProviders];
   }
 
-  getProvider(id: PresetNetworkId | string): Network | undefined {
+  getProvider(id: PresetNetworkId | string): Provider | undefined {
     const networks = this.getAllProviders();
     return networks.find((n) => n.id === id);
   }
