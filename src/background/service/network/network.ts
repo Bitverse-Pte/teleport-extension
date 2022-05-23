@@ -62,6 +62,9 @@ import { addHexPrefix } from 'ethereumjs-util';
 import { BaseAccount } from 'types/extend';
 // import { ChainUpdaterService, InteractionService } from '../cosmos';
 import { ChainIdHelper } from 'utils/cosmos/chainId';
+import { CosmosChainInfo } from 'types/cosmos';
+import { parsedKeplrChainInfoAsTeleportCosmosProvider } from '../cosmos/utils/provider.utils';
+import { ChainInfoSchema } from './cosmos/validation/chainInfoSchema';
 
 const toHexString = (val: string | number) =>
   addHexPrefix(Number(val).toString(16));
@@ -993,24 +996,27 @@ class NetworkPreferenceService extends EventEmitter {
 
   async suggestCosmosChainInfo(
     // env: Env,
-    chainInfo: Provider,
+    chainInfo: CosmosChainInfo,
     origin: string
   ): Promise<void> {
-    /** @TODO implement a schema check with joi for cosmos provider */
-    // chainInfo = await ChainInfoSchema.validateAsync(chainInfo, {
-    //   stripUnknown: true,
-    // });
-    // await this.interactionKeeper.waitApprove(
-    //   // env,
-    //   "/suggest-chain",
-    //   SuggestChainInfoMsg.type(),
-    //   {
-    //     ...chainInfo,
-    //     origin,
-    //   }
-    // );
-    // await this.addChainInfo(chainInfo);
-    /** @TODO use our approval interface to manage dapp request to add cosmos network */
+    chainInfo = await ChainInfoSchema.validateAsync(chainInfo, {
+      stripUnknown: true,
+    });
+
+    const newCosmosProvider =
+      parsedKeplrChainInfoAsTeleportCosmosProvider(chainInfo);
+    this.checkIsCustomNetworkNameLegit(newCosmosProvider.nickname);
+    const { networks, orderOfNetworks } = this.customNetworksStore.getState();
+    this.customNetworksStore.updateState({
+      networks: [...networks, newCosmosProvider],
+      orderOfNetworks: {
+        ...orderOfNetworks,
+        [Ecosystem.COSMOS]: [
+          ...orderOfNetworks[Ecosystem.COSMOS],
+          newCosmosProvider.id,
+        ],
+      },
+    });
   }
 }
 
