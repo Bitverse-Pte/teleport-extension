@@ -231,7 +231,9 @@ export class CosmosChainUpdaterService {
           ibcGoUpdates = true;
         }
       }
-    } catch {}
+    } catch (error) {
+      console.error('/ibc/apps/transfer/v1/params::error', error);
+    }
 
     let ibcTransferUpdate = false;
     try {
@@ -264,7 +266,9 @@ export class CosmosChainUpdaterService {
           ibcTransferUpdate = true;
         }
       }
-    } catch {}
+    } catch (error) {
+      console.error(`ibcTransferUpdate:: error`, error);
+    }
 
     let wasmd24Update = false;
     try {
@@ -288,7 +292,9 @@ export class CosmosChainUpdaterService {
           wasmd24Update = true;
         }
       }
-    } catch {}
+    } catch (error) {
+      console.error('/cosmwasm/wasm/v1/contract/test/smart/test', error);
+    }
 
     const features: string[] = [];
     if (ibcGoUpdates) {
