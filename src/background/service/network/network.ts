@@ -377,10 +377,24 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       networks,
     });
-    this.setProviderConfig({
-      ...newSettings,
-      type: 'rpc',
-    });
+
+    try {
+      this.setProviderConfig({
+        ...newSettings,
+        type: 'rpc',
+      });
+    } catch (error: any) {
+      if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+        /** error will be ignored, as it will 100% occurred in the first time (no account)
+         *  but will be log message as warn */
+        console.warn('editCustomNetwork::error: no account for now');
+      } else {
+        console.error(
+          `editCustomNetwork::error #${error.code || 'No Error Code'}: `,
+          error
+        );
+      }
+    }
     return newSettings;
   }
 
