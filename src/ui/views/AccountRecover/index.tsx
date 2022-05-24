@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useContext } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
@@ -21,6 +21,8 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import skynet from 'utils/skynet';
 import { PresetNetworkId } from 'constants/defaultNetwork';
 import EcosystemSelect from 'ui/components/EcosystemSelect';
+import { NetworkProviderContext } from 'ui/context/NetworkProvider';
+
 const { sensors } = skynet;
 
 const { TextArea } = Input;
@@ -79,6 +81,8 @@ const AccountRecover = () => {
   const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
     PresetNetworkId | string
   >();
+
+  const providerContext = useContext(NetworkProviderContext);
   const { t } = useTranslation();
 
   const handleSuccessCallback = async () => {
@@ -87,8 +91,11 @@ const AccountRecover = () => {
       page: location.pathname,
       importType: importType,
     });
-    /* if(policyShow && importType === Tabs.SECOND){
-      
+    //TODO (Jayce) Cosmos Provider is not support now
+    /* if (policyShow && importType === Tabs.SECOND) {
+      await providerContext?.useProviderById(privateKeyMasterChain as string).catch(e => {
+        console.error(e);
+      });
     } */
 
     history.push({

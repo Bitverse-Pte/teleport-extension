@@ -38,7 +38,7 @@ export default (props: EcosystemSelectProps) => {
     }
   };
   const fetchChains = async () => {
-    const chainList = await wallet.getChains().catch((e) => {
+    const chainList = await wallet.getAllProviders().catch((e) => {
       console.error(e);
     });
     console.log('chain list', chainList);
