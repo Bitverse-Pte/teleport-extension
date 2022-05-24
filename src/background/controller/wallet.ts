@@ -112,10 +112,18 @@ export class WalletController extends BaseController {
       isNative: true,
     });
 
-    networkPreferenceService.setProviderConfig({
-      ...network,
-      type: 'rpc',
-    });
+    try {
+      networkPreferenceService.setProviderConfig({
+        ...network,
+        type: 'rpc',
+      });
+    } catch (error: any) {
+      /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+      // if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+
+      // }
+      console.error('addCustomNetwork::error: ', error);
+    }
     return network;
   };
 
