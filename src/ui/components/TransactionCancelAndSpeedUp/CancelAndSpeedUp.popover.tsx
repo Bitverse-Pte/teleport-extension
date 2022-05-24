@@ -180,7 +180,7 @@ const CancelSpeedupPopoverImplementation = ({
   );
   const previousSelectedGasTier = usePrevious(selectedGasTier);
 
-  const [customGasPrice, setCustomGasPrice] = useState<
+  const [customGasPrice, setCustomGasPrice] = useSetState<
     Partial<Transaction['txParams']>
   >({
     estimateUsed: PRIORITY_LEVELS.CUSTOM,
@@ -463,10 +463,9 @@ const CancelSpeedupPopoverImplementation = ({
                     const gasPrice = utils
                       .parseUnits(value, 'gwei')
                       .toHexString();
-                    setCustomGasPrice((prevState) => ({
-                      ...prevState,
+                    setCustomGasPrice({
                       gasPrice,
-                    }));
+                    });
                   } catch (error) {
                     console.error('setCustomGasPrice::error', error);
                     setCustomTxParamsError({
@@ -492,10 +491,9 @@ const CancelSpeedupPopoverImplementation = ({
                     const maxFeePerGas = utils
                       .parseUnits(value, 'gwei')
                       .toHexString();
-                    setCustomGasPrice((prevState) => ({
-                      ...prevState,
+                    setCustomGasPrice({
                       maxFeePerGas,
-                    }));
+                    });
                   } catch (error) {
                     console.error('setCustomGasPrice::error', error);
                     setCustomTxParamsError({
@@ -523,10 +521,9 @@ const CancelSpeedupPopoverImplementation = ({
                     const maxPriorityFeePerGas = utils
                       .parseUnits(value, 'gwei')
                       .toHexString();
-                    setCustomGasPrice((prevState) => ({
-                      ...prevState,
+                    setCustomGasPrice({
                       maxPriorityFeePerGas,
-                    }));
+                    });
                   } catch (error) {
                     console.error('setCustomGasPrice::error', error);
                     setCustomTxParamsError({
