@@ -76,14 +76,25 @@ const DrawerHeader = (props: {
   title: string;
   handleCloseIconClick: () => void;
 }) => {
+  const { t } = useTranslation();
   return (
-    <div className="drawer-header-container-common flexR">
+    <div className="drawer-header-container-common drawer-header-network flexR with-padding-x-24 flex-wrap">
       <span className="drawer-header-title">{props.title}</span>
       <IconComponent
         name="close"
         onClick={props.handleCloseIconClick}
         cls="drawer-header-close-icon"
       />
+      <h6
+        className="flex items-center flex-wrap w-full"
+        style={{ fontSize: 12 }}
+      >
+        {t('cancelSpeedUpLabel', {
+          replace: {
+            $1: 'replace',
+          },
+        })}
+      </h6>
     </div>
   );
 };
@@ -219,7 +230,7 @@ const CancelSpeedupPopoverImplementation = ({
       closable={false}
       bodyStyle={{
         boxSizing: 'border-box',
-        padding: '0 24px 24px 24px',
+        padding: '0',
       }}
       contentWrapperStyle={{
         borderRadius: '16px 16px 0 0',
@@ -243,93 +254,96 @@ const CancelSpeedupPopoverImplementation = ({
           expanded: shouldDrawerExpanded,
         })}
       >
-        <h6
-          className="flex items-center flex-wrap"
-          style={{ margin: '0, 0, 2, 0' }}
-        >
-          {t('cancelSpeedUpLabel', {
-            replace: {
-              $1: 'replace',
-            },
-          })}
-        </h6>
-
         <div className="tier-select">
-          <div className="tier-header">
+          <div className="tier-header with-padding-x-24">
             <div className="level-name bold">Options</div>
             <div className="estimate-time bold">Time</div>
             <div className="maximum-charge bold">Max. Cost</div>
           </div>
-          <TierItem
-            levelName={t(
-              priorityLevelToI18nKey[PRIORITY_LEVELS.TEN_PERCENT_INCREASED]
-            )}
-            estimateTime={'--'}
-            gasPrice={BigNumber.from(
-              add10PercentTxParams.maxFeePerGas || add10PercentTxParams.gasPrice
-            )}
-            gasLimit={gasLimit}
-            selected={selectedGasTier == PRIORITY_LEVELS.TEN_PERCENT_INCREASED}
-            onClick={() => setGasTier(PRIORITY_LEVELS.TEN_PERCENT_INCREASED)}
-          />
-          <FeeMarketTiersList
-            isEIP1559Tx={isEIP1559Tx}
-            add10PercentTxParams={add10PercentTxParams}
-            gasTierState={gasTierState}
-            gasLimit={gasLimit}
-          />
           <div
-            className={clsx('tier', {
-              selected: selectedGasTier == PRIORITY_LEVELS.CUSTOM,
+            className={clsx('list', {
+              expanded: shouldDrawerExpanded,
             })}
-            onClick={() => {
-              console.debug(
-                'Custom::previousSelectedGasTier',
-                previousSelectedGasTier
-              );
-              const nextTier =
-                selectedGasTier !== PRIORITY_LEVELS.CUSTOM ||
-                !previousSelectedGasTier
-                  ? PRIORITY_LEVELS.CUSTOM
-                  : previousSelectedGasTier;
-              console.debug('Custom::nextTier:', nextTier);
-              setGasTier(nextTier);
-            }}
           >
-            <div className="level-name bold">
-              {t(priorityLevelToI18nKey[PRIORITY_LEVELS.CUSTOM])}
+            <TierItem
+              levelName={t(
+                priorityLevelToI18nKey[PRIORITY_LEVELS.TEN_PERCENT_INCREASED]
+              )}
+              estimateTime={'--'}
+              gasPrice={BigNumber.from(
+                add10PercentTxParams.maxFeePerGas ||
+                  add10PercentTxParams.gasPrice
+              )}
+              gasLimit={gasLimit}
+              selected={
+                selectedGasTier == PRIORITY_LEVELS.TEN_PERCENT_INCREASED
+              }
+              onClick={() => setGasTier(PRIORITY_LEVELS.TEN_PERCENT_INCREASED)}
+            />
+            <FeeMarketTiersList
+              isEIP1559Tx={isEIP1559Tx}
+              add10PercentTxParams={add10PercentTxParams}
+              gasTierState={gasTierState}
+              gasLimit={gasLimit}
+            />
+            <div
+              className={clsx('tier', {
+                selected: selectedGasTier == PRIORITY_LEVELS.CUSTOM,
+              })}
+              onClick={() => {
+                console.debug(
+                  'Custom::previousSelectedGasTier',
+                  previousSelectedGasTier
+                );
+                const nextTier =
+                  selectedGasTier !== PRIORITY_LEVELS.CUSTOM ||
+                  !previousSelectedGasTier
+                    ? PRIORITY_LEVELS.CUSTOM
+                    : previousSelectedGasTier;
+                console.debug('Custom::nextTier:', nextTier);
+                setGasTier(nextTier);
+              }}
+            >
+              <div className="level-name bold">
+                {t(priorityLevelToI18nKey[PRIORITY_LEVELS.CUSTOM])}
+              </div>
+              <div
+                className={clsx('estimate-time narrow-letter-spacing')}
+              ></div>
+              <div className="maximum-charge">
+                <IconComponent
+                  name={`chevron-${
+                    selectedGasTier == PRIORITY_LEVELS.CUSTOM ? 'up' : 'down'
+                  }`}
+                  cls="base-text-color"
+                />
+              </div>
             </div>
-            <div className={clsx('estimate-time narrow-letter-spacing')}></div>
-            <div className="maximum-charge">
-              <IconComponent
-                name={`chevron-${
-                  selectedGasTier == PRIORITY_LEVELS.CUSTOM ? 'up' : 'down'
-                }`}
-                cls="base-text-color"
-              />
-            </div>
+            <CustomGasInput
+              gasLimit={gasLimit}
+              setGasLimit={setGasLimit}
+              gasPriceuseSetState={gasPriceuseSetState}
+              selectedGasTier={selectedGasTier}
+              isEIP1559Tx={isEIP1559Tx}
+            />
           </div>
         </div>
-
-        <CustomGasInput
-          gasLimit={gasLimit}
-          setGasLimit={setGasLimit}
-          gasPriceuseSetState={gasPriceuseSetState}
-          selectedGasTier={selectedGasTier}
-          isEIP1559Tx={isEIP1559Tx}
-        />
       </div>
-      <Button
-        type="primary"
-        onClick={submitTransactionChange}
-        className="w-full bold"
+      <div
+        className="with-padding-x-24"
         style={{
           marginTop: 24,
         }}
-        disabled={isSubmitDisabled}
       >
-        {t('Submit')}
-      </Button>
+        <Button
+          type="primary"
+          onClick={submitTransactionChange}
+          className="w-full bold"
+          disabled={isSubmitDisabled}
+        >
+          {t('Submit')}
+        </Button>
+      </div>
       <UnlockModal
         title="Unlock Wallet to continue"
         visible={unlockPopupVisible}

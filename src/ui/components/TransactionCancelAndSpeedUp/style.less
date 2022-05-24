@@ -2,6 +2,13 @@
     height: 273px;
     overflow-y: auto;
     .tier-select {
+        .list {
+            height: 240px;
+            overflow-y: auto;
+        }
+        .list.expanded {
+            height: 342px;
+        }
         .narrow-letter-spacing {
             // narrower letter spacing
             letter-spacing: -0.5px;
@@ -9,7 +16,6 @@
         .tier-header {
             display: flex;
     
-            padding: 6px;
             margin-bottom: 6px;
             border-radius: 8px;
     
@@ -24,10 +30,7 @@
         .tier {
             display: flex;
             justify-content: space-between;
-    
-            padding: 6px;
-            margin-bottom: 6px;
-            border-radius: 8px;
+            padding: 12px 24px;
             font-size: 14px;
             .bold {
                 font-family: MontserratBold;
@@ -69,6 +72,9 @@
     }
 
     .custom-gas {
+        background: #F8FAFC;
+        margin: 12px 24px;
+        border-radius: 8px;
         .field {
             width: 100%;
             padding: 9px 18px;
@@ -118,4 +124,12 @@
 }
 .cancel-speedup-popover_wrapper.expanded {
     height: 385px;
+}
+
+.with-padding-x-24 {
+    padding: 0 24px;
+}
+
+.drawer-header-network {
+    height: 72px !important;
 }

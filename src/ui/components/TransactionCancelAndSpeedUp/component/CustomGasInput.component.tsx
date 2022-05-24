@@ -27,34 +27,37 @@ export function CustomGasInput({
   const [customTxParamsError, setCustomTxParamsError] = useSetState<
     Partial<Transaction['txParams']>
   >({});
+
+  if (selectedGasTier !== PRIORITY_LEVELS.CUSTOM) {
+    return null;
+  }
+
   return (
     <div
       className="flex items-center flex-col custom-gas"
       style={{ marginTop: 4 }}
     >
-      {selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
-        <div className="field">
-          <h1 className="form-title bold">Gas Limit</h1>
-          <InputNumber<string>
-            style={{ width: '100% ' }}
-            stringMode
-            value={Number(gasLimit || 21000).toString()}
-            min="21000"
-            controls={false}
-            onBlur={({ target }) => {
-              try {
-                props.setGasLimit(BigNumber.from(target.value).toHexString());
-              } catch (error) {
-                console.error('setGasLimit::error:', error);
-                setCustomTxParamsError({
-                  gasLimit: 'bad input',
-                });
-              }
-            }}
-          />
-        </div>
-      )}
-      {!isEIP1559Tx && selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
+      <div className="field">
+        <h1 className="form-title bold">Gas Limit</h1>
+        <InputNumber<string>
+          style={{ width: '100% ' }}
+          stringMode
+          value={Number(gasLimit || 21000).toString()}
+          min="21000"
+          controls={false}
+          onBlur={({ target }) => {
+            try {
+              props.setGasLimit(BigNumber.from(target.value).toHexString());
+            } catch (error) {
+              console.error('setGasLimit::error:', error);
+              setCustomTxParamsError({
+                gasLimit: 'bad input',
+              });
+            }
+          }}
+        />
+      </div>
+      {!isEIP1559Tx && (
         <div className="field">
           <h1 className="form-title bold">Gas Price</h1>
           <InputNumber<string>
@@ -80,7 +83,7 @@ export function CustomGasInput({
           />
         </div>
       )}
-      {isEIP1559Tx && selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
+      {isEIP1559Tx && (
         <div className="field">
           <h1 className="form-title bold">Max Fee</h1>
           <InputNumber<string>
@@ -110,7 +113,7 @@ export function CustomGasInput({
           />
         </div>
       )}
-      {isEIP1559Tx && selectedGasTier === PRIORITY_LEVELS.CUSTOM && (
+      {isEIP1559Tx && (
         <div className="field">
           <h1 className="form-title bold">Max Priority Fee</h1>
           <InputNumber<string>
