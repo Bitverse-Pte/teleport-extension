@@ -37,7 +37,9 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import ConnectedSites from '../ConnectedSites';
-import { PresetNetworkId } from 'constants/defaultNetwork';
+import { Ecosystem, Provider } from 'types/network';
+import { getProvider } from 'ui/selectors/selectors';
+import { useSelector } from 'react-redux';
 
 const onCopy = () => {
   sensors.track('teleport_home_copy_account', { page: location.pathname });
@@ -58,7 +60,7 @@ const Home = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
-  const [currentChain, setCurrentChain] = useState('');
+  const currentChain: Provider = useSelector(getProvider);
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -85,7 +87,6 @@ const Home = () => {
     });
 
     if (balances && balances.length) {
-      setCurrentChain(balances[0]?.chainCustomId);
       setTokens(balances);
     }
   };
@@ -297,11 +298,13 @@ const Home = () => {
             <div className="wrap">
               <SearchInput onChange={handleInputChange} placeholder="Search" />
             </div>
-            <img
-              onClick={handleAddTokenBtnClick}
-              src={AddTokenImg}
-              className="home-search-add-icon cursor"
-            />
+            {currentChain.ecosystem === Ecosystem.EVM ? (
+              <img
+                onClick={handleAddTokenBtnClick}
+                src={AddTokenImg}
+                className="home-search-add-icon cursor"
+              />
+            ) : null}
           </div>
         ) : null}
         {tabType === Tabs.FIRST && (

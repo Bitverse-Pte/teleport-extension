@@ -897,18 +897,18 @@ class KeyringService extends EventEmitter {
   }
 
   async getCurrentChainAccounts(): Promise<BaseAccount[]> {
-    const currentChainCoinType: CoinType =
-      networkPreferenceService.getProviderConfig().coinType;
+    const currentChain: Provider = networkPreferenceService.getProviderConfig();
+    const { coinType, id } = currentChain;
     const currentAccount = preference.getCurrentAccount();
     let accounts: BaseAccount[] = [];
     if (!currentAccount) {
       return Promise.reject(new Error('no account found'));
     }
 
-    accounts = this.accounts.filter(
-      (a: BaseAccount) =>
-        a.coinType === currentChainCoinType &&
-        a.hdWalletId === currentAccount.hdWalletId
+    accounts = this.accounts.filter((a: BaseAccount) =>
+      coinType === CoinType.ETH
+        ? a.coinType === coinType && a.hdWalletId === currentAccount.hdWalletId
+        : a.hdWalletId === currentAccount.hdWalletId && a.chainCustomId === id
     );
     return Promise.resolve(accounts);
   }
