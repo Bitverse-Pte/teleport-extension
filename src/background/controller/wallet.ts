@@ -156,7 +156,22 @@ export class WalletController extends BaseController {
     const { provider } = networkPreferenceService.networkStore.getState();
     console.debug('useCurrentSelectedNetwork use provider:', provider);
     // reset once again
-    networkPreferenceService.setProviderConfig(provider);
+    try {
+      networkPreferenceService.setProviderConfig(provider);
+    } catch (error: any) {
+      if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+        /** error will be ignored, as it will 100% occurred in the first time (no account)
+         *  but will be log message as warn */
+        console.warn('useCurrentSelectedNetwork::error: no account for now');
+      } else {
+        console.error(
+          `useCurrentSelectedNetwork::error #${
+            error.code || 'No Error Code'
+          }: `,
+          error
+        );
+      }
+    }
   };
 
   getCurrentCurrency = () => preferenceService.getCurrentCurrency();
