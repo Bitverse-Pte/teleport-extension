@@ -84,10 +84,7 @@ export class WalletController extends BaseController {
           : ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING
       );
     }
-    return networkPreferenceService.setProviderConfig({
-      ...network,
-      type: 'rpc',
-    });
+    return networkPreferenceService.setProviderConfig(network);
   };
 
   moveNetwork = (e: Ecosystem, f: number, d: number) =>

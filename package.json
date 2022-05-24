@@ -201,7 +201,9 @@
   },
   "resolutions": {
     "eth-method-registry": "2.0.0",
-    "xhr2": "file:./xhr2"
+    "xhr2": "file:./xhr2",
+    "libsodium": "file:./etc/noop",
+    "libsodium-wrappers": "file:./etc/noop"
   },
   "keywords": [],
   "author": "",
