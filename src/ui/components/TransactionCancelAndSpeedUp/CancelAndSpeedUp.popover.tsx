@@ -1,31 +1,31 @@
 import { useSelector } from 'react-redux';
-import React, { Fragment, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { EDIT_GAS_MODES, PRIORITY_LEVELS } from 'constants/gas';
 import { Transaction } from 'constants/transaction';
-import { Button, Drawer, InputNumber } from 'antd';
+import { Button, Drawer } from 'antd';
 import { addTenPercentAndRound as _addTenPercentAndRound } from 'ui/helpers/utils/gas';
 import { SimpleModal } from 'ui/components/universal/SimpleModal';
 import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
 import { useGasFeeEstimates } from 'ui/hooks/gas/useGasFeeEstimates';
 import { decGWEIToHexWEI } from 'ui/utils/conversion';
 import './style.less';
-import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import { useWallet } from 'ui/utils';
 import {
   isEIP1559Transaction,
   purifyTxParamsGasFields,
 } from 'utils/transaction.utils';
-import { toHumanReadableTime } from 'ui/utils/utils';
 import clsx from 'clsx';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { MIN_GAS_LIMIT_DEC } from 'ui/context/send.constants';
 import { usePrevious, useSetState } from 'react-use';
 import { IconComponent } from '../IconComponents';
 import { CustomGasInput } from './component/CustomGasInput.component';
+import { FeeMarketTiersList } from './component/FeeTier/FeeMarketTiersList.component';
+import { TierItem } from './component/FeeTier/TierItem.component';
+import { priorityLevelToI18nKey } from './component/FeeTier/constant';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -71,60 +71,6 @@ const CancelSpeedupPopover = (props: CancelAndSpeedUpPopoverParams) => {
 
 const addTenPercentAndRound = (hexStr?: string) =>
   _addTenPercentAndRound(hexStr)?.split('.')[0];
-
-const TierItem = ({
-  levelName,
-  estimateTime,
-  gasPrice,
-  gasLimit = 21000,
-  selected,
-  onClick,
-  ...props
-}: {
-  levelName: string;
-  estimateTime: string;
-  gasPrice: BigNumber;
-  gasLimit?: string | number;
-  selected: boolean;
-  disabled?: boolean;
-  fast?: boolean;
-  onClick?: (e: any) => void;
-}) => {
-  const nativeToken = useSelector(getCurrentProviderNativeToken);
-
-  return (
-    <div
-      className={clsx('tier', {
-        selected: selected,
-        disabled: props.disabled,
-      })}
-      onClick={
-        !props.disabled
-          ? onClick
-          : () =>
-              ClickToCloseMessage.error(
-                'Not enough to replace the old transaction'
-              )
-      }
-    >
-      <div className="level-name bold">{levelName}</div>
-      <div
-        className={clsx('estimate-time narrow-letter-spacing', {
-          fast: props.fast,
-          bold: props.fast,
-        })}
-      >
-        {estimateTime}
-      </div>
-      <div className="maximum-charge">
-        <span className="amount narrow-letter-spacing">
-          {utils.formatEther(gasPrice.mul(gasLimit))}
-        </span>
-        {nativeToken?.symbol}
-      </div>
-    </div>
-  );
-};
 
 const DrawerHeader = (props: {
   title: string;
@@ -174,11 +120,12 @@ const CancelSpeedupPopoverImplementation = ({
   const wallet = useWallet();
   const currentBlockMaxGasLimit = useSelector((s) => s.currentBlock.gasLimit);
 
-  const { gasFeeEstimates, isGasEstimatesLoading } = useGasFeeEstimates();
+  const { gasFeeEstimates } = useGasFeeEstimates();
 
-  const [selectedGasTier, setGasTier] = useState<PRIORITY_LEVELS>(
+  const gasTierState = useState<PRIORITY_LEVELS>(
     PRIORITY_LEVELS.TEN_PERCENT_INCREASED
   );
+  const [selectedGasTier, setGasTier] = gasTierState;
   const previousSelectedGasTier = usePrevious(selectedGasTier);
 
   const gasPriceuseSetState = useSetState<Partial<Transaction['txParams']>>({
@@ -191,10 +138,6 @@ const CancelSpeedupPopoverImplementation = ({
   const [customGasPrice] = gasPriceuseSetState;
 
   const shouldDrawerExpanded = selectedGasTier === PRIORITY_LEVELS.CUSTOM;
-
-  useEffect(() => {
-    console.debug('gasFeeEstimates::updated:', gasFeeEstimates);
-  }, [gasFeeEstimates]);
 
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
 
@@ -249,63 +192,6 @@ const CancelSpeedupPopoverImplementation = ({
       console.error('submitTransactionChange::error:', error);
     }
     setShowPopOver(false);
-  };
-
-  const tiersForEIP1559Network = () => {
-    console.log('isGasEstimatesLoading', isGasEstimatesLoading);
-    if (!isEIP1559Tx || isGasEstimatesLoading) return null;
-    // avoid undefined error
-    if (!gasFeeEstimates.low) return null;
-    const getEstimatedTimeMinFast = (priorityLevel: string) => {
-      const ms =
-        priorityLevel === PRIORITY_LEVELS.HIGH
-          ? gasFeeEstimates?.high.minWaitTimeEstimate
-          : gasFeeEstimates?.low.maxWaitTimeEstimate;
-      return toHumanReadableTime(t, ms);
-    };
-    const parsedMFPG = (tier: string) =>
-      utils.parseUnits(gasFeeEstimates[tier].suggestedMaxFeePerGas, 'gwei');
-    return (
-      <Fragment>
-        <TierItem
-          levelName={t('Low')}
-          estimateTime={getEstimatedTimeMinFast('low')}
-          gasPrice={parsedMFPG('low')}
-          gasLimit={gasLimit}
-          selected={selectedGasTier == 'low'}
-          /**
-           * add10Percent's maxFeePerGas > current level of maxFeePerGas
-           */
-          disabled={BigNumber.from(add10PercentTxParams.maxFeePerGas).gt(
-            parsedMFPG('low')
-          )}
-          onClick={() => setGasTier(PRIORITY_LEVELS.LOW)}
-        />
-        <TierItem
-          levelName={t('Market')}
-          estimateTime={getEstimatedTimeMinFast('medium')}
-          gasPrice={parsedMFPG('medium')}
-          gasLimit={gasLimit}
-          selected={selectedGasTier == 'medium'}
-          disabled={BigNumber.from(add10PercentTxParams.maxFeePerGas).gt(
-            parsedMFPG('medium')
-          )}
-          onClick={() => setGasTier(PRIORITY_LEVELS.MEDIUM)}
-        />
-        <TierItem
-          levelName={t('Fast')}
-          estimateTime={getEstimatedTimeMinFast('high')}
-          gasPrice={parsedMFPG('high')}
-          gasLimit={gasLimit}
-          selected={selectedGasTier == 'high'}
-          disabled={BigNumber.from(add10PercentTxParams.maxFeePerGas).gt(
-            parsedMFPG('high')
-          )}
-          fast
-          onClick={() => setGasTier(PRIORITY_LEVELS.HIGH)}
-        />
-      </Fragment>
-    );
   };
 
   const isSubmitDisabled = useMemo(() => {
@@ -375,7 +261,9 @@ const CancelSpeedupPopoverImplementation = ({
             <div className="maximum-charge bold">Max. Cost</div>
           </div>
           <TierItem
-            levelName={t('addTenPercent')}
+            levelName={t(
+              priorityLevelToI18nKey[PRIORITY_LEVELS.TEN_PERCENT_INCREASED]
+            )}
             estimateTime={'--'}
             gasPrice={BigNumber.from(
               add10PercentTxParams.maxFeePerGas || add10PercentTxParams.gasPrice
@@ -384,7 +272,12 @@ const CancelSpeedupPopoverImplementation = ({
             selected={selectedGasTier == PRIORITY_LEVELS.TEN_PERCENT_INCREASED}
             onClick={() => setGasTier(PRIORITY_LEVELS.TEN_PERCENT_INCREASED)}
           />
-          {tiersForEIP1559Network()}
+          <FeeMarketTiersList
+            isEIP1559Tx={isEIP1559Tx}
+            add10PercentTxParams={add10PercentTxParams}
+            gasTierState={gasTierState}
+            gasLimit={gasLimit}
+          />
           <div
             className={clsx('tier', {
               selected: selectedGasTier == PRIORITY_LEVELS.CUSTOM,
@@ -403,7 +296,9 @@ const CancelSpeedupPopoverImplementation = ({
               setGasTier(nextTier);
             }}
           >
-            <div className="level-name bold">Custom</div>
+            <div className="level-name bold">
+              {t(priorityLevelToI18nKey[PRIORITY_LEVELS.CUSTOM])}
+            </div>
             <div className={clsx('estimate-time narrow-letter-spacing')}></div>
             <div className="maximum-charge">
               <IconComponent
