@@ -334,38 +334,25 @@ export class WalletController extends BaseController {
     return networkPreferenceService.getProviderConfig();
   }
 
-  // TODO (Jayce) test code
-  getCurrentChains(): Provider[] {
-    return networkPreferenceService.getSupportProviders();
-  }
-
-  getTokenBalancesAsync = (showHideToken?: boolean): Promise<Token[]> => {
+  getTokenBalancesAsync = (): Promise<Token[]> => {
     const account = preferenceService.getCurrentAccount();
     let chainCustomId;
     const currentProvider = this.getCurrentChain();
     if (currentProvider) chainCustomId = currentProvider.id;
     if (account) {
-      return TokenService.getBalancesAsync(
-        account.address,
-        chainCustomId
-        //showHideToken
-      );
+      return TokenService.getBalancesAsync(account.address, chainCustomId);
     } else {
       return Promise.reject(new Error('no account found'));
     }
   };
 
-  getTokenBalancesSync = (showHideToken?: boolean): Promise<Token[]> => {
+  getTokenBalancesSync = (): Promise<Token[]> => {
     const account = preferenceService.getCurrentAccount();
     let chainCustomId;
     const currentProvider = this.getCurrentChain();
     if (currentProvider) chainCustomId = currentProvider.id;
     if (account && chainCustomId) {
-      return TokenService.getBalancesSync(
-        account.address,
-        chainCustomId
-        //showHideToken
-      );
+      return TokenService.getBalancesSync(account.address, chainCustomId);
     } else {
       return Promise.reject(new Error('no account found'));
     }
@@ -420,12 +407,7 @@ export class WalletController extends BaseController {
     return TokenService.addCustomToken(tokenParams);
   }
 
-  getChains = () => networkPreferenceService.getAllProviders();
-
   queryTokenPrices = () => TokenService.queryTokenPrices();
-
-  // TODO (Jayce) follows are test code
-  testUnlock = () => this.unlock('Q1!qqqqq');
 
   providers() {
     console.log(networkPreferenceService.getProviderConfig());

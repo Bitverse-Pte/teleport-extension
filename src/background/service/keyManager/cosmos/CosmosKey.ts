@@ -60,15 +60,29 @@ export class CosmosKey extends Base.KeyBase<Tx.Transaction> {
     return keyPair;
   }
 
-  public generateSignature(stdTx: Tx.Transaction, privateKey: string): string {
-    throw new Error('Method not implemented.');
+  public generateSignature(msg: any, privateKey: string | Buffer): Buffer {
+    const secp256k1 = new ec('secp256k1');
+    let privKey = privateKey;
+    if (typeof privKey === 'string') {
+      const stripped = ethUtil.stripHexPrefix(privateKey as string);
+      privKey = Buffer.from(stripped, 'hex');
+    }
+    const key = secp256k1.keyFromPrivate(privKey);
+
+    const hash = crypto
+      .SHA256(crypto.lib.WordArray.create(msg as any))
+      .toString();
+
+    const signature = key.sign(Buffer.from(hash, 'hex'), {
+      canonical: true,
+    });
+
+    return Buffer.from(
+      signature.r.toArray('be', 32).concat(signature.s.toArray('be', 32))
+    );
   }
 
   public signTx(stdTx: Tx.Transaction, privateKey: string): any {
-    const privateKeyBuf = Buffer.from(
-      ethUtil.stripHexPrefix(privateKey),
-      'hex'
-    );
-    return stdTx.sign(privateKeyBuf);
+    throw Error('method not impl');
   }
 }

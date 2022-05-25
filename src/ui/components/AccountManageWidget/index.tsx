@@ -120,7 +120,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
           } else {
             displayAccounts.push({
               hdPathIndex: a.hdPathIndex,
-              selected: a.address === currentAccount.address,
+              //selected: a.address === currentAccount.address,
               ecosystems: [
                 {
                   accounts: [a],
@@ -133,6 +133,9 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
         }
       }
       displayAccounts.forEach((da: IDisplayAccountManage) => {
+        da.selected = da.ecosystems.some((e) =>
+          e.accounts.some((subE) => subE.address === currentAccount.address)
+        );
         if (da.ecosystems.some((e) => e.ecosystem === Ecosystem.EVM)) {
           da.ethAddress = da.ecosystems.find(
             (e) => e.ecosystem === Ecosystem.EVM

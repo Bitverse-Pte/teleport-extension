@@ -289,7 +289,7 @@ const WalletManage: React.FC = () => {
                       : ''
                   }`}
                   style={isEdit ? { paddingRight: '24px' } : {}}
-                  key={w.hdWalletName}
+                  key={w.hdWalletId}
                   onClick={(e) => {
                     if (isEdit) return;
                     handleWalletClick(w);
