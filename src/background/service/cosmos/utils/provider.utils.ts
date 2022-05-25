@@ -14,7 +14,7 @@ export function parsedKeplrChainInfoAsTeleportCosmosProvider(
       chainInfo.feeCurrencies[0] ||
       chainInfo.stakeCurrency
     ).coinDenom,
-    nickname: 'Cosmos Hub',
+    nickname: chainInfo.chainName,
     rpcPrefs: {},
     chainName: 'COSMOS',
     coinType: chainInfo.bip44.coinType,
