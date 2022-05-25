@@ -48,11 +48,7 @@ export function NetworkSelectionItem({
   const selectProvider = useCallback(
     (network: Provider) => {
       console.debug(`Selected Chain ${network.chainId}`);
-      if (network.type === 'rpc') {
-        providerContext?.useCustomProvider(network.id);
-      } else {
-        providerContext?.usePresetProvider(network.type);
-      }
+      providerContext?.useProviderById(network.id);
       sensors.track('teleport_network_selected', {
         page: location.pathname,
         chainId: network.chainId,
