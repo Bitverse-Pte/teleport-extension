@@ -1044,6 +1044,7 @@ class NetworkPreferenceService extends EventEmitter {
       chainCustomId: newCosmosProvider.id,
       isNative: true,
     });
+    /** @TODO add account for this network needed, so no error in `setProviderConfig` */
     return newCosmosProvider;
   }
 }
