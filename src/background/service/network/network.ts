@@ -240,7 +240,8 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       networks: networks.map((n) => ({
         ...n,
-        chainId: toHexString(n.chainId),
+        chainId:
+          n.ecosystem === Ecosystem.EVM ? toHexString(n.chainId) : n.chainId,
       })),
     });
 
