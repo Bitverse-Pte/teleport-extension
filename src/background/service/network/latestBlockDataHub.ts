@@ -10,6 +10,7 @@ import EthQuery from 'eth-query';
 import pify from 'pify';
 import eventBus from 'eventBus';
 import { GAS_ESTIMATE_TYPES } from 'constants/gas';
+import { Ecosystem, Provider } from 'types/network';
 
 export type BlockData = {
   /**
@@ -33,9 +34,7 @@ export type BlockData = {
 };
 
 type NetworkProviderStore = ObservableStore<{
-  provider: {
-    rpcUrl: string;
-  };
+  provider: Provider;
 }>;
 
 interface LatestBlockDataHubConstructorParams {
@@ -150,6 +149,17 @@ export class LatestBlockDataHubService {
     const isRpcChanged = this.rpcUrl !== state.provider.rpcUrl;
     if (!isRpcChanged) {
       // skip
+      return;
+    }
+    const isNewProviderNonEvm = state.provider.ecosystem !== Ecosystem.EVM;
+    console.debug('handleProviderChange::state', state);
+    console.debug('isNewProviderNonEvm', isNewProviderNonEvm);
+    if (isNewProviderNonEvm) {
+      // this module do not track provider that are non EVM compatible
+      this.stop();
+      console.debug(
+        'LatestBlockDataHubService::stopped: new provider is not in EVM ecosystem.'
+      );
       return;
     }
     console.debug(
