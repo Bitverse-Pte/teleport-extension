@@ -10,6 +10,9 @@ const config = {
     ignored: ['**/public', '**/node_modules'],
     followSymlinks: false,
   },
+  resolve: {
+    fallback: { "path": require.resolve("path-browserify") }
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.BUILD_ENV': JSON.stringify('DEV'),
