@@ -33,6 +33,7 @@ import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
 import { CustomGasSettings } from 'types/tx';
 import { BigNumberish } from 'ethers';
+import { CosmosChainInfo } from 'types/cosmos';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -125,6 +126,27 @@ export class WalletController extends BaseController {
       console.error('addCustomNetwork::error: ', error);
     }
     return network;
+  };
+
+  addCustomCosmosNetwork = async (chainInfo: CosmosChainInfo) => {
+    /** @TODO this is for test only.
+     * remove this function only when
+     * `window.keplr.suggestChainInfo` was implemented
+     */
+    try {
+      const network = await networkPreferenceService.suggestCosmosChainInfo(
+        chainInfo,
+        'foo'
+      );
+      networkPreferenceService.setProviderConfig(network);
+      return network;
+    } catch (error: any) {
+      /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+      if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+        console.debug('account not exist, shall create here...');
+      }
+      console.error('addCustomCosmosNetwork::error: ', error);
+    }
   };
 
   editCustomNetwork = (

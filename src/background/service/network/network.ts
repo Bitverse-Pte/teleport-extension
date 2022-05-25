@@ -1012,13 +1012,17 @@ class NetworkPreferenceService extends EventEmitter {
     // env: Env,
     chainInfo: CosmosChainInfo,
     origin: string
-  ): Promise<void> {
+  ) {
     chainInfo = await ChainInfoSchema.validateAsync(chainInfo, {
       stripUnknown: true,
     });
 
     const newCosmosProvider =
       parsedKeplrChainInfoAsTeleportCosmosProvider(chainInfo);
+    console.debug(
+      'suggestCosmosChainInfo::newCosmosProvider:',
+      newCosmosProvider
+    );
     this.checkIsCustomNetworkNameLegit(newCosmosProvider.nickname);
     const { networks, orderOfNetworks } = this.customNetworksStore.getState();
     this.customNetworksStore.updateState({
@@ -1031,6 +1035,15 @@ class NetworkPreferenceService extends EventEmitter {
         ],
       },
     });
+    // add custom token
+    await TokenService.addCustomToken({
+      symbol: newCosmosProvider.ticker as string,
+      name: '',
+      decimal: 18,
+      chainCustomId: newCosmosProvider.id,
+      isNative: true,
+    });
+    return newCosmosProvider;
   }
 }
 
