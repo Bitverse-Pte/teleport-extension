@@ -4,19 +4,14 @@ import cloneDeep from 'lodash/cloneDeep';
 import { DEFAULT_TOKEN_CONFIG } from 'constants/token';
 import { nanoid } from 'nanoid';
 import { networkPreferenceService } from 'background/service';
-import abi, {
-  HumanStandardTokenABI,
-} from 'utils/human-standard-token-abi-extended';
+import abi from 'utils/human-standard-token-abi-extended';
 import { TOKEN_THEME_COLOR } from 'constants/wallet';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { ObservableStorage } from 'background/utils/obsStorage';
-import { PresetNetworkId } from 'constants/defaultNetwork';
-import { getMulticallAddressOf, MulticallV2ABI } from 'constants/evm/multicall';
+import { getMulticallAddressOf } from 'constants/evm/multicall';
 import { Ecosystem } from 'types/network';
-import { zeroAddress } from 'ethereumjs-util';
-import { BigNumber, Contract, ethers, utils } from 'ethers';
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
+import { MulticallHelper } from './utils/multicallHelper';
 
 class TokenService {
   store: ObservableStorage<ITokenStore>;
@@ -199,7 +194,8 @@ class TokenService {
           tokens = tokens.map((t, idx) =>
             !fetchedBalances[idx]
               ? t
-              : { ...t, amount: fetchedBalances[idx]?.toString() }
+              : /** assign if balance exist */
+                { ...t, amount: fetchedBalances[idx]?.toString() }
           );
         } catch (error) {
           console.error('getBalancesAsync::multicall:error:', error);
@@ -226,48 +222,21 @@ class TokenService {
   }
 
   private async _fetchBalancesByMulticall(
-    multicallV2Address: string,
+    mcallAddr: string,
     tokens: Token[],
     who: string,
     requireAllSuccess = false
   ) {
-    /**
-     * Init some interface(s) to encode/decode data
-     */
-    const erc20Iface = new utils.Interface(HumanStandardTokenABI);
-    const mcallV2Iface = new utils.Interface(MulticallV2ABI);
-    const queryBalanceCallDataGenerator = (t: Token) => ({
-      callData: t.isNative
-        ? mcallV2Iface.encodeFunctionData('getEthBalance', [who])
-        : erc20Iface.encodeFunctionData('balanceOf', [who]),
-      target: t.isNative ? multicallV2Address : t.contractAddress,
-    });
-    const callData = tokens.map(queryBalanceCallDataGenerator);
+    const encoder = MulticallHelper.encodeBalanceOf(mcallAddr, who);
+    const callData = tokens.map(encoder);
 
-    /**
-     * workaround from https://github.com/ethers-io/ethers.js/issues/1886#issuecomment-1063531514
-     * related to service worker(`XMLHttpRequest` vs `fetch` API) & ethers.js
-     */
-    const contract = new Contract(
-      multicallV2Address,
-      mcallV2Iface,
-      new StaticJsonRpcProvider({
-        url: networkPreferenceService.getProviderConfig().rpcUrl,
-        skipFetchSetup: true,
-      })
+    const returnData = await MulticallHelper.tryCall(
+      mcallAddr,
+      networkPreferenceService.getProviderConfig().rpcUrl,
+      callData,
+      requireAllSuccess
     );
-    const returnData = await contract.callStatic
-      .tryAggregate(requireAllSuccess, callData)
-      .catch((e: any) => {
-        console.error('_fetchBalancesByMulticall::error:', e);
-      });
-    const parsedReturnData: Array<BigNumber | undefined> = returnData.map(
-      (entry: { returnData: string; success: boolean }) => {
-        return entry.success
-          ? erc20Iface.decodeFunctionResult('balanceOf', entry.returnData)[0]
-          : undefined;
-      }
-    );
+    const parsedReturnData = returnData.map(MulticallHelper.decodeBalanceOf);
     console.info(
       '_fetchBalancesByMulticall::parsedReturnData:',
       parsedReturnData
