@@ -151,6 +151,31 @@ class TokenService {
     return Promise.resolve(tokens);
   }
 
+  private async _getBalancesAsyncLegacy(
+    tokens: Token[],
+    address: string
+    //showHideToken = false
+  ): Promise<Token[]> {
+    for (const token of tokens) {
+      if (token.contractAddress && address) {
+        const balance = await this.getERC20Balance(
+          token.contractAddress,
+          address
+        );
+        if (balance) {
+          token.amount = balance;
+        }
+      } else if (token.isNative) {
+        const balance = await this.getNativeBalance(address);
+        if (balance) {
+          token.amount = balance;
+        }
+      }
+    }
+
+    return tokens;
+  }
+
   async getBalancesAsync(
     address: string,
     chainCustomId: string
@@ -163,35 +188,35 @@ class TokenService {
     const { chainId, ecosystem } = networkPreferenceService.getProviderConfig();
     const multicallV2 = getMulticallAddressOf(chainId);
 
-    if (ecosystem == Ecosystem.EVM && multicallV2) {
+    if (ecosystem == Ecosystem.EVM) {
       /** Use multicall contract to fetch balance */
-      const fetchedBalances = await this._fetchBalancesByMulticall(
-        multicallV2,
-        tokens,
-        address
-      );
-      tokens = tokens.map((t, idx) =>
-        !fetchedBalances[idx]
-          ? t
-          : { ...t, amount: fetchedBalances[idx]?.toString() }
-      );
-    } else {
-      for (const token of tokens) {
-        if (token.contractAddress && address) {
-          const balance = await this.getERC20Balance(
-            token.contractAddress,
+      if (multicallV2) {
+        try {
+          const fetchedBalances = await this._fetchBalancesByMulticall(
+            multicallV2,
+            tokens,
             address
           );
-          if (balance) {
-            token.amount = balance;
-          }
-        } else if (token.isNative) {
-          const balance = await this.getNativeBalance(address);
-          if (balance) {
-            token.amount = balance;
-          }
+          tokens = tokens.map((t, idx) =>
+            !fetchedBalances[idx]
+              ? t
+              : { ...t, amount: fetchedBalances[idx]?.toString() }
+          );
+        } catch (error) {
+          console.error('getBalancesAsync::multicall:error:', error);
+          console.warn('using legacy query now...');
+          tokens = await this._getBalancesAsyncLegacy(tokens, address);
         }
+      } else {
+        /**
+         * just use legacy way if no multicall for this chain
+         */
+        tokens = await this._getBalancesAsyncLegacy(tokens, address);
       }
+    } else {
+      console.debug(
+        `query token balances for ${ecosystem} is not supported right now.`
+      );
     }
 
     balances![address] = tokens;
