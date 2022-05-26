@@ -16,6 +16,7 @@ import { getMulticallAddressOf, MulticallV2ABI } from 'constants/evm/multicall';
 import { Ecosystem } from 'types/network';
 import { zeroAddress } from 'ethereumjs-util';
 import { BigNumber, Contract, ethers, utils } from 'ethers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 
 class TokenService {
   store: ObservableStorage<ITokenStore>;
@@ -226,15 +227,16 @@ class TokenService {
     //   .contract(MulticallV2ABI)
     //   .at(multicallV2Address);
     /**
-     * @TODO need future notice!
-     * Not so sure about can it work properly in production
+     * workaround from https://github.com/ethers-io/ethers.js/issues/1886#issuecomment-1063531514
+     * related to service worker(`XMLHttpRequest` vs `fetch` API) & ethers.js
      */
     const contract = new Contract(
       multicallV2Address,
       mcallV2Iface,
-      new ethers.providers.JsonRpcProvider(
-        networkPreferenceService.getProviderConfig().rpcUrl
-      )
+      new StaticJsonRpcProvider({
+        url: networkPreferenceService.getProviderConfig().rpcUrl,
+        skipFetchSetup: true,
+      })
     );
     const returnData = await contract.callStatic
       .tryAggregate(requireAllSuccess, callData)
