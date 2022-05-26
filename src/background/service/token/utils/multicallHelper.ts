@@ -29,6 +29,11 @@ export class MulticallHelper {
   }
 
   static decodeBalanceOf(r: MulticallV2Result): BigNumber {
+    /**
+     * just use `ERC20.balanceOf` to decode
+     * since `getEthBalance` shared the same return types: [uint256]
+     * so convert bytes => [uint256], it's OK to use `ERC20.balanceOf` to decode
+     */
     return r.success
       ? erc20Iface.decodeFunctionResult('balanceOf', r.returnData)[0]
       : undefined;
