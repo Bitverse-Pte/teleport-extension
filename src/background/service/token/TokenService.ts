@@ -154,7 +154,6 @@ class TokenService {
   private async _getBalancesAsyncLegacy(
     tokens: Token[],
     address: string
-    //showHideToken = false
   ): Promise<Token[]> {
     for (const token of tokens) {
       if (token.contractAddress && address) {
@@ -245,10 +244,6 @@ class TokenService {
     });
     const callData = tokens.map(queryBalanceCallDataGenerator);
 
-    // const contract = networkPreferenceService
-    //   .getCurrentEth()
-    //   .contract(MulticallV2ABI)
-    //   .at(multicallV2Address);
     /**
      * workaround from https://github.com/ethers-io/ethers.js/issues/1886#issuecomment-1063531514
      * related to service worker(`XMLHttpRequest` vs `fetch` API) & ethers.js
