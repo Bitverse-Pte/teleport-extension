@@ -170,13 +170,11 @@ class TokenService {
         tokens,
         address
       );
-      tokens = tokens.map((t, idx) => {
-        if (fetchedBalances[idx]) {
-          return { ...t, amount: fetchedBalances[idx]?.toString() };
-        } else {
-          return t;
-        }
-      });
+      tokens = tokens.map((t, idx) =>
+        !fetchedBalances[idx]
+          ? t
+          : { ...t, amount: fetchedBalances[idx]?.toString() }
+      );
     } else {
       for (const token of tokens) {
         if (token.contractAddress && address) {
