@@ -4,12 +4,18 @@ import cloneDeep from 'lodash/cloneDeep';
 import { DEFAULT_TOKEN_CONFIG } from 'constants/token';
 import { nanoid } from 'nanoid';
 import { networkPreferenceService } from 'background/service';
-import abi from 'utils/human-standard-token-abi-extended';
+import abi, {
+  HumanStandardTokenABI,
+} from 'utils/human-standard-token-abi-extended';
 import { TOKEN_THEME_COLOR } from 'constants/wallet';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { PresetNetworkId } from 'constants/defaultNetwork';
+import { getMulticallAddressOf, MulticallV2ABI } from 'constants/evm/multicall';
+import { Ecosystem } from 'types/network';
+import { zeroAddress } from 'ethereumjs-util';
+import { BigNumber, Contract, ethers, utils } from 'ethers';
 
 class TokenService {
   store: ObservableStorage<ITokenStore>;
@@ -149,33 +155,104 @@ class TokenService {
     chainCustomId: string
     //showHideToken = false
   ): Promise<Token[]> {
-    const tokens: Token[] = cloneDeep(
-      this.store.getState().tokens || []
-    ).filter(
+    let tokens: Token[] = cloneDeep(this.store.getState().tokens || []).filter(
       (t: Token) => t.chainCustomId === chainCustomId // && (showHideToken ? true : t.display)
     );
     const balances = cloneDeep(this.store.getState().balances || {});
-    for (const token of tokens) {
-      if (token.contractAddress && address) {
-        const balance = await this.getERC20Balance(
-          token.contractAddress,
-          address
-        );
-        if (balance) {
-          token.amount = balance;
+    const { chainId, ecosystem } = networkPreferenceService.getProviderConfig();
+    const multicallV2 = getMulticallAddressOf(chainId);
+
+    if (ecosystem == Ecosystem.EVM && multicallV2) {
+      /** Use multicall contract to fetch balance */
+      const fetchedBalances = await this._fetchBalancesByMulticall(
+        multicallV2,
+        tokens,
+        address
+      );
+      tokens = tokens.map((t, idx) => {
+        if (fetchedBalances[idx]) {
+          return { ...t, amount: fetchedBalances[idx]?.toString() };
+        } else {
+          return t;
         }
-      } else if (token.isNative) {
-        const balance = await this.getNativeBalance(address);
-        if (balance) {
-          token.amount = balance;
+      });
+    } else {
+      for (const token of tokens) {
+        if (token.contractAddress && address) {
+          const balance = await this.getERC20Balance(
+            token.contractAddress,
+            address
+          );
+          if (balance) {
+            token.amount = balance;
+          }
+        } else if (token.isNative) {
+          const balance = await this.getNativeBalance(address);
+          if (balance) {
+            token.amount = balance;
+          }
         }
       }
     }
+
     balances![address] = tokens;
     this.store.updateState({
       balances,
     });
     return this.getBalancesSync(address, chainCustomId /* , showHideToken */);
+  }
+
+  private async _fetchBalancesByMulticall(
+    multicallV2Address: string,
+    tokens: Token[],
+    who: string,
+    requireAllSuccess = false
+  ) {
+    /**
+     * Init some interface(s) to encode/decode data
+     */
+    const erc20Iface = new utils.Interface(HumanStandardTokenABI);
+    const mcallV2Iface = new utils.Interface(MulticallV2ABI);
+    const queryBalanceCallDataGenerator = (t: Token) => ({
+      callData: t.isNative
+        ? mcallV2Iface.encodeFunctionData('getEthBalance', [who])
+        : erc20Iface.encodeFunctionData('balanceOf', [who]),
+      target: t.isNative ? multicallV2Address : t.contractAddress,
+    });
+    const callData = tokens.map(queryBalanceCallDataGenerator);
+
+    // const contract = networkPreferenceService
+    //   .getCurrentEth()
+    //   .contract(MulticallV2ABI)
+    //   .at(multicallV2Address);
+    /**
+     * @TODO need future notice!
+     * Not so sure about can it work properly in production
+     */
+    const contract = new Contract(
+      multicallV2Address,
+      mcallV2Iface,
+      new ethers.providers.JsonRpcProvider(
+        networkPreferenceService.getProviderConfig().rpcUrl
+      )
+    );
+    const returnData = await contract.callStatic
+      .tryAggregate(requireAllSuccess, callData)
+      .catch((e: any) => {
+        console.error('_fetchBalancesByMulticall::error:', e);
+      });
+    const parsedReturnData: Array<BigNumber | undefined> = returnData.map(
+      (entry: { returnData: string; success: boolean }) => {
+        return entry.success
+          ? erc20Iface.decodeFunctionResult('balanceOf', entry.returnData)[0]
+          : undefined;
+      }
+    );
+    console.info(
+      '_fetchBalancesByMulticall::parsedReturnData:',
+      parsedReturnData
+    );
+    return parsedReturnData;
   }
 
   async queryTokenPrices(target = 'usd') {
