@@ -46,9 +46,9 @@ export function NetworkSelectionItem({
   );
 
   const selectProvider = useCallback(
-    (network: Provider) => {
+    async (network: Provider) => {
       console.debug(`Selected Chain ${network.chainId}`);
-      providerContext?.useProviderById(network.id);
+      await providerContext?.useProviderById(network.id);
       sensors.track('teleport_network_selected', {
         page: location.pathname,
         chainId: network.chainId,
