@@ -19,16 +19,16 @@ const erc20Iface = new utils.Interface(HumanStandardTokenABI);
 const mcallV2Iface = new utils.Interface(MulticallV2ABI);
 
 export class MulticallHelper {
-  static encodeBalanceOf(multicallAddress: string, who: string) {
+  static encodeBalanceOf(mcallAddr: string, who: string): (t: Token) => Call {
     return (t: Token) => ({
       callData: t.isNative
         ? mcallV2Iface.encodeFunctionData('getEthBalance', [who])
         : erc20Iface.encodeFunctionData('balanceOf', [who]),
-      target: t.isNative ? multicallAddress : t.contractAddress,
+      target: t.isNative ? mcallAddr : t.contractAddress,
     });
   }
 
-  static decodeBalanceOf(r: MulticallV2Result): BigNumber {
+  static decodeBalanceOfResult(r: MulticallV2Result): BigNumber | undefined {
     /**
      * just use `ERC20.balanceOf` to decode
      * since `getEthBalance` shared the same return types: [uint256]
@@ -49,15 +49,12 @@ export class MulticallHelper {
      * workaround from https://github.com/ethers-io/ethers.js/issues/1886#issuecomment-1063531514
      * related to service worker(`XMLHttpRequest` vs `fetch` API) & ethers.js
      */
-    const contract = new Contract(
-      multicallV2Address,
-      mcallV2Iface,
-      new StaticJsonRpcProvider({
-        url: rpcUrl,
-        skipFetchSetup: true,
-      })
-    );
-    const returnData = await contract.callStatic
+    const provider = new StaticJsonRpcProvider({
+      url: rpcUrl,
+      skipFetchSetup: true,
+    });
+    const multicall = new Contract(multicallV2Address, mcallV2Iface, provider);
+    const returnData = await multicall.callStatic
       .tryAggregate(requireAllSuccess, calls)
       .catch((e: any) => {
         console.error('_fetchBalancesByMulticall::error:', e);

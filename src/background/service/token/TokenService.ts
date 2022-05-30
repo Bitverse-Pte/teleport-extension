@@ -209,7 +209,7 @@ class TokenService {
         tokens = await this._getBalancesAsyncLegacy(tokens, address);
       }
     } else {
-      console.debug(
+      console.warn(
         `query token balances for ${ecosystem} is not supported right now.`
       );
     }
@@ -227,17 +227,19 @@ class TokenService {
     who: string,
     requireAllSuccess = false
   ) {
-    const encoder = MulticallHelper.encodeBalanceOf(mcallAddr, who);
-    const callData = tokens.map(encoder);
+    const balanceOfEncoder = MulticallHelper.encodeBalanceOf(mcallAddr, who);
+    const balanceOfCalls = tokens.map(balanceOfEncoder);
 
     const returnData = await MulticallHelper.tryCall(
       mcallAddr,
       networkPreferenceService.getProviderConfig().rpcUrl,
-      callData,
+      balanceOfCalls,
       requireAllSuccess
     );
-    const parsedReturnData = returnData.map(MulticallHelper.decodeBalanceOf);
-    console.info(
+    const parsedReturnData = returnData.map(
+      MulticallHelper.decodeBalanceOfResult
+    );
+    console.debug(
       '_fetchBalancesByMulticall::parsedReturnData:',
       parsedReturnData
     );
