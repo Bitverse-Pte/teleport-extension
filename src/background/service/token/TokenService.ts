@@ -247,12 +247,11 @@ class TokenService {
   }
 
   async queryTokenPrices(target = 'usd') {
-    const currentChain = networkPreferenceService.getProviderConfig().type;
-    //TODO(Jayce) needs to be uncommented；
-    //if (currentChain !== 'ethereum') return Promise.resolve(null);
+    const { id } = networkPreferenceService.getProviderConfig();
     const tokensStr = this.store
       .getState()
-      .tokens.map((t: Token) => t.symbol)
+      .tokens.filter((t: Token) => t.chainCustomId === id)
+      .map((t: Token) => t.symbol)
       .join(',');
     if (!tokensStr) return Promise.reject('no token found');
     const coinsUrl = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${tokensStr}&tsyms=${target}&api_key=87e7ef93b4e386bc370b82ad39697409db31409a808f0e8f426cb59ddabceca4`;
