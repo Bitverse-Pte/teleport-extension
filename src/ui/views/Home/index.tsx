@@ -96,12 +96,6 @@ const Home = () => {
     if (account) setAccount(account);
   };
 
-  /* const getAccountList = async () => {
-    const accounts: DisplayWalletManage = await wallet.getAccountList();
-    setAccountList(accounts);
-  }; */
-
-  //useAsyncEffect(getAccountList, []);
   useAsyncEffect(updateAccount, []);
   useAsyncEffect(getTokenBalancesAsync, []);
   useAsyncEffect(getTokenBalancesSync, []);
