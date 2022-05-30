@@ -9,7 +9,9 @@ import { TOKEN_THEME_COLOR } from 'constants/wallet';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { ObservableStorage } from 'background/utils/obsStorage';
-import { PresetNetworkId } from 'constants/defaultNetwork';
+import { getMulticallAddressOf } from 'constants/evm/multicall';
+import { Ecosystem } from 'types/network';
+import { MulticallHelper } from './utils/multicallHelper';
 
 class TokenService {
   store: ObservableStorage<ITokenStore>;
@@ -144,17 +146,10 @@ class TokenService {
     return Promise.resolve(tokens);
   }
 
-  async getBalancesAsync(
-    address: string,
-    chainCustomId: string
-    //showHideToken = false
+  private async _getBalancesAsyncLegacy(
+    tokens: Token[],
+    address: string
   ): Promise<Token[]> {
-    const tokens: Token[] = cloneDeep(
-      this.store.getState().tokens || []
-    ).filter(
-      (t: Token) => t.chainCustomId === chainCustomId // && (showHideToken ? true : t.display)
-    );
-    const balances = cloneDeep(this.store.getState().balances || {});
     for (const token of tokens) {
       if (token.contractAddress && address) {
         const balance = await this.getERC20Balance(
@@ -171,11 +166,84 @@ class TokenService {
         }
       }
     }
+
+    return tokens;
+  }
+
+  async getBalancesAsync(
+    address: string,
+    chainCustomId: string
+    //showHideToken = false
+  ): Promise<Token[]> {
+    let tokens: Token[] = cloneDeep(this.store.getState().tokens || []).filter(
+      (t: Token) => t.chainCustomId === chainCustomId // && (showHideToken ? true : t.display)
+    );
+    const balances = cloneDeep(this.store.getState().balances || {});
+    const { chainId, ecosystem } = networkPreferenceService.getProviderConfig();
+    const multicallV2 = getMulticallAddressOf(chainId);
+
+    if (ecosystem == Ecosystem.EVM) {
+      /** Use multicall contract to fetch balance */
+      if (multicallV2) {
+        try {
+          const fetchedBalances = await this._fetchBalancesByMulticall(
+            multicallV2,
+            tokens,
+            address
+          );
+          tokens = tokens.map((t, idx) =>
+            !fetchedBalances[idx]
+              ? t
+              : /** assign if balance exist */
+                { ...t, amount: fetchedBalances[idx]?.toString() }
+          );
+        } catch (error) {
+          console.error('getBalancesAsync::multicall:error:', error);
+          console.warn('using legacy query now...');
+          tokens = await this._getBalancesAsyncLegacy(tokens, address);
+        }
+      } else {
+        /**
+         * just use legacy way if no multicall for this chain
+         */
+        tokens = await this._getBalancesAsyncLegacy(tokens, address);
+      }
+    } else {
+      console.warn(
+        `query token balances for ${ecosystem} is not supported right now.`
+      );
+    }
+
     balances![address] = tokens;
     this.store.updateState({
       balances,
     });
     return this.getBalancesSync(address, chainCustomId /* , showHideToken */);
+  }
+
+  private async _fetchBalancesByMulticall(
+    mcallAddr: string,
+    tokens: Token[],
+    who: string,
+    requireAllSuccess = false
+  ) {
+    const balanceOfEncoder = MulticallHelper.encodeBalanceOf(mcallAddr, who);
+    const balanceOfCalls = tokens.map(balanceOfEncoder);
+
+    const returnData = await MulticallHelper.tryCall(
+      mcallAddr,
+      networkPreferenceService.getProviderConfig().rpcUrl,
+      balanceOfCalls,
+      requireAllSuccess
+    );
+    const parsedReturnData = returnData.map(
+      MulticallHelper.decodeBalanceOfResult
+    );
+    console.debug(
+      '_fetchBalancesByMulticall::parsedReturnData:',
+      parsedReturnData
+    );
+    return parsedReturnData;
   }
 
   async queryTokenPrices(target = 'usd') {
