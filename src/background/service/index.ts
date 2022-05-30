@@ -11,13 +11,13 @@ import permissionService from './permission';
 import preferenceService from './preference';
 import networkPreferenceService from './network';
 import sessionService from './session';
-//import transactionWatchService from './transactionWatcher';
 import i18n from './i18n';
 import TokenService from './token/TokenService';
 import platform from './extension';
 import knownMethodService from './knownMethod';
 import { LatestBlockDataHubService } from './network/latestBlockDataHub';
 import contactBookService from './contactBook';
+import { CosmosChainUpdaterService } from './network/cosmos/updater';
 
 const controllerMessenger = new ControllerMessenger();
 
@@ -91,6 +91,12 @@ const latestBlockDataHub = new LatestBlockDataHubService({
   networkProviderStore: networkController.networkStore,
 });
 
+/**
+ * Cosmos related
+ */
+
+const cosmosChainUpdater = new CosmosChainUpdaterService(networkController);
+
 latestBlockDataHub.store.subscribe(({ isBaseFeePerGasExist }) => {
   networkPreferenceService.markCurrentNetworkEIPStatus(
     '1559',
@@ -108,7 +114,7 @@ export {
   preferenceService,
   networkPreferenceService,
   sessionService,
-  //transactionWatchService,
+  cosmosChainUpdater,
   i18n,
   knownMethodService,
   TokenService,
