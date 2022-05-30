@@ -21,6 +21,7 @@ import {
   CreateAccountOpts,
   DisplayAccountManage,
   DisplayWalletManage,
+  HdAccountStruct,
   ImportAccountOpts,
 } from 'types/extend';
 import provider from './provider';
@@ -222,6 +223,20 @@ export class WalletController extends BaseController {
   changeAccount = (account: BaseAccount) =>
     preferenceService.setCurrentAccount(account);
 
+  changeAccountByWalletId = (hdWalletId: string) => {
+    return keyringService.changeAccountByWallet(hdWalletId);
+  };
+
+  async addCurrentChainAccountByWalletId(hdWalletId) {
+    const account = await keyringService.addCurrentChainAccountByWalletId(
+      hdWalletId
+    );
+    if (account) {
+      keyringService.boot();
+      return this._setCurrentAccount(account);
+    }
+  }
+
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 
   setIsDefaultWallet = (val: boolean) =>
@@ -288,6 +303,10 @@ export class WalletController extends BaseController {
 
   getAccountList(useCurrentChain?: boolean): Promise<DisplayWalletManage> {
     return Promise.resolve(keyringService.getAccountList(useCurrentChain));
+  }
+
+  getWalletList(useCurrentEcosystem?: boolean): Promise<HdAccountStruct[]> {
+    return Promise.resolve(keyringService.getWalletList(useCurrentEcosystem));
   }
 
   getCurrentChainAccounts(): Promise<BaseAccount[]> {

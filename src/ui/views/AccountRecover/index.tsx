@@ -285,9 +285,7 @@ const AccountRecover = () => {
           <p className="account-recover-title">Ecosystems</p>
         ) : null}
         <EcosystemSelect
-          style={
-            importType === Tabs.FIRST || !policyShow ? { display: 'none' } : {}
-          }
+          style={importType === Tabs.FIRST ? { display: 'none' } : {}}
           handleEcosystemSelect={(chains: Provider[], originChainId) => {
             setPrivateKeyChains(chains);
             setPrivateKeyMasterChain(originChainId);
