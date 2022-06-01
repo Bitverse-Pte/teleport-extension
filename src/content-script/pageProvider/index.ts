@@ -6,6 +6,10 @@ import PushEventHandlers from './pushEventHandlers';
 import { domReadyCall, $ } from './utils';
 import ReadyPromise from './readyPromise';
 import DedupePromise from './dedupePromise';
+import { CosmosProvider } from './cosmosProvider';
+import { OfflineSigner } from '@cosmjs/launchpad';
+import { SecretUtils } from 'secretjs/types/enigmautils';
+import { OfflineDirectSigner } from '@cosmjs/proto-signing';
 
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -249,6 +253,13 @@ declare global {
       currentProvider: EthereumProvider;
     };
     teleport: EthereumProvider;
+    keplr?: CosmosProvider;
+    getOfflineSigner?: (chainId: string) => OfflineSigner & OfflineDirectSigner;
+    getOfflineSignerOnlyAmino?: (chainId: string) => OfflineSigner;
+    getOfflineSignerAuto?: (
+      chainId: string
+    ) => Promise<OfflineSigner | OfflineDirectSigner>;
+    getEnigmaUtils?: (chainId: string) => SecretUtils;
   }
 }
 
@@ -292,5 +303,23 @@ window.addEventListener('message', function (event) {
     });
 
     window.dispatchEvent(new Event('ethereum#initialized'));
+
+    const cosmosProvider = new CosmosProvider({ channelName });
+    if (!window.keplr) {
+      window.keplr = cosmosProvider;
+    }
+    if (!window.getOfflineSigner) {
+      window.getOfflineSigner = cosmosProvider.getOfflineSigner;
+    }
+    if (!window.getOfflineSignerOnlyAmino) {
+      //window.getOfflineSignerOnlyAmino = getOfflineSignerOnlyAmino;
+    }
+    if (!window.getOfflineSignerAuto) {
+      //window.getOfflineSignerAuto = getOfflineSignerAuto;
+    }
+    if (!window.getEnigmaUtils) {
+      //window.getEnigmaUtils = getEnigmaUtils;
+    }
+    window.dispatchEvent(new Event('cosmos#initialized'));
   }
 });
