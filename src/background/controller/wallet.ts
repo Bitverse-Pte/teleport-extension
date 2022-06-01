@@ -78,15 +78,16 @@ export class WalletController extends BaseController {
   getAllProviders = () => networkPreferenceService.getAllProviders();
 
   useProviderById = (id: PresetNetworkId | string) => {
-    const network = networkPreferenceService.getProvider(id);
-    if (!network) {
+    const provider = networkPreferenceService.getProvider(id);
+    if (!provider) {
       throw new BitError(
         Object.values(PresetNetworkId).includes(id as PresetNetworkId)
           ? ErrorCode.DEFAULT_NETWORK_PROVIDER_PRESET_MISSING
           : ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING
       );
     }
-    return networkPreferenceService.setProviderConfig(network);
+    networkPreferenceService.setProviderConfig(provider);
+    return provider;
   };
 
   moveNetwork = (e: Ecosystem, f: number, d: number) =>
