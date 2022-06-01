@@ -286,7 +286,7 @@ export class CosmosChainUpdaterService {
         }
       }
     } catch (error) {
-      console.error(`ibcTransferUpdate:: error`, error);
+      console.error('ibcTransferUpdate:: error', error);
     }
 
     let wasmd24Update = false;

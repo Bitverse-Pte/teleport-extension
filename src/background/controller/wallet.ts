@@ -272,7 +272,7 @@ export class WalletController extends BaseController {
     return keyringService.changeAccountByWallet(hdWalletId);
   };
 
-  async addCurrentChainAccountByWalletId(hdWalletId) {
+  addCurrentChainAccountByWalletId = async (hdWalletId) => {
     const account = await keyringService.addCurrentChainAccountByWalletId(
       hdWalletId
     );
@@ -280,7 +280,7 @@ export class WalletController extends BaseController {
       keyringService.boot();
       return this._setCurrentAccount(account);
     }
-  }
+  };
 
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 
