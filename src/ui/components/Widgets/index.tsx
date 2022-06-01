@@ -106,7 +106,7 @@ function _getDefaultIcon(
         case PresetNetworkId.ARBITRUM:
           if (token.isNative) {
             _src =
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png';
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
           } else {
             _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/assets/${contractAddress}/logo.png`;
           }
@@ -129,6 +129,12 @@ function _getDefaultIcon(
           break;
         case PresetNetworkId.OP:
           if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+          } else if (
+            token.contractAddress ===
+            '0x4200000000000000000000000000000000000042'
+          ) {
             _src =
               'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png';
           } else {
