@@ -26,6 +26,12 @@ export enum CHAINS {
   COSMOS_HUB = 'COSMOS_HUB',
   OSMOSIS = 'OSMOSIS',
   SECRET_NETWORK = 'SECRET_NETWORK',
+
+  KAVA = 'KAVA',
+  CRYPTO_ORG = 'CRYPTO_ORG',
+  UMEE = 'UMEE',
+  EVMOS = 'EVMOS',
+  JUNO = 'JUNO',
 }
 
 export const CHAIN_TO_RPC_URL_MAP = {

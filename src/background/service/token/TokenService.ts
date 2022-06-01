@@ -8,6 +8,9 @@ import abi from 'utils/human-standard-token-abi-extended';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { ObservableStorage } from 'background/utils/obsStorage';
+import { getMulticallAddressOf } from 'constants/evm/multicall';
+import { Ecosystem } from 'types/network';
+import { MulticallHelper } from './utils/multicallHelper';
 import { PresetNetworkId } from 'constants/defaultNetwork';
 import { Network, Provider } from 'types/network';
 
@@ -132,13 +135,10 @@ class TokenService {
     return Promise.resolve(tokens);
   }
 
-  async getEvmBalancesAsync(
-    address: string,
-    chainCustomId: string
+  private async _getEvmBalancesLegacy(
+    tokens: Token[],
+    address: string
   ): Promise<Token[]> {
-    const tokens: Token[] = cloneDeep(
-      this.store.getState().tokens || []
-    ).filter((t: Token) => t.chainCustomId === chainCustomId);
     for (const token of tokens) {
       if (token.contractAddress && address) {
         const balance = await this.getERC20Balance(
@@ -155,6 +155,44 @@ class TokenService {
         }
       }
     }
+    return tokens;
+  }
+  async getEvmBalancesAsync(
+    address: string,
+    chainCustomId: string
+  ): Promise<Token[]> {
+    let tokens: Token[] = cloneDeep(this.store.getState().tokens || []).filter(
+      (t: Token) => t.chainCustomId === chainCustomId // && (showHideToken ? true : t.display)
+    );
+    const { chainId } = networkPreferenceService.getProviderConfig();
+    const multicallV2 = getMulticallAddressOf(chainId);
+
+    /** Use multicall contract to fetch balance */
+    if (multicallV2) {
+      try {
+        const fetchedBalances = await this._fetchBalancesByMulticall(
+          multicallV2,
+          tokens,
+          address
+        );
+        tokens = tokens.map((t, idx) =>
+          !fetchedBalances[idx]
+            ? t
+            : /** assign if balance exist */
+              { ...t, amount: fetchedBalances[idx]?.toString() }
+        );
+      } catch (error) {
+        console.error('getBalancesAsync::multicall:error:', error);
+        console.warn('using legacy query now...');
+        tokens = await this._getEvmBalancesLegacy(tokens, address);
+      }
+    } else {
+      /**
+       * just use legacy way if no multicall for this chain
+       */
+      tokens = await this._getEvmBalancesLegacy(tokens, address);
+    }
+
     return Promise.resolve(tokens);
   }
 
@@ -212,6 +250,7 @@ class TokenService {
   async getBalancesAsync(
     address: string,
     chainCustomId: string
+    //showHideToken = false
   ): Promise<Token[]> {
     const balances = cloneDeep(this.store.getState().balances || {});
     let tokens: Token[] = [];
@@ -236,13 +275,37 @@ class TokenService {
     return this.getBalancesSync(address, chainCustomId);
   }
 
+  private async _fetchBalancesByMulticall(
+    mcallAddr: string,
+    tokens: Token[],
+    who: string,
+    requireAllSuccess = false
+  ) {
+    const balanceOfEncoder = MulticallHelper.encodeBalanceOf(mcallAddr, who);
+    const balanceOfCalls = tokens.map(balanceOfEncoder);
+
+    const returnData = await MulticallHelper.tryCall(
+      mcallAddr,
+      networkPreferenceService.getProviderConfig().rpcUrl,
+      balanceOfCalls,
+      requireAllSuccess
+    );
+    const parsedReturnData = returnData.map(
+      MulticallHelper.decodeBalanceOfResult
+    );
+    console.debug(
+      '_fetchBalancesByMulticall::parsedReturnData:',
+      parsedReturnData
+    );
+    return parsedReturnData;
+  }
+
   async queryTokenPrices(target = 'usd') {
-    const currentChain = networkPreferenceService.getProviderConfig().type;
-    //TODO(Jayce) needs to be uncommented；
-    //if (currentChain !== 'ethereum') return Promise.resolve(null);
+    const { id } = networkPreferenceService.getProviderConfig();
     const tokensStr = this.store
       .getState()
-      .tokens.map((t: Token) => t.symbol)
+      .tokens.filter((t: Token) => t.chainCustomId === id)
+      .map((t: Token) => t.symbol)
       .join(',');
     if (!tokensStr) return Promise.reject('no token found');
     const coinsUrl = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${tokensStr}&tsyms=${target}&api_key=87e7ef93b4e386bc370b82ad39697409db31409a808f0e8f426cb59ddabceca4`;
