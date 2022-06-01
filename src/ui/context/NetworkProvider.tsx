@@ -32,7 +32,7 @@ export const NetworkProviderContext = React.createContext<{
   /**
    * useProviderById can switch the selected network to the specific provider
    */
-  useProviderById: (networkId: PresetNetworkId | string) => Promise<any>;
+  useProviderById: (networkId: PresetNetworkId | string) => Promise<Provider>;
 
   // you can create / edit / remove custom network
   addCustomProvider: (
@@ -76,8 +76,9 @@ export function NetworkStoreProvider({
     async (networkId: string) => {
       dispatch(showLoadingIndicator());
       try {
-        await wallet.useProviderById(networkId);
+        const provider = await wallet.useProviderById(networkId);
         await wallet.fetchLatestBlockDataNow();
+        return provider;
       } catch (error) {
         console.error('useProviderById::error', error);
       } finally {
