@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { EDIT_GAS_MODES, PRIORITY_LEVELS } from 'constants/gas';
 import { Transaction } from 'constants/transaction';
 import { Button, Drawer } from 'antd';
-import { addTenPercentAndRound as _addTenPercentAndRound } from 'ui/helpers/utils/gas';
 import { SimpleModal } from 'ui/components/universal/SimpleModal';
 import { useGasFeeInputs } from 'ui/hooks/gasFeeInput/useGasFeeInput';
 import { useGasFeeEstimates } from 'ui/hooks/gas/useGasFeeEstimates';
@@ -26,6 +25,7 @@ import { CustomGasInput } from './component/CustomGasInput.component';
 import { FeeMarketTiersList } from './component/FeeTier/FeeMarketTiersList.component';
 import { TierItem } from './component/FeeTier/TierItem.component';
 import { priorityLevelToI18nKey } from './component/FeeTier/constant';
+import { useAdd10PctTxParams } from './hooks/useAdd10PctTx';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -69,9 +69,6 @@ const CancelSpeedupPopover = (props: CancelAndSpeedUpPopoverParams) => {
   return <CancelSpeedupPopoverImplementation {...props} />;
 };
 
-const addTenPercentAndRound = (hexStr?: string) =>
-  _addTenPercentAndRound(hexStr)?.split('.')[0];
-
 const DrawerHeader = (props: {
   title: string;
   handleCloseIconClick: () => void;
@@ -109,21 +106,10 @@ const CancelSpeedupPopoverImplementation = ({
   const transaction = purifyTxParamsGasFields(_transaction);
   // const
   const [gasLimit, setGasLimit] = useState(transaction.txParams.gas);
-  const add10PercentTxParams = useMemo(() => {
-    return {
-      ...transaction.txParams,
-      // default will add 10% because it's a override tx(for both speedup and cancel)
-      estimateSuggested: PRIORITY_LEVELS.TEN_PERCENT_INCREASED,
-      estimateUsed: PRIORITY_LEVELS.TEN_PERCENT_INCREASED,
-      maxFeePerGas: addTenPercentAndRound(transaction.txParams.maxFeePerGas),
-      maxPriorityFeePerGas: addTenPercentAndRound(
-        transaction.txParams.maxPriorityFeePerGas
-      ),
-      gasPrice: addTenPercentAndRound(transaction.txParams.gasPrice),
-      gas: gasLimit,
-      gasLimit,
-    };
-  }, [transaction, gasLimit]);
+  const [add10PercentTxParams, add10PctTimeEstimate] = useAdd10PctTxParams(
+    transaction,
+    gasLimit
+  );
   const isEIP1559Tx = isEIP1559Transaction(transaction);
   const { cancelTransactionWithTxParams, speedUpTransactionWithTxParams } =
     useGasFeeInputs(undefined, transaction, undefined, editGasMode);
@@ -269,7 +255,7 @@ const CancelSpeedupPopoverImplementation = ({
               levelName={t(
                 priorityLevelToI18nKey[PRIORITY_LEVELS.TEN_PERCENT_INCREASED]
               )}
-              estimateTime={'--'}
+              estimateTime={add10PctTimeEstimate}
               gasPrice={BigNumber.from(
                 add10PercentTxParams.maxFeePerGas ||
                   add10PercentTxParams.gasPrice
