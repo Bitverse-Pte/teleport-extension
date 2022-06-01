@@ -16,7 +16,12 @@ import { ErrorCode } from 'constants/code';
 import BitError from 'error';
 import { providerFromEngine } from 'eth-json-rpc-middleware';
 import Eth from 'ethjs';
-import { sessionService, TokenService } from '../index';
+import {
+  keyringService,
+  preferenceService,
+  sessionService,
+  TokenService,
+} from '../index';
 import { ObservableStorage } from '../../utils/obsStorage';
 import EventEmitter from 'events';
 import log from 'loglevel';
@@ -54,6 +59,12 @@ import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
 import { parseStringTemplate } from 'utils/string';
 import { addHexPrefix } from 'ethereumjs-util';
+import { BaseAccount } from 'types/extend';
+// import { ChainUpdaterService, InteractionService } from '../cosmos';
+import { ChainIdHelper } from 'utils/cosmos/chainId';
+import { CosmosChainInfo } from 'types/cosmos';
+import { parsedKeplrChainInfoAsTeleportCosmosProvider } from '../cosmos/utils/provider.utils';
+import { ChainInfoSchema } from './cosmos/validation/chainInfoSchema';
 
 const toHexString = (val: string | number) =>
   addHexPrefix(Number(val).toString(16));
@@ -125,6 +136,8 @@ class NetworkPreferenceService extends EventEmitter {
   // UI communication
 
   constructor() {
+    // protected readonly interactionKeeper: InteractionService,
+    // protected readonly chainUpdaterKeeper: ChainUpdaterService,
     super();
 
     this.customNetworksStore = new ObservableStore<CustomNetworkList>({
@@ -227,7 +240,8 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       networks: networks.map((n) => ({
         ...n,
-        chainId: toHexString(n.chainId),
+        chainId:
+          n.ecosystem === Ecosystem.EVM ? toHexString(n.chainId) : n.chainId,
       })),
     });
 
@@ -364,10 +378,24 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       networks,
     });
-    this.setProviderConfig({
-      ...newSettings,
-      type: 'rpc',
-    });
+
+    try {
+      this.setProviderConfig({
+        ...newSettings,
+        type: 'rpc',
+      });
+    } catch (error: any) {
+      if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+        /** error will be ignored, as it will 100% occurred in the first time (no account)
+         *  but will be log message as warn */
+        console.warn('editCustomNetwork::error: no account for now');
+      } else {
+        console.error(
+          `editCustomNetwork::error #${error.code || 'No Error Code'}: `,
+          error
+        );
+      }
+    }
     return newSettings;
   }
 
@@ -556,6 +584,13 @@ class NetworkPreferenceService extends EventEmitter {
       );
       return;
     }
+    const { type, ecosystem } = this.getProviderConfig();
+    if (ecosystem !== Ecosystem.EVM) {
+      console.warn(
+        'Skipped lookupNetwork, because it is designed for EVM provider'
+      );
+      return;
+    }
 
     const chainId = this.getCurrentChainId();
     if (!chainId) {
@@ -571,7 +606,6 @@ class NetworkPreferenceService extends EventEmitter {
     // Ping the RPC endpoint so we can confirm that it works
     const ethQuery = new EthQuery(this._provider);
     const initialNetwork = this.getNetworkState();
-    const { type } = this.getProviderConfig();
     const isInfura = INFURA_PROVIDER_TYPES.includes(type);
 
     if (isInfura) {
@@ -674,6 +708,8 @@ class NetworkPreferenceService extends EventEmitter {
    * Sets the provider config and switches the network.
    */
   setProviderConfig(config: Provider) {
+    if (!this._checkAccountExistWithChain(config))
+      throw new BitError(ErrorCode.ACCOUNT_DOES_NOT_EXIST);
     const copiedConfig = config;
     copiedConfig.rpcUrl = parseStringTemplate(copiedConfig.rpcUrl, {
       INFURA_API_KEY: process.env.INFURA_PROJECT_ID as string,
@@ -682,7 +718,45 @@ class NetworkPreferenceService extends EventEmitter {
       previousProviderStore: this.getProviderConfig(),
       provider: copiedConfig,
     });
-    this._switchNetwork(copiedConfig);
+    this._setDestinationChainAccount(config);
+    if (config.ecosystem === Ecosystem.EVM) {
+      /**
+       * Only trigger this fn when provider is EVM ecosystem
+       */
+      this._switchNetwork(copiedConfig);
+    }
+  }
+
+  private _checkAccountExistWithChain(chain: Provider): boolean {
+    const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
+    return (
+      (chain.coinType === CoinType.ETH &&
+        allAccounts.some((a: BaseAccount) => a.coinType === CoinType.ETH)) ||
+      (chain.coinType !== CoinType.ETH &&
+        allAccounts.some((a: BaseAccount) => a.chainCustomId === chain.id))
+    );
+  }
+
+  private _setDestinationChainAccount(chain: Provider) {
+    const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
+    const currentAccount: BaseAccount | null | undefined =
+      preferenceService.getCurrentAccount();
+    if (chain.coinType === CoinType.ETH) {
+      if (currentAccount?.coinType === CoinType.ETH) return;
+      const evmAccounts: BaseAccount[] = allAccounts.filter(
+        (a: BaseAccount) => a.coinType === CoinType.ETH
+      );
+      if (evmAccounts && evmAccounts.length > 0) {
+        preferenceService.setCurrentAccount(evmAccounts[0]);
+      }
+    } else {
+      const accounts: BaseAccount[] = allAccounts.filter(
+        (a: BaseAccount) => a.chainCustomId === chain.id
+      );
+      if (accounts && accounts.length > 0) {
+        preferenceService.setCurrentAccount(accounts[0]);
+      }
+    }
   }
 
   rollbackToPreviousProvider() {
@@ -736,7 +810,10 @@ class NetworkPreferenceService extends EventEmitter {
     const supportProviders: Provider[] = [];
     presetProviders.forEach((p: Provider) => {
       if (
-        supportProviders.every((subP: Provider) => subP.coinType !== p.coinType)
+        supportProviders.every(
+          (subP: Provider) =>
+            !(subP.coinType === p.coinType && subP.coinType === CoinType.ETH)
+        )
       ) {
         supportProviders.push(p);
       }
@@ -892,6 +969,83 @@ class NetworkPreferenceService extends EventEmitter {
   }
   getEthByNetwork(rpcUrl: string) {
     return new Eth(new Eth.HttpProvider(rpcUrl));
+  }
+
+  getCosmosChainInfo(cosmosChainId: string): Provider {
+    const chainInfo = this.getAllProviders().find((chainInfo) => {
+      return (
+        ChainIdHelper.parse(chainInfo.chainId).identifier ===
+        ChainIdHelper.parse(cosmosChainId).identifier
+      );
+    });
+
+    if (!chainInfo) {
+      throw new Error(`There is no cosmos chain info for ${cosmosChainId}`);
+    }
+    return chainInfo;
+  }
+
+  /**
+   * extended for cosmos ecosystem
+   */
+  getChainCoinType(chainId: string): number {
+    const chainInfo = this.getCosmosChainInfo(chainId);
+
+    if (!chainInfo) {
+      throw new Error(`There is no chain info for ${chainId}`);
+    }
+
+    return chainInfo.coinType;
+  }
+
+  hasChainInfo(chainId: string): boolean {
+    return (
+      this.getAllProviders().find((chainInfo) => {
+        return (
+          ChainIdHelper.parse(chainInfo.chainId).identifier ===
+          ChainIdHelper.parse(chainId).identifier
+        );
+      }) != null
+    );
+  }
+
+  async suggestCosmosChainInfo(
+    // env: Env,
+    chainInfo: CosmosChainInfo,
+    origin: string
+  ) {
+    chainInfo = await ChainInfoSchema.validateAsync(chainInfo, {
+      stripUnknown: true,
+    });
+
+    const newCosmosProvider =
+      parsedKeplrChainInfoAsTeleportCosmosProvider(chainInfo);
+    console.debug(
+      'suggestCosmosChainInfo::newCosmosProvider:',
+      newCosmosProvider
+    );
+    this.checkIsCustomNetworkNameLegit(newCosmosProvider.nickname);
+    const { networks, orderOfNetworks } = this.customNetworksStore.getState();
+    this.customNetworksStore.updateState({
+      networks: [...networks, newCosmosProvider],
+      orderOfNetworks: {
+        ...orderOfNetworks,
+        [Ecosystem.COSMOS]: [
+          ...orderOfNetworks[Ecosystem.COSMOS],
+          newCosmosProvider.id,
+        ],
+      },
+    });
+    // add custom token
+    await TokenService.addCustomToken({
+      symbol: newCosmosProvider.ticker as string,
+      name: '',
+      decimal: 18,
+      chainCustomId: newCosmosProvider.id,
+      isNative: true,
+    });
+    /** @TODO add account for this network needed, so no error in `setProviderConfig` */
+    return newCosmosProvider;
   }
 }
 

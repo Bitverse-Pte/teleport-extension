@@ -1,14 +1,12 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { useMemo, useState, useContext } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { ACCOUNT_IMPORT_TYPE, MIN_PASSWORD_LENGTH } from 'constants/index';
-import { Button, Checkbox, Input, message } from 'antd';
+import { Checkbox, Input } from 'antd';
 import { usePolicyAgreed, useWallet, useWalletRequest } from 'ui/utils';
 import './style.less';
 import { CreateAccountOpts, ImportAccountOpts } from 'types/extend';
 import { CoinType, Provider } from 'types/network';
-import ChainSelect from 'ui/components/ChainSelect';
 import {
   CustomButton,
   CustomInput,
@@ -19,10 +17,12 @@ import {
 import { ErrorCode } from 'constants/code';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Tabs } from 'constants/wallet';
-import { useSeedPhraseValidation } from 'ui/hooks/validation/useSeedPhraseValidation';
-import { usePrivateKeyValidation } from 'ui/hooks/validation/usePrivateKeyValidation';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
+import { PresetNetworkId } from 'constants/defaultNetwork';
+import EcosystemSelect from 'ui/components/EcosystemSelect';
+import { NetworkProviderContext } from 'ui/context/NetworkProvider';
+
 const { sensors } = skynet;
 
 const { TextArea } = Input;
@@ -77,15 +77,27 @@ const AccountRecover = () => {
   const wallet = useWallet();
   const [policyShow, updateStoragePolicyAgreed] = usePolicyAgreed();
   const [passwordCheckPassed, setPasswordCheckPassed] = useState(false);
-  const [coinType, setCoinType] = useState(CoinType.ETH);
+  const [privateKeyChains, setPrivateKeyChains] = useState<Provider[]>([]);
+  const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
+    PresetNetworkId | string
+  >();
+
+  const providerContext = useContext(NetworkProviderContext);
   const { t } = useTranslation();
 
-  const handleSuccessCallback = () => {
+  const handleSuccessCallback = async () => {
     updateStoragePolicyAgreed();
     sensors.track('teleport_account_recover_imported', {
       page: location.pathname,
       importType: importType,
     });
+    //TODO (Jayce) Cosmos Provider is not support now
+    /* if (policyShow && importType === Tabs.SECOND) {
+      await providerContext?.useProviderById(privateKeyMasterChain as string).catch(e => {
+        console.error(e);
+      });
+    } */
+
     history.push({
       pathname: '/home',
     });
@@ -212,7 +224,7 @@ const AccountRecover = () => {
     } else {
       const importAccountOpts: ImportAccountOpts = {
         name: name.trim(),
-        coinType,
+        chains: privateKeyChains,
         privateKey: privateKey.startsWith('0x')
           ? privateKey.trim()
           : `0x${privateKey.trim()}`,
@@ -256,9 +268,6 @@ const AccountRecover = () => {
             placeholder="Click on the space to change words"
             rows={4}
           />
-          {/* {mnemonicError && (
-            <p className="secret-error-detail">{t(mnemonicError)}</p>
-          )} */}
         </div>
         <div className={clsx(importType !== Tabs.SECOND && 'hidden')}>
           <CustomPasswordInput
@@ -271,29 +280,17 @@ const AccountRecover = () => {
             placeholder="Enter private key"
             cls="private-key-input"
           />
-          {/* {privateKeyError && (
-            <p className="secret-error-detail">{t(privateKeyError)}</p>
-          )} */}
         </div>
-
-        {/* @todo: enable below when cosmos supported */}
-        {/* <p
-          className="account-recover-title"
-          style={{
-            display: importType === Tabs.SECOND ? 'block' : 'none',
+        {importType === Tabs.SECOND && policyShow ? (
+          <p className="account-recover-title">Ecosystems</p>
+        ) : null}
+        <EcosystemSelect
+          style={importType === Tabs.FIRST ? { display: 'none' } : {}}
+          handleEcosystemSelect={(chains: Provider[], originChainId) => {
+            setPrivateKeyChains(chains);
+            setPrivateKeyMasterChain(originChainId);
           }}
-        >
-          Belonging Chain
-        </p>
-        <ChainSelect
-          style={{
-            display: importType === Tabs.SECOND ? 'flex' : 'none',
-          }}
-          handleChainSelect={(chain: Provider) => {
-            setCoinType(chain.coinType);
-          }}
-        /> */}
-
+        />
         <p className="account-recover-title">Wallet name</p>
         <CustomInput
           placeholder="Enter wallet name"

@@ -44,7 +44,7 @@ export class EthKey extends Base.KeyBase<Tx.Transaction> {
     return keyPair;
   }
 
-  public generateSignature(stdTx: Tx.Transaction, privateKey: string): string {
+  public generateSignature(stdTx: any, privateKey: string | Buffer): Buffer {
     throw new Error('Method not implemented.');
   }
 

@@ -21,6 +21,7 @@ import {
   CreateAccountOpts,
   DisplayAccountManage,
   DisplayWalletManage,
+  HdAccountStruct,
   ImportAccountOpts,
 } from 'types/extend';
 import provider from './provider';
@@ -33,6 +34,7 @@ import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
 import { CustomGasSettings } from 'types/tx';
 import { BigNumberish } from 'ethers';
+import { CosmosChainInfo } from 'types/cosmos';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -113,11 +115,40 @@ export class WalletController extends BaseController {
       isNative: true,
     });
 
-    networkPreferenceService.setProviderConfig({
-      ...network,
-      type: 'rpc',
-    });
+    try {
+      networkPreferenceService.setProviderConfig({
+        ...network,
+        type: 'rpc',
+      });
+    } catch (error: any) {
+      /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+      // if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+
+      // }
+      console.error('addCustomNetwork::error: ', error);
+    }
     return network;
+  };
+
+  addCustomCosmosNetwork = async (chainInfo: CosmosChainInfo) => {
+    /** @TODO this is for test only.
+     * remove this function only when
+     * `window.keplr.suggestChainInfo` was implemented
+     */
+    try {
+      const network = await networkPreferenceService.suggestCosmosChainInfo(
+        chainInfo,
+        'foo'
+      );
+      networkPreferenceService.setProviderConfig(network);
+      return network;
+    } catch (error: any) {
+      /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+      if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+        console.debug('account not exist, shall create here...');
+      }
+      console.error('addCustomCosmosNetwork::error: ', error);
+    }
   };
 
   editCustomNetwork = (
@@ -157,7 +188,22 @@ export class WalletController extends BaseController {
     const { provider } = networkPreferenceService.networkStore.getState();
     console.debug('useCurrentSelectedNetwork use provider:', provider);
     // reset once again
-    networkPreferenceService.setProviderConfig(provider);
+    try {
+      networkPreferenceService.setProviderConfig(provider);
+    } catch (error: any) {
+      if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+        /** error will be ignored, as it will 100% occurred in the first time (no account)
+         *  but will be log message as warn */
+        console.warn('useCurrentSelectedNetwork::error: no account for now');
+      } else {
+        console.error(
+          `useCurrentSelectedNetwork::error #${
+            error.code || 'No Error Code'
+          }: `,
+          error
+        );
+      }
+    }
   };
 
   getCurrentCurrency = () => preferenceService.getCurrentCurrency();
@@ -222,6 +268,20 @@ export class WalletController extends BaseController {
 
   changeAccount = (account: BaseAccount) =>
     preferenceService.setCurrentAccount(account);
+
+  changeAccountByWalletId = (hdWalletId: string) => {
+    return keyringService.changeAccountByWallet(hdWalletId);
+  };
+
+  async addCurrentChainAccountByWalletId(hdWalletId) {
+    const account = await keyringService.addCurrentChainAccountByWalletId(
+      hdWalletId
+    );
+    if (account) {
+      keyringService.boot();
+      return this._setCurrentAccount(account);
+    }
+  }
 
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 
@@ -291,6 +351,10 @@ export class WalletController extends BaseController {
     return Promise.resolve(keyringService.getAccountList(useCurrentChain));
   }
 
+  getWalletList(useCurrentEcosystem?: boolean): Promise<HdAccountStruct[]> {
+    return Promise.resolve(keyringService.getWalletList(useCurrentEcosystem));
+  }
+
   getCurrentChainAccounts(): Promise<BaseAccount[]> {
     return keyringService.getCurrentChainAccounts();
   }
@@ -312,33 +376,25 @@ export class WalletController extends BaseController {
     return networkPreferenceService.getProviderConfig();
   }
 
-  getTokenBalancesAsync = (showHideToken?: boolean): Promise<Token[]> => {
+  getTokenBalancesAsync = (): Promise<Token[]> => {
     const account = preferenceService.getCurrentAccount();
     let chainCustomId;
     const currentProvider = this.getCurrentChain();
     if (currentProvider) chainCustomId = currentProvider.id;
     if (account) {
-      return TokenService.getBalancesAsync(
-        account.address,
-        chainCustomId
-        //showHideToken
-      );
+      return TokenService.getBalancesAsync(account.address, chainCustomId);
     } else {
       return Promise.reject(new Error('no account found'));
     }
   };
 
-  getTokenBalancesSync = (showHideToken?: boolean): Promise<Token[]> => {
+  getTokenBalancesSync = (): Promise<Token[]> => {
     const account = preferenceService.getCurrentAccount();
     let chainCustomId;
     const currentProvider = this.getCurrentChain();
     if (currentProvider) chainCustomId = currentProvider.id;
     if (account && chainCustomId) {
-      return TokenService.getBalancesSync(
-        account.address,
-        chainCustomId
-        //showHideToken
-      );
+      return TokenService.getBalancesSync(account.address, chainCustomId);
     } else {
       return Promise.reject(new Error('no account found'));
     }
@@ -393,12 +449,7 @@ export class WalletController extends BaseController {
     return TokenService.addCustomToken(tokenParams);
   }
 
-  getChains = () => networkPreferenceService.getAllProviders();
-
   queryTokenPrices = () => TokenService.queryTokenPrices();
-
-  // TODO (Jayce) follows are test code
-  testUnlock = () => this.unlock('Q1!qqqqq');
 
   providers() {
     console.log(networkPreferenceService.getProviderConfig());

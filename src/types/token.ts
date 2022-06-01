@@ -2,13 +2,12 @@ export interface Token {
   symbol: string;
   decimal: number | string;
   name: string;
-  demon: string;
+  denom: string;
   icon: string;
   chainCustomId: string;
   isNative: boolean;
   contractAddress: string;
-  track: string;
-  themeColor: string;
+  trace?: string;
   isCustom: boolean;
   amount?: number | string;
   display?: boolean;

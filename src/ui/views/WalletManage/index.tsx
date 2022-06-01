@@ -7,6 +7,7 @@ import {
   AccountCreateType,
   BaseAccount,
   DisplayWalletManage,
+  HdAccountStruct,
 } from 'types/extend';
 import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
 import { CustomTab, WalletName } from 'ui/components/Widgets';
@@ -23,6 +24,7 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
+import BitError from 'error';
 const { sensors } = skynet;
 export interface WalletHeaderProps {
   title: string;
@@ -49,7 +51,7 @@ const WalletManage: React.FC = () => {
   const wallet = useWallet();
   const [hdWalletAccounts, setHdWalletAccount] = useState<any>([]);
   const [simpleWalletAccounts, setSimpleWalletAccount] = useState<
-    BaseAccount[]
+    HdAccountStruct[]
   >([]);
   const [accountType, setAccountType] = useState(Tabs.FIRST);
   const [deletePopupVisible, setDeletePopupVisible] = useState(false);
@@ -62,21 +64,30 @@ const WalletManage: React.FC = () => {
   const [unlockType, setUnlockType] = useState('edit');
 
   const queryWallets = async () => {
-    const accounts: DisplayWalletManage = await wallet.getAccountList(true);
-    if (accounts && accounts.hdAccount) {
-      setHdWalletAccount(accounts.hdAccount);
+    const accounts: HdAccountStruct[] = await wallet.getWalletList(true);
+    const hdWallets: HdAccountStruct[] = [],
+      simpleWallets: HdAccountStruct[] = [];
+    if (accounts?.length > 0) {
+      accounts.forEach((a: HdAccountStruct) => {
+        if (a.accounts[0]?.accountCreateType === AccountCreateType.MNEMONIC) {
+          hdWallets.push(a);
+        } else if (
+          a.accounts[0]?.accountCreateType === AccountCreateType.PRIVATE_KEY
+        ) {
+          simpleWallets.push(a);
+        }
+      });
+      setHdWalletAccount(hdWallets);
+      setSimpleWalletAccount(simpleWallets);
     }
 
-    if (accounts && accounts.simpleAccount) {
-      setSimpleWalletAccount(accounts.simpleAccount);
-    }
     const current: BaseAccount = await wallet.getCurrentAccount();
     if (current) {
       setCurrentAccount(current);
     }
     return {
       current,
-      hdWalletAccounts: accounts?.hdAccount,
+      hdWalletAccounts: hdWallets,
     };
   };
 
@@ -131,11 +142,26 @@ const WalletManage: React.FC = () => {
     //queryCurrentAccount();
   };
 
-  const handleWalletClick = async (w: any) => {
+  const handleWalletClick = async (w: HdAccountStruct) => {
     sensors.track('teleport_wallet_manage_wallet_click', {
       page: location.pathname,
     });
-    await wallet.changeAccount(w?.accounts ? w?.accounts[0] : w);
+    if (currentAccount?.hdWalletId === w?.accounts[0]?.hdWalletId) {
+      return;
+    }
+    await wallet
+      .changeAccountByWalletId(w.hdWalletId)
+      .catch(async (e: BitError) => {
+        //There is no account on this chain, which must unlock the keyring, and create a new account;
+        if (e?.code === ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+          if (!(await wallet.isUnlocked())) {
+            setCurrentHdWalletId(w.hdWalletId);
+            setUnlockType('add');
+            setUnlockPopupVisible(true);
+            return;
+          }
+        }
+      });
     history.goBack();
   };
 
@@ -184,15 +210,25 @@ const WalletManage: React.FC = () => {
     setCurrentHdWalletId(hdWalletId);
   };
 
-  const handleUnlock = () => {
-    if (unlockType === 'edit') {
-      setIsEdit(!isEdit);
-    }
-    if (unlockType === 'create') {
-      history.push('/create');
-    }
-    if (unlockType === 'import') {
-      history.push('/recover');
+  const handleUnlock = async () => {
+    switch (unlockType) {
+      case 'edit':
+        setIsEdit(!isEdit);
+        break;
+      case 'create':
+        history.push('/create');
+        break;
+      case 'import':
+        history.push('/recover');
+        break;
+      case 'add':
+        await wallet
+          .addCurrentChainAccountByWalletId(currentHdWalletId)
+          .catch((e) => {
+            console.error(e);
+          });
+        history.goBack();
+        break;
     }
   };
 
@@ -289,7 +325,7 @@ const WalletManage: React.FC = () => {
                       : ''
                   }`}
                   style={isEdit ? { paddingRight: '24px' } : {}}
-                  key={w.hdWalletName}
+                  key={w.hdWalletId}
                   onClick={(e) => {
                     if (isEdit) return;
                     handleWalletClick(w);
