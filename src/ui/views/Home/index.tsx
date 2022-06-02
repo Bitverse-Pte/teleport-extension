@@ -181,7 +181,38 @@ const Home = () => {
   }, [tokens, prices]);
 
   const displayTokenList = useMemo(() => {
-    return tokenList.filter((t: Token) => t.display);
+    const t = tokenList.filter((t: Token) => t.display);
+    if (
+      t.some(
+        (token: Token) =>
+          token.contractAddress === '0x4200000000000000000000000000000000000042'
+      ) &&
+      t.length > 2
+    ) {
+      const temp = t[1];
+      const opIndex = t.findIndex(
+        (token: Token) =>
+          token.contractAddress === '0x4200000000000000000000000000000000000042'
+      );
+      if (opIndex > -1) {
+        t[1] = t[opIndex];
+        t[opIndex] = temp;
+      }
+    }
+    return t.sort((a: any, b: any) => {
+      if (a.isNative) {
+        a.sort = 1;
+      } else {
+        a.sort = 0;
+      }
+
+      if (b.isNative) {
+        b.sort = 1;
+      } else {
+        b.sort = 0;
+      }
+      return b.sort - a.sort;
+    });
   }, [tokenList]);
 
   return (
