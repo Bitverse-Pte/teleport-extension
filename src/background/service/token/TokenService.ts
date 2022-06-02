@@ -218,7 +218,8 @@ class TokenService {
         case PresetNetworkId.SECRET_NETWORK:
         case PresetNetworkId.OSMOSIS:
         default:
-          url = `${urlPrefix}/cosmos/bank/v1beta1/balances/cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4?pagination.limit=1000`;
+          //cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4
+          url = `${urlPrefix}/cosmos/bank/v1beta1/balances/${address}?pagination.limit=1000`;
           break;
       }
       const res = await fetch(url)

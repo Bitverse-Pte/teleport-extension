@@ -228,8 +228,8 @@ class KeyringService extends EventEmitter {
       }
       let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
       let signatureAlgorithm: SignatureAlgorithm, ecosystem: Ecosystem;
-      switch (chain.id) {
-        case PresetNetworkId.ETHEREUM:
+      switch (chain.ecosystem) {
+        case Ecosystem.EVM:
           keyPair = await this._createEthKeypairByImportPrivateKey(
             opts.privateKey
           );
@@ -239,9 +239,7 @@ class KeyringService extends EventEmitter {
           signatureAlgorithm = SignatureAlgorithm.secp256k1;
           ecosystem = Ecosystem.EVM;
           break;
-        case PresetNetworkId.COSMOS_HUB:
-        case PresetNetworkId.SECRET_NETWORK:
-        case PresetNetworkId.OSMOSIS:
+        case Ecosystem.COSMOS:
           keyPair = await this._createCosmosKeypairByImportPrivateKey(
             opts.privateKey,
             (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
@@ -424,69 +422,18 @@ class KeyringService extends EventEmitter {
       chainCustomId: '',
       ecosystem: Ecosystem.EVM,
     };
-    const currentCoinType =
-      networkPreferenceService.getProviderConfig().coinType;
+    const { id } = networkPreferenceService.getProviderConfig();
     for (const p of supportProviders) {
       let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
-      let signatureAlgorithm: SignatureAlgorithm,
-        countOfPhrase: number,
-        coinType: CoinType,
-        hdPathCoinType: number,
-        chainCustomId: PresetNetworkId | string,
-        ecosystem: Ecosystem;
-      switch (p.coinType) {
-        case CoinType.ETH:
+      hdPath.coinType = p.coinType;
+      switch (p.ecosystem) {
+        case Ecosystem.EVM:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
           if (this._checkDuplicateAccount(keyPair.address)) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
-          signatureAlgorithm = SignatureAlgorithm.secp256k1;
-          countOfPhrase = 12;
-          coinType = p.coinType;
-          hdPathCoinType = p.coinType;
-          chainCustomId = PresetNetworkId.ETHEREUM;
-          ecosystem = Ecosystem.EVM;
           break;
-        case CoinType.COSMOS:
-          switch (p.id) {
-            case PresetNetworkId.COSMOS_HUB:
-            default:
-              hdPath.coinType = CoinType.COSMOS;
-              keyPair = this._createCosmosKeypairByMnemonic(
-                opts.mnemonic,
-                hdPath,
-                (p.prefix as Bech32Config).bech32PrefixAccAddr
-              );
-              if (this._checkDuplicateAccount(keyPair.address)) {
-                return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
-              }
-              signatureAlgorithm = SignatureAlgorithm.secp256k1;
-              countOfPhrase = 12;
-              coinType = p.coinType;
-              hdPathCoinType = p.coinType;
-              chainCustomId = PresetNetworkId.COSMOS_HUB;
-              break;
-            case PresetNetworkId.OSMOSIS:
-              hdPath.coinType = CoinType.COSMOS;
-              keyPair = this._createCosmosKeypairByMnemonic(
-                opts.mnemonic,
-                hdPath,
-                (p.prefix as Bech32Config).bech32PrefixAccAddr
-              );
-              if (this._checkDuplicateAccount(keyPair.address)) {
-                return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
-              }
-              signatureAlgorithm = SignatureAlgorithm.secp256k1;
-              countOfPhrase = 12;
-              coinType = p.coinType;
-              hdPathCoinType = p.coinType;
-              chainCustomId = PresetNetworkId.OSMOSIS;
-              break;
-          }
-          ecosystem = Ecosystem.COSMOS;
-          break;
-        case CoinType.SECRET_NETWORK:
-          hdPath.coinType = CoinType.SECRET_NETWORK;
+        case Ecosystem.COSMOS:
           keyPair = this._createCosmosKeypairByMnemonic(
             opts.mnemonic,
             hdPath,
@@ -495,43 +442,31 @@ class KeyringService extends EventEmitter {
           if (this._checkDuplicateAccount(keyPair.address)) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
-          signatureAlgorithm = SignatureAlgorithm.secp256k1;
-          countOfPhrase = 12;
-          coinType = p.coinType;
-          hdPathCoinType = p.coinType;
-          chainCustomId = PresetNetworkId.SECRET_NETWORK;
-          ecosystem = Ecosystem.COSMOS;
           break;
         default:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
           if (this._checkDuplicateAccount(keyPair.address)) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
-          signatureAlgorithm = SignatureAlgorithm.secp256k1;
-          countOfPhrase = 12;
-          coinType = p.coinType;
-          hdPathCoinType = p.coinType;
-          chainCustomId = PresetNetworkId.ETHEREUM;
-          ecosystem = Ecosystem.EVM;
       }
       const account: BaseAccount = {
         address: keyPair.address,
-        coinType,
+        coinType: p.coinType,
         publicKey: keyPair.publicKey,
-        hdPathCoinType,
+        hdPathCoinType: p.coinType,
         hdPathAccount: 0,
         hdPathChange: 0,
         hdPathIndex: opts.addressIndex as number,
         hdWalletName: opts.name,
         hdWalletId: hdWalletId as string,
         accountName: opts.accountName || `account ${hdPath.addressIndex + 1}`,
-        countOfPhrase,
-        signatureAlgorithm,
+        countOfPhrase: 12,
+        signatureAlgorithm: SignatureAlgorithm.secp256k1,
         accountCreateType: AccountCreateType.MNEMONIC,
-        chainCustomId,
-        ecosystem,
+        chainCustomId: p.id,
+        ecosystem: p.ecosystem,
       };
-      if (coinType === currentCoinType) {
+      if (p.id === id) {
         newDisplayAccount = Object.assign(account, {});
       }
       const secret: Secret = {
@@ -590,45 +525,14 @@ class KeyringService extends EventEmitter {
     };
 
     let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
-    switch (coinType) {
-      case CoinType.ETH:
+    switch (ecosystem) {
+      case Ecosystem.EVM:
         keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
         if (this._checkDuplicateAccount(keyPair.address)) {
           return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
         }
-        createdAccount.signatureAlgorithm = SignatureAlgorithm.secp256k1;
         break;
-      case CoinType.COSMOS:
-        switch (id) {
-          case PresetNetworkId.COSMOS_HUB:
-          default:
-            hdPath.coinType = CoinType.COSMOS;
-            keyPair = this._createCosmosKeypairByMnemonic(
-              mnemonic,
-              hdPath,
-              (prefix as Bech32Config).bech32PrefixAccAddr
-            );
-            if (this._checkDuplicateAccount(keyPair.address)) {
-              return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
-            }
-            createdAccount.signatureAlgorithm = SignatureAlgorithm.secp256k1;
-            break;
-          case PresetNetworkId.OSMOSIS:
-            hdPath.coinType = CoinType.COSMOS;
-            keyPair = this._createCosmosKeypairByMnemonic(
-              mnemonic,
-              hdPath,
-              (prefix as Bech32Config).bech32PrefixAccAddr
-            );
-            if (this._checkDuplicateAccount(keyPair.address)) {
-              return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
-            }
-            createdAccount.signatureAlgorithm = SignatureAlgorithm.secp256k1;
-            break;
-        }
-        break;
-      case CoinType.SECRET_NETWORK:
-        hdPath.coinType = CoinType.SECRET_NETWORK;
+      case Ecosystem.COSMOS:
         keyPair = this._createCosmosKeypairByMnemonic(
           mnemonic,
           hdPath,
@@ -637,14 +541,12 @@ class KeyringService extends EventEmitter {
         if (this._checkDuplicateAccount(keyPair.address)) {
           return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
         }
-        createdAccount.signatureAlgorithm = SignatureAlgorithm.secp256k1;
         break;
       default:
         keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
         if (this._checkDuplicateAccount(keyPair.address)) {
           return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
         }
-        createdAccount.signatureAlgorithm = SignatureAlgorithm.secp256k1;
     }
     createdAccount.address = keyPair.address;
     createdAccount.publicKey = keyPair.publicKey;
