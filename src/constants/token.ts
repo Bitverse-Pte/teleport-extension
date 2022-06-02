@@ -12,7 +12,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-    trace: '',
+
     display: true,
   },
   {
@@ -25,7 +25,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-    trace: '',
+
     display: true,
   },
 
@@ -39,7 +39,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    trace: '',
+
     display: true,
   },
   {
@@ -52,7 +52,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
-    trace: '',
+
     display: true,
   },
 
@@ -66,7 +66,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    trace: '',
+
     display: true,
   },
 
@@ -80,7 +80,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x1a4b46696b2bb4794eb3d4c26f1c55f9170fa4c5',
-    trace: '',
+
     display: true,
   },
 
@@ -94,7 +94,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x0000000000085d4780B73119b644AE5ecd22b376',
-    trace: '',
+
     display: true,
   },
   {
@@ -107,7 +107,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-    trace: '',
+
     display: true,
   },
   {
@@ -120,7 +120,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-    trace: '',
+
     display: true,
   },
 
@@ -134,7 +134,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x55d398326f99059ff775485246999027b3197955',
-    trace: '',
+
     display: true,
   },
   {
@@ -147,7 +147,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',
-    trace: '',
+
     display: true,
   },
   {
@@ -160,7 +160,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
-    trace: '',
+
     display: true,
   },
   {
@@ -173,7 +173,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
-    trace: '',
+
     display: true,
   },
   {
@@ -186,7 +186,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
-    trace: '',
+
     display: true,
   },
   {
@@ -199,7 +199,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3',
-    trace: '',
+
     display: true,
   },
   {
@@ -212,7 +212,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x14016e85a25aeb13065688cafb43044c2ef86784',
-    trace: '',
+
     display: true,
   },
   {
@@ -225,7 +225,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-    trace: '',
+
     display: true,
   },
   {
@@ -238,7 +238,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
-    trace: '',
+
     display: true,
   },
 
@@ -252,7 +252,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
-    trace: '',
+
     display: true,
   },
   {
@@ -265,7 +265,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-    trace: '',
+
     display: true,
   },
   {
@@ -278,7 +278,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063',
-    trace: '',
+
     display: true,
   },
   {
@@ -291,7 +291,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x2e1ad108ff1d8c782fcbbb89aad783ac49586756',
-    trace: '',
+
     display: true,
   },
   {
@@ -304,7 +304,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xb33eaad8d922b1083446dc23f610c2567fb5180f',
-    trace: '',
+
     display: true,
   },
   {
@@ -317,7 +317,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-    trace: '',
+
     display: true,
   },
   {
@@ -330,7 +330,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9',
-    trace: '',
+
     display: true,
   },
 
@@ -344,7 +344,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
-    trace: '',
+
     display: true,
   },
   {
@@ -357,7 +357,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1',
-    trace: '',
+
     display: true,
   },
   {
@@ -370,7 +370,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x4d15a3a2286d883af0aa1b3f21367843fac63e07',
-    trace: '',
+
     display: true,
   },
   {
@@ -383,7 +383,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xfa7f8980b0f1e64a2062791cc3b0871572f1f7f0',
-    trace: '',
+
     display: true,
   },
   {
@@ -396,7 +396,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xd4d42f0b6def4ce0383636770ef773390d85c61a',
-    trace: '',
+
     display: true,
   },
 
@@ -410,7 +410,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-    trace: '',
+
     display: true,
   },
   {
@@ -423,7 +423,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad',
-    trace: '',
+
     display: true,
   },
 
@@ -437,7 +437,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x04068da6c83afcfa0e13ba15a6696662335d5b75',
-    trace: '',
+
     display: true,
   },
   {
@@ -450,7 +450,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e',
-    trace: '',
+
     display: true,
   },
   {
@@ -463,7 +463,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x29b0Da86e484E1C0029B56e817912d778aC0EC69',
-    trace: '',
+
     display: true,
   },
   {
@@ -476,7 +476,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-    trace: '',
+
     display: true,
   },
   {
@@ -489,7 +489,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',
-    trace: '',
+
     display: true,
   },
   {
@@ -502,7 +502,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xc7198437980c041c805A1EDcbA50c1Ce5db95118',
-    trace: '',
+
     display: true,
   },
   {
@@ -515,7 +515,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xd586E7F844cEa2F87f50152665BCbc2C279D8d70',
-    trace: '',
+
     display: true,
   },
   {
@@ -528,7 +528,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB',
-    trace: '',
+
     display: true,
   },
   {
@@ -541,7 +541,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664',
-    trace: '',
+
     display: true,
   },
   {
@@ -554,22 +554,21 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-    trace: '',
+
     display: true,
   },
   {
     symbol: 'OP',
     decimal: 18,
     name: 'OP',
-    demon: '',
+    denom: '',
     icon: '',
     chainCustomId: PresetNetworkId.OP,
     isNative: false,
     isCustom: false,
     contractAddress: '0x4200000000000000000000000000000000000042',
-    track: '',
+
     display: true,
-    themeColor: '#000000',
   },
   {
     symbol: 'USDT',
@@ -581,7 +580,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58',
-    trace: '',
+
     display: true,
   },
   {
@@ -594,7 +593,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
-    trace: '',
+
     display: true,
   },
   {
@@ -607,7 +606,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: false,
     isCustom: false,
     contractAddress: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1',
-    trace: '',
+
     display: true,
   },
   {
@@ -620,7 +619,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-    trace: '',
+
     display: true,
   },
   {
@@ -628,12 +627,10 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     decimal: 6,
     name: 'ATOM',
     denom: 'uatom',
-    icon: '',
+    icon: 'https://raw.githubusercontent.com/trustwallet/assets/blob/master/blockchains/cosmos/info/logo.png',
     chainCustomId: PresetNetworkId.COSMOS_HUB,
     isNative: true,
     isCustom: false,
-    contractAddress: '',
-    trace: '',
     display: true,
   },
 ];

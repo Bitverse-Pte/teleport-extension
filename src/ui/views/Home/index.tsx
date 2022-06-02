@@ -199,7 +199,20 @@ const Home = () => {
         t[opIndex] = temp;
       }
     }
-    return t;
+    return t.sort((a: any, b: any) => {
+      if (a.isNative) {
+        a.sort = 1;
+      } else {
+        a.sort = 0;
+      }
+
+      if (b.isNative) {
+        b.sort = 1;
+      } else {
+        b.sort = 0;
+      }
+      return b.sort - a.sort;
+    });
   }, [tokenList]);
 
   return (

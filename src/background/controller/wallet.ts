@@ -378,11 +378,9 @@ export class WalletController extends BaseController {
 
   getTokenBalancesAsync = (): Promise<Token[]> => {
     const account = preferenceService.getCurrentAccount();
-    let chainCustomId;
-    const currentProvider = this.getCurrentChain();
-    if (currentProvider) chainCustomId = currentProvider.id;
+    const { id, ecosystem } = this.getCurrentChain();
     if (account) {
-      return TokenService.getBalancesAsync(account.address, chainCustomId);
+      return TokenService.getBalancesAsync(account.address, id, ecosystem);
     } else {
       return Promise.reject(new Error('no account found'));
     }
@@ -449,7 +447,8 @@ export class WalletController extends BaseController {
     return TokenService.addCustomToken(tokenParams);
   }
 
-  queryTokenPrices = () => TokenService.queryTokenPrices();
+  queryTokenPrices = (tokenId?: string) =>
+    TokenService.queryTokenPrices('usd', tokenId);
 
   providers() {
     console.log(networkPreferenceService.getProviderConfig());
