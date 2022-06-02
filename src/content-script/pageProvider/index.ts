@@ -74,9 +74,15 @@ export class EthereumProvider extends EventEmitter {
   ]);
   private _bcm: BroadcastChannelMessage;
 
-  constructor({ channelName = '', maxListeners = 200 } = {}) {
+  constructor({
+    bcm,
+    maxListeners = 200,
+  }: {
+    bcm: BroadcastChannelMessage;
+    maxListeners?: number;
+  }) {
     super();
-    this._bcm = new BroadcastChannelMessage(channelName);
+    this._bcm = bcm;
     this.setMaxListeners(maxListeners);
     this.initialize();
     this.shimLegacy();
@@ -270,7 +276,8 @@ window.addEventListener('message', function (event) {
 
   if (event.data.type && event.data.type == 'INIT_TELEPORT_PROVIDER') {
     const channelName = event.data.channelName;
-    const provider = new EthereumProvider({ channelName });
+    const bcm = new BroadcastChannelMessage(channelName);
+    const provider = new EthereumProvider({ bcm });
     provider
       .request({
         method: 'isDefaultWallet',
@@ -303,13 +310,16 @@ window.addEventListener('message', function (event) {
     });
 
     window.dispatchEvent(new Event('ethereum#initialized'));
-
-    const cosmosProvider = new CosmosProvider({ channelName });
+    const cosmosProvider = new CosmosProvider({ bcm });
     if (!window.keplr) {
-      window.keplr = cosmosProvider;
+      window.keplr = new Proxy(cosmosProvider, {
+        deleteProperty: () => true,
+      });
     }
     if (!window.getOfflineSigner) {
-      window.getOfflineSigner = cosmosProvider.getOfflineSigner;
+      window.getOfflineSigner = new Proxy(cosmosProvider.getOfflineSigner, {
+        deleteProperty: () => true,
+      });
     }
     if (!window.getOfflineSignerOnlyAmino) {
       //window.getOfflineSignerOnlyAmino = getOfflineSignerOnlyAmino;

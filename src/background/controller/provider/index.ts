@@ -19,7 +19,7 @@ export default async (req) => {
   } = req;
   console.log('=====req:=====', req);
   if (type && type === 'cosmos-proxy-request') {
-    return preferenceService.getIsDefaultWallet();
+    return { id: 'xxx' };
   }
 
   //TODO for debug use, remove later...

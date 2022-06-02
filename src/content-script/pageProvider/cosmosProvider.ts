@@ -28,8 +28,10 @@ import { SecretUtils } from 'secretjs/types/enigmautils';
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
     console.log(
-      `%c [teleport] (${new Date().toTimeString().substr(0, 8)}) ${event}`,
-      'font-weight: bold; background-color: #6AB5FF; color: white;',
+      `%c [teleport-cosmos] (${new Date()
+        .toTimeString()
+        .substr(0, 8)}) ${event}`,
+      'font-weight: bold; background-color: #374D80; color: white;',
       ...args
     );
   }
@@ -44,11 +46,18 @@ const log = (event, ...args) => {
 export class CosmosProvider extends EventEmitter implements Keplr {
   private _pushEventHandlers: PushEventHandlers;
   private _requestPromise = new ReadyPromise(2);
+  private _dedupePromise = new DedupePromise([]);
   private _bcm: BroadcastChannelMessage;
 
-  constructor({ channelName = '', maxListeners = 200 } = {}) {
+  constructor({
+    bcm,
+    maxListeners = 200,
+  }: {
+    bcm: BroadcastChannelMessage;
+    maxListeners?: number;
+  }) {
     super();
-    this._bcm = new BroadcastChannelMessage(channelName);
+    this._bcm = bcm;
     this.setMaxListeners(maxListeners);
     this.initialize();
     this._pushEventHandlers = new PushEventHandlers(this);
@@ -56,6 +65,74 @@ export class CosmosProvider extends EventEmitter implements Keplr {
   version = 'x.x.x';
   mode: KeplrMode = 'extension';
   defaultOptions: KeplrIntereactionOptions = {};
+  initialize = async () => {
+    this._bcm.connect().on('message', this._handleBackgroundMessage);
+    domReadyCall(() => {
+      const origin = top?.location.origin;
+      const icon =
+        ($('head > link[rel~="icon"]') as HTMLLinkElement)?.href ||
+        ($('head > meta[itemprop="image"]') as HTMLMetaElement)?.content;
+      const name =
+        document.title ||
+        ($('head > meta[name="title"]') as HTMLMetaElement)?.content ||
+        origin;
+      this._requestPromise.check(2);
+    });
+  };
+
+  private _handleBackgroundMessage = ({ event, data }) => {
+    if (this._pushEventHandlers[event]) {
+      return this._pushEventHandlers[event](data);
+    }
+    this.emit(event, data);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected requestMethod(method: string, args: any[]): Promise<any> {
+    const id: string = Array.from(crypto.getRandomValues(new Uint8Array(8)))
+      .map((value) => {
+        return value.toString(16);
+      })
+      .join('');
+    const proxyMessage = {
+      type: 'cosmos-proxy-request',
+      id,
+      method,
+      args: JSONUint8Array.wrap(args),
+    };
+    return this._dedupePromise.call(method, () => this._request(proxyMessage));
+  }
+
+  _request = async (proxyMessage) => {
+    this._requestPromise.check(1);
+    this._requestPromise.check(2);
+    return this._requestPromise.call(() => {
+      log('[request]', JSON.stringify(proxyMessage, null, 2));
+      this._bcm
+        .request(proxyMessage)
+        .then((res) => {
+          log('[response: success]', proxyMessage.method, res);
+          return res;
+        })
+        .catch((err) => {
+          log('[response: error]', proxyMessage.method, err);
+          return err;
+        });
+    });
+  };
+
+  async getKey(chainId: string): Promise<Key> {
+    return await this.requestMethod('getKey', [chainId]);
+  }
+
+  async enable(chainIds: string | string[]): Promise<void> {
+    await this.requestMethod('enable', [chainIds]);
+  }
+
+  getOfflineSigner(chainId: string): OfflineSigner & OfflineDirectSigner {
+    return new CosmJSOfflineSigner(chainId, this);
+  }
+
   experimentalSuggestChain(chainInfo: CosmosChainInfo): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -148,68 +225,5 @@ export class CosmosProvider extends EventEmitter implements Keplr {
     nonce: Uint8Array
   ): Promise<Uint8Array> {
     throw new Error('Method not implemented.');
-  }
-
-  initialize = async () => {
-    this._bcm.connect().on('message', this._handleBackgroundMessage);
-    domReadyCall(() => {
-      const origin = top?.location.origin;
-      const icon =
-        ($('head > link[rel~="icon"]') as HTMLLinkElement)?.href ||
-        ($('head > meta[itemprop="image"]') as HTMLMetaElement)?.content;
-      const name =
-        document.title ||
-        ($('head > meta[name="title"]') as HTMLMetaElement)?.content ||
-        origin;
-    });
-  };
-
-  private _handleBackgroundMessage = ({ event, data }) => {
-    if (this._pushEventHandlers[event]) {
-      return this._pushEventHandlers[event](data);
-    }
-    this.emit(event, data);
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected requestMethod(method: string, args: any[]): Promise<any> {
-    const id: string = Array.from(crypto.getRandomValues(new Uint8Array(8)))
-      .map((value) => {
-        return value.toString(16);
-      })
-      .join('');
-
-    const proxyMessage = {
-      type: 'cosmos-proxy-request',
-      id,
-      method,
-      args: JSONUint8Array.wrap(args),
-    };
-    this._requestPromise.uncheck(1);
-    return this._requestPromise.call(() => {
-      log('[request]', JSON.stringify(proxyMessage, null, 2));
-      this._bcm
-        .request(proxyMessage)
-        .then((res) => {
-          log('[response: success]', proxyMessage.method, res);
-          return res;
-        })
-        .catch((err) => {
-          log('[response: error]', proxyMessage.method, err);
-          return err;
-        });
-    });
-  }
-
-  async getKey(chainId: string): Promise<Key> {
-    return await this.requestMethod('getKey', [chainId]);
-  }
-
-  async enable(chainIds: string | string[]): Promise<void> {
-    await this.requestMethod('enable', [chainIds]);
-  }
-
-  getOfflineSigner(chainId: string): OfflineSigner & OfflineDirectSigner {
-    return new CosmJSOfflineSigner(chainId, this);
   }
 }
