@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from 'ui/components/Header';
-import TeleportLogoURI from 'assets/walletLogo.svg';
+import TeleportLogoURI from 'assets/walletLogo.png';
 import './style.less';
 import { useTranslation } from 'react-i18next';
 import { IconComponent } from 'ui/components/IconComponents';

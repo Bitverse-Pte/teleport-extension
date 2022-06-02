@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { message } from 'antd';
 import { useWallet, useWalletRequest, useApproval } from 'ui/utils';
-import walletLogo from 'assets/walletLogo.svg';
+import walletLogo from 'assets/walletLogo.png';
 import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
 
 import './style.less';
