@@ -13,10 +13,16 @@ export class CosmJSOfflineSigner implements OfflineSigner, OfflineDirectSigner {
   constructor(
     protected readonly chainId: string,
     protected readonly keplr: Keplr
-  ) {}
+  ) {
+    this.chainId = chainId;
+    this.keplr = keplr;
+  }
 
   async getAccounts(): Promise<AccountData[]> {
-    const key = await this.keplr.getKey(this.chainId);
+    const key = {
+      bech32Address: '',
+      pubKey: '__uint8array__' as unknown as Uint8Array,
+    }; //await this.keplr.getKey(this.chainId);
 
     return [
       {

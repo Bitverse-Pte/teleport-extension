@@ -22,8 +22,9 @@ import {
   StdSignDoc,
 } from '@cosmjs/launchpad';
 import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
-import { Long } from 'long';
+import deepmerge from 'deepmerge';
 import { SecretUtils } from 'secretjs/types/enigmautils';
+import Long from 'long';
 
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -133,18 +134,25 @@ export class CosmosProvider extends EventEmitter implements Keplr {
     return new CosmJSOfflineSigner(chainId, this);
   }
 
-  experimentalSuggestChain(chainInfo: CosmosChainInfo): Promise<void> {
-    throw new Error('Method not implemented.');
+  async experimentalSuggestChain(chainInfo: CosmosChainInfo): Promise<void> {
+    return await this.requestMethod('experimentalSuggestChain', [chainInfo]);
   }
-  signAmino(
+
+  async signAmino(
     chainId: string,
     signer: string,
     signDoc: StdSignDoc,
     signOptions?: KeplrSignOptions
   ): Promise<AminoSignResponse> {
-    throw new Error('Method not implemented.');
+    return await this.requestMethod('signAmino', [
+      chainId,
+      signer,
+      signDoc,
+      signOptions,
+    ]);
   }
-  signDirect(
+
+  async signDirect(
     chainId: string,
     signer: string,
     signDoc: {
@@ -155,15 +163,56 @@ export class CosmosProvider extends EventEmitter implements Keplr {
     },
     signOptions?: KeplrSignOptions
   ): Promise<DirectSignResponse> {
-    throw new Error('Method not implemented.');
+    const result = await this.requestMethod('signDirect', [
+      chainId,
+      signer,
+      // We can't send the `Long` with remaing the type.
+      // Receiver should change the `string` to `Long`.
+      {
+        bodyBytes: signDoc.bodyBytes,
+        authInfoBytes: signDoc.authInfoBytes,
+        chainId: signDoc.chainId,
+        accountNumber: signDoc.accountNumber
+          ? signDoc.accountNumber.toString()
+          : null,
+      },
+      signOptions,
+    ]);
+
+    const signed: {
+      bodyBytes: Uint8Array;
+      authInfoBytes: Uint8Array;
+      chainId: string;
+      accountNumber: string;
+    } = result.signed;
+
+    return {
+      signed: {
+        bodyBytes: signed.bodyBytes,
+        authInfoBytes: signed.authInfoBytes,
+        chainId: signed.chainId,
+        // We can't send the `Long` with remaing the type.
+        // Sender should change the `Long` to `string`.
+        accountNumber: Long.fromString(signed.accountNumber),
+      },
+      signature: result.signature,
+    };
   }
-  sendTx(
+
+  async sendTx(
     chainId: string,
     tx: Uint8Array,
     mode: BroadcastMode
   ): Promise<Uint8Array> {
-    throw new Error('Method not implemented.');
+    if (!('length' in tx)) {
+      console.log(
+        'Do not send legacy std tx via `sendTx` API. We now only support protobuf tx. The usage of legeacy std tx would throw an error in the near future.'
+      );
+    }
+
+    return await this.requestMethod('sendTx', [chainId, tx, mode]);
   }
+
   signArbitrary(
     chainId: string,
     signer: string,
