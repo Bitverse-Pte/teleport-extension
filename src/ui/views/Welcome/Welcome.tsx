@@ -3,7 +3,8 @@ import { Button } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ACCOUNT_CREATE_TYPE } from '../../../constants/index';
-import walletLogo from 'assets/walletLogo.svg';
+import walletLogo from 'assets/walletLogo.png';
+import TeleportText from 'assets/teleportText.svg';
 
 import './style.less';
 import { CustomButton } from 'ui/components/Widgets';
@@ -28,8 +29,8 @@ const Welcome = () => {
     <div className="welcome-container">
       <div className="logo-container">
         <img src={walletLogo} className="logo" />
-        <p className="welcome-to">Welcome to</p>
-        <p className="wallet-name flexR">Teleport Wallet</p>
+        <img src={TeleportText} className="logo-header-left-title" />
+        <p className="welcome-to">Welcome to Teleport Wallet</p>
       </div>
 
       <div className="btn-container">
