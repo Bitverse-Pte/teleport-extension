@@ -692,7 +692,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     decimal: 6,
     name: 'KAVA',
     denom: 'ukava',
-    icon: '',
+    icon: 'https://github.com/trustwallet/assets/blob/master/blockchains/kava/info/logo.png',
     chainCustomId: PresetNetworkId.KAVA,
     isNative: true,
     isCustom: false,
