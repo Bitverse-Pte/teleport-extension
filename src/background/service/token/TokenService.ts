@@ -207,46 +207,57 @@ class TokenService {
     address: string,
     chainCustomId: string | PresetNetworkId
   ): Promise<Token[]> {
+    let currentAccountTokens: Token[] = [];
     const chain: Network | undefined =
       networkPreferenceService.getProvider(chainCustomId);
-    const tokenBalance: Token[] = [];
     if (chain && chain.ecoSystemParams?.rest) {
       const urlPrefix = chain.ecoSystemParams.rest;
-      let url;
-      switch (chainCustomId) {
-        case PresetNetworkId.COSMOS_HUB:
-        case PresetNetworkId.SECRET_NETWORK:
-        case PresetNetworkId.OSMOSIS:
-        default:
-          //cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4
-          url = `${urlPrefix}/cosmos/bank/v1beta1/balances/${address}?pagination.limit=1000`;
-          break;
-      }
+      //cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4
+      const url = `${urlPrefix}/cosmos/bank/v1beta1/balances/cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4?pagination.limit=1000`;
       const res = await fetch(url)
         .then((res) => res.json())
         .catch((e) => console.error(e));
+      console.log('balance', res);
       const balances = cloneDeep(this.store.getState().balances || {});
-      const tokens = cloneDeep(this.store.getState().tokens);
-
-      const nativeToken = tokens.find(
+      const allTokens = cloneDeep(this.store.getState().tokens);
+      const nativeToken = allTokens.find(
         (t: Token) => t.chainCustomId === chainCustomId && t.isNative
       );
-      console.log('balance', res);
-      if (res && res.balances?.length >= 0) {
-        if (nativeToken) {
-          const denoms = cloneDeep(this.store.getState().denomTrace);
-          if (res.balances.every((b) => b.denom !== nativeToken.denom)) {
-            nativeToken.amount = 0;
-            tokenBalance.push(nativeToken);
+      if (nativeToken) {
+        if (!balances[address]) {
+          nativeToken.amount = 0;
+          balances[address] = [cloneDeep(nativeToken)];
+        }
+        currentAccountTokens = balances[address];
+        if (res && res.balances?.length >= 0) {
+          //current balance is 0, which is not 0 ever;
+          for (let i = 0; i < currentAccountTokens.length; i++) {
+            if (
+              res.balances.every((b: { denom: string; amount }) => {
+                if (b.denom.includes('ibc/')) {
+                  const hash = b.denom.split('ibc/')[1];
+                  return currentAccountTokens[i]?.trace?.hash !== hash;
+                } else {
+                  return false;
+                }
+              })
+            ) {
+              currentAccountTokens.splice(i, 1);
+              i--;
+            }
           }
+
+          const denoms = cloneDeep(this.store.getState().denomTrace);
           const updatedTokens: Token[] = [];
           for (const b of res.balances) {
-            if (b.denom === nativeToken.denom) {
-              nativeToken.amount = b.amount;
-              tokenBalance.push(nativeToken);
-            } else {
-              if (b.denom.includes('ibc/')) {
-                const hash = b.denom.split('ibc/')[1];
+            if (b.denom.includes('ibc/')) {
+              const hash = b.denom.split('ibc/')[1];
+              const token = currentAccountTokens.find(
+                (t: Token) => t.trace?.hash === hash
+              );
+              if (token) {
+                token.amount = b.amount;
+              } else {
                 const token: Token = {
                   symbol: '',
                   decimal: 6,
@@ -268,28 +279,33 @@ class TokenService {
                       console.error(e);
                     }
                   );
+                  (denoms as any)[hash] = denomRes;
+                  this.store.updateState({
+                    denomTrace: denoms,
+                  });
                   if (denomRes) denomTrace = denomRes;
                 }
                 if (denomTrace) {
                   token.symbol = denomTrace.denom.substr(1).toUpperCase();
                   token.name = denomTrace.denom.substr(1).toUpperCase();
                   token.trace = denomTrace;
-                  tokenBalance.push(token);
-                  if (!tokens.find((t: Token) => t?.trace?.hash === hash)) {
-                    updatedTokens.push(token);
-                  }
+                  currentAccountTokens.push(token);
                 }
+                updatedTokens.push(token);
+                this.store.updateState({
+                  tokens: [...allTokens, ...updatedTokens],
+                });
               }
+            } else {
+              const token = currentAccountTokens.find((t: Token) => t.isNative);
+              if (token) token.amount = b.amount;
             }
           }
-          this.store.updateState({
-            tokens: [...tokens, ...updatedTokens],
-          });
         }
       }
     }
 
-    return Promise.resolve(tokenBalance);
+    return Promise.resolve(currentAccountTokens);
   }
 
   private async _fetchIbcDenom(hash: string): Promise<IDenomTrace | null> {
