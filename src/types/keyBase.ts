@@ -44,3 +44,12 @@ export enum SignatureAlgorithm {
   ed25519,
   sm2,
 }
+
+export interface KeplrGetKeyResponseInterface {
+  name: string;
+  algo: string;
+  pubKey: Buffer | Uint8Array;
+  address: Buffer | Uint8Array;
+  bech32Address: string;
+  isNanoLedger: boolean;
+}

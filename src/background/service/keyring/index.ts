@@ -28,12 +28,18 @@ import { ErrorCode } from 'constants/code';
 import { nanoid } from 'nanoid';
 import { EthKey } from '../keyManager/eth/EthKey';
 import { CosmosKey } from '../keyManager/cosmos/CosmosKey';
-import { Bip44HdPath, KeyPair, SignatureAlgorithm } from 'types/keyBase';
+import {
+  Bip44HdPath,
+  KeplrGetKeyResponseInterface,
+  KeyPair,
+  SignatureAlgorithm,
+} from 'types/keyBase';
 import cloneDeep from 'lodash/cloneDeep';
 import { CoinType, Ecosystem, Provider } from 'types/network';
 import secp256k1_1 from 'ethereum-cryptography/secp256k1';
 import { Bech32Config } from 'types/cosmos';
 import { PresetNetworkId } from 'constants/defaultNetwork';
+import { Bech32Address } from 'utils/cosmos/bech32';
 
 export interface IStorageState {
   booted: string;
@@ -1075,8 +1081,8 @@ class KeyringService extends EventEmitter {
    *
    * @returns {Promise<Array<string>>} The array of accounts.
    */
-  async getAccounts(): Promise<string[]> {
-    return this.accounts.map((a: BaseAccount) => a.address);
+  async getAccounts(): Promise<BaseAccount[]> {
+    return cloneDeep(this.accounts) as BaseAccount[];
   }
 
   /**
@@ -1191,6 +1197,41 @@ class KeyringService extends EventEmitter {
     });
     await this._persistAllAccount();
     return Promise.resolve(true);
+  }
+
+  public getKeplrCompatibleKey(chainId): KeplrGetKeyResponseInterface | null {
+    const chains: Provider[] = networkPreferenceService.getSupportProviders();
+    const chain: Provider | undefined = chains.find(
+      (c: Provider) => c.chainId === chainId
+    );
+    if (chain) {
+      const { id } = chain;
+      const accounts = cloneDeep(this.accounts);
+      const currentChainAccounts: BaseAccount[] = accounts.filter(
+        (a: BaseAccount) => a.chainCustomId === id
+      );
+      if (currentChainAccounts?.length > 0) {
+        const account: BaseAccount = currentChainAccounts[0];
+        const { address, publicKey, hdWalletName, signatureAlgorithm } =
+          account;
+        const addressBuf = Bech32Address.fromBech32(address).address,
+          publicKeyBuf = Buffer.from(publicKey, 'hex');
+        return {
+          name: hdWalletName,
+          algo:
+            signatureAlgorithm === SignatureAlgorithm.secp256k1
+              ? 'secp256k1'
+              : '',
+          pubKey: publicKeyBuf,
+          address: addressBuf,
+          bech32Address: address,
+          isNanoLedger: false,
+        } as KeplrGetKeyResponseInterface;
+      }
+      return null;
+    } else {
+      return null;
+    }
   }
 }
 

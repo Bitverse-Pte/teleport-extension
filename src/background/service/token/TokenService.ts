@@ -389,7 +389,6 @@ class TokenService {
 
   async queryTokenPrices(target = 'usd', tokenId?: string) {
     const { id } = networkPreferenceService.getProviderConfig();
-    console.log(this.store.getState().tokens);
     const tokensStr = this.store
       .getState()
       .tokens.filter(
