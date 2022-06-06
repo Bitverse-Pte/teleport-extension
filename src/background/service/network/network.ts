@@ -239,14 +239,14 @@ class NetworkPreferenceService extends EventEmitter {
        * - uncessary padding 0
        * - pure decimal number
        */
-      if (n.ecosystem === Ecosystem.EVM) {
-        updatedObj.chainId = toHexString(n.chainId);
-      }
       if (!updatedObj.ecosystem) {
         /**
          * issue due to type changes, fix `undefined` to avoid future errors
          */
         updatedObj.ecosystem = Ecosystem.EVM;
+      }
+      if (updatedObj.ecosystem === Ecosystem.EVM) {
+        updatedObj.chainId = toHexString(n.chainId);
       }
       return updatedObj;
     });
