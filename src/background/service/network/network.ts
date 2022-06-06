@@ -231,18 +231,27 @@ class NetworkPreferenceService extends EventEmitter {
       console.debug('No more migration');
     }
 
-    /**
-     * Fix `chainId` issues with
-     * - uncessary padding 0
-     * - pure decimal number
-     */
     const { networks } = this.customNetworksStore.getState();
+    const migratedNetworks = networks.map((n) => {
+      const updatedObj = { ...n };
+      /**
+       * Fix `chainId` issues with
+       * - uncessary padding 0
+       * - pure decimal number
+       */
+      if (!updatedObj.ecosystem) {
+        /**
+         * issue due to type changes, fix `undefined` to avoid future errors
+         */
+        updatedObj.ecosystem = Ecosystem.EVM;
+      }
+      if (updatedObj.ecosystem === Ecosystem.EVM) {
+        updatedObj.chainId = toHexString(n.chainId);
+      }
+      return updatedObj;
+    });
     this.customNetworksStore.updateState({
-      networks: networks.map((n) => ({
-        ...n,
-        chainId:
-          n.ecosystem === Ecosystem.EVM ? toHexString(n.chainId) : n.chainId,
-      })),
+      networks: migratedNetworks,
     });
 
     /**

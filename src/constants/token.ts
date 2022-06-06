@@ -571,6 +571,18 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     display: true,
   },
   {
+    symbol: 'OP',
+    decimal: 18,
+    name: 'OP',
+    denom: '',
+    icon: '',
+    chainCustomId: PresetNetworkId.OP,
+    isNative: false,
+    isCustom: false,
+    contractAddress: '0x4200000000000000000000000000000000000042',
+    display: true,
+  },
+  {
     symbol: 'USDT',
     decimal: 6,
     name: 'USDT',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
-import walletLogo from 'assets/walletLogo.svg';
+import walletLogo from 'assets/walletLogo.png';
 import './style.less';
 import { useHistory } from 'react-router';
 import { Space } from 'antd';
