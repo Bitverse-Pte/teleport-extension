@@ -12,6 +12,9 @@ import {
   getCustomProvidersSelector,
   getEnabledProvidersSelector,
 } from 'ui/selectors/network.selector';
+import { ErrorCode } from 'constants/code';
+import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Design was based on MetaMask
@@ -68,6 +71,8 @@ export function NetworkStoreProvider({
 
   const dispatch = useDispatch();
 
+  const { t } = useTranslation();
+
   const currentNetworkController = useSelector((state) => state.network);
 
   const customProviders = useSelector(getCustomProvidersSelector);
@@ -79,8 +84,13 @@ export function NetworkStoreProvider({
         const provider = await wallet.useProviderById(networkId);
         await wallet.fetchLatestBlockDataNow();
         return provider;
-      } catch (error) {
+      } catch (error: any) {
         console.error('useProviderById::error', error);
+        if (error?.code && error.code === ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+          ClickToCloseMessage.error(
+            t('SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST')
+          );
+        }
       } finally {
         dispatch(hideLoadingIndicator());
       }

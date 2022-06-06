@@ -415,10 +415,18 @@ class ProviderController extends BaseController {
       Ecosystem.EVM,
       '0x'
     );
-    networkPreferenceService.setProviderConfig({
-      ...network,
-      type: 'rpc',
-    });
+    try {
+      networkPreferenceService.setProviderConfig({
+        ...network,
+        type: 'rpc',
+      });
+    } catch (error: any) {
+      /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+      // if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+
+      // }
+      console.error('walletAddEthereumChain::error: ', error);
+    }
 
     await TokenService.addCustomToken({
       symbol: chainParams.nativeCurrency.symbol || 'ETH',
@@ -455,7 +463,16 @@ class ProviderController extends BaseController {
           message: `Unrecognized chain ID "${chainParams.chainId}". Try adding the chain using ${MESSAGE_TYPE.ADD_ETHEREUM_CHAIN} first.`,
         });
       }
-      networkPreferenceService.setProviderConfig(matchedProvider);
+
+      try {
+        networkPreferenceService.setProviderConfig(matchedProvider);
+      } catch (error: any) {
+        /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+        // if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+
+        // }
+        console.error('walletSwitchEthereumChain::error: ', error);
+      }
 
       // return null is expected behaviour
       return null;

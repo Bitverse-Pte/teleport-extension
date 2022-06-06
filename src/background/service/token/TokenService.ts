@@ -1,17 +1,24 @@
-import { AddTokenOpts, ERC20Struct, ITokenStore, Token } from 'types/token';
+import {
+  AddTokenOpts,
+  ERC20Struct,
+  IDenomTrace,
+  ITokenStore,
+  Token,
+} from 'types/token';
 import { TOKEN_STORE_KEY } from 'constants/chain';
 import cloneDeep from 'lodash/cloneDeep';
 import { DEFAULT_TOKEN_CONFIG } from 'constants/token';
 import { nanoid } from 'nanoid';
 import { networkPreferenceService } from 'background/service';
 import abi from 'utils/human-standard-token-abi-extended';
-import { TOKEN_THEME_COLOR } from 'constants/wallet';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { getMulticallAddressOf } from 'constants/evm/multicall';
 import { Ecosystem } from 'types/network';
 import { MulticallHelper } from './utils/multicallHelper';
+import { PresetNetworkId } from 'constants/defaultNetwork';
+import { Network, Provider } from 'types/network';
 
 class TokenService {
   store: ObservableStorage<ITokenStore>;
@@ -20,6 +27,7 @@ class TokenService {
     this.store = new ObservableStorage<ITokenStore>(TOKEN_STORE_KEY, {
       tokens: [],
       balances: null,
+      denomTrace: {},
     });
   }
 
@@ -58,16 +66,11 @@ class TokenService {
       );
   }
 
-  private _getRandomColor(): string {
-    const length = TOKEN_THEME_COLOR.length;
-    const randomNumber = Math.floor(Math.random() * length);
-    return TOKEN_THEME_COLOR[randomNumber];
-  }
-
   private _checkDuplicateToken(chainCustomId, contractAddress): boolean {
     return !!this.getAllTokens(chainCustomId).find(
       (t: Token) =>
-        t.contractAddress.toLowerCase() === contractAddress.toLowerCase()
+        (t as any).contractAddress.toLowerCase() ===
+        contractAddress.toLowerCase()
     );
   }
 
@@ -87,15 +90,13 @@ class TokenService {
       symbol: tokenParams.symbol,
       decimal: tokenParams.decimal,
       name: tokenParams.name,
-      demon: '',
+      denom: '',
       icon: '',
       chainCustomId: tokenParams.chainCustomId,
       isNative: tokenParams.isNative,
       contractAddress: tokenParams.contractAddress || '',
-      track: '',
       isCustom: true,
       display: true,
-      themeColor: this._getRandomColor(),
       tokenId: nanoid(),
     };
     const storageTokens = cloneDeep(this.store.getState().tokens || []);
@@ -128,25 +129,20 @@ class TokenService {
     return Promise.resolve(true);
   }
 
-  getBalancesSync(
-    address: string,
-    chainCustomId: string
-    //showHideToken = false
-  ): Promise<Token[]> {
+  getBalancesSync(address: string, chainCustomId: string): Promise<Token[]> {
     let tokens: Token[] = [];
     if (this.store.getState().balances) {
       const clonedBalances = cloneDeep(this.store.getState().balances);
       if (clonedBalances && clonedBalances[address]) {
         tokens = clonedBalances[address].filter(
           (t: Token) => t.chainCustomId === chainCustomId
-          //(showHideToken ? true : t.display)
         );
       }
     }
     return Promise.resolve(tokens);
   }
 
-  private async _getBalancesAsyncLegacy(
+  private async _getEvmBalancesLegacy(
     tokens: Token[],
     address: string
   ): Promise<Token[]> {
@@ -166,59 +162,188 @@ class TokenService {
         }
       }
     }
-
     return tokens;
   }
-
-  async getBalancesAsync(
+  async getEvmBalancesAsync(
     address: string,
     chainCustomId: string
-    //showHideToken = false
   ): Promise<Token[]> {
     let tokens: Token[] = cloneDeep(this.store.getState().tokens || []).filter(
       (t: Token) => t.chainCustomId === chainCustomId // && (showHideToken ? true : t.display)
     );
-    const balances = cloneDeep(this.store.getState().balances || {});
-    const { chainId, ecosystem } = networkPreferenceService.getProviderConfig();
+    const { chainId } = networkPreferenceService.getProviderConfig();
     const multicallV2 = getMulticallAddressOf(chainId);
 
-    if (ecosystem == Ecosystem.EVM) {
-      /** Use multicall contract to fetch balance */
-      if (multicallV2) {
-        try {
-          const fetchedBalances = await this._fetchBalancesByMulticall(
-            multicallV2,
-            tokens,
-            address
-          );
-          tokens = tokens.map((t, idx) =>
-            !fetchedBalances[idx]
-              ? t
-              : /** assign if balance exist */
-                { ...t, amount: fetchedBalances[idx]?.toString() }
-          );
-        } catch (error) {
-          console.error('getBalancesAsync::multicall:error:', error);
-          console.warn('using legacy query now...');
-          tokens = await this._getBalancesAsyncLegacy(tokens, address);
-        }
-      } else {
-        /**
-         * just use legacy way if no multicall for this chain
-         */
-        tokens = await this._getBalancesAsyncLegacy(tokens, address);
+    /** Use multicall contract to fetch balance */
+    if (multicallV2) {
+      try {
+        const fetchedBalances = await this._fetchBalancesByMulticall(
+          multicallV2,
+          tokens,
+          address
+        );
+        tokens = tokens.map((t, idx) =>
+          !fetchedBalances[idx]
+            ? t
+            : /** assign if balance exist */
+              { ...t, amount: fetchedBalances[idx]?.toString() }
+        );
+      } catch (error) {
+        console.error('getBalancesAsync::multicall:error:', error);
+        console.warn('using legacy query now...');
+        tokens = await this._getEvmBalancesLegacy(tokens, address);
       }
     } else {
-      console.warn(
-        `query token balances for ${ecosystem} is not supported right now.`
+      /**
+       * just use legacy way if no multicall for this chain
+       */
+      tokens = await this._getEvmBalancesLegacy(tokens, address);
+    }
+
+    return Promise.resolve(tokens);
+  }
+
+  async getCosmosEcosystemBalancesAsync(
+    address: string,
+    chainCustomId: string | PresetNetworkId
+  ): Promise<Token[]> {
+    const chain: Network | undefined =
+      networkPreferenceService.getProvider(chainCustomId);
+    const tokenBalance: Token[] = [];
+    if (chain && chain.ecoSystemParams?.rest) {
+      const urlPrefix = chain.ecoSystemParams.rest;
+      let url;
+      switch (chainCustomId) {
+        case PresetNetworkId.COSMOS_HUB:
+        case PresetNetworkId.SECRET_NETWORK:
+        case PresetNetworkId.OSMOSIS:
+        default:
+          //cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4
+          url = `${urlPrefix}/cosmos/bank/v1beta1/balances/${address}?pagination.limit=1000`;
+          break;
+      }
+      const res = await fetch(url)
+        .then((res) => res.json())
+        .catch((e) => console.error(e));
+      const balances = cloneDeep(this.store.getState().balances || {});
+      const tokens = cloneDeep(this.store.getState().tokens);
+
+      const nativeToken = tokens.find(
+        (t: Token) => t.chainCustomId === chainCustomId && t.isNative
       );
+      console.log('balance', res);
+      if (res && res.balances?.length >= 0) {
+        if (nativeToken) {
+          const denoms = cloneDeep(this.store.getState().denomTrace);
+          if (res.balances.every((b) => b.denom !== nativeToken.denom)) {
+            nativeToken.amount = 0;
+            tokenBalance.push(nativeToken);
+          }
+          const updatedTokens: Token[] = [];
+          for (const b of res.balances) {
+            if (b.denom === nativeToken.denom) {
+              nativeToken.amount = b.amount;
+              tokenBalance.push(nativeToken);
+            } else {
+              if (b.denom.includes('ibc/')) {
+                const hash = b.denom.split('ibc/')[1];
+                const token: Token = {
+                  symbol: '',
+                  decimal: 6,
+                  name: '',
+                  denom: b.denom,
+                  chainCustomId,
+                  isNative: false,
+                  isCustom: false,
+                  display: true,
+                  tokenId: nanoid(),
+                  amount: b.amount,
+                };
+                let denomTrace: any;
+                if (denoms && denoms[hash]) {
+                  denomTrace = denoms[hash];
+                } else {
+                  const denomRes = await this._fetchIbcDenom(hash).catch(
+                    (e) => {
+                      console.error(e);
+                    }
+                  );
+                  if (denomRes) denomTrace = denomRes;
+                }
+                if (denomTrace) {
+                  token.symbol = denomTrace.denom.substr(1).toUpperCase();
+                  token.name = denomTrace.denom.substr(1).toUpperCase();
+                  token.trace = denomTrace;
+                  tokenBalance.push(token);
+                  if (!tokens.find((t: Token) => t?.trace?.hash === hash)) {
+                    updatedTokens.push(token);
+                  }
+                }
+              }
+            }
+          }
+          this.store.updateState({
+            tokens: [...tokens, ...updatedTokens],
+          });
+        }
+      }
+    }
+
+    return Promise.resolve(tokenBalance);
+  }
+
+  private async _fetchIbcDenom(hash: string): Promise<IDenomTrace | null> {
+    const { ecoSystemParams } = networkPreferenceService.getProviderConfig();
+    if (ecoSystemParams?.rest) {
+      const urlPrefix = ecoSystemParams.rest;
+      const url = `${urlPrefix}/ibc/apps/transfer/v1/denom_traces/${hash}`;
+      const res = await fetch(url)
+        .then((res) => res.json())
+        .catch((e) => console.error(e));
+      if (res?.denom_trace?.path && res?.denom_trace?.base_denom) {
+        const pathArr = res?.denom_trace?.path.split('/');
+        let portId, channelId;
+        if (pathArr?.length % 2 === 0) {
+          portId = pathArr[0];
+          channelId = pathArr[0];
+          const denomTrace: IDenomTrace = {
+            hash,
+            portId,
+            channelId,
+            denom: res?.denom_trace?.base_denom,
+            path: res?.denom_trace?.path,
+          };
+          return Promise.resolve(denomTrace);
+        }
+      }
+    }
+    return Promise.resolve(null);
+  }
+
+  async getBalancesAsync(
+    address: string,
+    chainCustomId: string,
+    ecosystem: Ecosystem
+  ): Promise<Token[]> {
+    const balances = cloneDeep(this.store.getState().balances || {});
+    let tokens: Token[] = [];
+    switch (ecosystem) {
+      case Ecosystem.COSMOS:
+        tokens = await this.getCosmosEcosystemBalancesAsync(
+          address,
+          chainCustomId
+        );
+        break;
+      default:
+        tokens = await this.getEvmBalancesAsync(address, chainCustomId);
+        break;
     }
 
     balances![address] = tokens;
     this.store.updateState({
       balances,
     });
-    return this.getBalancesSync(address, chainCustomId /* , showHideToken */);
+    return this.getBalancesSync(address, chainCustomId);
   }
 
   private async _fetchBalancesByMulticall(
@@ -246,14 +371,18 @@ class TokenService {
     return parsedReturnData;
   }
 
-  async queryTokenPrices(target = 'usd') {
+  async queryTokenPrices(target = 'usd', tokenId?: string) {
     const { id } = networkPreferenceService.getProviderConfig();
+    console.log(this.store.getState().tokens);
     const tokensStr = this.store
       .getState()
-      .tokens.filter((t: Token) => t.chainCustomId === id)
+      .tokens.filter(
+        (t: Token) =>
+          t.chainCustomId === id && (tokenId ? tokenId === t.tokenId : true)
+      )
       .map((t: Token) => t.symbol)
       .join(',');
-    if (!tokensStr) return Promise.reject('no token found');
+    if (!tokensStr) return null;
     const coinsUrl = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${tokensStr}&tsyms=${target}&api_key=87e7ef93b4e386bc370b82ad39697409db31409a808f0e8f426cb59ddabceca4`;
     const res = await fetch(coinsUrl)
       .then((res) => res.json())

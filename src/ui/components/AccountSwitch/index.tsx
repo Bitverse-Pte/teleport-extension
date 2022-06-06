@@ -31,7 +31,7 @@ export interface IDisplayAccountInfo {
   chain: CHAINS;
   walletName?: string;
 }
-
+/* 
 const AccountSwitch: React.FC<AccountSwitchProps> = (
   props: AccountSwitchProps
 ) => {
@@ -230,4 +230,4 @@ const AccountSwitch: React.FC<AccountSwitchProps> = (
   );
 };
 
-export default AccountSwitch;
+export default AccountSwitch; */

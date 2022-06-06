@@ -32,13 +32,13 @@ const SingleToken = () => {
   const [token, setToken] = useState<Token>();
   const [prices, setPrices] = useState();
 
-  const getTokenBalanceAsync = async () => {
+  /* const getTokenBalanceAsync = async () => {
     const balance = await wallet.getTokenBalanceAsync(tokenId).catch((e) => {
       console.error(e);
     });
     console.log('async balance', balance);
     if (balance) setToken(balance);
-  };
+  }; */
 
   const getTokenBalanceSync = async () => {
     const balance = await wallet.getTokenBalanceSync(tokenId).catch((e) => {
@@ -53,10 +53,10 @@ const SingleToken = () => {
     if (account) setAccount(account);
   };
   useAsyncEffect(updateAccount, []);
-  useAsyncEffect(getTokenBalanceAsync, []);
+  //useAsyncEffect(getTokenBalanceAsync, []);
   useAsyncEffect(getTokenBalanceSync, []);
   const queryTokenPrices = async () => {
-    const prices = await wallet.queryTokenPrices().catch((e) => {
+    const prices = await wallet.queryTokenPrices(tokenId).catch((e) => {
       console.error(e);
     });
     console.log('prices', prices);
@@ -110,7 +110,7 @@ const SingleToken = () => {
             {getTotalPricesByAmountAndPrice(
               updatedToken?.amount || 0,
               updatedToken?.decimal || 0,
-              updatedToken?.price || 1
+              updatedToken?.price || 0
             )}{' '}
             USD
           </span>
