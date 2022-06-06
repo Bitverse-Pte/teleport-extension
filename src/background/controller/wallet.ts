@@ -35,6 +35,7 @@ import { HexString } from 'constants/transaction';
 import { CustomGasSettings } from 'types/tx';
 import { BigNumberish } from 'ethers';
 import { CosmosChainInfo } from 'types/cosmos';
+import { KeplrGetKeyResponseInterface } from 'types/keyBase';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -449,6 +450,10 @@ export class WalletController extends BaseController {
 
   queryTokenPrices = (tokenId?: string) =>
     TokenService.queryTokenPrices('usd', tokenId);
+
+  getKey(chainId): KeplrGetKeyResponseInterface | null {
+    return keyringService.getKeplrCompatibleKey(chainId);
+  }
 
   providers() {
     console.log(networkPreferenceService.getProviderConfig());
