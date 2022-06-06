@@ -8,6 +8,7 @@ import {
 
 import rpcFlow from './rpcFlow';
 import internalMethod from './internalMethod';
+import cosmosRpcFlow from './cosmosRpcFlow';
 
 tab.on('tabRemove', (id) => {
   sessionService.deleteSession(id);
@@ -17,11 +18,6 @@ export default async (req) => {
   const {
     data: { method, type },
   } = req;
-  console.log('=====req:=====', req);
-  if (type && type === 'cosmos-proxy-request') {
-    return { id: 'xxx' };
-  }
-
   //TODO for debug use, remove later...
   if (internalMethod[method]) {
     return internalMethod[method](req);
@@ -31,6 +27,10 @@ export default async (req) => {
     throw ethErrors.provider.userRejectedRequest({
       message: 'wallet must has at least one account',
     });
+  }
+
+  if (type && type === 'cosmos-proxy-request') {
+    return cosmosRpcFlow(req);
   }
 
   return rpcFlow(req);

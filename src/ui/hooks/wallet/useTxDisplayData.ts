@@ -162,7 +162,10 @@ export function useTransactionDisplayData(
   // hook to return null
   const token = isTokenCategory
     ? knownTokens.find(({ contractAddress }) =>
-        isEqualCaseInsensitive(contractAddress, recipientAddress as string)
+        isEqualCaseInsensitive(
+          contractAddress as string,
+          recipientAddress as string
+        )
       )
     : undefined;
   const tokenData = useTokenData(

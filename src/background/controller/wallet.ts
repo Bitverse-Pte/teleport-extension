@@ -21,6 +21,7 @@ import {
   CreateAccountOpts,
   DisplayAccountManage,
   DisplayWalletManage,
+  HdAccountStruct,
   ImportAccountOpts,
 } from 'types/extend';
 import provider from './provider';
@@ -77,15 +78,16 @@ export class WalletController extends BaseController {
   getAllProviders = () => networkPreferenceService.getAllProviders();
 
   useProviderById = (id: PresetNetworkId | string) => {
-    const network = networkPreferenceService.getProvider(id);
-    if (!network) {
+    const provider = networkPreferenceService.getProvider(id);
+    if (!provider) {
       throw new BitError(
         Object.values(PresetNetworkId).includes(id as PresetNetworkId)
           ? ErrorCode.DEFAULT_NETWORK_PROVIDER_PRESET_MISSING
           : ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING
       );
     }
-    return networkPreferenceService.setProviderConfig(network);
+    networkPreferenceService.setProviderConfig(provider);
+    return provider;
   };
 
   moveNetwork = (e: Ecosystem, f: number, d: number) =>
@@ -267,6 +269,20 @@ export class WalletController extends BaseController {
   changeAccount = (account: BaseAccount) =>
     preferenceService.setCurrentAccount(account);
 
+  changeAccountByWalletId = (hdWalletId: string) => {
+    return keyringService.changeAccountByWallet(hdWalletId);
+  };
+
+  addCurrentChainAccountByWalletId = async (hdWalletId) => {
+    const account = await keyringService.addCurrentChainAccountByWalletId(
+      hdWalletId
+    );
+    if (account) {
+      keyringService.boot();
+      return this._setCurrentAccount(account);
+    }
+  };
+
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 
   setIsDefaultWallet = (val: boolean) =>
@@ -335,6 +351,10 @@ export class WalletController extends BaseController {
     return Promise.resolve(keyringService.getAccountList(useCurrentChain));
   }
 
+  getWalletList(useCurrentEcosystem?: boolean): Promise<HdAccountStruct[]> {
+    return Promise.resolve(keyringService.getWalletList(useCurrentEcosystem));
+  }
+
   getCurrentChainAccounts(): Promise<BaseAccount[]> {
     return keyringService.getCurrentChainAccounts();
   }
@@ -358,11 +378,9 @@ export class WalletController extends BaseController {
 
   getTokenBalancesAsync = (): Promise<Token[]> => {
     const account = preferenceService.getCurrentAccount();
-    let chainCustomId;
-    const currentProvider = this.getCurrentChain();
-    if (currentProvider) chainCustomId = currentProvider.id;
+    const { id, ecosystem } = this.getCurrentChain();
     if (account) {
-      return TokenService.getBalancesAsync(account.address, chainCustomId);
+      return TokenService.getBalancesAsync(account.address, id, ecosystem);
     } else {
       return Promise.reject(new Error('no account found'));
     }
@@ -429,7 +447,8 @@ export class WalletController extends BaseController {
     return TokenService.addCustomToken(tokenParams);
   }
 
-  queryTokenPrices = () => TokenService.queryTokenPrices();
+  queryTokenPrices = (tokenId?: string) =>
+    TokenService.queryTokenPrices('usd', tokenId);
 
   providers() {
     console.log(networkPreferenceService.getProviderConfig());

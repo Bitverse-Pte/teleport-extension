@@ -2,7 +2,7 @@ import './style.less';
 import React, { useState } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
-import walletLogo from 'assets/walletLogo.svg';
+import walletLogo from 'assets/walletLogo.png';
 import TeleportText from 'assets/teleportText.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';

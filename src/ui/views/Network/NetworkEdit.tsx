@@ -13,7 +13,7 @@ import axios, { AxiosError } from 'axios';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { Button, Input, Select } from 'antd';
 import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { useDispatch, useSelector } from 'react-redux';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
@@ -24,9 +24,15 @@ import {
   showLoadingIndicator,
 } from 'ui/reducer/appState.reducer';
 import { useChainList } from 'ui/hooks/utils/useChainList';
+import { Ecosystem } from 'types/network';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
+
+/**
+ * No add / edit for providers in Cosmos ecosystem.
+ */
+const EcosystemThatCanAddEdit = [Ecosystem.EVM];
 
 const NetworkEdit = () => {
   const { t } = useTranslation();
@@ -268,9 +274,9 @@ const NetworkEdit = () => {
         /**
          * Basic chain id validation passed, now looking for existed provider with same chainId
          */
-        const matchedProvider = customNetworks.find((p) =>
-          chainIdBN.eq(p.chainId)
-        );
+        const matchedProvider = customNetworks
+          .filter((p) => EcosystemThatCanAddEdit.includes(p.ecosystem))
+          .find((p) => chainIdBN.eq(p.chainId));
         if (matchedProvider && !isEdit) {
           errors.chainId = t('chainIdExistsErrorMsg', {
             replace: {
