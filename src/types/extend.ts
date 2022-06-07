@@ -68,3 +68,16 @@ export interface DisplayAccountManage {
   hdPathIndex: number;
   accounts: BaseAccount[];
 }
+
+export interface CompareAccountsForCompatible {
+  hdWalletId: string;
+  hdWalletName: string;
+  mnemonic?: string;
+  privateKey?: string;
+  accountCreateType: AccountCreateType;
+  accounts?: {
+    hdPathIndex: number;
+    accountName: string;
+  }[];
+  chains: Provider[];
+}

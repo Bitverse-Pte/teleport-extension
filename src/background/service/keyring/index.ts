@@ -13,6 +13,7 @@ import preference from '../preference';
 import {
   AccountCreateType,
   BaseAccount,
+  CompareAccountsForCompatible,
   DisplayAccountManage,
   DisplayWalletManage,
   HdAccountStruct,
@@ -1232,6 +1233,92 @@ class KeyringService extends EventEmitter {
     } else {
       return null;
     }
+  }
+
+  public generateMissedAccounts() {
+    const wallets: CompareAccountsForCompatible[] =
+      this._getMissedAccountsForAllChain();
+    console.log('missed accounts', wallets);
+  }
+
+  private _getMissedAccountsForAllChain(): CompareAccountsForCompatible[] {
+    const accounts: BaseAccount[] = cloneDeep(this.accounts);
+    const secret: Secret[] = cloneDeep(this.secrets);
+    // accounts bellow evm chains are not missed;
+    const chains: Provider[] = networkPreferenceService
+      .getSupportProviders()
+      .filter((c: Provider) => c.ecosystem !== Ecosystem.EVM);
+    const difference: CompareAccountsForCompatible[] = [];
+
+    const walletIdMap: Record<string, BaseAccount[]> = {};
+    accounts.forEach((a: BaseAccount) => {
+      if (walletIdMap[a.hdWalletId]) {
+        walletIdMap[a.hdWalletId].push(a);
+      } else {
+        walletIdMap[a.hdWalletId] = [a];
+      }
+    });
+
+    for (const walletId in walletIdMap) {
+      const { accountCreateType, ecosystem, hdWalletName } =
+        walletIdMap[walletId][0];
+      let currentChains = chains,
+        mnemonic,
+        privateKey;
+      if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
+        currentChains = chains.filter(
+          (c: Provider) => c.ecosystem === ecosystem
+        );
+        privateKey = secret.find(
+          (s: Secret) => s.hdWalletId === walletId
+        )?.privateKey;
+      } else if (accountCreateType === AccountCreateType.MNEMONIC) {
+        mnemonic = secret.find(
+          (s: Secret) => s.hdWalletId === walletId
+        )?.mnemonic;
+      }
+      currentChains.forEach((c: Provider) => {
+        if (
+          walletIdMap[walletId].every(
+            (a: BaseAccount) => a.chainCustomId !== c.id
+          )
+        ) {
+          const diffItem = difference.find(
+            (d: CompareAccountsForCompatible) => d.hdWalletId === walletId
+          );
+          if (diffItem) {
+            diffItem.chains.push(c);
+          } else {
+            const d: CompareAccountsForCompatible = {
+              hdWalletId: walletId,
+              hdWalletName,
+              mnemonic,
+              privateKey,
+              accountCreateType,
+              accounts: [],
+              chains: [c],
+            };
+            if (accountCreateType === AccountCreateType.MNEMONIC) {
+              walletIdMap[walletId].forEach((a: BaseAccount) => {
+                if (
+                  (d as any).accounts.every(
+                    (d: { hdPathIndex: number; accountName }) => {
+                      d.hdPathIndex !== a.hdPathIndex;
+                    }
+                  )
+                ) {
+                  (d as any).accounts.push({
+                    hdPathIndex: a.hdPathIndex,
+                    accountName: a.accountName,
+                  });
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+    return difference;
   }
 }
 

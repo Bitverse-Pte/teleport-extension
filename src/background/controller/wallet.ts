@@ -455,6 +455,10 @@ export class WalletController extends BaseController {
     return keyringService.getKeplrCompatibleKey(chainId);
   }
 
+  generateMissedAccounts() {
+    return keyringService.generateMissedAccounts();
+  }
+
   providers() {
     console.log(networkPreferenceService.getProviderConfig());
     console.log(networkPreferenceService.getAllProviders());
