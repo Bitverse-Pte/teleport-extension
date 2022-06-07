@@ -21,9 +21,12 @@
     "pub": "node build/release.js"
   },
   "dependencies": {
+    "@cosmjs/launchpad": "^0.27.1",
     "@ethereumjs/common": "^2.5.0",
     "@ethereumjs/tx": "^3.3.2",
+    "@keplr-wallet/common": "^0.10.5",
     "@keplr-wallet/cosmos": "^0.10.3",
+    "@keplr-wallet/router": "^0.10.5",
     "@ledgerhq/hw-app-eth": "^6.0.2",
     "@ledgerhq/hw-transport-webusb": "^6.0.2",
     "@metamask/controllers": "^20.1.0",
@@ -35,6 +38,7 @@
     "@sentry/browser": "^6.7.2",
     "@sentry/react": "^6.7.2",
     "@sentry/tracing": "^6.7.2",
+    "@tharsis/address-converter": "^0.1.8",
     "@types/bignumber.js": "^5.0.0",
     "@types/lodash": "^4.14.172",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
@@ -85,6 +89,7 @@
     "lodash": "^4.17.21",
     "loglevel": "^1.7.1",
     "lru-cache": "^6.0.0",
+    "mobx": "^6.6.0",
     "nanoid": "^3.1.23",
     "nonce-tracker": "^1.1.0",
     "obs-store": "^4.0.3",
