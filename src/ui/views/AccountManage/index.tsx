@@ -56,7 +56,7 @@ const AccountManage: React.FC = () => {
           tempAccounts.push(a);
         }
       });
-      setAccounts(accountList);
+      setAccounts(tempAccounts);
     }
   };
 

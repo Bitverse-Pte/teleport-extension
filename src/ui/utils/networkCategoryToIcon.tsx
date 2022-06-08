@@ -132,7 +132,7 @@ export function ecosystemToIconSVG(ecosystem: Ecosystem) {
     case Ecosystem.EVM:
       return EthIconB;
     case Ecosystem.COSMOS:
-      return EthIconB;
+      return CosmosAtomIcon;
     case Ecosystem.POLKADOT:
       return EthIconB;
     default:
@@ -150,7 +150,7 @@ export function coinTypeToIconSVG(coinType: CoinType) {
     case Ecosystem.EVM:
       return EthIconB;
     case Ecosystem.COSMOS:
-      return EthIconB;
+      return CosmosAtomIcon;
     case Ecosystem.POLKADOT:
       return EthIconB;
     default:

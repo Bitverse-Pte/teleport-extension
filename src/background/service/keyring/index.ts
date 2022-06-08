@@ -1200,6 +1200,21 @@ class KeyringService extends EventEmitter {
     return Promise.resolve(true);
   }
 
+  private _getKey(account: BaseAccount): KeplrGetKeyResponseInterface {
+    const { address, publicKey, hdWalletName, signatureAlgorithm } = account;
+    const addressBuf = Bech32Address.fromBech32(address).address,
+      publicKeyBuf = Buffer.from(publicKey, 'hex');
+    return {
+      name: hdWalletName,
+      algo:
+        signatureAlgorithm === SignatureAlgorithm.secp256k1 ? 'secp256k1' : '',
+      pubKey: publicKeyBuf,
+      address: addressBuf,
+      bech32Address: address,
+      isNanoLedger: false,
+    } as KeplrGetKeyResponseInterface;
+  }
+
   public getKeplrCompatibleKey(chainId): KeplrGetKeyResponseInterface | null {
     const chains: Provider[] = networkPreferenceService.getSupportProviders();
     const chain: Provider | undefined = chains.find(
@@ -1208,28 +1223,41 @@ class KeyringService extends EventEmitter {
     if (chain) {
       const { id } = chain;
       const accounts = cloneDeep(this.accounts);
-      const currentChainAccounts: BaseAccount[] = accounts.filter(
-        (a: BaseAccount) => a.chainCustomId === id
-      );
-      if (currentChainAccounts?.length > 0) {
-        const account: BaseAccount = currentChainAccounts[0];
-        const { address, publicKey, hdWalletName, signatureAlgorithm } =
-          account;
-        const addressBuf = Bech32Address.fromBech32(address).address,
-          publicKeyBuf = Buffer.from(publicKey, 'hex');
-        return {
-          name: hdWalletName,
-          algo:
-            signatureAlgorithm === SignatureAlgorithm.secp256k1
-              ? 'secp256k1'
-              : '',
-          pubKey: publicKeyBuf,
-          address: addressBuf,
-          bech32Address: address,
-          isNanoLedger: false,
-        } as KeplrGetKeyResponseInterface;
+      const currentAccount: BaseAccount | null | undefined =
+        preferenceService.getCurrentAccount();
+      if (currentAccount) {
+        const { hdPathIndex, ecosystem, accountCreateType, hdWalletId } =
+          currentAccount;
+        if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
+          if (ecosystem !== Ecosystem.COSMOS) {
+            return null;
+          } else {
+            const currentChainAccounts: BaseAccount[] = accounts.filter(
+              (a: BaseAccount) =>
+                a.chainCustomId === id && a.hdWalletId === hdWalletId
+            );
+            if (currentChainAccounts?.length > 0) {
+              return this._getKey(currentChainAccounts[0]);
+            } else {
+              return null;
+            }
+          }
+        } else {
+          const currentChainAccounts: BaseAccount[] = accounts.filter(
+            (a: BaseAccount) =>
+              a.chainCustomId === id &&
+              a.hdWalletId === hdWalletId &&
+              a.hdPathIndex === hdPathIndex
+          );
+          if (currentChainAccounts?.length > 0) {
+            return this._getKey(currentChainAccounts[0]);
+          } else {
+            return null;
+          }
+        }
+      } else {
+        return null;
       }
-      return null;
     } else {
       return null;
     }

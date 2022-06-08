@@ -461,7 +461,6 @@ export class WalletController extends BaseController {
 
   hasMissedAccounts() {
     const missed = keyringService.getMissedAccountsForAllChain();
-    console.error('---- missed', missed);
     return missed.length > 0;
   }
 

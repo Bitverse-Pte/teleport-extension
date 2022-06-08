@@ -213,7 +213,7 @@ class TokenService {
     if (chain && chain.ecoSystemParams?.rest) {
       const urlPrefix = chain.ecoSystemParams.rest;
       //cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4
-      const url = `${urlPrefix}/cosmos/bank/v1beta1/balances/cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4?pagination.limit=1000`;
+      const url = `${urlPrefix}/cosmos/bank/v1beta1/balances/${address}?pagination.limit=1000`;
       const res = await fetch(url)
         .then((res) => res.json())
         .catch((e) => console.error(e));
