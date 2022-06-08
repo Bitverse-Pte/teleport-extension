@@ -459,6 +459,12 @@ export class WalletController extends BaseController {
     return keyringService.generateMissedAccounts();
   }
 
+  hasMissedAccounts() {
+    const missed = keyringService.getMissedAccountsForAllChain();
+    console.error('---- missed', missed);
+    return missed.length > 0;
+  }
+
   providers() {
     console.log(networkPreferenceService.getProviderConfig());
     console.log(networkPreferenceService.getAllProviders());

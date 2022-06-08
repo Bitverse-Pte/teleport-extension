@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
-import { Drawer } from 'antd';
+import { Drawer, Spin } from 'antd';
 import {
   useWallet,
   useAsyncEffect,
@@ -40,6 +40,8 @@ import ConnectedSites from '../ConnectedSites';
 import { Ecosystem, Provider } from 'types/network';
 import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
+import { ErrorCode } from 'constants/code';
+import { UnlockModal } from 'ui/components/UnlockModal';
 
 const onCopy = () => {
   sensors.track('teleport_home_copy_account', { page: location.pathname });
@@ -53,6 +55,7 @@ const Home = () => {
     useState<BaseAccount>();
   //const [accountList, setAccountList] = useState<DisplayWalletManage>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
+  const [createAccountLoading, setCreateAccountLoading] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
   const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
     useState(false);
@@ -61,6 +64,7 @@ const Home = () => {
   const [filterCondition, setFilterCondition] = useState('');
   const [prices, setPrices] = useState();
   const currentChain: Provider = useSelector(getProvider);
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -100,6 +104,33 @@ const Home = () => {
   useAsyncEffect(getTokenBalancesAsync, []);
   useAsyncEffect(getTokenBalancesSync, []);
   useAsyncEffect(queryTokenPrices, []);
+
+  const generateMissedAccount = async () => {
+    setCreateAccountLoading(true);
+    setTimeout(async () => {
+      await wallet.generateMissedAccounts().catch((e) => {
+        console.error(e);
+        setCreateAccountLoading(false);
+        if (e?.code === ErrorCode.WALLET_WAS_LOCKED) {
+          setUnlockPopupVisible(true);
+        }
+      });
+      setCreateAccountLoading(false);
+    }, 0);
+  };
+
+  useAsyncEffect(async () => {
+    const accountMissed = await wallet
+      .hasMissedAccounts()
+      .catch((e) => console.error(e));
+    if (accountMissed) {
+      if (!(await wallet.isUnlocked())) {
+        setUnlockPopupVisible(true);
+      } else {
+        generateMissedAccount();
+      }
+    }
+  });
 
   const tokenList = useMemo(() => {
     const clonedTokens = cloneDeep(tokens);
@@ -217,255 +248,199 @@ const Home = () => {
 
   return (
     <div className="home flexCol">
-      <HomeHeader
-        menuOnClick={() => {
-          sensors.track('teleport_home_menus', { page: location.pathname });
-          setSettingPopupVisible(true);
-        }}
-        networkOnClick={() => {
-          sensors.track('teleport_home_networks', { page: location.pathname });
-          history.push('/network');
-        }}
-      />
-      <div className="home-bg"></div>
-      <div className="home-content">
-        <div className="home-content-name-wrap content-wrap-padding flexR">
-          <img src={ArrowRight} className="home-content-name-arrow-right" />
-          <WalletName width={200} cls="home-wallet-name">
-            {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
-              ? 'Normal Wallet'
-              : `ID Wallet: ${account?.hdWalletName}`}
-          </WalletName>
-        </div>
-
-        <div className="home-preview-container flexCol content-wrap-padding">
-          <div
-            className="home-preview-top-container flexR"
-            onClick={() => {
-              sensors.track('teleport_home_accounts', {
-                page: location.pathname,
-              });
-              setPopupVisible(true);
-            }}
-          >
-            <div className="home-preview-top-left flexR cursor">
-              <Jazzicon
-                diameter={16}
-                seed={Number(account?.address?.substr(0, 8) || 0)}
-              />
-              <span className="home-preview-top-account-name">
-                {account?.accountCreateType === AccountCreateType.MNEMONIC
-                  ? account?.accountName
-                  : account?.hdWalletName}
-              </span>
-            </div>
-            <IconComponent name="chevron-down" cls="chevron-down" />
-          </div>
-          <div className="home-preview-address-container flexR">
-            <span className="home-preview-address">
-              ({transferAddress2Display(account?.address)})
-            </span>
-            <div className="home-preview-icon-container flexR">
-              <CopyToClipboard text={account?.address} onCopy={onCopy}>
-                <IconComponent name="copy" cls="copy" />
-              </CopyToClipboard>
-            </div>
-          </div>
-          <div className="home-preview-balance flexR">
-            <span className="home-preview-balance-amount">
-              {denom2SymbolRatio(
-                nativeToken?.amount || 0,
-                nativeToken?.decimal || 0
-              )}
-            </span>
-            <span className="home-preview-balance-symbol">
-              {nativeToken?.symbol?.toUpperCase()}
-            </span>
-          </div>
-          <div className="home-preview-dollar">
-            ${' '}
-            {getTotalPricesByAmountAndPrice(
-              nativeToken?.amount || 0,
-              nativeToken?.decimal || 0,
-              nativeToken?.price || 0
-            )}
-          </div>
-          <div className="home-preview-button-container flexR">
-            <TipButton
-              title="Send"
-              type={TipButtonEnum.SEND}
-              handleClick={handleSendBtnClick}
-            />
-            <TipButton
-              title="Receive"
-              type={TipButtonEnum.RECEIVE}
-              handleClick={handleReceiveBtnClick}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="tab-container content-wrap-padding">
-        <CustomTab
-          tab1="Assets"
-          tab2="Activity"
-          currentTab={tabType}
-          handleTabClick={(tab: Tabs) => {
-            sensors.track('teleport_home_' + Tabs[tab], {
+      <Spin spinning={createAccountLoading}>
+        <HomeHeader
+          menuOnClick={() => {
+            sensors.track('teleport_home_menus', { page: location.pathname });
+            setSettingPopupVisible(true);
+          }}
+          networkOnClick={() => {
+            sensors.track('teleport_home_networks', {
               page: location.pathname,
             });
-            setTabType(tab);
+            history.push('/network');
           }}
         />
-      </div>
-      <div className="assets-container flexCol">
-        {tabType === Tabs.FIRST ? (
-          <div className="search-container flexR content-wrap-padding">
-            <div className="wrap">
-              <SearchInput onChange={handleInputChange} placeholder="Search" />
-            </div>
-            {currentChain.ecosystem === Ecosystem.EVM ? (
-              <img
-                onClick={handleAddTokenBtnClick}
-                src={AddTokenImg}
-                className="home-search-add-icon cursor"
-              />
-            ) : null}
-          </div>
-        ) : null}
-        {tabType === Tabs.FIRST && (
-          <div className="token-list flexCol">
-            {displayTokenList.length > 0 ? (
-              displayTokenList.map((t: Token, i) => {
-                return (
-                  <div
-                    className="token-item flexR cursor"
-                    key={i}
-                    onClick={() => handleTokenClick(t)}
-                  >
-                    <div className="left flexR">
-                      <TokenIcon token={t} radius={32} />
-                      <div className="balance-container flexCol">
-                        <span
-                          className="balance"
-                          title={denom2SymbolRatio(t.amount || 0, t.decimal)}
-                        >
-                          {addEllipsisToEachWordsInTheEnd(
-                            denom2SymbolRatio(t.amount || 0, t.decimal),
-                            16
-                          )}{' '}
-                          {t.symbol?.toUpperCase()}
-                        </span>
-                        <span className="estimate">
-                          ≈
-                          {getTotalPricesByAmountAndPrice(
-                            t?.amount || 0,
-                            t?.decimal || 0,
-                            t?.price || 0
-                          )}{' '}
-                          USD
-                        </span>
-                      </div>
-                    </div>
-                    <IconComponent name="chevron-right" cls="right-icon" />
-                  </div>
-                );
-              })
-            ) : (
-              <NoContent
-                title="Assets"
-                ext={
-                  <CustomButton
-                    cls="add-assets-button"
-                    type="primary"
-                    style={{
-                      width: '200px',
-                      marginTop: '16px',
-                    }}
-                    onClick={handleAddTokenBtnClick}
-                  >
-                    + Add Assets
-                  </CustomButton>
-                }
-              />
-            )}
-          </div>
-        )}
-        {tabType === Tabs.SECOND && (
-          <div className="transaction-list">
-            <TransactionsList
-              listContiannerHeight={206}
-              txData={filterCondition}
-            />
-          </div>
-        )}
-      </div>
-      <Drawer
-        placement="top"
-        closable={false}
-        onClose={() => {
-          setPopupVisible(false);
-        }}
-        height="76vh"
-        bodyStyle={{
-          padding: 0,
-        }}
-        contentWrapperStyle={{
-          borderRadius: '0 0 23px 23px',
-          overflow: 'hidden',
-        }}
-        visible={accountPopupVisible}
-        key="right"
-      >
-        <div
-          style={{ width: '100%', height: '100%' }}
-          className="account-switch-drawer flexCol"
-        >
-          <div className="account-switch-header flexR content-wrap-padding">
-            <IconComponent
-              name="close"
-              cls="icon icon-close"
-              onClick={() => {
-                setPopupVisible(false);
-              }}
-            />
-          </div>
-          <div className="account-switch-accounts flexR content-wrap-padding">
-            <span className="account-switch-accounts-title">Accounts</span>
-            {account?.accountCreateType === AccountCreateType.MNEMONIC ? (
-              <span
-                className="account-switch-accounts-manage-wallet-container cursor flexR"
-                onClick={() => {
-                  sensors.track('teleport_home_account_manage', {
-                    page: location.pathname,
-                  });
-                  history.push({
-                    pathname: '/account-manage',
-                    state: {
-                      hdWalletId: account?.hdWalletId,
-                      hdWalletName: account?.hdWalletName,
-                      accountCreateType: account?.accountCreateType,
-                    },
-                  });
-                }}
-              >
-                Manage Account
-                <IconComponent name="chevron-right" cls="icon chevron-right" />
-              </span>
-            ) : null}
+        <div className="home-bg"></div>
+        <div className="home-content">
+          <div className="home-content-name-wrap content-wrap-padding flexR">
+            <img src={ArrowRight} className="home-content-name-arrow-right" />
+            <WalletName width={200} cls="home-wallet-name">
+              {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
+                ? 'Normal Wallet'
+                : `ID Wallet: ${account?.hdWalletName}`}
+            </WalletName>
           </div>
 
-          <CurrentWalletAccountSwitch
-            visible={accountPopupVisible}
-            handleAccountClick={handleAccountClick}
-            handleSiteClick={handleSiteClick}
+          <div className="home-preview-container flexCol content-wrap-padding">
+            <div
+              className="home-preview-top-container flexR"
+              onClick={() => {
+                sensors.track('teleport_home_accounts', {
+                  page: location.pathname,
+                });
+                setPopupVisible(true);
+              }}
+            >
+              <div className="home-preview-top-left flexR cursor">
+                <Jazzicon
+                  diameter={16}
+                  seed={Number(account?.address?.substr(0, 8) || 0)}
+                />
+                <span className="home-preview-top-account-name">
+                  {account?.accountCreateType === AccountCreateType.MNEMONIC
+                    ? account?.accountName
+                    : account?.hdWalletName}
+                </span>
+              </div>
+              <IconComponent name="chevron-down" cls="chevron-down" />
+            </div>
+            <div className="home-preview-address-container flexR">
+              <span className="home-preview-address">
+                ({transferAddress2Display(account?.address)})
+              </span>
+              <div className="home-preview-icon-container flexR">
+                <CopyToClipboard text={account?.address} onCopy={onCopy}>
+                  <IconComponent name="copy" cls="copy" />
+                </CopyToClipboard>
+              </div>
+            </div>
+            <div className="home-preview-balance flexR">
+              <span className="home-preview-balance-amount">
+                {denom2SymbolRatio(
+                  nativeToken?.amount || 0,
+                  nativeToken?.decimal || 0
+                )}
+              </span>
+              <span className="home-preview-balance-symbol">
+                {nativeToken?.symbol?.toUpperCase()}
+              </span>
+            </div>
+            <div className="home-preview-dollar">
+              ${' '}
+              {getTotalPricesByAmountAndPrice(
+                nativeToken?.amount || 0,
+                nativeToken?.decimal || 0,
+                nativeToken?.price || 0
+              )}
+            </div>
+            <div className="home-preview-button-container flexR">
+              <TipButton
+                title="Send"
+                type={TipButtonEnum.SEND}
+                handleClick={handleSendBtnClick}
+              />
+              <TipButton
+                title="Receive"
+                type={TipButtonEnum.RECEIVE}
+                handleClick={handleReceiveBtnClick}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="tab-container content-wrap-padding">
+          <CustomTab
+            tab1="Assets"
+            tab2="Activity"
+            currentTab={tabType}
+            handleTabClick={(tab: Tabs) => {
+              sensors.track('teleport_home_' + Tabs[tab], {
+                page: location.pathname,
+              });
+              setTabType(tab);
+            }}
           />
+        </div>
+        <div className="assets-container flexCol">
+          {tabType === Tabs.FIRST ? (
+            <div className="search-container flexR content-wrap-padding">
+              <div className="wrap">
+                <SearchInput
+                  onChange={handleInputChange}
+                  placeholder="Search"
+                />
+              </div>
+              {currentChain.ecosystem === Ecosystem.EVM ? (
+                <img
+                  onClick={handleAddTokenBtnClick}
+                  src={AddTokenImg}
+                  className="home-search-add-icon cursor"
+                />
+              ) : null}
+            </div>
+          ) : null}
+          {tabType === Tabs.FIRST && (
+            <div className="token-list flexCol">
+              {displayTokenList.length > 0 ? (
+                displayTokenList.map((t: Token, i) => {
+                  return (
+                    <div
+                      className="token-item flexR cursor"
+                      key={i}
+                      onClick={() => handleTokenClick(t)}
+                    >
+                      <div className="left flexR">
+                        <TokenIcon token={t} radius={32} />
+                        <div className="balance-container flexCol">
+                          <span
+                            className="balance"
+                            title={denom2SymbolRatio(t.amount || 0, t.decimal)}
+                          >
+                            {addEllipsisToEachWordsInTheEnd(
+                              denom2SymbolRatio(t.amount || 0, t.decimal),
+                              16
+                            )}{' '}
+                            {t.symbol?.toUpperCase()}
+                          </span>
+                          <span className="estimate">
+                            ≈
+                            {getTotalPricesByAmountAndPrice(
+                              t?.amount || 0,
+                              t?.decimal || 0,
+                              t?.price || 0
+                            )}{' '}
+                            USD
+                          </span>
+                        </div>
+                      </div>
+                      <IconComponent name="chevron-right" cls="right-icon" />
+                    </div>
+                  );
+                })
+              ) : (
+                <NoContent
+                  title="Assets"
+                  ext={
+                    <CustomButton
+                      cls="add-assets-button"
+                      type="primary"
+                      style={{
+                        width: '200px',
+                        marginTop: '16px',
+                      }}
+                      onClick={handleAddTokenBtnClick}
+                    >
+                      + Add Assets
+                    </CustomButton>
+                  }
+                />
+              )}
+            </div>
+          )}
+          {tabType === Tabs.SECOND && (
+            <div className="transaction-list">
+              <TransactionsList
+                listContiannerHeight={206}
+                txData={filterCondition}
+              />
+            </div>
+          )}
         </div>
         <Drawer
           placement="top"
-          closable={true}
-          closeIcon={<IconComponent name="back" cls="icon back-icon" />}
+          closable={false}
           onClose={() => {
-            setConnectedSitePopupVisible(false);
+            setPopupVisible(false);
           }}
           height="76vh"
           bodyStyle={{
@@ -475,45 +450,120 @@ const Home = () => {
             borderRadius: '0 0 23px 23px',
             overflow: 'hidden',
           }}
-          visible={connectedSitePopupVisible}
-          key="inside"
+          visible={accountPopupVisible}
+          key="right"
+        >
+          <div
+            style={{ width: '100%', height: '100%' }}
+            className="account-switch-drawer flexCol"
+          >
+            <div className="account-switch-header flexR content-wrap-padding">
+              <IconComponent
+                name="close"
+                cls="icon icon-close"
+                onClick={() => {
+                  setPopupVisible(false);
+                }}
+              />
+            </div>
+            <div className="account-switch-accounts flexR content-wrap-padding">
+              <span className="account-switch-accounts-title">Accounts</span>
+              {account?.accountCreateType === AccountCreateType.MNEMONIC ? (
+                <span
+                  className="account-switch-accounts-manage-wallet-container cursor flexR"
+                  onClick={() => {
+                    sensors.track('teleport_home_account_manage', {
+                      page: location.pathname,
+                    });
+                    history.push({
+                      pathname: '/account-manage',
+                      state: {
+                        hdWalletId: account?.hdWalletId,
+                        hdWalletName: account?.hdWalletName,
+                        accountCreateType: account?.accountCreateType,
+                      },
+                    });
+                  }}
+                >
+                  Manage Account
+                  <IconComponent
+                    name="chevron-right"
+                    cls="icon chevron-right"
+                  />
+                </span>
+              ) : null}
+            </div>
+
+            <CurrentWalletAccountSwitch
+              visible={accountPopupVisible}
+              handleAccountClick={handleAccountClick}
+              handleSiteClick={handleSiteClick}
+            />
+          </div>
+          <Drawer
+            placement="top"
+            closable={true}
+            closeIcon={<IconComponent name="back" cls="icon back-icon" />}
+            onClose={() => {
+              setConnectedSitePopupVisible(false);
+            }}
+            height="76vh"
+            bodyStyle={{
+              padding: 0,
+            }}
+            contentWrapperStyle={{
+              borderRadius: '0 0 23px 23px',
+              overflow: 'hidden',
+            }}
+            visible={connectedSitePopupVisible}
+            key="inside"
+          >
+            <div style={{ width: '100%', height: '100%' }}>
+              <ConnectedSites
+                account={account2ConnectedSite}
+                visible={connectedSitePopupVisible}
+                handleOnClose={() => {
+                  setConnectedSitePopupVisible(false);
+                }}
+              />
+            </div>
+          </Drawer>
+        </Drawer>
+        <Drawer
+          placement="top"
+          closable={false}
+          onClose={() => {
+            setSettingPopupVisible(false);
+          }}
+          height="540px"
+          bodyStyle={{
+            padding: 0,
+          }}
+          contentWrapperStyle={{
+            borderRadius: '0 0 16px 16px',
+            overflow: 'hidden',
+          }}
+          visible={settingPopupVisible}
+          key="top"
         >
           <div style={{ width: '100%', height: '100%' }}>
-            <ConnectedSites
-              account={account2ConnectedSite}
-              visible={connectedSitePopupVisible}
-              handleOnClose={() => {
-                setConnectedSitePopupVisible(false);
+            <Setting
+              handleCloseClick={() => {
+                setSettingPopupVisible(false);
               }}
             />
           </div>
         </Drawer>
-      </Drawer>
-      <Drawer
-        placement="top"
-        closable={false}
-        onClose={() => {
-          setSettingPopupVisible(false);
-        }}
-        height="540px"
-        bodyStyle={{
-          padding: 0,
-        }}
-        contentWrapperStyle={{
-          borderRadius: '0 0 16px 16px',
-          overflow: 'hidden',
-        }}
-        visible={settingPopupVisible}
-        key="top"
-      >
-        <div style={{ width: '100%', height: '100%' }}>
-          <Setting
-            handleCloseClick={() => {
-              setSettingPopupVisible(false);
-            }}
-          />
-        </div>
-      </Drawer>
+        <UnlockModal
+          title="Unlock Wallet"
+          hideCloseIcon
+          visible={unlockPopupVisible}
+          setVisible={(visible: boolean) => {
+            setUnlockPopupVisible(visible);
+          }}
+          unlocked={generateMissedAccount}
+        />
+      </Spin>
     </div>
   );
 };
