@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { Drawer, Spin } from 'antd';
 import {
   useWallet,
@@ -285,7 +286,7 @@ const Home = () => {
               <div className="home-preview-top-left flexR cursor">
                 <Jazzicon
                   diameter={16}
-                  seed={Number(account?.address?.substr(0, 8) || 0)}
+                  seed={getUnit10ByAddress(account?.address)}
                 />
                 <span className="home-preview-top-account-name">
                   {account?.accountCreateType === AccountCreateType.MNEMONIC
@@ -411,17 +412,19 @@ const Home = () => {
                 <NoContent
                   title="Assets"
                   ext={
-                    <CustomButton
-                      cls="add-assets-button"
-                      type="primary"
-                      style={{
-                        width: '200px',
-                        marginTop: '16px',
-                      }}
-                      onClick={handleAddTokenBtnClick}
-                    >
-                      + Add Assets
-                    </CustomButton>
+                    currentChain.ecosystem === Ecosystem.EVM ? (
+                      <CustomButton
+                        cls="add-assets-button"
+                        type="primary"
+                        style={{
+                          width: '200px',
+                          marginTop: '16px',
+                        }}
+                        onClick={handleAddTokenBtnClick}
+                      >
+                        + Add Assets
+                      </CustomButton>
+                    ) : null
                   }
                 />
               )}

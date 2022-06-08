@@ -9,6 +9,7 @@ import { Input, InputNumber, Select, Spin } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { addHexPrefix, isValidAddress } from 'ethereumjs-util';
 
 import {
@@ -326,7 +327,7 @@ const Send = () => {
         <div className="from-container flexCol">
           <div className="account-info flexR">
             <Jazzicon
-              seed={Number(fromAccount?.address?.substring(0, 8) || 0)}
+              seed={getUnit10ByAddress(fromAccount?.address)}
               diameter={16}
             />
             <WalletName cls="account-name" width={100}>

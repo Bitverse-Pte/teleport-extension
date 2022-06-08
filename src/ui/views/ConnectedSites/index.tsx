@@ -5,6 +5,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { Modal } from 'antd';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { TipButton, WalletName } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
@@ -88,10 +89,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
       <div className="page-header">Connected Sites</div>
       <div className="account-item flexR" key={account?.address}>
         <div className="account-left flexR">
-          <Jazzicon
-            diameter={30}
-            seed={Number(account?.address?.substr(0, 8) || 0)}
-          />
+          <Jazzicon diameter={30} seed={getUnit10ByAddress(account?.address)} />
           <div className="account-info flexCol">
             <WalletName cls="account-name" width={100}>
               {account?.accountName || account?.hdWalletName}

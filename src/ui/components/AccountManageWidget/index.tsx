@@ -22,6 +22,7 @@ import {
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { CoinTypeEcosystemMapping } from 'constants/wallet';
 import classnames from 'classnames';
+import { getUnit10ByAddress } from 'background/utils';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -216,7 +217,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
                   {account?.ethAddress ? (
                     <Jazzicon
                       diameter={account.selected ? 40 : 30}
-                      seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
+                      seed={getUnit10ByAddress(account?.ethAddress)}
                     />
                   ) : null}
                 </div>

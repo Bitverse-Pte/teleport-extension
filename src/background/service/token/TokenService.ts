@@ -224,7 +224,7 @@ class TokenService {
         (t: Token) => t.chainCustomId === chainCustomId && t.isNative
       );
       if (nativeToken) {
-        if (!balances[address]) {
+        if (!balances[address] || balances[address]?.length === 0) {
           nativeToken.amount = 0;
           balances[address] = [cloneDeep(nativeToken)];
         }
@@ -233,14 +233,15 @@ class TokenService {
           //current balance is 0, which is not 0 ever;
           for (let i = 0; i < currentAccountTokens.length; i++) {
             if (
-              res.balances.every((b: { denom: string; amount }) => {
-                if (b.denom.includes('ibc/')) {
+              !currentAccountTokens[i].isNative &&
+              res.balances
+                .filter((b: { denom: string; amount }) => {
+                  return b.denom.includes('ibc/');
+                })
+                .every((b: { denom: string; amount }) => {
                   const hash = b.denom.split('ibc/')[1];
                   return currentAccountTokens[i]?.trace?.hash !== hash;
-                } else {
-                  return false;
-                }
-              })
+                })
             ) {
               currentAccountTokens.splice(i, 1);
               i--;
