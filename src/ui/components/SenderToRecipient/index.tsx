@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { message, Space } from 'antd';
 import { transferAddress2Display, toChecksumHexAddress } from 'ui/utils';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import './index.less';
 import { ClickToCloseMessage } from '../universal/ClickToCloseMessage';
@@ -22,10 +23,7 @@ function Address({ checksummedAddress, name }) {
       }}
     >
       <div className="sender-icon-and-name flex">
-        <Jazzicon
-          seed={Number(checksummedAddress?.substr(0, 8) || 0)}
-          diameter={16}
-        />
+        <Jazzicon seed={getUnit10ByAddress(checksummedAddress)} diameter={16} />
         <div className="name">{name}</div>
       </div>
       <CopyToClipboard text={checksummedAddress} onCopy={onCopy}>

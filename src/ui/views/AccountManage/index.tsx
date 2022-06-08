@@ -6,6 +6,7 @@ import { Drawer } from 'antd';
 import { useAsyncEffect, useWallet, useWalletRequest } from 'ui/utils';
 import { AccountCreateType, BaseAccount } from 'types/extend';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import * as _ from 'lodash';
 import { IconComponent } from 'ui/components/IconComponents';
 import {
@@ -56,7 +57,7 @@ const AccountManage: React.FC = () => {
           tempAccounts.push(a);
         }
       });
-      setAccounts(accountList);
+      setAccounts(tempAccounts);
     }
   };
 
@@ -211,10 +212,7 @@ const AccountManage: React.FC = () => {
           {accounts.map((a, i) => (
             <div className="edit-account flexR" key={`edit_${i}`}>
               <div className="edit-left flexR">
-                <Jazzicon
-                  diameter={30}
-                  seed={Number(a.address.substr(0, 8) || 0)}
-                />
+                <Jazzicon diameter={30} seed={getUnit10ByAddress(a.address)} />
                 <WalletName cls="account" width={100}>
                   {a.accountName || a.hdWalletName}
                 </WalletName>
