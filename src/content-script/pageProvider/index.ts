@@ -6,6 +6,10 @@ import PushEventHandlers from './pushEventHandlers';
 import { domReadyCall, $ } from './utils';
 import ReadyPromise from './readyPromise';
 import DedupePromise from './dedupePromise';
+import { CosmosProvider } from './cosmosProvider';
+import { OfflineSigner } from '@cosmjs/launchpad';
+import { SecretUtils } from 'secretjs/types/enigmautils';
+import { OfflineDirectSigner } from '@cosmjs/proto-signing';
 
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -70,9 +74,15 @@ export class EthereumProvider extends EventEmitter {
   ]);
   private _bcm: BroadcastChannelMessage;
 
-  constructor({ channelName = '', maxListeners = 200 } = {}) {
+  constructor({
+    bcm,
+    maxListeners = 200,
+  }: {
+    bcm: BroadcastChannelMessage;
+    maxListeners?: number;
+  }) {
     super();
-    this._bcm = new BroadcastChannelMessage(channelName);
+    this._bcm = bcm;
     this.setMaxListeners(maxListeners);
     this.initialize();
     this.shimLegacy();
@@ -249,6 +259,13 @@ declare global {
       currentProvider: EthereumProvider;
     };
     teleport: EthereumProvider;
+    keplr?: CosmosProvider;
+    getOfflineSigner?: (chainId: string) => OfflineSigner & OfflineDirectSigner;
+    getOfflineSignerOnlyAmino?: (chainId: string) => OfflineSigner;
+    getOfflineSignerAuto?: (
+      chainId: string
+    ) => Promise<OfflineSigner | OfflineDirectSigner>;
+    getEnigmaUtils?: (chainId: string) => SecretUtils;
   }
 }
 
@@ -259,7 +276,8 @@ window.addEventListener('message', function (event) {
 
   if (event.data.type && event.data.type == 'INIT_TELEPORT_PROVIDER') {
     const channelName = event.data.channelName;
-    const provider = new EthereumProvider({ channelName });
+    const bcm = new BroadcastChannelMessage(channelName);
+    const provider = new EthereumProvider({ bcm });
     provider
       .request({
         method: 'isDefaultWallet',
@@ -292,5 +310,26 @@ window.addEventListener('message', function (event) {
     });
 
     window.dispatchEvent(new Event('ethereum#initialized'));
+    const cosmosProvider = new CosmosProvider({ bcm });
+    if (!window.keplr) {
+      window.keplr = new Proxy(cosmosProvider, {
+        deleteProperty: () => true,
+      });
+    }
+    if (!window.getOfflineSigner) {
+      window.getOfflineSigner = new Proxy(cosmosProvider.getOfflineSigner, {
+        deleteProperty: () => true,
+      });
+    }
+    if (!window.getOfflineSignerOnlyAmino) {
+      //window.getOfflineSignerOnlyAmino = getOfflineSignerOnlyAmino;
+    }
+    if (!window.getOfflineSignerAuto) {
+      //window.getOfflineSignerAuto = getOfflineSignerAuto;
+    }
+    if (!window.getEnigmaUtils) {
+      //window.getEnigmaUtils = getEnigmaUtils;
+    }
+    window.dispatchEvent(new Event('cosmos#initialized'));
   }
 });

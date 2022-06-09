@@ -114,7 +114,12 @@ class ProviderController extends BaseController {
 
   ethRequestAccounts = async ({ session: { origin } }) => {
     const _account = await this.getCurrentAccount();
-    if (!permissionService.hasPerssmion(origin, _account?.address)) {
+    if (
+      !permissionService.hasPerssmion({
+        origin: origin,
+        account: _account?.address,
+      })
+    ) {
       throw ethErrors.provider.unauthorized();
     }
 
@@ -138,7 +143,12 @@ class ProviderController extends BaseController {
   @Reflect.metadata('SAFE', true)
   ethAccounts = async ({ session: { origin } }) => {
     const account = await this.getCurrentAccount();
-    if (!permissionService.hasPerssmion(origin, account?.address)) {
+    if (
+      !permissionService.hasPerssmion({
+        origin: origin,
+        account: account?.address,
+      })
+    ) {
       return [];
     }
     return account ? [account.address] : [];
@@ -147,7 +157,12 @@ class ProviderController extends BaseController {
   @Reflect.metadata('SAFE', true)
   ethCoinbase = async ({ session: { origin } }) => {
     const account = await this.getCurrentAccount();
-    if (!permissionService.hasPerssmion(origin, account?.address)) {
+    if (
+      !permissionService.hasPerssmion({
+        origin: origin,
+        account: account?.address,
+      })
+    ) {
       return null;
     }
     return account ? [account.address] : [];

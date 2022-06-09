@@ -91,6 +91,9 @@ export class WalletController extends BaseController {
     return provider;
   };
 
+  getCosmosProviderByChainId = (id: string) =>
+    networkPreferenceService.getCosmosChainInfo(id);
+
   moveNetwork = (e: Ecosystem, f: number, d: number) =>
     networkPreferenceService.moveNetwork(e, f, d);
 
