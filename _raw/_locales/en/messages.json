@@ -427,6 +427,9 @@
   "doYouAllowSiteToAddNetwork" : {
     "message": "Allow this site to add a chain?"
   },
+  "existedChain": {
+    "message": "This chain already exists in wallet！"
+  },
   "doYouAllowSiteToSwitchNetwork" : {
     "message": "Allow this site to switch the network?"
   },
