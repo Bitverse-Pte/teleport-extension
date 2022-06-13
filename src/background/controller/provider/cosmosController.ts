@@ -36,6 +36,7 @@ class CosmosProviderController {
     session: { origin },
   }) => {
     networkPreferenceService.suggestCosmosChainInfo(chainParams, origin);
+    keyringService.generateMissedAccounts();
   };
 }
 
