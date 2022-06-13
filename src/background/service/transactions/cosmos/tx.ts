@@ -35,6 +35,16 @@ import { PubKey } from "@keplr-wallet/proto-types/cosmos/crypto/secp256k1/keys";
 import { Coin } from "@keplr-wallet/proto-types/cosmos/base/v1beta1/coin";
 import platform from '../../extension';
 
+// FOR SIGN
+import {
+  encodeSecp256k1Signature,
+  serializeSignDoc,
+  AminoSignResponse,
+} from "@cosmjs/launchpad";
+import {
+  checkAndValidateADR36AminoSignDoc,
+} from "@keplr-wallet/cosmos";
+
 export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
 }
@@ -403,7 +413,7 @@ export class CosmosAccountImpl {
 
     // TODO: need remove keplr
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const keplr = (await this.base.getKeplr())!;
+		// const keplr = (await this.base.getKeplr())!;
 
 		const signDoc = makeSignDoc(
 			aminoMsgs,
@@ -415,17 +425,20 @@ export class CosmosAccountImpl {
 		);
     
     // TODO: need remove keplr
-		const signResponse = await keplr.signAmino(
+		const signResponse = await this.requestSignAmino(
 			this.chainId,
 			this.base.bech32Address,
 			signDoc,
-			signOptions
+			signOptions as KeplrSignOptions
 		);
 
 		const signedTx = TxRaw.encode({
 			bodyBytes: TxBody.encode(
 				TxBody.fromPartial({
-					messages: protoMsgs,
+					messages: protoMsgs as {
+            typeUrl?: string | undefined;
+            value?: Uint8Array | undefined;
+          }[] | undefined,
 					memo: signResponse.signed.memo,
 				})
 			).finish(),
@@ -454,7 +467,10 @@ export class CosmosAccountImpl {
 					},
 				],
 				fee: Fee.fromPartial({
-					amount: signResponse.signed.fee.amount as Coin[],
+					amount: signResponse.signed.fee.amount as {
+            denom?: string | undefined;
+            amount?: string | undefined;
+          }[] | undefined,
 					gasLimit: signResponse.signed.fee.gas,
 				}),
 			}).finish(),
@@ -589,6 +605,99 @@ export class CosmosAccountImpl {
       console.log(e);
       platform.showTransactionNotification(e, {});
       throw e;
+    }
+  }
+  async requestSignAmino(
+    chainId: string,
+    signer: string,
+    signDoc: StdSignDoc,
+    signOptions: KeplrSignOptions & {
+      // Hack option field to detect the sign arbitrary for string
+      isADR36WithString?: boolean;
+    }
+  ): Promise<AminoSignResponse> {
+    const coinType = this.cosChainInfo.coinType;
+
+    // TODO: use keyRing
+    const key = await this.keyRing.getKey(chainId, coinType);
+    const bech32Prefix = this.cosChainInfo.bech32Config.bech32PrefixAccAddr;
+    const bech32Address = new Bech32Address(key.address).toBech32(bech32Prefix);
+    if (signer !== bech32Address) {
+      // throw new KeplrError("keyring", 231, "Signer mismatched");
+      throw new Error('Signer mismatched');
+    }
+
+    const isADR36SignDoc = checkAndValidateADR36AminoSignDoc(
+      signDoc,
+      bech32Prefix
+    );
+    if (isADR36SignDoc) {
+      if (signDoc.msgs[0].value.signer !== signer) {
+        // throw new KeplrError("keyring", 233, "Unmatched signer in sign doc");
+        throw new Error('Unmatched signer in sign doc');
+      }
+    }
+
+    if (signOptions.isADR36WithString != null && !isADR36SignDoc) {
+      // throw new KeplrError(
+      //   "keyring",
+      //   236,
+      //   'Sign doc is not for ADR-36. But, "isADR36WithString" option is defined'
+      // );
+      throw new Error('Sign doc is not for ADR-36. But, "isADR36WithString" option is defined');
+    }
+
+    // const newSignDoc = (await this.interactionService.waitApprove(
+    //   env,
+    //   "/sign",
+    //   "request-sign",
+    //   {
+    //     msgOrigin,
+    //     chainId,
+    //     mode: "amino",
+    //     signDoc,
+    //     signer,
+    //     signOptions,
+    //     isADR36SignDoc,
+    //     isADR36WithString: signOptions.isADR36WithString,
+    //   }
+    // )) as StdSignDoc;
+
+    if (isADR36SignDoc) {
+      // Validate the new sign doc, if it was for ADR-36.
+      if (checkAndValidateADR36AminoSignDoc(signDoc, bech32Prefix)) {
+        if (signDoc.msgs[0].value.signer !== signer) {
+          // throw new KeplrError(
+          //   "keyring",
+          //   232,
+          //   "Unmatched signer in new sign doc"
+          // );
+          throw new Error('Unmatched signer in new sign doc');
+        }
+      } else {
+        // throw new KeplrError(
+        //   "keyring",
+        //   237,
+        //   "Signing request was for ADR-36. But, accidentally, new sign doc is not for ADR-36"
+        // );
+        throw new Error('Signing request was for ADR-36. But, accidentally, new sign doc is not for ADR-36');
+      }
+    }
+
+    try {
+      // TODO: use keyRing
+      const signature = await this.keyRing.sign(
+        chainId,
+        coinType,
+        serializeSignDoc(signDoc)
+      );
+
+      return {
+        signed: signDoc,
+        signature: encodeSecp256k1Signature(key.pubKey, signature),
+      };
+    } finally {
+      // this.interactionService.dispatchEvent(APP_PORT, "request-sign-end", {});
     }
   }
 }
