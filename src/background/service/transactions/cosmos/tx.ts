@@ -33,7 +33,7 @@ import {
 import { SignMode } from "@keplr-wallet/proto-types/cosmos/tx/signing/v1beta1/signing";
 import { PubKey } from "@keplr-wallet/proto-types/cosmos/crypto/secp256k1/keys";
 import { Coin } from "@keplr-wallet/proto-types/cosmos/base/v1beta1/coin";
-
+import platform from '../../extension';
 
 export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
@@ -463,7 +463,7 @@ export class CosmosAccountImpl {
 
 		return {
       // TODO: need remove keplr
-			txHash: await keplr.sendTx(this.chainId, signedTx, mode as BroadcastMode),
+			txHash: await this.sendTx(this.cosChainInfo, signedTx, mode as BroadcastMode),
 			signDoc: signResponse.signed,
 		};
 	}
@@ -521,5 +521,74 @@ export class CosmosAccountImpl {
       },
       ...chainInfo.restConfig,
     });
+  }
+  async sendTx(
+    cosChainInfo: CosChainInfo,
+    tx: unknown,
+    mode: "async" | "sync" | "block"
+  ): Promise<Uint8Array> {
+    const chainInfo = cosChainInfo;
+    const restInstance = Axios.create({
+      ...{
+        baseURL: chainInfo.rest,
+      },
+      ...chainInfo.restConfig,
+    });
+
+    // this.notification.create({
+    //   iconRelativeUrl: "assets/temp-icon.svg",
+    //   title: "Tx is pending...",
+    //   message: "Wait a second",
+    // });
+
+    const isProtoTx = Buffer.isBuffer(tx) || tx instanceof Uint8Array;
+
+    const params = isProtoTx
+      ? {
+          tx_bytes: Buffer.from(tx as any).toString("base64"),
+          mode: (() => {
+            switch (mode) {
+              case "async":
+                return "BROADCAST_MODE_ASYNC";
+              case "block":
+                return "BROADCAST_MODE_BLOCK";
+              case "sync":
+                return "BROADCAST_MODE_SYNC";
+              default:
+                return "BROADCAST_MODE_UNSPECIFIED";
+            }
+          })(),
+        }
+      : {
+          tx,
+          mode: mode,
+        };
+
+    try {
+      const result = await restInstance.post(
+        isProtoTx ? "/cosmos/tx/v1beta1/txs" : "/txs",
+        params
+      );
+
+      const txResponse = isProtoTx ? result.data["tx_response"] : result.data;
+
+      if (txResponse.code != null && txResponse.code !== 0) {
+        throw new Error(txResponse["raw_log"]);
+      }
+
+      const txHash = Buffer.from(txResponse.txhash, "hex");
+
+      const txTracer = new TendermintTxTracer(chainInfo.rpc, "/websocket");
+      txTracer.traceTx(txHash).then((tx) => {
+        txTracer.close();
+        platform.showTransactionNotification(tx, {});
+      });
+
+      return txHash;
+    } catch (e) {
+      console.log(e);
+      platform.showTransactionNotification(e, {});
+      throw e;
+    }
   }
 }
