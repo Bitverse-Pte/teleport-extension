@@ -20,7 +20,7 @@ import {
   IdToChainLogoSVG,
 } from 'ui/utils/networkCategoryToIcon';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
-import { CoinTypeEcosystemMapping } from 'constants/wallet';
+import { ecosystemMapping } from 'constants/wallet';
 import classnames from 'classnames';
 import { getUnit10ByAddress } from 'background/utils';
 
@@ -65,29 +65,13 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
       setCurrentAccount(currentAccount);
       for (const a of accounts) {
         a.chainList = [];
-        let ecosystem,
-          ecosystemName = '';
-        if (a.coinType === CoinType.ETH) {
-          ecosystem = Ecosystem.EVM;
-          ecosystemName = CoinTypeEcosystemMapping[Ecosystem.EVM].ecosystemName;
-        } else {
-          ecosystem = a.ecosystem;
-          if (ecosystem in CoinTypeEcosystemMapping) {
-            ecosystemName = CoinTypeEcosystemMapping[ecosystem].ecosystemName;
-          }
-        }
-        /* for (const eco in CoinTypeEcosystemMapping) {
-          if (CoinTypeEcosystemMapping[eco].coinType.includes(a.coinType)) {
-            ecosystem = eco;
-            ecosystemName = CoinTypeEcosystemMapping[eco].ecosystemName;
-          }
-        } */
         const chains: Provider[] = await wallet.getAllProviders();
         if (chains?.length) {
           chains.forEach((p: Provider) => {
             if (
-              (a.coinType === CoinType.ETH && p.coinType === a.coinType) ||
-              (a.coinType !== CoinType.ETH && p.id === a.chainCustomId)
+              (a.ecosystem === Ecosystem.EVM &&
+                p.ecosystem === Ecosystem.EVM) ||
+              (a.ecosystem !== Ecosystem.EVM && p.id === a.chainCustomId)
             ) {
               const chainItem = {
                 chainCustomId: p.id,
@@ -102,14 +86,14 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
           displayAccounts.some(
             (da: IDisplayAccountManage) =>
               da.hdPathIndex === a.hdPathIndex &&
-              da.ecosystems.some((subDa) => subDa.ecosystem === ecosystem)
+              da.ecosystems.some((subDa) => subDa.ecosystem === a.ecosystem)
           )
         ) {
           displayAccounts
             .find(
               (da: IDisplayAccountManage) => da.hdPathIndex === a.hdPathIndex
             )
-            ?.ecosystems?.find((subDa) => subDa.ecosystem === ecosystem)
+            ?.ecosystems?.find((subDa) => subDa.ecosystem === a.ecosystem)
             ?.accounts.push(a);
         } else {
           if (
@@ -123,8 +107,8 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
               )
               ?.ecosystems?.push({
                 accounts: [a],
-                ecosystem,
-                ecosystemName,
+                ecosystem: a.ecosystem,
+                ecosystemName: ecosystemMapping[a.ecosystem].ecosystemName,
               });
           } else {
             displayAccounts.push({
@@ -133,8 +117,8 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
               ecosystems: [
                 {
                   accounts: [a],
-                  ecosystem,
-                  ecosystemName,
+                  ecosystem: a.ecosystem,
+                  ecosystemName: ecosystemMapping[a.ecosystem].ecosystemName,
                 },
               ],
             });

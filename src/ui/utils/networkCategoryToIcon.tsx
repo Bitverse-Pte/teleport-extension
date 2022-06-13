@@ -17,8 +17,7 @@ import CosmosAtomIcon from 'assets/tokens/atom.svg';
 import DefaulutIcon from 'assets/tokens/default.svg';
 import { BigNumber } from 'ethers';
 import { PresetNetworkId } from 'constants/defaultNetwork';
-import { CoinType, Ecosystem } from 'types/network';
-import { CoinTypeEcosystemMapping } from 'constants/wallet';
+import { Ecosystem } from 'types/network';
 
 export function categoryToIconSVG(category?: string): string | undefined {
   switch (category) {
@@ -128,24 +127,6 @@ export function ChainIdToChainLogoSVG(_chainId: string) {
 }
 
 export function ecosystemToIconSVG(ecosystem: Ecosystem) {
-  switch (ecosystem) {
-    case Ecosystem.EVM:
-      return EthIconB;
-    case Ecosystem.COSMOS:
-      return CosmosAtomIcon;
-    case Ecosystem.POLKADOT:
-      return EthIconB;
-    default:
-      return EthIconB;
-  }
-}
-export function coinTypeToIconSVG(coinType: CoinType) {
-  let ecosystem;
-  for (const eco in CoinTypeEcosystemMapping) {
-    if (CoinTypeEcosystemMapping[eco].coinType.includes(coinType)) {
-      ecosystem = eco;
-    }
-  }
   switch (ecosystem) {
     case Ecosystem.EVM:
       return EthIconB;

@@ -21,7 +21,7 @@ import importImg from 'assets/importImg.svg';
 import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
-import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
+//import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 import BitError from 'error';
@@ -351,10 +351,10 @@ const WalletManage: React.FC = () => {
                             : 'none',
                       }}
                     >
-                      <img
+                      {/* <img
                         src={coinTypeToIconSVG(w?.coinType)}
                         className="circle-ecosystem-icon"
-                      />
+                      /> */}
                     </div>
                   </div>
                   <div className="right flexR">

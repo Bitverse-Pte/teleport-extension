@@ -739,9 +739,9 @@ class NetworkPreferenceService extends EventEmitter {
   private _checkAccountExistWithChain(chain: Provider): boolean {
     const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
     return (
-      (chain.coinType === CoinType.ETH &&
-        allAccounts.some((a: BaseAccount) => a.coinType === CoinType.ETH)) ||
-      (chain.coinType !== CoinType.ETH &&
+      (chain.ecosystem === Ecosystem.EVM &&
+        allAccounts.some((a: BaseAccount) => a.ecosystem === Ecosystem.EVM)) ||
+      (chain.ecosystem !== Ecosystem.EVM &&
         allAccounts.some((a: BaseAccount) => a.chainCustomId === chain.id))
     );
   }
@@ -750,10 +750,10 @@ class NetworkPreferenceService extends EventEmitter {
     const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
     const currentAccount: BaseAccount | null | undefined =
       preferenceService.getCurrentAccount();
-    if (chain.coinType === CoinType.ETH) {
-      if (currentAccount?.coinType === CoinType.ETH) return;
+    if (chain.ecosystem === Ecosystem.EVM) {
+      if (currentAccount?.ecosystem === Ecosystem.EVM) return;
       const evmAccounts: BaseAccount[] = allAccounts.filter(
-        (a: BaseAccount) => a.coinType === CoinType.ETH
+        (a: BaseAccount) => a.ecosystem === Ecosystem.EVM
       );
       if (evmAccounts && evmAccounts.length > 0) {
         preferenceService.setCurrentAccount(evmAccounts[0]);
@@ -819,10 +819,11 @@ class NetworkPreferenceService extends EventEmitter {
     const supportProviders: Provider[] = [];
     presetProviders.forEach((p: Provider) => {
       if (
-        supportProviders.every(
-          (subP: Provider) =>
-            !(subP.coinType === p.coinType && subP.coinType === CoinType.ETH)
-        )
+        (p.ecosystem === Ecosystem.EVM &&
+          supportProviders.every(
+            (subP: Provider) => subP.ecosystem !== Ecosystem.EVM
+          )) ||
+        p.ecosystem !== Ecosystem.EVM
       ) {
         supportProviders.push(p);
       }
