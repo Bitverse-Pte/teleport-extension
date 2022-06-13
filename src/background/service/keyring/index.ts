@@ -178,7 +178,7 @@ class KeyringService extends EventEmitter {
     return this.accounts.some((a: BaseAccount) => a.hdWalletName === name);
   }
 
-  private _checkDuplicatePrivateKeyWalletName(
+  /* private _checkDuplicatePrivateKeyWalletName(
     name: string,
     chainCustomId: PresetNetworkId | string
   ): boolean {
@@ -197,7 +197,7 @@ class KeyringService extends EventEmitter {
         }
       }
     });
-  }
+  } */
 
   private _checkDuplicateAccount(
     address: string,
@@ -988,7 +988,7 @@ class KeyringService extends EventEmitter {
 
   async getCurrentChainAccounts(): Promise<BaseAccount[]> {
     const currentChain: Provider = networkPreferenceService.getProviderConfig();
-    const { coinType, id } = currentChain;
+    const { ecosystem, id } = currentChain;
     const currentAccount = preference.getCurrentAccount();
     let accounts: BaseAccount[] = [];
     if (!currentAccount) {
@@ -996,8 +996,9 @@ class KeyringService extends EventEmitter {
     }
 
     accounts = this.accounts.filter((a: BaseAccount) =>
-      coinType === CoinType.ETH
-        ? a.coinType === coinType && a.hdWalletId === currentAccount.hdWalletId
+      ecosystem === Ecosystem.EVM
+        ? a.ecosystem === Ecosystem.EVM &&
+          a.hdWalletId === currentAccount.hdWalletId
         : a.hdWalletId === currentAccount.hdWalletId && a.chainCustomId === id
     );
     return Promise.resolve(accounts);

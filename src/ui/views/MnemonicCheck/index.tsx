@@ -66,6 +66,8 @@ const BackupCheck = () => {
     if (pk) {
       if (pk.startsWith('0x')) {
         setPrivateKey(pk.replace('0x', ''));
+      } else {
+        setPrivateKey(pk);
       }
     }
   };

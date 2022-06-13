@@ -375,10 +375,12 @@ const Home = () => {
               {displayTokenList.length > 0 ? (
                 displayTokenList.map((t: Token, i) => {
                   let ibcChainInfoStr = '';
-                  if(t.chainName && (t.trace?.trace as any).length > 0){
-                    let trace = (t as any).trace.trace[(t as any).trace.trace.length - 1];
-                    if(trace){
-                      ibcChainInfoStr = `(${t.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`
+                  if (t.chainName && (t.trace?.trace as any).length > 0) {
+                    const trace = (t as any).trace.trace[
+                      (t as any).trace.trace.length - 1
+                    ];
+                    if (trace) {
+                      ibcChainInfoStr = `(${t.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`;
                     }
                   }
                   return (
