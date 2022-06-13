@@ -22,6 +22,7 @@ import {
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { CoinTypeEcosystemMapping } from 'constants/wallet';
 import classnames from 'classnames';
+import { getUnit10ByAddress } from 'background/utils';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -66,20 +67,27 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
         a.chainList = [];
         let ecosystem,
           ecosystemName = '';
-        for (const eco in CoinTypeEcosystemMapping) {
+        if (a.coinType === CoinType.ETH) {
+          ecosystem = Ecosystem.EVM;
+          ecosystemName = CoinTypeEcosystemMapping[Ecosystem.EVM].ecosystemName;
+        } else {
+          ecosystem = a.ecosystem;
+          if (ecosystem in CoinTypeEcosystemMapping) {
+            ecosystemName = CoinTypeEcosystemMapping[ecosystem].ecosystemName;
+          }
+        }
+        /* for (const eco in CoinTypeEcosystemMapping) {
           if (CoinTypeEcosystemMapping[eco].coinType.includes(a.coinType)) {
             ecosystem = eco;
             ecosystemName = CoinTypeEcosystemMapping[eco].ecosystemName;
           }
-        }
-        const chains: Provider[] = await wallet.getSameChainsByCoinType(
-          a.coinType
-        );
+        } */
+        const chains: Provider[] = await wallet.getAllProviders();
         if (chains?.length) {
           chains.forEach((p: Provider) => {
             if (
-              (a.coinType !== CoinType.ETH && a.chainCustomId === p.id) ||
-              a.coinType === CoinType.ETH
+              (a.coinType === CoinType.ETH && p.coinType === a.coinType) ||
+              (a.coinType !== CoinType.ETH && p.id === a.chainCustomId)
             ) {
               const chainItem = {
                 chainCustomId: p.id,
@@ -89,6 +97,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
             }
           });
         }
+
         if (
           displayAccounts.some(
             (da: IDisplayAccountManage) =>
@@ -208,7 +217,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
                   {account?.ethAddress ? (
                     <Jazzicon
                       diameter={account.selected ? 40 : 30}
-                      seed={Number(account?.ethAddress?.substr(0, 8) || 0)}
+                      seed={getUnit10ByAddress(account?.ethAddress)}
                     />
                   ) : null}
                 </div>
@@ -218,7 +227,10 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
         })}
       </div>
       <div className="account-manage-widget-content flexCol">
-        <WalletName cls="account-manage-widget-account-name" width={250}>
+        <WalletName
+          cls="account-manage-widget-account-name account-manage-widget-content-name"
+          width={250}
+        >
           {(() => {
             const account = tempAccounts?.find(
               (a: IDisplayAccountManage) => a.selected
@@ -226,81 +238,83 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
             return account?.accountName || account?.hdWalletName;
           })()}
         </WalletName>
-        <Collapse
-          expandIconPosition="right"
-          bordered={false}
-          ghost={true}
-          defaultActiveKey={[Ecosystem.EVM]}
-          expandIcon={({ isActive }) =>
-            isActive ? (
-              <IconComponent name="chevron-up" cls="base-text-color" />
-            ) : (
-              <IconComponent name="chevron-down" cls="base-text-color" />
-            )
-          }
-        >
-          {tempAccounts
-            ?.find((a: IDisplayAccountManage) => a.selected)
-            ?.ecosystems.map((a, i) => {
-              return (
-                <Collapse.Panel
-                  key={a.ecosystem}
-                  header={
-                    <div className="account-item flexR">
-                      <img
-                        src={ecosystemToIconSVG(a.ecosystem)}
-                        className="account-item-ecosystem-icon"
-                      />
-                      <WalletName cls="account-address bold" width={180}>
-                        {a.ecosystemName}
-                      </WalletName>
-                    </div>
-                  }
-                >
-                  <div className="address-container flexCol">
-                    {a.accounts.map((item: ICustomChain) => {
-                      return (
-                        <div className="address-item" key={item.address}>
-                          <div className="address-chain-container flexR">
-                            {item?.chainList?.map((c) => (
-                              <Tooltip
-                                title={c.chainName}
-                                key={c.chainCustomId}
+        <div className="account-manage-widget-content-list">
+          <Collapse
+            expandIconPosition="right"
+            bordered={false}
+            ghost={true}
+            defaultActiveKey={[Ecosystem.EVM]}
+            expandIcon={({ isActive }) =>
+              isActive ? (
+                <IconComponent name="chevron-up" cls="base-text-color" />
+              ) : (
+                <IconComponent name="chevron-down" cls="base-text-color" />
+              )
+            }
+          >
+            {tempAccounts
+              ?.find((a: IDisplayAccountManage) => a.selected)
+              ?.ecosystems.map((a, i) => {
+                return (
+                  <Collapse.Panel
+                    key={a.ecosystem}
+                    header={
+                      <div className="account-item flexR">
+                        <img
+                          src={ecosystemToIconSVG(a.ecosystem)}
+                          className="account-item-ecosystem-icon"
+                        />
+                        <WalletName cls="account-address bold" width={180}>
+                          {a.ecosystemName}
+                        </WalletName>
+                      </div>
+                    }
+                  >
+                    <div className="address-container flexCol">
+                      {a.accounts.map((item: ICustomChain) => {
+                        return (
+                          <div className="address-item" key={item.address}>
+                            <div className="address-chain-container flexR">
+                              {item?.chainList?.map((c) => (
+                                <Tooltip
+                                  title={c.chainName}
+                                  key={c.chainCustomId}
+                                >
+                                  <img
+                                    src={IdToChainLogoSVG(c.chainCustomId)}
+                                    className="chain-icon"
+                                  />
+                                </Tooltip>
+                              ))}
+                            </div>
+                            <div className="address-chain-address-container flexR">
+                              <span className="address-chain-address">
+                                {transferAddress2Display(item.address)}
+                              </span>
+                              <CopyToClipboard
+                                text={item.address}
+                                onCopy={() =>
+                                  ClickToCloseMessage.success('Copied')
+                                }
                               >
-                                <img
-                                  src={IdToChainLogoSVG(c.chainCustomId)}
-                                  className="chain-icon"
+                                <IconComponent
+                                  name="copy"
+                                  cls="copy-icon"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
                                 />
-                              </Tooltip>
-                            ))}
+                              </CopyToClipboard>
+                            </div>
                           </div>
-                          <div className="address-chain-address-container flexR">
-                            <span className="address-chain-address">
-                              {transferAddress2Display(item.address)}
-                            </span>
-                            <CopyToClipboard
-                              text={item.address}
-                              onCopy={() =>
-                                ClickToCloseMessage.success('Copied')
-                              }
-                            >
-                              <IconComponent
-                                name="copy"
-                                cls="copy-icon"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                              />
-                            </CopyToClipboard>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </Collapse.Panel>
-              );
-            })}
-        </Collapse>
+                        );
+                      })}
+                    </div>
+                  </Collapse.Panel>
+                );
+              })}
+          </Collapse>
+        </div>
       </div>
     </div>
   );

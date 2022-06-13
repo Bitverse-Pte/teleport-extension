@@ -13,6 +13,8 @@ import siteDefaultIcon from 'assets/siteDefault.svg';
 import siteActiveIcon from 'assets/siteActive.svg';
 import classnames from 'classnames';
 import skynet from 'utils/skynet';
+import { getUnit10ByAddress } from 'background/utils';
+
 const { sensors } = skynet;
 
 interface AccountSwitchProps {
@@ -84,7 +86,7 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
                 <div className="account-left flexR">
                   <Jazzicon
                     diameter={30}
-                    seed={Number(a?.address?.substr(0, 8) || 0)}
+                    seed={getUnit10ByAddress(a?.address)}
                   />
                   <div className="account-info flexCol">
                     <WalletName cls="account-name" width={100}>

@@ -12,6 +12,18 @@
     line-height: 1;
   }
 
+  .ant-spin-nested-loading {
+    height: 100%;
+
+    .ant-spin-container {
+      position: relative;
+      height: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
   .home-bg {
     position: absolute;
     top: 0;
@@ -27,9 +39,9 @@
     box-sizing: border-box;
     padding-top: 2px;
 
-    .home-content-name-wrap{
+    .home-content-name-wrap {
       align-items: center;
-      font-size:12px;
+      font-size: 12px;
       font-family: MontserratBold;
       color: @themeColor;
       margin-bottom: 8px;
@@ -40,7 +52,7 @@
       }
     }
 
-    
+
 
     .home-preview-container {
       height: 160px;
@@ -268,6 +280,7 @@
           font-size: 36px;
           font-weight: 600;
           line-height: 50px;
+          max-width: 250px;
         }
 
         .token {
@@ -313,13 +326,13 @@
     justify-content: space-between;
 
     .wrap {
-      flex:1;
+      flex: 1;
     }
 
     .home-search-add-icon {
       width: 24px;
       height: 24px;
-      flex:0 0 24px;
+      flex: 0 0 24px;
       margin-left: 22px;
     }
 
@@ -356,6 +369,7 @@
             font-size: 14px;
             line-height: 20px;
             font-family: MontserratBold;
+            max-width: 240px;
           }
 
           .estimate {
@@ -391,25 +405,27 @@
     color: #9EA2A9;
   }
 }
-.account-switch-drawer{
+
+.account-switch-drawer {
   div.account-switch-header {
     justify-content: flex-end;
     align-items: center;
     height: 60px;
-    flex:0 0 60px;
+    flex: 0 0 60px;
   }
-  
+
   div.account-switch-accounts {
     height: 24px;
-    flex:0 0 24px;
+    flex: 0 0 24px;
     margin-bottom: 24px;
     justify-content: space-between;
     align-items: center;
+
     span.account-switch-accounts-title {
       font-family: MontserratBold;
       font-size: 24px;
     }
-  
+
     span.account-switch-accounts-manage-wallet-container {
       font-size: 12px;
       font-family: MontserratBold;
@@ -417,15 +433,16 @@
       margin-right: 8px;
       align-items: center;
 
-      .chevron-right{
+      .chevron-right {
         fill: @themeColor;
-      }   
+      }
     }
   }
 }
+
 .back-icon {
   cursor: pointer;
   fill: #798CAD;
-  width: 24px!important;
-  height: 24px!important;
+  width: 24px !important;
+  height: 24px !important;
 }

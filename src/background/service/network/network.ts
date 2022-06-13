@@ -60,6 +60,11 @@ import { nanoid } from 'nanoid';
 import { parseStringTemplate } from 'utils/string';
 import { addHexPrefix } from 'ethereumjs-util';
 import { BaseAccount } from 'types/extend';
+// import { ChainUpdaterService, InteractionService } from '../cosmos';
+import { ChainIdHelper } from 'utils/cosmos/chainId';
+import { CosmosChainInfo } from 'types/cosmos';
+import { parsedKeplrChainInfoAsTeleportCosmosProvider } from '../cosmos/utils/provider.utils';
+import { ChainInfoSchema } from './cosmos/validation/chainInfoSchema';
 
 const toHexString = (val: string | number) =>
   addHexPrefix(Number(val).toString(16));
@@ -131,6 +136,8 @@ class NetworkPreferenceService extends EventEmitter {
   // UI communication
 
   constructor() {
+    // protected readonly interactionKeeper: InteractionService,
+    // protected readonly chainUpdaterKeeper: ChainUpdaterService,
     super();
 
     this.customNetworksStore = new ObservableStore<CustomNetworkList>({
@@ -224,17 +231,27 @@ class NetworkPreferenceService extends EventEmitter {
       console.debug('No more migration');
     }
 
-    /**
-     * Fix `chainId` issues with
-     * - uncessary padding 0
-     * - pure decimal number
-     */
     const { networks } = this.customNetworksStore.getState();
+    const migratedNetworks = networks.map((n) => {
+      const updatedObj = { ...n };
+      /**
+       * Fix `chainId` issues with
+       * - uncessary padding 0
+       * - pure decimal number
+       */
+      if (!updatedObj.ecosystem) {
+        /**
+         * issue due to type changes, fix `undefined` to avoid future errors
+         */
+        updatedObj.ecosystem = Ecosystem.EVM;
+      }
+      if (updatedObj.ecosystem === Ecosystem.EVM) {
+        updatedObj.chainId = toHexString(n.chainId);
+      }
+      return updatedObj;
+    });
     this.customNetworksStore.updateState({
-      networks: networks.map((n) => ({
-        ...n,
-        chainId: toHexString(n.chainId),
-      })),
+      networks: migratedNetworks,
     });
 
     /**
@@ -576,6 +593,13 @@ class NetworkPreferenceService extends EventEmitter {
       );
       return;
     }
+    const { type, ecosystem } = this.getProviderConfig();
+    if (ecosystem !== Ecosystem.EVM) {
+      console.warn(
+        'Skipped lookupNetwork, because it is designed for EVM provider'
+      );
+      return;
+    }
 
     const chainId = this.getCurrentChainId();
     if (!chainId) {
@@ -591,7 +615,6 @@ class NetworkPreferenceService extends EventEmitter {
     // Ping the RPC endpoint so we can confirm that it works
     const ethQuery = new EthQuery(this._provider);
     const initialNetwork = this.getNetworkState();
-    const { type } = this.getProviderConfig();
     const isInfura = INFURA_PROVIDER_TYPES.includes(type);
 
     if (isInfura) {
@@ -955,6 +978,83 @@ class NetworkPreferenceService extends EventEmitter {
   }
   getEthByNetwork(rpcUrl: string) {
     return new Eth(new Eth.HttpProvider(rpcUrl));
+  }
+
+  getCosmosChainInfo(cosmosChainId: string): Provider {
+    const chainInfo = this.getAllProviders().find((chainInfo) => {
+      return (
+        ChainIdHelper.parse(chainInfo.chainId).identifier ===
+        ChainIdHelper.parse(cosmosChainId).identifier
+      );
+    });
+
+    if (!chainInfo) {
+      throw new Error(`There is no cosmos chain info for ${cosmosChainId}`);
+    }
+    return chainInfo;
+  }
+
+  /**
+   * extended for cosmos ecosystem
+   */
+  getChainCoinType(chainId: string): number {
+    const chainInfo = this.getCosmosChainInfo(chainId);
+
+    if (!chainInfo) {
+      throw new Error(`There is no chain info for ${chainId}`);
+    }
+
+    return chainInfo.coinType;
+  }
+
+  hasChainInfo(chainId: string): boolean {
+    return (
+      this.getAllProviders().find((chainInfo) => {
+        return (
+          ChainIdHelper.parse(chainInfo.chainId).identifier ===
+          ChainIdHelper.parse(chainId).identifier
+        );
+      }) != null
+    );
+  }
+
+  async suggestCosmosChainInfo(
+    // env: Env,
+    chainInfo: CosmosChainInfo,
+    origin: string
+  ) {
+    chainInfo = await ChainInfoSchema.validateAsync(chainInfo, {
+      stripUnknown: true,
+    });
+
+    const newCosmosProvider =
+      parsedKeplrChainInfoAsTeleportCosmosProvider(chainInfo);
+    console.debug(
+      'suggestCosmosChainInfo::newCosmosProvider:',
+      newCosmosProvider
+    );
+    this.checkIsCustomNetworkNameLegit(newCosmosProvider.nickname);
+    const { networks, orderOfNetworks } = this.customNetworksStore.getState();
+    this.customNetworksStore.updateState({
+      networks: [...networks, newCosmosProvider],
+      orderOfNetworks: {
+        ...orderOfNetworks,
+        [Ecosystem.COSMOS]: [
+          ...orderOfNetworks[Ecosystem.COSMOS],
+          newCosmosProvider.id,
+        ],
+      },
+    });
+    // add custom token
+    await TokenService.addCustomToken({
+      symbol: newCosmosProvider.ticker as string,
+      name: '',
+      decimal: 18,
+      chainCustomId: newCosmosProvider.id,
+      isNative: true,
+    });
+    /** @TODO add account for this network needed, so no error in `setProviderConfig` */
+    return newCosmosProvider;
   }
 }
 

@@ -60,18 +60,17 @@ function _getDefaultIcon(
       {token?.symbol?.substr(0, 1)?.toUpperCase()}
     </span>
   );
-  if (!token.isNative && !token.contractAddress) return defaultIcon;
   let contractAddress = '';
-  try {
-    contractAddress = (token as any).contractAddress
-      ? utils.getAddress((token as any).contractAddress)
-      : '';
-  } catch {
-    setLoadError(true);
+  if ('contractAddress' in token) {
+    if (!token.isNative && !token.contractAddress) return defaultIcon;
+    try {
+      contractAddress = (token as any).contractAddress
+        ? utils.getAddress((token as any).contractAddress)
+        : '';
+    } catch {
+      setLoadError(true);
+    }
   }
-  /* const contractAddress = (token as any).contractAddress
-    ? utils.getAddress((token as any).contractAddress)
-    : ''; */
 
   const src = useMemo(() => {
     let _src: string | undefined;
@@ -106,7 +105,7 @@ function _getDefaultIcon(
         case PresetNetworkId.ARBITRUM:
           if (token.isNative) {
             _src =
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png';
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
           } else {
             _src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/assets/${contractAddress}/logo.png`;
           }
@@ -129,6 +128,12 @@ function _getDefaultIcon(
           break;
         case PresetNetworkId.OP:
           if (token.isNative) {
+            _src =
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+          } else if (
+            token.contractAddress ===
+            '0x4200000000000000000000000000000000000042'
+          ) {
             _src =
               'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png';
           } else {

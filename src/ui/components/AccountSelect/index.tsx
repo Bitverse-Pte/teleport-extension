@@ -12,6 +12,7 @@ import {
 import { Object } from 'ts-toolbelt';
 import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { Drawer } from 'antd';
 import * as _ from 'lodash';
 import { CustomTab, WalletName } from '../Widgets';
@@ -218,7 +219,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
                         <div className="account-left flex">
                           <Jazzicon
                             diameter={30}
-                            seed={Number(a?.address?.substr(0, 8) || 0)}
+                            seed={getUnit10ByAddress(a?.address)}
                           />
                           <div className="account-info flexCol">
                             <WalletName cls="account-name" width={100}>

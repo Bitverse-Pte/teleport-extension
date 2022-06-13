@@ -14,6 +14,8 @@ export enum CoinType {
   COSMOS = 118,
   POLKADOT = 354,
   SECRET_NETWORK = 529,
+  CRYPTO_ORG = 394,
+  KAVA = 459,
 }
 
 export enum Ecosystem {
@@ -74,6 +76,11 @@ export interface Provider extends Network {
     | 'COSMOS_HUB'
     | 'OSMOSIS'
     | 'SECRET_NETWORK'
+    | 'KAVA'
+    | 'CRYPTO_ORG'
+    | 'UMEE'
+    | 'EVMOS'
+    | 'JUNO'
     | 'rpc';
 }
 

@@ -3,16 +3,17 @@ export interface Token {
   decimal: number | string;
   name: string;
   denom: string;
-  icon: string;
+  icon?: string;
   chainCustomId: string;
   isNative: boolean;
-  contractAddress: string;
-  trace?: string;
+  contractAddress?: string;
+  trace?: IDenomTrace;
   isCustom: boolean;
   amount?: number | string;
   display?: boolean;
   tokenId?: string;
   price?: number | string;
+  chainName?: string;
 }
 
 export interface AddTokenOpts {
@@ -27,6 +28,19 @@ export interface AddTokenOpts {
 export interface ITokenStore {
   tokens: Token[];
   balances: Record<string, Token[]> | null;
+  denomTrace: Record<string, IDenomTrace> | null;
+}
+
+export interface ITrace {
+  portId: string;
+  channelId: string;
+}
+
+export interface IDenomTrace {
+  hash: string;
+  trace: ITrace[];
+  denom: string;
+  path: string;
 }
 
 export interface ERC20Struct {
