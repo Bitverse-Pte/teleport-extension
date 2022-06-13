@@ -90,7 +90,7 @@ const Home = () => {
     const balances = await wallet.getTokenBalancesSync().catch((e) => {
       console.error(e);
     });
-
+    console.log(balances);
     if (balances && balances.length) {
       setTokens(balances);
     }
@@ -374,6 +374,13 @@ const Home = () => {
             <div className="token-list flexCol">
               {displayTokenList.length > 0 ? (
                 displayTokenList.map((t: Token, i) => {
+                  let ibcChainInfoStr = '';
+                  if(t.chainName && (t.trace?.trace as any).length > 0){
+                    let trace = (t as any).trace.trace[(t as any).trace.trace.length - 1];
+                    if(trace){
+                      ibcChainInfoStr = `(${t.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`
+                    }
+                  }
                   return (
                     <div
                       className="token-item flexR cursor"
@@ -384,7 +391,7 @@ const Home = () => {
                         <TokenIcon token={t} radius={32} />
                         <div className="balance-container flexCol">
                           <span
-                            className="balance"
+                            className="balance ellipsis"
                             title={denom2SymbolRatio(t.amount || 0, t.decimal)}
                           >
                             {addEllipsisToEachWordsInTheEnd(
@@ -392,6 +399,7 @@ const Home = () => {
                               16
                             )}{' '}
                             {t.symbol?.toUpperCase()}
+                            {ibcChainInfoStr ? ibcChainInfoStr : null}
                           </span>
                           <span className="estimate">
                             ≈

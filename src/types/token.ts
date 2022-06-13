@@ -13,6 +13,7 @@ export interface Token {
   display?: boolean;
   tokenId?: string;
   price?: number | string;
+  chainName?: string;
 }
 
 export interface AddTokenOpts {
@@ -30,10 +31,14 @@ export interface ITokenStore {
   denomTrace: Record<string, IDenomTrace> | null;
 }
 
-export interface IDenomTrace {
-  hash: string;
+export interface ITrace {
   portId: string;
   channelId: string;
+}
+
+export interface IDenomTrace {
+  hash: string;
+  trace: ITrace[];
   denom: string;
   path: string;
 }

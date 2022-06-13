@@ -3,11 +3,16 @@ import {
   ERC20Struct,
   IDenomTrace,
   ITokenStore,
+  ITrace,
   Token,
 } from 'types/token';
 import { TOKEN_STORE_KEY } from 'constants/chain';
 import cloneDeep from 'lodash/cloneDeep';
-import { DEFAULT_TOKEN_CONFIG } from 'constants/token';
+import {
+  AppChainInfo,
+  DEFAULT_TOKEN_CONFIG,
+  EmbedChainInfos,
+} from 'constants/token';
 import { nanoid } from 'nanoid';
 import { networkPreferenceService } from 'background/service';
 import abi from 'utils/human-standard-token-abi-extended';
@@ -131,6 +136,7 @@ class TokenService {
 
   getBalancesSync(address: string, chainCustomId: string): Promise<Token[]> {
     let tokens: Token[] = [];
+    const { ecosystem } = networkPreferenceService.getProviderConfig();
     if (this.store.getState().balances) {
       const clonedBalances = cloneDeep(this.store.getState().balances);
       if (clonedBalances && clonedBalances[address]) {
@@ -287,8 +293,35 @@ class TokenService {
                   if (denomRes) denomTrace = denomRes;
                 }
                 if (denomTrace) {
-                  token.symbol = denomTrace.denom.substr(1).toUpperCase();
-                  token.name = denomTrace.denom.substr(1).toUpperCase();
+                  const currentToken = EmbedChainInfos.find(
+                    (e: AppChainInfo) => {
+                      return (
+                        e.stakeCurrency.coinMinimalDenom === denomTrace.denom ||
+                        e.currencies.some(
+                          (c) => c.coinMinimalDenom === denomTrace.denom
+                        )
+                      );
+                    }
+                  );
+                  if (currentToken) {
+                    token.chainName = currentToken.chainName;
+                    if (
+                      currentToken.stakeCurrency.coinMinimalDenom ===
+                      denomTrace.denom
+                    ) {
+                      token.symbol =
+                        currentToken.stakeCurrency.coinDenom.toUpperCase();
+                      token.name =
+                        currentToken.stakeCurrency.coinDenom.toUpperCase();
+                    } else {
+                      currentToken.currencies.forEach((c) => {
+                        if (c.coinMinimalDenom === denomTrace.denom) {
+                          token.symbol = c.coinDenom.toUpperCase();
+                          token.name = c.coinDenom.toUpperCase();
+                        }
+                      });
+                    }
+                  }
                   token.trace = denomTrace;
                   currentAccountTokens.push(token);
                 }
@@ -319,14 +352,20 @@ class TokenService {
         .catch((e) => console.error(e));
       if (res?.denom_trace?.path && res?.denom_trace?.base_denom) {
         const pathArr = res?.denom_trace?.path.split('/');
-        let portId, channelId;
         if (pathArr?.length % 2 === 0) {
-          portId = pathArr[0];
-          channelId = pathArr[0];
+          const traces: string[][] = [];
+          for (let i = 0; i < pathArr.length; i += 2) {
+            traces.push(pathArr.slice(i, i + 2));
+          }
+          const traceArray: ITrace[] = traces.map((t) => {
+            return {
+              portId: t[0],
+              channelId: t[1],
+            };
+          });
           const denomTrace: IDenomTrace = {
             hash,
-            portId,
-            channelId,
+            trace: traceArray,
             denom: res?.denom_trace?.base_denom,
             path: res?.denom_trace?.path,
           };
