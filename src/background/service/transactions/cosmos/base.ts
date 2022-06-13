@@ -68,10 +68,10 @@ export class AccountSetBase {
   ) => Promise<boolean>)[] = [];
 
   constructor(
-    protected readonly eventListener: {
-      addEventListener: (type: string, fn: () => unknown) => void;
-      removeEventListener: (type: string, fn: () => unknown) => void;
-    },
+    // protected readonly eventListener: {
+    //   addEventListener: (type: string, fn: () => unknown) => void;
+    //   removeEventListener: (type: string, fn: () => unknown) => void;
+    // },
     protected readonly chainGetter: ChainGetter,
     protected readonly chainId: string,
     protected readonly opts: AccountSetOpts
@@ -80,9 +80,9 @@ export class AccountSetBase {
 
     this.pubKey = new Uint8Array();
 
-    if (opts.autoInit) {
-      this.init();
-    }
+    // if (opts.autoInit) {
+    //   this.init();
+    // }
   }
 
   getKeplr(): Promise<Keplr | undefined> {
@@ -108,99 +108,101 @@ export class AccountSetBase {
     this.sendTokenFns.push(fn);
   }
 
-  protected async enable(keplr: Keplr, chainId: string): Promise<void> {
-    const chainInfo = this.chainGetter.getChain(chainId);
+  // protected async enable(keplr: Keplr, chainId: string): Promise<void> {
+  //   const chainInfo = this.chainGetter.getChain(chainId);
 
-    if (this.opts.suggestChain) {
-      if (this.opts.suggestChainFn) {
-        await this.opts.suggestChainFn(keplr, chainInfo);
-      } else {
-        await this.suggestChain(keplr, chainInfo);
-      }
-    }
-    await keplr.enable(chainId);
-  }
+  //   if (this.opts.suggestChain) {
+  //     if (this.opts.suggestChainFn) {
+  //       await this.opts.suggestChainFn(keplr, chainInfo);
+  //     } else {
+  //       await this.suggestChain(keplr, chainInfo);
+  //     }
+  //   }
+  //   await keplr.enable(chainId);
+  // }
 
-  protected async suggestChain(
-    keplr: Keplr,
-    chainInfo: ReturnType<ChainGetter["getChain"]>
-  ): Promise<void> {
-    await keplr.experimentalSuggestChain(chainInfo.raw);
-  }
+  // protected async suggestChain(
+  //   keplr: Keplr,
+  //   chainInfo: ReturnType<ChainGetter["getChain"]>
+  // ): Promise<void> {
+  //   await keplr.experimentalSuggestChain(chainInfo.raw);
+  // }
 
-  private readonly handleInit = () => this.init();
+  // private readonly handleInit = () => this.init();
 
-  @flow
-  public *init() {
-    // If wallet status is not exist, there is no need to try to init because it always fails.
-    if (this.walletStatus === WalletStatus.NotExist) {
-      return;
-    }
+  // @flow
+  // public *init() {
+  //   // If wallet status is not exist, there is no need to try to init because it always fails.
+  //   if (this.walletStatus === WalletStatus.NotExist) {
+  //     return;
+  //   }
 
-    // If the store has never been initialized, add the event listener.
-    if (!this.hasInited) {
-      // If key store in the keplr extension is changed, this event will be dispatched.
-      this.eventListener.addEventListener(
-        "keplr_keystorechange",
-        this.handleInit
-      );
-    }
-    this.hasInited = true;
+  //   // If the store has never been initialized, add the event listener.
+  //   if (!this.hasInited) {
+  //     // If key store in the keplr extension is changed, this event will be dispatched.
+  //     // TODO: update event listener
+  //     // this.eventListener.addEventListener(
+  //     //   "keplr_keystorechange",
+  //     //   this.handleInit
+  //     // );
+  //   }
+  //   this.hasInited = true;
 
-    // Set wallet status as loading whenever try to init.
-    this._walletStatus = WalletStatus.Loading;
+  //   // Set wallet status as loading whenever try to init.
+  //   this._walletStatus = WalletStatus.Loading;
 
-    const keplr = yield* toGenerator(this.getKeplr());
-    if (!keplr) {
-      this._walletStatus = WalletStatus.NotExist;
-      return;
-    }
+  //   const keplr = yield* toGenerator(this.getKeplr());
+  //   if (!keplr) {
+  //     this._walletStatus = WalletStatus.NotExist;
+  //     return;
+  //   }
 
-    this._walletVersion = keplr.version;
+  //   this._walletVersion = keplr.version;
 
-    try {
-      yield this.enable(keplr, this.chainId);
-    } catch (e) {
-      console.log(e);
-      this._walletStatus = WalletStatus.Rejected;
-      this._rejectionReason = e;
-      return;
-    }
+  //   try {
+  //     yield this.enable(keplr, this.chainId);
+  //   } catch (e) {
+  //     console.log(e);
+  //     this._walletStatus = WalletStatus.Rejected;
+  //     this._rejectionReason = e;
+  //     return;
+  //   }
 
-    try {
-      const key = yield* toGenerator(keplr.getKey(this.chainId));
-      this._bech32Address = key.bech32Address;
-      this._name = key.name;
-      this.pubKey = key.pubKey;
+  //   try {
+  //     const key = yield* toGenerator(keplr.getKey(this.chainId));
+  //     this._bech32Address = key.bech32Address;
+  //     this._name = key.name;
+  //     this.pubKey = key.pubKey;
 
-      // Set the wallet status as loaded after getting all necessary infos.
-      this._walletStatus = WalletStatus.Loaded;
-    } catch (e) {
-      console.log(e);
-      // Caught error loading key
-      // Reset properties, and set status to Rejected
-      this._bech32Address = "";
-      this._name = "";
-      this.pubKey = new Uint8Array(0);
+  //     // Set the wallet status as loaded after getting all necessary infos.
+  //     this._walletStatus = WalletStatus.Loaded;
+  //   } catch (e) {
+  //     console.log(e);
+  //     // Caught error loading key
+  //     // Reset properties, and set status to Rejected
+  //     this._bech32Address = "";
+  //     this._name = "";
+  //     this.pubKey = new Uint8Array(0);
 
-      this._walletStatus = WalletStatus.Rejected;
-      this._rejectionReason = e;
-    }
+  //     this._walletStatus = WalletStatus.Rejected;
+  //     this._rejectionReason = e;
+  //   }
 
-    if (this._walletStatus !== WalletStatus.Rejected) {
-      // Reset previous rejection error message
-      this._rejectionReason = undefined;
-    }
-  }
+  //   if (this._walletStatus !== WalletStatus.Rejected) {
+  //     // Reset previous rejection error message
+  //     this._rejectionReason = undefined;
+  //   }
+  // }
 
   @action
   public disconnect(): void {
     this._walletStatus = WalletStatus.NotInit;
     this.hasInited = false;
-    this.eventListener.removeEventListener(
-      "keplr_keystorechange",
-      this.handleInit
-    );
+    // TODO: use eventListener
+    // this.eventListener.removeEventListener(
+    //   "keplr_keystorechange",
+    //   this.handleInit
+    // );
     this._bech32Address = "";
     this._name = "";
     this.pubKey = new Uint8Array(0);
