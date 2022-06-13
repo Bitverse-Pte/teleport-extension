@@ -66,7 +66,12 @@ const flowContext = flow
     } = ctx;
     const account = preferenceService.getCurrentAccount();
     if (!Reflect.getMetadata('SAFE', providerController, mapMethod)) {
-      if (!permissionService.hasPerssmion(origin, account?.address)) {
+      if (
+        !permissionService.hasPerssmion({
+          origin: origin,
+          account: account?.address,
+        })
+      ) {
         ctx.request.requestedApproval = true;
         const { defaultChain } = await notificationService.requestApproval({
           params: { origin, name, icon },
