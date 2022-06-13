@@ -1,6 +1,6 @@
 import { action, computed, flow, makeObservable, observable } from "mobx";
 import { AppCurrency, Keplr, KeplrSignOptions } from "@keplr-wallet/types";
-import { ChainGetter } from "./types";
+// import { ChainGetter } from "./types";
 import { DenomHelper, toGenerator } from "@keplr-wallet/common";
 import { StdFee } from "@cosmjs/launchpad";
 import { evmosToEth } from "@tharsis/address-converter";
@@ -20,12 +20,12 @@ export interface MsgOpt {
 
 export interface AccountSetOpts {
   readonly suggestChain: boolean;
-  readonly suggestChainFn?: (
-    keplr: Keplr,
-    chainInfo: ReturnType<ChainGetter["getChain"]>
-  ) => Promise<void>;
+  // readonly suggestChainFn?: (
+  //   keplr: Keplr,
+  //   chainInfo: ReturnType<ChainGetter["getChain"]>
+  // ) => Promise<void>;
   readonly autoInit: boolean;
-  readonly getKeplr: () => Promise<Keplr | undefined>;
+  // readonly getKeplr: () => Promise<Keplr | undefined>;
 }
 
 export class AccountSetBase {
@@ -72,7 +72,7 @@ export class AccountSetBase {
     //   addEventListener: (type: string, fn: () => unknown) => void;
     //   removeEventListener: (type: string, fn: () => unknown) => void;
     // },
-    protected readonly chainGetter: ChainGetter,
+    // protected readonly chainInfo: ChainInfo,
     protected readonly chainId: string,
     protected readonly opts: AccountSetOpts
   ) {
@@ -85,9 +85,9 @@ export class AccountSetBase {
     // }
   }
 
-  getKeplr(): Promise<Keplr | undefined> {
-    return this.opts.getKeplr();
-  }
+  // getKeplr(): Promise<Keplr | undefined> {
+  //   return this.opts.getKeplr();
+  // }
 
   registerSendTokenFn(
     fn: (

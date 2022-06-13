@@ -19,7 +19,7 @@ import {
 } from "@keplr-wallet/cosmos";
 // import { QueriesSetBase, IQueriesStore, CosmosQueries } from "./query";
 import { DeepPartial, DeepReadonly } from "utility-types";
-import { ChainGetter } from "./types";
+import { CosChainInfo } from "./types";
 import deepmerge from "deepmerge";
 import { isAddress } from "@ethersproject/address";
 import { Buffer } from "buffer/";
@@ -53,10 +53,10 @@ export const CosmosAccount = {
     };
   }): (
     base: AccountSetBaseSuper,
-    chainGetter: ChainGetter,
+    cosChainInfo: CosChainInfo,
     chainId: string
   ) => CosmosAccount {
-    return (base, chainGetter, chainId) => {
+    return (base, cosChainInfo, chainId) => {
       const msgOptsFromCreator = options.msgOptsCreator
         ? options.msgOptsCreator(chainId)
         : undefined;
@@ -64,7 +64,7 @@ export const CosmosAccount = {
       return {
         cosmos: new CosmosAccountImpl(
           base,
-          chainGetter,
+          cosChainInfo,
           chainId,
           // options.queriesStore,
           deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
@@ -137,7 +137,7 @@ export class CosmosAccountImpl {
 
   constructor(
     protected readonly base: AccountSetBaseSuper,
-    protected readonly chainGetter: ChainGetter,
+    protected readonly cosChainInfo: CosChainInfo,
     protected readonly chainId: string,
     // protected readonly queriesStore: IQueriesStore<CosmosQueries>,
     protected readonly _msgOpts: CosmosMsgOpts,
@@ -174,8 +174,7 @@ export class CosmosAccountImpl {
     const denomHelper = new DenomHelper(currency.coinMinimalDenom);
 
     const hexAdjustedRecipient = (recipient: string) => {
-      const bech32prefix = this.chainGetter.getChain(this.chainId).bech32Config
-        .bech32PrefixAccAddr;
+      const bech32prefix = this.cosChainInfo.bech32Config.bech32PrefixAccAddr;
       if (bech32prefix === "evmos" && recipient.startsWith("0x")) {
         // Validate hex address
         if (!isAddress(recipient)) {
@@ -328,7 +327,7 @@ export class CosmosAccountImpl {
     }
 
     const txTracer = new TendermintTxTracer(
-      this.chainGetter.getChain(this.chainId).rpc,
+      this.cosChainInfo.rpc,
       "/websocket",
       {
         wsObject: this.txOpts.wsObject,
@@ -400,7 +399,7 @@ export class CosmosAccountImpl {
 			true
 		);
 
-		const coinType = this.chainGetter.getChain(this.chainId).bip44.coinType;
+		const coinType = this.cosChainInfo.coinType;
 
     // TODO: need remove keplr
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -515,7 +514,7 @@ export class CosmosAccountImpl {
   // }
 
 	get instance(): AxiosInstance {
-    const chainInfo = this.chainGetter.getChain(this.chainId);
+    const chainInfo = this.cosChainInfo;
     return Axios.create({
       ...{
         baseURL: chainInfo.rest,

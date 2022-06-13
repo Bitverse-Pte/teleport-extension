@@ -1,5 +1,5 @@
-import { AppCurrency, ChainInfo } from "@keplr-wallet/types";
-
+import { AppCurrency, ChainInfo, Bech32Config } from "@keplr-wallet/types";
+import { AxiosRequestConfig } from "axios";
 export interface ChainGetter {
   // Return the chain info matched with chain id.
   // Expect that this method will return the chain info reactively,
@@ -18,3 +18,13 @@ export type CoinPrimitive = {
   denom: string;
   amount: string;
 };
+
+export interface CosChainInfo {
+  readonly rpc: string;
+  readonly chainId: string;
+  readonly rest: string | undefined;
+  readonly restConfig?: AxiosRequestConfig;
+
+  readonly bech32Config: Bech32Config;
+  readonly coinType: number;
+}

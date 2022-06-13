@@ -1,13 +1,22 @@
 import { CosmosAccount } from './tx';
+import { CosChainInfo } from './types';
 import { AccountSetBaseSuper } from './base';
+import networkPreferenceService from '../../network';
+
+const { rpcUrl, chainId, ecoSystemParams, prefix: bech32Config, coinType } = networkPreferenceService.getProviderConfig();
+const cosChainInfo = {
+  rpc: rpcUrl,
+  chainId,
+  rest: ecoSystemParams?.rest,
+  bech32Config,
+  coinType
+} as CosChainInfo;
 
 const accountSetBase = new AccountSetBaseSuper(
-  chainGetter,
   chainId,
   {
     suggestChain: false,
-    autoInit: true,
-    getKeplr: null
+    autoInit: true
   }
 );
 
@@ -107,6 +116,6 @@ const cosmosAccountFn = CosmosAccount.use({
   },
 })
 
-const cosmosAccount = cosmosAccountFn(accountSetBase, chainGetter, chainId);
+const cosmosAccount = cosmosAccountFn(accountSetBase, cosChainInfo, chainId);
 
 export default cosmosAccount;
