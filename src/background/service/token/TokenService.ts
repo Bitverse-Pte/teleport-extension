@@ -3,6 +3,7 @@ import {
   ERC20Struct,
   IDenomTrace,
   ITokenStore,
+  ITrace,
   Token,
 } from 'types/token';
 import { TOKEN_STORE_KEY } from 'constants/chain';
@@ -186,7 +187,7 @@ class TokenService {
           !fetchedBalances[idx]
             ? t
             : /** assign if balance exist */
-              { ...t, amount: fetchedBalances[idx]?.toString() }
+            { ...t, amount: fetchedBalances[idx]?.toString() }
         );
       } catch (error) {
         console.error('getBalancesAsync::multicall:error:', error);
@@ -319,14 +320,20 @@ class TokenService {
         .catch((e) => console.error(e));
       if (res?.denom_trace?.path && res?.denom_trace?.base_denom) {
         const pathArr = res?.denom_trace?.path.split('/');
-        let portId, channelId;
         if (pathArr?.length % 2 === 0) {
-          portId = pathArr[0];
-          channelId = pathArr[0];
+          const traces: string[][] = [];
+          for (let i = 0; i < pathArr.length; i += 2) {
+            traces.push(pathArr.slice(i, i + 2));
+          }
+          const traceArray: ITrace[] = traces.map((t) => {
+            return {
+              portId: t[0],
+              channelId: t[1],
+            };
+          });
           const denomTrace: IDenomTrace = {
             hash,
-            portId,
-            channelId,
+            trace: traceArray,
             denom: res?.denom_trace?.base_denom,
             path: res?.denom_trace?.path,
           };

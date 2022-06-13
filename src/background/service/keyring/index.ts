@@ -199,8 +199,14 @@ class KeyringService extends EventEmitter {
     });
   }
 
-  private _checkDuplicateAccount(address: string): boolean {
-    return this.accounts.some((a: BaseAccount) => a.address === address);
+  private _checkDuplicateAccount(
+    address: string,
+    accountCreateType: AccountCreateType
+  ): boolean {
+    return this.accounts.some(
+      (a: BaseAccount) =>
+        a.address === address && accountCreateType === a.accountCreateType
+    );
   }
 
   private _checkDuplicateIndexName(
@@ -240,7 +246,12 @@ class KeyringService extends EventEmitter {
           keyPair = await this._createEthKeypairByImportPrivateKey(
             opts.privateKey
           );
-          if (this._checkDuplicateAccount(keyPair.address)) {
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.PRIVATE_KEY
+            )
+          ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
           signatureAlgorithm = SignatureAlgorithm.secp256k1;
@@ -251,7 +262,12 @@ class KeyringService extends EventEmitter {
             opts.privateKey,
             (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
           );
-          if (this._checkDuplicateAccount(keyPair.address)) {
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.PRIVATE_KEY
+            )
+          ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
           signatureAlgorithm = SignatureAlgorithm.secp256k1;
@@ -436,7 +452,12 @@ class KeyringService extends EventEmitter {
       switch (p.ecosystem) {
         case Ecosystem.EVM:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
-          if (this._checkDuplicateAccount(keyPair.address)) {
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.MNEMONIC
+            )
+          ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
           break;
@@ -446,13 +467,23 @@ class KeyringService extends EventEmitter {
             hdPath,
             (p.prefix as Bech32Config).bech32PrefixAccAddr
           );
-          if (this._checkDuplicateAccount(keyPair.address)) {
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.MNEMONIC
+            )
+          ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
           break;
         default:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
-          if (this._checkDuplicateAccount(keyPair.address)) {
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.MNEMONIC
+            )
+          ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
       }
@@ -535,7 +566,12 @@ class KeyringService extends EventEmitter {
     switch (ecosystem) {
       case Ecosystem.EVM:
         keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
-        if (this._checkDuplicateAccount(keyPair.address)) {
+        if (
+          this._checkDuplicateAccount(
+            keyPair.address,
+            AccountCreateType.MNEMONIC
+          )
+        ) {
           return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
         }
         break;
@@ -545,13 +581,23 @@ class KeyringService extends EventEmitter {
           hdPath,
           (prefix as Bech32Config).bech32PrefixAccAddr
         );
-        if (this._checkDuplicateAccount(keyPair.address)) {
+        if (
+          this._checkDuplicateAccount(
+            keyPair.address,
+            AccountCreateType.MNEMONIC
+          )
+        ) {
           return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
         }
         break;
       default:
         keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
-        if (this._checkDuplicateAccount(keyPair.address)) {
+        if (
+          this._checkDuplicateAccount(
+            keyPair.address,
+            AccountCreateType.MNEMONIC
+          )
+        ) {
           return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
         }
     }
@@ -1310,7 +1356,12 @@ class KeyringService extends EventEmitter {
                   wallet.mnemonic as string,
                   hdPath
                 );
-                if (this._checkDuplicateAccount(keyPair.address)) {
+                if (
+                  this._checkDuplicateAccount(
+                    keyPair.address,
+                    AccountCreateType.MNEMONIC
+                  )
+                ) {
                   return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
                 }
                 break;
@@ -1320,7 +1371,12 @@ class KeyringService extends EventEmitter {
                   hdPath,
                   (chain.prefix as Bech32Config).bech32PrefixAccAddr
                 );
-                if (this._checkDuplicateAccount(keyPair.address)) {
+                if (
+                  this._checkDuplicateAccount(
+                    keyPair.address,
+                    AccountCreateType.MNEMONIC
+                  )
+                ) {
                   return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
                 }
                 break;
@@ -1329,7 +1385,12 @@ class KeyringService extends EventEmitter {
                   wallet.mnemonic as string,
                   hdPath
                 );
-                if (this._checkDuplicateAccount(keyPair.address)) {
+                if (
+                  this._checkDuplicateAccount(
+                    keyPair.address,
+                    AccountCreateType.MNEMONIC
+                  )
+                ) {
                   return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
                 }
             }
@@ -1369,7 +1430,12 @@ class KeyringService extends EventEmitter {
               keyPair = await this._createEthKeypairByImportPrivateKey(
                 (wallet as any).privateKey
               );
-              if (this._checkDuplicateAccount(keyPair.address)) {
+              if (
+                this._checkDuplicateAccount(
+                  keyPair.address,
+                  AccountCreateType.PRIVATE_KEY
+                )
+              ) {
                 return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
               }
               break;
@@ -1378,7 +1444,12 @@ class KeyringService extends EventEmitter {
                 (wallet as any).privateKey,
                 (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
               );
-              if (this._checkDuplicateAccount(keyPair.address)) {
+              if (
+                this._checkDuplicateAccount(
+                  keyPair.address,
+                  AccountCreateType.PRIVATE_KEY
+                )
+              ) {
                 return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
               }
 
