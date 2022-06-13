@@ -8,7 +8,11 @@ import {
 } from 'types/token';
 import { TOKEN_STORE_KEY } from 'constants/chain';
 import cloneDeep from 'lodash/cloneDeep';
-import { DEFAULT_TOKEN_CONFIG } from 'constants/token';
+import {
+  AppChainInfo,
+  DEFAULT_TOKEN_CONFIG,
+  EmbedChainInfos,
+} from 'constants/token';
 import { nanoid } from 'nanoid';
 import { networkPreferenceService } from 'background/service';
 import abi from 'utils/human-standard-token-abi-extended';
@@ -132,6 +136,7 @@ class TokenService {
 
   getBalancesSync(address: string, chainCustomId: string): Promise<Token[]> {
     let tokens: Token[] = [];
+    const { ecosystem } = networkPreferenceService.getProviderConfig();
     if (this.store.getState().balances) {
       const clonedBalances = cloneDeep(this.store.getState().balances);
       if (clonedBalances && clonedBalances[address]) {
@@ -187,7 +192,7 @@ class TokenService {
           !fetchedBalances[idx]
             ? t
             : /** assign if balance exist */
-            { ...t, amount: fetchedBalances[idx]?.toString() }
+              { ...t, amount: fetchedBalances[idx]?.toString() }
         );
       } catch (error) {
         console.error('getBalancesAsync::multicall:error:', error);
@@ -288,8 +293,35 @@ class TokenService {
                   if (denomRes) denomTrace = denomRes;
                 }
                 if (denomTrace) {
-                  token.symbol = denomTrace.denom.substr(1).toUpperCase();
-                  token.name = denomTrace.denom.substr(1).toUpperCase();
+                  const currentToken = EmbedChainInfos.find(
+                    (e: AppChainInfo) => {
+                      return (
+                        e.stakeCurrency.coinMinimalDenom === denomTrace.denom ||
+                        e.currencies.some(
+                          (c) => c.coinMinimalDenom === denomTrace.denom
+                        )
+                      );
+                    }
+                  );
+                  if (currentToken) {
+                    token.chainName = currentToken.chainName;
+                    if (
+                      currentToken.stakeCurrency.coinMinimalDenom ===
+                      denomTrace.denom
+                    ) {
+                      token.symbol =
+                        currentToken.stakeCurrency.coinDenom.toUpperCase();
+                      token.name =
+                        currentToken.stakeCurrency.coinDenom.toUpperCase();
+                    } else {
+                      currentToken.currencies.forEach((c) => {
+                        if (c.coinMinimalDenom === denomTrace.denom) {
+                          token.symbol = c.coinDenom.toUpperCase();
+                          token.name = c.coinDenom.toUpperCase();
+                        }
+                      });
+                    }
+                  }
                   token.trace = denomTrace;
                   currentAccountTokens.push(token);
                 }

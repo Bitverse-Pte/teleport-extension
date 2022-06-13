@@ -13,6 +13,7 @@ export interface Token {
   display?: boolean;
   tokenId?: string;
   price?: number | string;
+  chainName?: string;
 }
 
 export interface AddTokenOpts {
