@@ -8,17 +8,16 @@ import {
   StdSignDoc,
 } from "@cosmjs/launchpad";
 import { DenomHelper } from "@keplr-wallet/common";
-import { Dec, DecUtils, Int } from "@keplr-wallet/unit";
+import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { Any } from "@keplr-wallet/proto-types/google/protobuf/any";
 import { MsgSend } from "@keplr-wallet/proto-types/cosmos/bank/v1beta1/tx";
 import {
   BaseAccount,
   Bech32Address,
-  ChainIdHelper,
   TendermintTxTracer,
 } from "@keplr-wallet/cosmos";
 // import { QueriesSetBase, IQueriesStore, CosmosQueries } from "./query";
-import { DeepPartial, DeepReadonly } from "utility-types";
+import { DeepPartial } from "utility-types";
 import { CosChainInfo } from "./types";
 import deepmerge from "deepmerge";
 import { isAddress } from "@ethersproject/address";
@@ -32,7 +31,6 @@ import {
 } from "@keplr-wallet/proto-types/cosmos/tx/v1beta1/tx";
 import { SignMode } from "@keplr-wallet/proto-types/cosmos/tx/signing/v1beta1/signing";
 import { PubKey } from "@keplr-wallet/proto-types/cosmos/crypto/secp256k1/keys";
-import { Coin } from "@keplr-wallet/proto-types/cosmos/base/v1beta1/coin";
 import platform from '../../extension';
 
 // FOR SIGN

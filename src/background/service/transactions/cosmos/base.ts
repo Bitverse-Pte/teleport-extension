@@ -1,7 +1,7 @@
-import { action, computed, flow, makeObservable, observable } from "mobx";
-import { AppCurrency, Keplr, KeplrSignOptions } from "@keplr-wallet/types";
+import { action, computed, makeObservable, observable } from "mobx";
+import { AppCurrency, KeplrSignOptions } from "@keplr-wallet/types";
 // import { ChainGetter } from "./types";
-import { DenomHelper, toGenerator } from "@keplr-wallet/common";
+import { DenomHelper } from "@keplr-wallet/common";
 import { StdFee } from "@cosmjs/launchpad";
 import { evmosToEth } from "@tharsis/address-converter";
 

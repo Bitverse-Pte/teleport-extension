@@ -1378,6 +1378,17 @@
     "@ethersproject/logger" "^5.5.0"
     "@ethersproject/rlp" "^5.5.0"
 
+"@ethersproject/address@^5.6.1":
+  version "5.6.1"
+  resolved "https://registry.npmjs.org/@ethersproject/address/-/address-5.6.1.tgz#ab57818d9aefee919c5721d28cd31fd95eff413d"
+  integrity sha512-uOgF0kS5MJv9ZvCz7x6T2EXJSzotiybApn4XlOgoTX0xdtyVIJ7pF+6cGPxiEq/dpBiTfMiw7Yc81JcwhSYA0Q==
+  dependencies:
+    "@ethersproject/bignumber" "^5.6.2"
+    "@ethersproject/bytes" "^5.6.1"
+    "@ethersproject/keccak256" "^5.6.1"
+    "@ethersproject/logger" "^5.6.0"
+    "@ethersproject/rlp" "^5.6.1"
+
 "@ethersproject/base64@5.5.0", "@ethersproject/base64@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@ethersproject/base64/-/base64-5.5.0.tgz#881e8544e47ed976930836986e5eb8fab259c090"
@@ -1402,12 +1413,28 @@
     "@ethersproject/logger" "^5.5.0"
     bn.js "^4.11.9"
 
+"@ethersproject/bignumber@^5.6.2":
+  version "5.6.2"
+  resolved "https://registry.npmjs.org/@ethersproject/bignumber/-/bignumber-5.6.2.tgz#72a0717d6163fab44c47bcc82e0c550ac0315d66"
+  integrity sha512-v7+EEUbhGqT3XJ9LMPsKvXYHFc8eHxTowFCG/HgJErmq4XHJ2WR7aeyICg3uTOAQ7Icn0GFHAohXEhxQHq4Ubw==
+  dependencies:
+    "@ethersproject/bytes" "^5.6.1"
+    "@ethersproject/logger" "^5.6.0"
+    bn.js "^5.2.1"
+
 "@ethersproject/bytes@5.5.0", "@ethersproject/bytes@^5.0.4", "@ethersproject/bytes@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@ethersproject/bytes/-/bytes-5.5.0.tgz#cb11c526de657e7b45d2e0f0246fb3b9d29a601c"
   integrity sha512-ABvc7BHWhZU9PNM/tANm/Qx4ostPGadAuQzWTr3doklZOhDlmcBqclrQe/ZXUIj3K8wC28oYeuRa+A37tX9kog==
   dependencies:
     "@ethersproject/logger" "^5.5.0"
+
+"@ethersproject/bytes@^5.6.1":
+  version "5.6.1"
+  resolved "https://registry.npmjs.org/@ethersproject/bytes/-/bytes-5.6.1.tgz#24f916e411f82a8a60412344bf4a813b917eefe7"
+  integrity sha512-NwQt7cKn5+ZE4uDn+X5RAXLp46E1chXoaMmrxAyA0rblpxz8t58lVkrHXoRIn0lz1joQElQ8410GqhTqMOwc6g==
+  dependencies:
+    "@ethersproject/logger" "^5.6.0"
 
 "@ethersproject/constants@5.5.0", "@ethersproject/constants@^5.0.4", "@ethersproject/constants@^5.5.0":
   version "5.5.0"
@@ -1491,10 +1518,23 @@
     "@ethersproject/bytes" "^5.5.0"
     js-sha3 "0.8.0"
 
+"@ethersproject/keccak256@^5.6.1":
+  version "5.6.1"
+  resolved "https://registry.npmjs.org/@ethersproject/keccak256/-/keccak256-5.6.1.tgz#b867167c9b50ba1b1a92bccdd4f2d6bd168a91cc"
+  integrity sha512-bB7DQHCTRDooZZdL3lk9wpL0+XuG3XLGHLh3cePnybsO3V0rdCAOQGpn/0R3aODmnTOOkCATJiD2hnL+5bwthA==
+  dependencies:
+    "@ethersproject/bytes" "^5.6.1"
+    js-sha3 "0.8.0"
+
 "@ethersproject/logger@5.5.0", "@ethersproject/logger@^5.0.5", "@ethersproject/logger@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@ethersproject/logger/-/logger-5.5.0.tgz#0c2caebeff98e10aefa5aef27d7441c7fd18cf5d"
   integrity sha512-rIY/6WPm7T8n3qS2vuHTUBPdXHl+rGxWxW5okDfo9J4Z0+gRRZT0msvUdIJkE4/HS29GUMziwGaaKO2bWONBrg==
+
+"@ethersproject/logger@^5.6.0":
+  version "5.6.0"
+  resolved "https://registry.npmjs.org/@ethersproject/logger/-/logger-5.6.0.tgz#d7db1bfcc22fd2e4ab574cba0bb6ad779a9a3e7a"
+  integrity sha512-BiBWllUROH9w+P21RzoxJKzqoqpkyM1pRnEKG69bulE9TSQD8SAIvTQqIMZmmCO8pUNkgLP1wndX1gKghSpBmg==
 
 "@ethersproject/networks@5.5.0", "@ethersproject/networks@^5.5.0":
   version "5.5.0"
@@ -1558,6 +1598,14 @@
   dependencies:
     "@ethersproject/bytes" "^5.5.0"
     "@ethersproject/logger" "^5.5.0"
+
+"@ethersproject/rlp@^5.6.1":
+  version "5.6.1"
+  resolved "https://registry.npmjs.org/@ethersproject/rlp/-/rlp-5.6.1.tgz#df8311e6f9f24dcb03d59a2bac457a28a4fe2bd8"
+  integrity sha512-uYjmcZx+DKlFUk7a5/W9aQVaoEC7+1MOBgNtvNg13+RnuUwT4F0zTovC0tmay5SmRslb29V1B7Y5KCri46WhuQ==
+  dependencies:
+    "@ethersproject/bytes" "^5.6.1"
+    "@ethersproject/logger" "^5.6.0"
 
 "@ethersproject/sha2@5.5.0", "@ethersproject/sha2@^5.5.0":
   version "5.5.0"
@@ -1968,6 +2016,14 @@
     long "^4.0.0"
     protobufjs "^6.11.2"
 
+"@keplr-wallet/proto-types@^0.10.5":
+  version "0.10.5"
+  resolved "https://registry.npmjs.org/@keplr-wallet/proto-types/-/proto-types-0.10.5.tgz#94805572189657d6e2413d75e66ebaab1629ddd5"
+  integrity sha512-mJfyZJytUSaVhaJVxx50hXkFH6tzu+tXkz2w5+XsLQsYzZQVemCSU8yXHLxxFvpPafJtDCo9rxJtdonSYKNkPw==
+  dependencies:
+    long "^4.0.0"
+    protobufjs "^6.11.2"
+
 "@keplr-wallet/router@^0.10.5":
   version "0.10.5"
   resolved "https://registry.npmjs.org/@keplr-wallet/router/-/router-0.10.5.tgz#52f4f58bed4ee34ff921ad9065065baddd6bb037"
@@ -1984,12 +2040,32 @@
     long "^4.0.0"
     secretjs "^0.17.0"
 
+"@keplr-wallet/types@0.10.5", "@keplr-wallet/types@^0.10.5":
+  version "0.10.5"
+  resolved "https://registry.npmjs.org/@keplr-wallet/types/-/types-0.10.5.tgz#6d3f7ddd60a545eaadb55d17774f7a2f65f5b0a0"
+  integrity sha512-CY1F+Rsfe2fs5uPioC1o80lKxQWsYHIwoILLptdebr2Sg1DjSuWVLHWScsB8EbBGm0LQQ9nQ+3LHklbsTNo2bw==
+  dependencies:
+    "@cosmjs/launchpad" "^0.24.0-alpha.25"
+    "@cosmjs/proto-signing" "^0.24.0-alpha.25"
+    axios "^0.21.4"
+    long "^4.0.0"
+    secretjs "^0.17.0"
+
 "@keplr-wallet/unit@0.10.3":
   version "0.10.3"
   resolved "https://registry.yarnpkg.com/@keplr-wallet/unit/-/unit-0.10.3.tgz#161e1f6c90eb6157fca7faecafc09d4135821b99"
   integrity sha512-RocgfG071vL9Y5kMRbOPKaptF0BehJUHiB1sjd+L1wqqSZuReSD/6NyG+90YkIbe169RdmXnSCaaow6WNDwiuA==
   dependencies:
     "@keplr-wallet/types" "0.10.3"
+    big-integer "^1.6.48"
+    utility-types "^3.10.0"
+
+"@keplr-wallet/unit@^0.10.5":
+  version "0.10.5"
+  resolved "https://registry.npmjs.org/@keplr-wallet/unit/-/unit-0.10.5.tgz#5d28420aac7b59a12df9a5cf6834a83d8433cd57"
+  integrity sha512-7rk8IskEzo3/rM89XsaLpkzWPcYjsNCl8lbKjkPEjQ5hbmz7g352YoE9L1EhjgT0zCHfop/yM2CP8e/hq8AIog==
+  dependencies:
+    "@keplr-wallet/types" "0.10.5"
     big-integer "^1.6.48"
     utility-types "^3.10.0"
 
@@ -4213,6 +4289,11 @@ bn.js@^5.0.0, bn.js@^5.1.1, bn.js@^5.1.2, bn.js@^5.2.0:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.2.0.tgz#358860674396c6997771a9d051fcc1b57d4ae002"
   integrity sha512-D7iWRBvnZE8ecXiLj/9wbxH7Tk79fAh8IHaTNq1RWRixsS02W+5qS+iE9yq6RYl0asXx5tw0bLhmT5pIfbSquw==
 
+bn.js@^5.2.1:
+  version "5.2.1"
+  resolved "https://registry.npmjs.org/bn.js/-/bn.js-5.2.1.tgz#0bc527a6a0d18d0aa8d5b0538ce4a77dccfa7b70"
+  integrity sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==
+
 body-parser@1.19.0, body-parser@^1.16.0:
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.19.0.tgz#96b2709e57c9c4e09a6fd66a8fd979844f69f08a"
@@ -5471,7 +5552,7 @@ deepmerge@^2.1.1:
 
 deepmerge@^4.2.2:
   version "4.2.2"
-  resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-4.2.2.tgz#44d2ea3679b8f4d4ffba33f03d865fc1e7bf4955"
+  resolved "https://registry.npmjs.org/deepmerge/-/deepmerge-4.2.2.tgz#44d2ea3679b8f4d4ffba33f03d865fc1e7bf4955"
   integrity sha512-FJ3UgI4gIl+PHZm53knsuSFpE+nESMr7M4v9QcgB7S63Kj/6WqMiFQJpBBYz1Pt+66bZpP3Q7Lye0Oo9MPKEdg==
 
 default-gateway@^6.0.3:
@@ -13513,7 +13594,7 @@ utila@~0.4:
 
 utility-types@^3.10.0:
   version "3.10.0"
-  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.10.0.tgz#ea4148f9a741015f05ed74fd615e1d20e6bed82b"
+  resolved "https://registry.npmjs.org/utility-types/-/utility-types-3.10.0.tgz#ea4148f9a741015f05ed74fd615e1d20e6bed82b"
   integrity sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==
 
 utils-merge@1.0.1:
