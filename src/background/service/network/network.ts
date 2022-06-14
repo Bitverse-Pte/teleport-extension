@@ -59,7 +59,7 @@ import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
 import { parseStringTemplate } from 'utils/string';
 import { addHexPrefix } from 'ethereumjs-util';
-import { BaseAccount } from 'types/extend';
+import { AccountCreateType, BaseAccount } from 'types/extend';
 // import { ChainUpdaterService, InteractionService } from '../cosmos';
 import { ChainIdHelper } from 'utils/cosmos/chainId';
 import { CosmosChainInfo } from 'types/cosmos';
@@ -723,11 +723,19 @@ class NetworkPreferenceService extends EventEmitter {
     copiedConfig.rpcUrl = parseStringTemplate(copiedConfig.rpcUrl, {
       INFURA_API_KEY: process.env.INFURA_PROJECT_ID as string,
     });
+    if (
+      !(
+        this.getProviderConfig().ecosystem === Ecosystem.EVM &&
+        config.ecosystem === Ecosystem.EVM
+      )
+    ) {
+      this._setDestinationChainAccount(config);
+    }
     this.networkStore.updateState({
       previousProviderStore: this.getProviderConfig(),
       provider: copiedConfig,
     });
-    this._setDestinationChainAccount(config);
+
     if (config.ecosystem === Ecosystem.EVM) {
       /**
        * Only trigger this fn when provider is EVM ecosystem
@@ -750,20 +758,49 @@ class NetworkPreferenceService extends EventEmitter {
     const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
     const currentAccount: BaseAccount | null | undefined =
       preferenceService.getCurrentAccount();
-    if (chain.ecosystem === Ecosystem.EVM) {
-      if (currentAccount?.ecosystem === Ecosystem.EVM) return;
-      const evmAccounts: BaseAccount[] = allAccounts.filter(
-        (a: BaseAccount) => a.ecosystem === Ecosystem.EVM
-      );
-      if (evmAccounts && evmAccounts.length > 0) {
-        preferenceService.setCurrentAccount(evmAccounts[0]);
+    if (!currentAccount) throw Error('current account not found');
+    const { accountCreateType, hdWalletId, hdPathIndex } = currentAccount;
+    if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
+      if (chain.ecosystem === Ecosystem.EVM) {
+        const evmAccounts: BaseAccount[] = allAccounts.filter(
+          (a: BaseAccount) =>
+            a.ecosystem === Ecosystem.EVM &&
+            a.accountCreateType === AccountCreateType.MNEMONIC
+        );
+        if (evmAccounts && evmAccounts.length > 0) {
+          preferenceService.setCurrentAccount(evmAccounts[0]);
+        }
+      } else {
+        const accounts: BaseAccount[] = allAccounts.filter(
+          (a: BaseAccount) =>
+            a.chainCustomId === chain.id &&
+            a.accountCreateType === AccountCreateType.MNEMONIC
+        );
+        if (accounts && accounts.length > 0) {
+          preferenceService.setCurrentAccount(accounts[0]);
+        }
       }
     } else {
-      const accounts: BaseAccount[] = allAccounts.filter(
-        (a: BaseAccount) => a.chainCustomId === chain.id
-      );
-      if (accounts && accounts.length > 0) {
-        preferenceService.setCurrentAccount(accounts[0]);
+      if (chain.ecosystem === Ecosystem.EVM) {
+        const evmAccounts: BaseAccount[] = allAccounts.filter(
+          (a: BaseAccount) =>
+            a.ecosystem === Ecosystem.EVM &&
+            a.hdWalletId === hdWalletId &&
+            a.hdPathIndex === hdPathIndex
+        );
+        if (evmAccounts && evmAccounts.length > 0) {
+          preferenceService.setCurrentAccount(evmAccounts[0]);
+        }
+      } else {
+        const accounts: BaseAccount[] = allAccounts.filter(
+          (a: BaseAccount) =>
+            a.chainCustomId === chain.id &&
+            a.hdWalletId === hdWalletId &&
+            a.hdPathIndex === hdPathIndex
+        );
+        if (accounts && accounts.length > 0) {
+          preferenceService.setCurrentAccount(accounts[0]);
+        }
       }
     }
   }
