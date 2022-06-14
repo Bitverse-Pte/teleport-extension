@@ -23,6 +23,7 @@ import deepmerge from "deepmerge";
 import { isAddress } from "@ethersproject/address";
 import { Buffer } from "buffer/";
 import Axios, { AxiosInstance } from "axios";
+import { CoinType, Ecosystem, Provider } from 'types/network';
 import {
   AuthInfo,
   TxRaw,
@@ -42,6 +43,9 @@ import {
 import {
   checkAndValidateADR36AminoSignDoc,
 } from "@keplr-wallet/cosmos";
+import { keyringService, networkPreferenceService } from "background/service";
+import { Bech32Config } from "types/cosmos";
+import { CosmosKey } from "background/service/keyManager/cosmos/CosmosKey";
 
 export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
@@ -60,10 +64,10 @@ export const CosmosAccount = {
       onFulfill?: (chainId: string, tx: any) => void;
     };
   }): (
-    base: AccountSetBaseSuper,
-    cosChainInfo: CosChainInfo,
-    chainId: string
-  ) => CosmosAccount {
+      base: AccountSetBaseSuper,
+      cosChainInfo: CosChainInfo,
+      chainId: string
+    ) => CosmosAccount {
     return (base, cosChainInfo, chainId) => {
       const msgOptsFromCreator = options.msgOptsCreator
         ? options.msgOptsCreator(chainId)
@@ -175,9 +179,9 @@ export class CosmosAccountImpl {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ): Promise<boolean> {
     const denomHelper = new DenomHelper(currency.coinMinimalDenom);
 
@@ -274,10 +278,10 @@ export class CosmosAccountImpl {
     onTxEvents?:
       | ((tx: any) => void)
       | {
-          onBroadcastFailed?: (e?: Error) => void;
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcastFailed?: (e?: Error) => void;
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
   ) {
     this.base.setTxTypeInProgress(type);
 
@@ -373,129 +377,129 @@ export class CosmosAccountImpl {
       }
     });
   }
-	// Return the tx hash.
-	protected async broadcastMsgs(
-		msgs: ProtoMsgsOrWithAminoMsgs,
-		fee: StdFee,
-		memo: string = "",
-		signOptions?: KeplrSignOptions,
-		mode: "block" | "async" | "sync" = "async"
-	): Promise<{
-		txHash: Uint8Array;
-		signDoc: StdSignDoc;
-	}> {
-		if (this.base.walletStatus !== WalletStatus.Loaded) {
-			throw new Error(`Wallet is not loaded: ${this.base.walletStatus}`);
-		}
+  // Return the tx hash.
+  protected async broadcastMsgs(
+    msgs: ProtoMsgsOrWithAminoMsgs,
+    fee: StdFee,
+    memo: string = "",
+    signOptions?: KeplrSignOptions,
+    mode: "block" | "async" | "sync" = "async"
+  ): Promise<{
+    txHash: Uint8Array;
+    signDoc: StdSignDoc;
+  }> {
+    if (this.base.walletStatus !== WalletStatus.Loaded) {
+      throw new Error(`Wallet is not loaded: ${this.base.walletStatus}`);
+    }
 
-		const aminoMsgs: Msg[] = msgs.aminoMsgs;
-		// fixed type error: const protoMsgs: Any[] = msgs.protoMsgs;
-		const protoMsgs: Any[] = msgs.protoMsgs;
+    const aminoMsgs: Msg[] = msgs.aminoMsgs;
+    // fixed type error: const protoMsgs: Any[] = msgs.protoMsgs;
+    const protoMsgs: Any[] = msgs.protoMsgs;
 
-		// TODO: Make proto sign doc if `aminoMsgs` is empty or null
-		if (aminoMsgs.length === 0 || protoMsgs.length === 0) {
-			throw new Error("There is no msg to send");
-		}
+    // TODO: Make proto sign doc if `aminoMsgs` is empty or null
+    if (aminoMsgs.length === 0 || protoMsgs.length === 0) {
+      throw new Error("There is no msg to send");
+    }
 
-		if (aminoMsgs.length !== protoMsgs.length) {
-			throw new Error("The length of aminoMsgs and protoMsgs are different");
-		}
+    if (aminoMsgs.length !== protoMsgs.length) {
+      throw new Error("The length of aminoMsgs and protoMsgs are different");
+    }
 
-		const account = await BaseAccount.fetchFromRest(
-			this.instance,
-			this.base.bech32Address,
-			true
-		);
+    const account = await BaseAccount.fetchFromRest(
+      this.instance,
+      this.base.bech32Address,
+      true
+    );
 
-		const coinType = this.cosChainInfo.coinType;
+    const coinType = this.cosChainInfo.coinType;
 
     // TODO: need remove keplr
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		// const keplr = (await this.base.getKeplr())!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // const keplr = (await this.base.getKeplr())!;
 
-		const signDoc = makeSignDoc(
-			aminoMsgs,
-			fee,
-			this.chainId,
-			memo,
-			account.getAccountNumber().toString(),
-			account.getSequence().toString()
-		);
-    
+    const signDoc = makeSignDoc(
+      aminoMsgs,
+      fee,
+      this.chainId,
+      memo,
+      account.getAccountNumber().toString(),
+      account.getSequence().toString()
+    );
+
     // TODO: need remove keplr
-		const signResponse = await this.requestSignAmino(
-			this.chainId,
-			this.base.bech32Address,
-			signDoc,
-			signOptions as KeplrSignOptions
-		);
+    const signResponse = await this.requestSignAmino(
+      this.chainId,
+      this.base.bech32Address,
+      signDoc,
+      signOptions as KeplrSignOptions
+    );
 
-		const signedTx = TxRaw.encode({
-			bodyBytes: TxBody.encode(
-				TxBody.fromPartial({
-					messages: protoMsgs as {
+    const signedTx = TxRaw.encode({
+      bodyBytes: TxBody.encode(
+        TxBody.fromPartial({
+          messages: protoMsgs as {
             typeUrl?: string | undefined;
             value?: Uint8Array | undefined;
           }[] | undefined,
-					memo: signResponse.signed.memo,
-				})
-			).finish(),
-			authInfoBytes: AuthInfo.encode({
-				signerInfos: [
-					{
-						publicKey: {
-							typeUrl:
-								coinType === 60
-									? "/ethermint.crypto.v1.ethsecp256k1.PubKey"
-									: "/cosmos.crypto.secp256k1.PubKey",
-							value: PubKey.encode({
-								key: Buffer.from(
-									signResponse.signature.pub_key.value,
-									"base64"
-								),
-							}).finish(),
-						},
-						modeInfo: {
-							single: {
-								mode: SignMode.SIGN_MODE_LEGACY_AMINO_JSON,
-							},
-							multi: undefined,
-						},
-						sequence: signResponse.signed.sequence,
-					},
-				],
-				fee: Fee.fromPartial({
-					amount: signResponse.signed.fee.amount as {
+          memo: signResponse.signed.memo,
+        })
+      ).finish(),
+      authInfoBytes: AuthInfo.encode({
+        signerInfos: [
+          {
+            publicKey: {
+              typeUrl:
+                coinType === 60
+                  ? "/ethermint.crypto.v1.ethsecp256k1.PubKey"
+                  : "/cosmos.crypto.secp256k1.PubKey",
+              value: PubKey.encode({
+                key: Buffer.from(
+                  signResponse.signature.pub_key.value,
+                  "base64"
+                ),
+              }).finish(),
+            },
+            modeInfo: {
+              single: {
+                mode: SignMode.SIGN_MODE_LEGACY_AMINO_JSON,
+              },
+              multi: undefined,
+            },
+            sequence: signResponse.signed.sequence,
+          },
+        ],
+        fee: Fee.fromPartial({
+          amount: signResponse.signed.fee.amount as {
             denom?: string | undefined;
             amount?: string | undefined;
           }[] | undefined,
-					gasLimit: signResponse.signed.fee.gas,
-				}),
-			}).finish(),
-			signatures: [Buffer.from(signResponse.signature.signature, "base64")],
-		}).finish();
+          gasLimit: signResponse.signed.fee.gas,
+        }),
+      }).finish(),
+      signatures: [Buffer.from(signResponse.signature.signature, "base64")],
+    }).finish();
 
-		return {
+    return {
       // TODO: need remove keplr
-			txHash: await this.sendTx(this.cosChainInfo, signedTx, mode as BroadcastMode),
-			signDoc: signResponse.signed,
-		};
-	}
+      txHash: await this.sendTx(this.cosChainInfo, signedTx, mode as BroadcastMode),
+      signDoc: signResponse.signed,
+    };
+  }
 
   protected txEventsWithPreOnFulfill(
     onTxEvents:
       | ((tx: any) => void)
       | {
-          onBroadcasted?: (txHash: Uint8Array) => void;
-          onFulfill?: (tx: any) => void;
-        }
+        onBroadcasted?: (txHash: Uint8Array) => void;
+        onFulfill?: (tx: any) => void;
+      }
       | undefined,
     preOnFulfill?: (tx: any) => void
   ):
     | {
-        onBroadcasted?: (txHash: Uint8Array) => void;
-        onFulfill?: (tx: any) => void;
-      }
+      onBroadcasted?: (txHash: Uint8Array) => void;
+      onFulfill?: (tx: any) => void;
+    }
     | undefined {
     if (!onTxEvents) {
       return;
@@ -511,23 +515,23 @@ export class CosmosAccountImpl {
       onFulfill:
         onFulfill || preOnFulfill
           ? (tx: any) => {
-              if (preOnFulfill) {
-                preOnFulfill(tx);
-              }
-
-              if (onFulfill) {
-                onFulfill(tx);
-              }
+            if (preOnFulfill) {
+              preOnFulfill(tx);
             }
+
+            if (onFulfill) {
+              onFulfill(tx);
+            }
+          }
           : undefined,
     };
   }
 
-	// protected get queries(): DeepReadonly<QueriesSetBase & CosmosQueries> {
+  // protected get queries(): DeepReadonly<QueriesSetBase & CosmosQueries> {
   //   return this.queriesStore.get(this.chainId);
   // }
 
-	get instance(): AxiosInstance {
+  get instance(): AxiosInstance {
     const chainInfo = this.cosChainInfo;
     return Axios.create({
       ...{
@@ -559,24 +563,24 @@ export class CosmosAccountImpl {
 
     const params = isProtoTx
       ? {
-          tx_bytes: Buffer.from(tx as any).toString("base64"),
-          mode: (() => {
-            switch (mode) {
-              case "async":
-                return "BROADCAST_MODE_ASYNC";
-              case "block":
-                return "BROADCAST_MODE_BLOCK";
-              case "sync":
-                return "BROADCAST_MODE_SYNC";
-              default:
-                return "BROADCAST_MODE_UNSPECIFIED";
-            }
-          })(),
-        }
+        tx_bytes: Buffer.from(tx as any).toString("base64"),
+        mode: (() => {
+          switch (mode) {
+            case "async":
+              return "BROADCAST_MODE_ASYNC";
+            case "block":
+              return "BROADCAST_MODE_BLOCK";
+            case "sync":
+              return "BROADCAST_MODE_SYNC";
+            default:
+              return "BROADCAST_MODE_UNSPECIFIED";
+          }
+        })(),
+      }
       : {
-          tx,
-          mode: mode,
-        };
+        tx,
+        mode: mode,
+      };
 
     try {
       const result = await restInstance.post(
@@ -614,20 +618,29 @@ export class CosmosAccountImpl {
       isADR36WithString?: boolean;
     }
   ): Promise<AminoSignResponse> {
-    const coinType = this.cosChainInfo.coinType;
+    //const coinType = this.cosChainInfo.coinType;
 
     // TODO: use keyRing
-    const key = await this.keyRing.getKey(chainId, coinType);
-    const bech32Prefix = this.cosChainInfo.bech32Config.bech32PrefixAccAddr;
-    const bech32Address = new Bech32Address(key.address).toBech32(bech32Prefix);
+    //const key = await this.keyRing.getKey(chainId, coinType);
+    //const bech32Prefix = this.cosChainInfo.bech32Config.bech32PrefixAccAddr;
+    //const bech32Address = new Bech32Address(key.address).toBech32(bech32Prefix);
+
+
+    const chains: Provider[] = networkPreferenceService.getSupportProviders();
+    const chain: Provider | undefined = chains.find(
+      (c: Provider) => c.chainId === chainId
+    );
+    const k = keyringService.getKeplrCompatibleKey(chainId);
+    if (!k) throw Error('no key found');
+    if (!chain) throw Error('no chain found');
+    const { bech32Address, pubKey } = k;
     if (signer !== bech32Address) {
-      // throw new KeplrError("keyring", 231, "Signer mismatched");
       throw new Error('Signer mismatched');
     }
 
     const isADR36SignDoc = checkAndValidateADR36AminoSignDoc(
       signDoc,
-      bech32Prefix
+      (chain.prefix as Bech32Config).bech32PrefixAccAddr
     );
     if (isADR36SignDoc) {
       if (signDoc.msgs[0].value.signer !== signer) {
@@ -663,7 +676,7 @@ export class CosmosAccountImpl {
 
     if (isADR36SignDoc) {
       // Validate the new sign doc, if it was for ADR-36.
-      if (checkAndValidateADR36AminoSignDoc(signDoc, bech32Prefix)) {
+      if (checkAndValidateADR36AminoSignDoc(signDoc, (chain.prefix as Bech32Config).bech32PrefixAccAddr)) {
         if (signDoc.msgs[0].value.signer !== signer) {
           // throw new KeplrError(
           //   "keyring",
@@ -683,16 +696,13 @@ export class CosmosAccountImpl {
     }
 
     try {
-      // TODO: use keyRing
-      const signature = await this.keyRing.sign(
-        chainId,
-        coinType,
-        serializeSignDoc(signDoc)
-      );
+      const privateKey = keyringService.getPrivateKeyByAddress(k.bech32Address);
+      if (!privateKey) throw Error('no private key found');
+      const signature = new CosmosKey().generateSignature(serializeSignDoc(signDoc), privateKey)
 
       return {
         signed: signDoc,
-        signature: encodeSecp256k1Signature(key.pubKey, signature),
+        signature: encodeSecp256k1Signature(k.pubKey, signature),
       };
     } finally {
       // this.interactionService.dispatchEvent(APP_PORT, "request-sign-end", {});

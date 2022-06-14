@@ -199,6 +199,19 @@ class KeyringService extends EventEmitter {
     });
   }
 
+  /**
+   * Get Private Key
+   *
+   * Get private key by address
+   *
+   * @param {string} address - the current account address
+   *
+   * @returns {Promise<String>} the current account private key.
+   */
+  public getPrivateKeyByAddress(address){
+    return this.secrets.find(s=> s.address === address)?.privateKey;
+  }
+
   private _checkDuplicateAccount(
     address: string,
     accountCreateType: AccountCreateType
@@ -766,21 +779,6 @@ class KeyringService extends EventEmitter {
         return Promise.reject(new BitError(ErrorCode.WRONG_PSD));
       });
     return Promise.resolve(Boolean(checksumPassed));
-  }
-
-  /**
-   * Get Private Key
-   *
-   * Get private key by address
-   *
-   * @param {string} address - the current account address
-   *
-   * @returns {Promise<String>} the current account private key.
-   */
-  getPrivateKeyByAddress(address: string): Promise<string> {
-    const secret = this.secrets.find((s: Secret) => s.address === address);
-    if (secret) return Promise.resolve(secret.privateKey);
-    return Promise.resolve('');
   }
 
   /**
