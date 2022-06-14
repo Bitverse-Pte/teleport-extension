@@ -47,11 +47,16 @@ const flowContext = flow
       },
       mapMethod,
     } = ctx;
-    const chainId = args[0];
-    const provider = await networkPreferenceService.getCosmosChainInfo(chainId);
-    console.log('====provider====', provider);
-    console.log('====[chainId, mapMethod]===', chainId, mapMethod);
     if (!Reflect.getMetadata('SAFE', cosmosController, mapMethod)) {
+      const chainId = args[0] || networkPreferenceService.getCurrentChainId();
+      const provider = await networkPreferenceService.getCosmosChainInfo(
+        chainId
+      );
+      if (!provider) {
+        throw new Error(
+          `chain id [${chainId}] doesn't has registed provider in wallet`
+        );
+      }
       if (
         !permissionService.hasPerssmion({ origin: origin, chainId: chainId })
       ) {
@@ -70,7 +75,35 @@ const flowContext = flow
     }
     return next();
   })
+  // check need approval
   .use(async (ctx, next) => {
+    const {
+      request: {
+        data: { args, id, method, type },
+        session: { origin, name, icon },
+      },
+      mapMethod,
+    } = ctx;
+    const [approvalType, precheck] =
+      Reflect.getMetadata('APPROVAL', cosmosController, mapMethod) || [];
+    if (approvalType) {
+      const existed = precheck && precheck(ctx.request);
+      ctx.request.requestedApproval = true;
+      ctx.approvalRes = await notificationService.requestApproval({
+        approvalComponent: approvalType,
+        params: {
+          method,
+          data: args,
+          existed: existed,
+          session: { origin, name, icon },
+        },
+        origin,
+      });
+      permissionService.touchConnectedSite(origin);
+    }
+    return next();
+  })
+  .use(async (ctx) => {
     const { approvalRes, mapMethod, request } = ctx;
     const [approvalType] =
       Reflect.getMetadata('APPROVAL', cosmosController, mapMethod) || [];
