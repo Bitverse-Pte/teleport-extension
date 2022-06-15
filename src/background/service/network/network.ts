@@ -852,9 +852,8 @@ class NetworkPreferenceService extends EventEmitter {
   }
 
   getSupportProviders(): Provider[] {
-    const presetProviders = Object.values(defaultNetworks);
     const supportProviders: Provider[] = [];
-    presetProviders.forEach((p: Provider) => {
+    this.getAllProviders().forEach((p: Provider) => {
       if (
         (p.ecosystem === Ecosystem.EVM &&
           supportProviders.every(
