@@ -3,7 +3,9 @@ import { keyringService, networkPreferenceService } from 'background/service';
 class CosmosProviderController {
   @Reflect.metadata('SAFE', true)
   getKey = async ({ data: { args } }) => {
-    return keyringService.getKeplrCompatibleKey(args[0]);
+    const resp = keyringService.getKeplrCompatibleKey(args[0]);
+    console.log('======[resp, chainId]=====', resp, args[0]);
+    return resp;
   };
 
   enable = async ({ data: { args } }) => {
@@ -11,7 +13,7 @@ class CosmosProviderController {
     return chainId;
   };
 
-  @Reflect.metadata('SAFE', true)
+  @Reflect.metadata('SkipConnect', true)
   @Reflect.metadata('APPROVAL', [
     'AddCosmosChain',
     (req) => {
@@ -35,8 +37,23 @@ class CosmosProviderController {
     },
     session: { origin },
   }) => {
-    networkPreferenceService.suggestCosmosChainInfo(chainParams, origin);
+    await networkPreferenceService.suggestCosmosChainInfo(chainParams, origin);
     keyringService.generateMissedAccounts();
+    console.log('=keyringService.generateMissedAccounts()=');
+  };
+
+  @Reflect.metadata('APPROVAL', ['SignTx'])
+  signDirect = async ({ data, session: { origin } }) => {
+    //return keyringService.signDirect();
+  };
+
+  @Reflect.metadata('APPROVAL', ['SignTx'])
+  signAmino = async ({ data, session: { origin } }) => {
+    //return keyringService.signDirect();
+  };
+
+  sendTx = async () => {
+    //
   };
 }
 

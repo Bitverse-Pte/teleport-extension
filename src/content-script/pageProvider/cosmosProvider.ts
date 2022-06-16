@@ -130,6 +130,10 @@ export class CosmosProvider extends EventEmitter implements Keplr {
     await this.requestMethod('enable', [chainIds]);
   }
 
+  some() {
+    console.log('this:', this);
+  }
+
   getOfflineSigner(chainId: string): OfflineSigner & OfflineDirectSigner {
     return new CosmJSOfflineSigner(chainId, this);
   }
