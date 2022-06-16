@@ -151,23 +151,29 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
 
   const handleAccountClick = async (
     a: IDisplayAccountManage,
-    isEmpty: boolean
+    isEmpty: boolean,
+    isCurrentAccount
   ) => {
-    if (a.ethAddress === currentAccount || isEmpty) return;
-    let coinType: CoinType, account;
+    console.log(isCurrentAccount);
+    if (isCurrentAccount || isEmpty) return;
+    let account;
     const currentChain: Provider | null = await wallet.getCurrentChain();
     if (currentChain) {
-      coinType = currentChain.coinType;
-    }
-    a.ecosystems.forEach((e) =>
-      e.accounts.forEach((ic: ICustomChain) => {
-        if (ic.coinType === coinType) {
-          account = ic;
+      const { ecosystem, id } = currentChain;
+      a.ecosystems.forEach((e) => {
+        if (ecosystem === Ecosystem.EVM && e.ecosystem === ecosystem) {
+          account = e.accounts[0];
+        } else if (ecosystem !== Ecosystem.EVM && e.ecosystem === ecosystem) {
+          e.accounts.forEach((ic: ICustomChain) => {
+            if (ic.chainCustomId === id) {
+              account = ic;
+            }
+          });
         }
-      })
-    );
-    await wallet.changeAccount(account);
-    queryAccounts();
+      });
+      await wallet.changeAccount(account);
+      queryAccounts();
+    }
   };
 
   const selectedIndex = useMemo(
@@ -188,7 +194,11 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
                 cursor: i !== tempAccounts.length,
               })}
               onClick={() =>
-                handleAccountClick(account, i === tempAccounts.length)
+                handleAccountClick(
+                  account,
+                  i === tempAccounts.length,
+                  i === selectedIndex
+                )
               }
               key={i}
             >
