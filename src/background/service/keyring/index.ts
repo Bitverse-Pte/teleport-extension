@@ -201,11 +201,12 @@ class KeyringService extends EventEmitter {
 
   private _checkDuplicateAccount(
     address: string,
-    accountCreateType: AccountCreateType
+    accountCreateType: AccountCreateType,
+    customChainId?: PresetNetworkId | string
   ): boolean {
     return this.accounts.some(
       (a: BaseAccount) =>
-        a.address === address && accountCreateType === a.accountCreateType
+        a.address === address && accountCreateType === a.accountCreateType && (customChainId ? a.chainCustomId === customChainId : true)
     );
   }
 
@@ -470,7 +471,7 @@ class KeyringService extends EventEmitter {
           if (
             this._checkDuplicateAccount(
               keyPair.address,
-              AccountCreateType.MNEMONIC
+              AccountCreateType.MNEMONIC,
             )
           ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
@@ -1375,7 +1376,8 @@ class KeyringService extends EventEmitter {
                 if (
                   this._checkDuplicateAccount(
                     keyPair.address,
-                    AccountCreateType.MNEMONIC
+                    AccountCreateType.MNEMONIC,
+                    chain.id
                   )
                 ) {
                   return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
@@ -1448,7 +1450,8 @@ class KeyringService extends EventEmitter {
               if (
                 this._checkDuplicateAccount(
                   keyPair.address,
-                  AccountCreateType.PRIVATE_KEY
+                  AccountCreateType.PRIVATE_KEY,
+                  chain.id
                 )
               ) {
                 return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
