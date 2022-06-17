@@ -42,12 +42,12 @@ class CosmosProviderController {
     console.log('=keyringService.generateMissedAccounts()=');
   };
 
-  @Reflect.metadata('APPROVAL', ['SignTx'])
+  @Reflect.metadata('APPROVAL', ['SignCosmTx'])
   signDirect = async ({ data, session: { origin } }) => {
     //return keyringService.signDirect();
   };
 
-  @Reflect.metadata('APPROVAL', ['SignTx'])
+  @Reflect.metadata('APPROVAL', ['SignCosmTx'])
   signAmino = async ({ data, session: { origin } }) => {
     //return keyringService.signDirect();
   };
