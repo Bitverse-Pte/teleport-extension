@@ -1,11 +1,11 @@
 import { keyringService, networkPreferenceService } from 'background/service';
+import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
 
 class CosmosProviderController {
   @Reflect.metadata('SAFE', true)
   getKey = async ({ data: { args } }) => {
     const resp = keyringService.getKeplrCompatibleKey(args[0]);
-    console.log('======[resp, chainId]=====', resp, args[0]);
-    return resp;
+    return JSONUint8Array.wrap(resp);
   };
 
   enable = async ({ data: { args } }) => {
