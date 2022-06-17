@@ -69,60 +69,72 @@ export class CosmosChainUpdaterService {
 
   async tryUpdateChain(chainId: string) {
     console.debug('CosmosChainUpdate::tryUpdateChain: started');
-    const chainInfo = this.chainsService.getCosmosChainInfo(chainId);
+    try {
+      const chainInfo = this.chainsService.getCosmosChainInfo(chainId);
 
-    // If chain id is not fomatted as {chainID}-{version},
-    // there is no way to deal with the updated chain id.
-    if (!ChainIdHelper.hasChainVersion(chainInfo.chainId)) {
-      console.debug(
-        'CosmosChainUpdate::tryUpdateChain: exit due to no version in chainId:',
-        chainInfo.chainId
-      );
-      return;
-    }
-
-    const updates = await CosmosChainUpdaterService.checkChainUpdate(chainInfo);
-    console.debug('CosmosChainUpdate::tryUpdateChain::updates:', updates);
-
-    if (updates.explicit || updates.slient) {
-      const currentVersion = ChainIdHelper.parse(chainInfo.chainId);
-
-      if (updates.chainId) {
-        const fetchedChainId = updates.chainId;
-        const fetchedVersion = ChainIdHelper.parse(fetchedChainId);
-
-        if (
-          currentVersion.identifier === fetchedVersion.identifier &&
-          currentVersion.version < fetchedVersion.version
-        ) {
-          await this.saveChainProperty(currentVersion.identifier, {
-            chainId: fetchedChainId,
-          });
-        }
-      }
-
-      if (updates.features && updates.features.length > 0) {
-        const savedChainProperty = await this.getUpdatedChainProperty(
+      // If chain id is not fomatted as {chainID}-{version},
+      // there is no way to deal with the updated chain id.
+      if (!ChainIdHelper.hasChainVersion(chainInfo.chainId)) {
+        console.debug(
+          'CosmosChainUpdate::tryUpdateChain: exit due to no version in chainId:',
           chainInfo.chainId
         );
+        return;
+      }
 
-        const updateFeatures =
-          savedChainProperty.ecoSystemParams?.features ?? [];
+      const updates = await CosmosChainUpdaterService.checkChainUpdate(
+        chainInfo
+      );
+      console.debug('CosmosChainUpdate::tryUpdateChain::updates:', updates);
 
-        for (const feature of updates.features) {
-          if (!updateFeatures.includes(feature)) {
-            updateFeatures.push(feature);
+      if (updates.explicit || updates.slient) {
+        const currentVersion = ChainIdHelper.parse(chainInfo.chainId);
+
+        if (updates.chainId) {
+          const fetchedChainId = updates.chainId;
+          const fetchedVersion = ChainIdHelper.parse(fetchedChainId);
+
+          if (
+            currentVersion.identifier === fetchedVersion.identifier &&
+            currentVersion.version < fetchedVersion.version
+          ) {
+            await this.saveChainProperty(currentVersion.identifier, {
+              chainId: fetchedChainId,
+            });
           }
         }
 
-        console.debug(
-          'CosmosChainUpdate::tryUpdateChain::updateFeatures:',
-          updateFeatures
-        );
+        if (updates.features && updates.features.length > 0) {
+          const savedChainProperty = await this.getUpdatedChainProperty(
+            chainInfo.chainId
+          );
 
-        await this.saveChainEcoSystemProperty(currentVersion.identifier, {
-          features: updateFeatures,
-        });
+          const updateFeatures =
+            savedChainProperty.ecoSystemParams?.features ?? [];
+
+          for (const feature of updates.features) {
+            if (!updateFeatures.includes(feature)) {
+              updateFeatures.push(feature);
+            }
+          }
+
+          console.debug(
+            'CosmosChainUpdate::tryUpdateChain::updateFeatures:',
+            updateFeatures
+          );
+
+          await this.saveChainEcoSystemProperty(currentVersion.identifier, {
+            features: updateFeatures,
+          });
+        }
+      }
+    } catch (error: any) {
+      if (error.message.startsWith('There is no cosmos chain info for')) {
+        console.warn(
+          'unable to tryUpdateChain, since no match network found, maybe the app is initializing.'
+        );
+      } else {
+        console.error('tryUpdateChain::error: ', error);
       }
     }
   }
