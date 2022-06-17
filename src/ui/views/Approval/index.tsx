@@ -19,7 +19,7 @@ const Approval = () => {
       return null;
     }
     if (approval.lock) {
-      history.replace('/home');
+      history.replace('/unlock');
       return null;
     }
     setApproval(approval);

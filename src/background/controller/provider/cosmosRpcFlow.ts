@@ -47,8 +47,14 @@ const flowContext = flow
       },
       mapMethod,
     } = ctx;
+    if (Reflect.getMetadata('SkipConnect', cosmosController, mapMethod)) {
+      return next();
+    }
     if (!Reflect.getMetadata('SAFE', cosmosController, mapMethod)) {
-      const chainId = args[0] || networkPreferenceService.getCurrentChainId();
+      let chainId = args[0] || networkPreferenceService.getCurrentChainId();
+      if (chainId.chainId) {
+        chainId = chainId.chainId;
+      }
       const provider = await networkPreferenceService.getCosmosChainInfo(
         chainId
       );

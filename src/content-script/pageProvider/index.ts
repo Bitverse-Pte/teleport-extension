@@ -10,6 +10,7 @@ import { CosmosProvider } from './cosmosProvider';
 import { OfflineSigner } from '@cosmjs/launchpad';
 import { SecretUtils } from 'secretjs/types/enigmautils';
 import { OfflineDirectSigner } from '@cosmjs/proto-signing';
+import { Keplr } from 'types/cosmos';
 
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -259,7 +260,7 @@ declare global {
       currentProvider: EthereumProvider;
     };
     teleport: EthereumProvider;
-    keplr?: CosmosProvider;
+    keplr?: Keplr;
     getOfflineSigner?: (chainId: string) => OfflineSigner & OfflineDirectSigner;
     getOfflineSignerOnlyAmino?: (chainId: string) => OfflineSigner;
     getOfflineSignerAuto?: (
@@ -311,25 +312,40 @@ window.addEventListener('message', function (event) {
 
     window.dispatchEvent(new Event('ethereum#initialized'));
     const cosmosProvider = new CosmosProvider({ bcm });
-    if (!window.keplr) {
-      window.keplr = new Proxy(cosmosProvider, {
-        deleteProperty: () => true,
-      });
-    }
-    if (!window.getOfflineSigner) {
-      window.getOfflineSigner = new Proxy(cosmosProvider.getOfflineSigner, {
-        deleteProperty: () => true,
-      });
-    }
-    if (!window.getOfflineSignerOnlyAmino) {
-      //window.getOfflineSignerOnlyAmino = getOfflineSignerOnlyAmino;
-    }
-    if (!window.getOfflineSignerAuto) {
-      //window.getOfflineSignerAuto = getOfflineSignerAuto;
-    }
-    if (!window.getEnigmaUtils) {
-      //window.getEnigmaUtils = getEnigmaUtils;
-    }
+    init(
+      cosmosProvider,
+      (chainId: string) => cosmosProvider.getOfflineSigner(chainId),
+      (chainId: string) => cosmosProvider.getOfflineSignerOnlyAmino(chainId),
+      (chainId: string) => cosmosProvider.getOfflineSignerAuto(chainId),
+      (chainId: string) => cosmosProvider.getEnigmaUtils(chainId)
+    );
     window.dispatchEvent(new Event('cosmos#initialized'));
   }
 });
+
+function init(
+  keplr: Keplr,
+  getOfflineSigner: (chainId: string) => OfflineSigner & OfflineDirectSigner,
+  getOfflineSignerOnlyAmino: (chainId: string) => OfflineSigner,
+  getOfflineSignerAuto: (
+    chainId: string
+  ) => Promise<OfflineSigner | OfflineDirectSigner>,
+  getEnigmaUtils: (chainId: string) => SecretUtils
+) {
+  if (!window.keplr) {
+    window.keplr = keplr;
+  }
+
+  if (!window.getOfflineSigner) {
+    window.getOfflineSigner = getOfflineSigner;
+  }
+  if (!window.getOfflineSignerOnlyAmino) {
+    window.getOfflineSignerOnlyAmino = getOfflineSignerOnlyAmino;
+  }
+  if (!window.getOfflineSignerAuto) {
+    window.getOfflineSignerAuto = getOfflineSignerAuto;
+  }
+  if (!window.getEnigmaUtils) {
+    window.getEnigmaUtils = getEnigmaUtils;
+  }
+}
