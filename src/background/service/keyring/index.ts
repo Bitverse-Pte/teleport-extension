@@ -208,8 +208,8 @@ class KeyringService extends EventEmitter {
    *
    * @returns {Promise<String>} the current account private key.
    */
-  public getPrivateKeyByAddress(address){
-    return this.secrets.find(s=> s.address === address)?.privateKey;
+  public getPrivateKeyByAddress(address) {
+    return this.secrets.find((s) => s.address === address)?.privateKey;
   }
 
   private _checkDuplicateAccount(

@@ -3,42 +3,41 @@ import { CosChainInfo } from './types';
 import { AccountSetBaseSuper } from './base';
 import networkPreferenceService from '../../network';
 
-const { rpcUrl, chainId, ecoSystemParams, prefix: bech32Config, coinType } = networkPreferenceService.getProviderConfig();
+const {
+  rpcUrl,
+  chainId,
+  ecoSystemParams,
+  prefix: bech32Config,
+  coinType,
+} = networkPreferenceService.getProviderConfig();
 const cosChainInfo = {
   rpc: rpcUrl,
   chainId,
   rest: ecoSystemParams?.rest,
   bech32Config,
-  coinType
+  coinType,
 } as CosChainInfo;
 
-const accountSetBase = new AccountSetBaseSuper(
-  chainId,
-  {
-    suggestChain: false,
-    autoInit: true
-  }
-);
-
+const accountSetBase = new AccountSetBaseSuper(chainId, {
+  suggestChain: false,
+  autoInit: true,
+});
 
 const cosmosAccountFn = CosmosAccount.use({
   msgOptsCreator: (chainId) => {
     // In certik, change the msg type of the MsgSend to "bank/MsgSend"
-    if (chainId.startsWith("shentu-")) {
+    if (chainId.startsWith('shentu-')) {
       return {
         send: {
           native: {
-            type: "bank/MsgSend",
+            type: 'bank/MsgSend',
           },
         },
       };
     }
 
     // In akash or sifchain, increase the default gas for sending
-    if (
-      chainId.startsWith("akashnet-") ||
-      chainId.startsWith("sifchain")
-    ) {
+    if (chainId.startsWith('akashnet-') || chainId.startsWith('sifchain')) {
       return {
         send: {
           native: {
@@ -48,7 +47,7 @@ const cosmosAccountFn = CosmosAccount.use({
       };
     }
 
-    if (chainId.startsWith("secret-")) {
+    if (chainId.startsWith('secret-')) {
       return {
         send: {
           native: {
@@ -62,20 +61,17 @@ const cosmosAccountFn = CosmosAccount.use({
     }
 
     // For terra related chains
-    if (
-      chainId.startsWith("bombay-") ||
-      chainId.startsWith("columbus-")
-    ) {
+    if (chainId.startsWith('bombay-') || chainId.startsWith('columbus-')) {
       return {
         send: {
           native: {
-            type: "bank/MsgSend",
+            type: 'bank/MsgSend',
           },
         },
       };
     }
 
-    if (chainId.startsWith("evmos_")) {
+    if (chainId.startsWith('evmos_')) {
       return {
         send: {
           native: {
@@ -88,7 +84,7 @@ const cosmosAccountFn = CosmosAccount.use({
       };
     }
 
-    if (chainId.startsWith("osmosis")) {
+    if (chainId.startsWith('osmosis')) {
       return {
         send: {
           native: {
@@ -101,7 +97,7 @@ const cosmosAccountFn = CosmosAccount.use({
       };
     }
 
-    if (chainId.startsWith("stargaze-")) {
+    if (chainId.startsWith('stargaze-')) {
       return {
         send: {
           native: {
@@ -114,7 +110,7 @@ const cosmosAccountFn = CosmosAccount.use({
       };
     }
   },
-})
+});
 
 const cosmosAccount = cosmosAccountFn(accountSetBase, cosChainInfo, chainId);
 

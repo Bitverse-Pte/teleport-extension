@@ -1,5 +1,6 @@
 import { MAINNET_CHAIN_ID } from 'constants/network';
 import TransactionController from './transactions/index';
+import cosmosTxController from './transactions/cosmos';
 import NetworkController, { NETWORK_EVENTS } from './network/index';
 import keyringController from './keyring';
 import { GasFeeController, ControllerMessenger } from '@metamask/controllers';
@@ -120,6 +121,7 @@ export {
   TokenService,
   latestBlockDataHub,
   contactBookService,
+  cosmosTxController,
 };
 
 async function newUnapprovedTransaction(txParams, req) {

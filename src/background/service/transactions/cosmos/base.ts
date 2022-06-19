@@ -1,16 +1,16 @@
-import { action, computed, makeObservable, observable } from "mobx";
-import { AppCurrency, KeplrSignOptions } from "@keplr-wallet/types";
+import { action, computed, makeObservable, observable } from 'mobx';
+import { AppCurrency, KeplrSignOptions } from '@keplr-wallet/types';
 // import { ChainGetter } from "./types";
-import { DenomHelper } from "@keplr-wallet/common";
-import { StdFee } from "@cosmjs/launchpad";
-import { evmosToEth } from "@tharsis/address-converter";
+import { DenomHelper } from '@keplr-wallet/common';
+import { StdFee } from '@cosmjs/launchpad';
+import { evmosToEth } from '@tharsis/address-converter';
 
 export enum WalletStatus {
-  NotInit = "NotInit",
-  Loading = "Loading",
-  Loaded = "Loaded",
-  NotExist = "NotExist",
-  Rejected = "Rejected",
+  NotInit = 'NotInit',
+  Loading = 'Loading',
+  Loaded = 'Loaded',
+  NotExist = 'NotExist',
+  Rejected = 'Rejected',
 }
 
 export interface MsgOpt {
@@ -39,13 +39,13 @@ export class AccountSetBase {
   protected _rejectionReason: Error | undefined;
 
   @observable
-  protected _name: string = "";
+  protected _name = '';
 
   @observable
-  protected _bech32Address: string = "";
+  protected _bech32Address = '';
 
   @observable
-  protected _txTypeInProgress: string = "";
+  protected _txTypeInProgress = '';
 
   protected pubKey: Uint8Array;
 
@@ -203,8 +203,8 @@ export class AccountSetBase {
     //   "keplr_keystorechange",
     //   this.handleInit
     // );
-    this._bech32Address = "";
-    this._name = "";
+    this._bech32Address = '';
+    this._name = '';
     this.pubKey = new Uint8Array(0);
   }
 
@@ -215,7 +215,7 @@ export class AccountSetBase {
   @computed
   get isReadyToSendTx(): boolean {
     return (
-      this.walletStatus === WalletStatus.Loaded && this.bech32Address !== ""
+      this.walletStatus === WalletStatus.Loaded && this.bech32Address !== ''
     );
   }
 
@@ -225,7 +225,7 @@ export class AccountSetBase {
   @computed
   get isReadyToSendMsgs(): boolean {
     return (
-      this.walletStatus === WalletStatus.Loaded && this.bech32Address !== ""
+      this.walletStatus === WalletStatus.Loaded && this.bech32Address !== ''
     );
   }
 
@@ -233,7 +233,7 @@ export class AccountSetBase {
     amount: string,
     currency: AppCurrency,
     recipient: string,
-    memo: string = "",
+    memo = '',
     stdFee: Partial<StdFee> = {},
     signOptions?: KeplrSignOptions,
     onTxEvents?:
@@ -298,7 +298,7 @@ export class AccountSetBase {
   }
 
   get hasEvmosHexAddress(): boolean {
-    return this.bech32Address.startsWith("evmos");
+    return this.bech32Address.startsWith('evmos');
   }
 
   get evmosHexAddress(): string {
