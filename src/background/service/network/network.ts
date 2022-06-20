@@ -1084,9 +1084,10 @@ class NetworkPreferenceService extends EventEmitter {
     });
     // add custom token
     await TokenService.addCustomToken({
-      symbol: newCosmosProvider.ticker as string,
-      name: '',
-      decimal: 18,
+      symbol: chainInfo.currencies[0].coinDenom,
+      name: chainInfo.currencies[0].coinDenom.toUpperCase(),
+      decimal: chainInfo.currencies[0].coinDecimals,
+      denom: chainInfo.currencies[0].coinDenom,
       chainCustomId: newCosmosProvider.id,
       isNative: true,
     });
