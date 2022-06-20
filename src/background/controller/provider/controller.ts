@@ -73,7 +73,7 @@ const switchChainValidation = ({
 }) => {
   const providers = networkPreferenceService.getAllProviders();
   const matchedProvider = providers.find((p) => {
-    return BigNumber.from(p.chainId).eq(chainParams.chainId);
+    return p.ecosystem == Ecosystem.EVM && BigNumber.from(p.chainId).eq(chainParams.chainId);
   });
   if (!matchedProvider) {
     throw ethErrors.provider.custom({
@@ -82,10 +82,10 @@ const switchChainValidation = ({
     });
   }
   const connected = permissionService.getConnectedSite(session.origin);
-  const { chainId: currentChainId } =
+  const { chainId: currentChainId, ecosystem } =
     networkPreferenceService.getProviderConfig();
   if (connected) {
-    if (BigNumber.from(chainParams.chainId).eq(currentChainId)) {
+    if (ecosystem == Ecosystem.EVM && BigNumber.from(chainParams.chainId).eq(currentChainId)) {
       return true;
     }
   }
@@ -368,10 +368,10 @@ class ProviderController extends BaseController {
       session,
     }) => {
       const connected = permissionService.getConnectedSite(session.origin);
-      const { chainId: currentChainId } =
+      const { chainId: currentChainId, ecosystem } =
         networkPreferenceService.getProviderConfig();
       if (connected) {
-        if (BigNumber.from(chainParams.chainId).eq(currentChainId)) {
+        if (ecosystem == Ecosystem.EVM && BigNumber.from(chainParams.chainId).eq(currentChainId)) {
           return true;
         }
       }
@@ -398,7 +398,7 @@ class ProviderController extends BaseController {
        * then they are treated as existed provider:
        * - Chain ID
        */
-      return BigNumber.from(p.chainId).eq(chainParams.chainId);
+      return p.ecosystem == Ecosystem.EVM && BigNumber.from(p.chainId).eq(chainParams.chainId);
     });
 
     if (matchedSameChainIdProvider) {
@@ -470,7 +470,7 @@ class ProviderController extends BaseController {
       console.debug('walletSwitchEthereumChain::chainParams:', chainParams);
       const providers = networkPreferenceService.getAllProviders();
       const matchedProvider = providers.find((p) => {
-        return BigNumber.from(p.chainId).eq(chainParams.chainId);
+        return p.ecosystem == Ecosystem.EVM && BigNumber.from(p.chainId).eq(chainParams.chainId);
       });
       if (!matchedProvider) {
         throw ethErrors.provider.custom({

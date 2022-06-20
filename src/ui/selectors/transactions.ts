@@ -24,6 +24,7 @@ import { RootState } from '../reducer';
 import { BigNumber } from 'ethers';
 import { pickBy } from 'lodash';
 import { transactionMatchesNetwork } from 'background/service/transactions/lib/util';
+import { Ecosystem } from 'types/network';
 // import { getSelectedAddress } from '.';
 
 export const unapprovedTxsSelector = (state: RootState) => {
@@ -57,9 +58,11 @@ export const unapprovedMsgsSelector = (state: RootState) => ({});
 // state.metamask.unapprovedMsgs;
 export const currentNetworkTxListSelector = (state: RootState) => {
   // state.metamask.currentNetworkTxList;
-  const { chainId } = state.network.provider;
+  const { chainId, ecosystem } = state.network.provider;
   return Object.values(state.transactions).filter((tx) => {
-    return BigNumber.from(tx.chainId).eq(chainId);
+    const isEVMTx = ecosystem == Ecosystem.EVM && BigNumber.from(tx.chainId).eq(chainId);
+    const isOtherTx = tx.chainId == chainId;
+    return isEVMTx || isOtherTx;
   });
 };
 export const unapprovedPersonalMsgsSelector = (state: RootState) => ({});
