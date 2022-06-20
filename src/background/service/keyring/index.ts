@@ -206,7 +206,9 @@ class KeyringService extends EventEmitter {
   ): boolean {
     return this.accounts.some(
       (a: BaseAccount) =>
-        a.address === address && accountCreateType === a.accountCreateType && (customChainId ? a.chainCustomId === customChainId : true)
+        a.address === address &&
+        accountCreateType === a.accountCreateType &&
+        (customChainId ? a.chainCustomId === customChainId : true)
     );
   }
 
@@ -471,7 +473,7 @@ class KeyringService extends EventEmitter {
           if (
             this._checkDuplicateAccount(
               keyPair.address,
-              AccountCreateType.MNEMONIC,
+              AccountCreateType.MNEMONIC
             )
           ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
