@@ -461,7 +461,7 @@ export const defaultNetworks: {
     ecosystem: Ecosystem.COSMOS,
     prefix: Bech32Address.defaultBech32Config('kava'),
     ecoSystemParams: {
-      rest: 'https://api.data.kava.io/',
+      rest: 'https://api.data.kava.io',
       stakeCurrency: {
         coinDenom: 'KAVA',
         coinMinimalDenom: 'ukava',

@@ -108,7 +108,9 @@ const AddChain = ({ params }: { params: AddChainProps }) => {
    * - is same ChainId
    */
   const findMatchedChain = useCallback(
-    (chain: Provider) => BigNumber.from(chain.chainId).eq(data.chainId),
+    (chain: Provider) =>
+      chain.ecosystem == Ecosystem.EVM &&
+      BigNumber.from(chain.chainId).eq(data.chainId),
     [data]
   );
 
