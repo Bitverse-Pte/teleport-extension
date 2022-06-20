@@ -8,3 +8,4 @@ export { default as Connect4Cosmos } from './Connect4Cosmos';
 export { default as AddChain } from './AddChain';
 export { default as AddToken } from './AddToken';
 export { default as AddCosmosChain } from './AddCosmosChain';
+export { default as SignCosmTx } from './SignCosmTx';
