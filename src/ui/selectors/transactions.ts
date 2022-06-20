@@ -60,7 +60,8 @@ export const currentNetworkTxListSelector = (state: RootState) => {
   // state.metamask.currentNetworkTxList;
   const { chainId, ecosystem } = state.network.provider;
   return Object.values(state.transactions).filter((tx) => {
-    const isEVMTx = ecosystem == Ecosystem.EVM && BigNumber.from(tx.chainId).eq(chainId);
+    const isEVMTx =
+      ecosystem == Ecosystem.EVM && BigNumber.from(tx.chainId).eq(chainId);
     const isOtherTx = tx.chainId == chainId;
     return isEVMTx || isOtherTx;
   });
