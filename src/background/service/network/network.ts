@@ -759,23 +759,49 @@ class NetworkPreferenceService extends EventEmitter {
     const currentAccount: BaseAccount | null | undefined =
       preferenceService.getCurrentAccount();
     if (!currentAccount) throw Error('current account not found');
-    const { accountCreateType, hdWalletId, hdPathIndex } = currentAccount;
+    const { accountCreateType, hdWalletId, hdPathIndex, ecosystem } =
+      currentAccount;
     if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
       if (chain.ecosystem === Ecosystem.EVM) {
-        const evmAccounts: BaseAccount[] = allAccounts.filter(
+        let evmAccounts: BaseAccount[];
+        evmAccounts = allAccounts.filter(
           (a: BaseAccount) =>
             a.ecosystem === Ecosystem.EVM &&
-            a.accountCreateType === AccountCreateType.MNEMONIC
+            a.accountCreateType === AccountCreateType.PRIVATE_KEY
         );
-        if (evmAccounts && evmAccounts.length > 0) {
+        if (evmAccounts?.length > 0) {
+          preferenceService.setCurrentAccount(evmAccounts[0]);
+        } else {
+          evmAccounts = allAccounts.filter(
+            (a: BaseAccount) =>
+              a.ecosystem === Ecosystem.EVM &&
+              a.accountCreateType === AccountCreateType.MNEMONIC
+          );
           preferenceService.setCurrentAccount(evmAccounts[0]);
         }
       } else {
-        const accounts: BaseAccount[] = allAccounts.filter(
-          (a: BaseAccount) =>
-            a.chainCustomId === chain.id &&
-            a.accountCreateType === AccountCreateType.MNEMONIC
-        );
+        let accounts: BaseAccount[];
+        if (currentAccount.ecosystem === Ecosystem.EVM) {
+          accounts = allAccounts.filter(
+            (a: BaseAccount) =>
+              a.chainCustomId === chain.id &&
+              a.accountCreateType === AccountCreateType.PRIVATE_KEY
+          );
+          if (accounts?.length === 0) {
+            accounts = allAccounts.filter(
+              (a: BaseAccount) =>
+                a.chainCustomId === chain.id &&
+                a.accountCreateType === AccountCreateType.MNEMONIC
+            );
+          }
+        } else {
+          accounts = allAccounts.filter(
+            (a: BaseAccount) =>
+              a.hdWalletId === currentAccount.hdWalletId &&
+              a.chainCustomId === chain.id
+          );
+        }
+
         if (accounts && accounts.length > 0) {
           preferenceService.setCurrentAccount(accounts[0]);
         }

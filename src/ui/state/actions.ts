@@ -275,5 +275,5 @@ export function closeNotificationPopup() {
 }
 
 export function getTokenBalancesSync() {
-  return background.getTokenBalancesSync(true);
+  return background.getTokenBalancesSync();
 }
