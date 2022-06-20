@@ -21,7 +21,7 @@ import importImg from 'assets/importImg.svg';
 import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
-//import { coinTypeToIconSVG } from 'ui/utils/networkCategoryToIcon';
+import { ecosystemToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 import BitError from 'error';
@@ -323,7 +323,7 @@ const WalletManage: React.FC = () => {
               {(accountType === Tabs.FIRST
                 ? hdWalletAccounts
                 : simpleWalletAccounts
-              ).map((w: BaseAccount | any, i: number) => (
+              ).map((w: HdAccountStruct, i: number) => (
                 <div
                   className={`item flexR ${
                     currentAccount?.hdWalletId === w?.hdWalletId
@@ -345,16 +345,13 @@ const WalletManage: React.FC = () => {
                     <div
                       className="circle-wrap flexR"
                       style={{
-                        display:
-                          w?.accountCreateType === AccountCreateType.PRIVATE_KEY
-                            ? 'flex'
-                            : 'none',
+                        display: accountType === Tabs.SECOND ? 'flex' : 'none',
                       }}
                     >
-                      {/* <img
-                        src={coinTypeToIconSVG(w?.coinType)}
+                      <img
+                        src={ecosystemToIconSVG(w?.accounts[0]?.ecosystem)}
                         className="circle-ecosystem-icon"
-                      /> */}
+                      />
                     </div>
                   </div>
                   <div className="right flexR">
