@@ -23,6 +23,7 @@ export interface AddTokenOpts {
   chainCustomId: string;
   contractAddress?: string;
   isNative: boolean;
+  denom?: string;
 }
 
 export interface ITokenStore {
