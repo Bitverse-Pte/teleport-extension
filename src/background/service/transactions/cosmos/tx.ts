@@ -73,9 +73,9 @@ export const CosmosAccount = {
 
       return {
         cosmos: new CosmosAccountImpl(
-          base,
-          cosChainInfo,
-          chainId,
+          // base,
+          // cosChainInfo,
+          // chainId,
           // options.queriesStore,
           deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
             defaultCosmosMsgOpts,
@@ -146,9 +146,9 @@ export class CosmosAccountImpl {
   public broadcastMode: 'sync' | 'async' | 'block' = 'sync';
 
   constructor(
-    protected readonly base: AccountSetBaseSuper,
-    protected readonly cosChainInfo: CosChainInfo,
-    protected readonly chainId: string,
+    // protected readonly base: AccountSetBaseSuper,
+    // protected readonly cosChainInfo: CosChainInfo,
+    // protected readonly chainId: string,
     // protected readonly queriesStore: IQueriesStore<CosmosQueries>,
     protected readonly _msgOpts: CosmosMsgOpts,
     protected readonly txOpts: {
@@ -160,7 +160,7 @@ export class CosmosAccountImpl {
       };
     }
   ) {
-    this.base.registerSendTokenFn(this.processSendToken.bind(this));
+    // this.base.registerSendTokenFn(this.processSendToken.bind(this));
   }
 
   get msgOpts(): CosmosMsgOpts {
@@ -182,9 +182,23 @@ export class CosmosAccountImpl {
         }
   ): Promise<boolean> {
     const denomHelper = new DenomHelper(currency.coinMinimalDenom);
+    const {
+      rpcUrl,
+      chainId,
+      ecoSystemParams,
+      prefix: bech32Config,
+      coinType,
+    } = networkPreferenceService.getProviderConfig();
+    const cosChainInfo = {
+      rpc: rpcUrl,
+      chainId,
+      rest: ecoSystemParams?.rest,
+      bech32Config,
+      coinType,
+    } as CosChainInfo;
 
     const hexAdjustedRecipient = (recipient: string) => {
-      const bech32prefix = this.cosChainInfo.bech32Config.bech32PrefixAccAddr;
+      const bech32prefix = cosChainInfo.bech32Config.bech32PrefixAccAddr;
       if (bech32prefix === 'evmos' && recipient.startsWith('0x')) {
         // Validate hex address
         if (!isAddress(recipient)) {
@@ -199,6 +213,10 @@ export class CosmosAccountImpl {
       return recipient;
     };
 
+    const k = keyringService.getKeplrCompatibleKey(chainId);
+    if (!k) throw Error('no key found');
+    const { bech32Address, pubKey } = k;
+
     switch (denomHelper.type) {
       case 'native':
         const actualAmount = (() => {
@@ -210,7 +228,7 @@ export class CosmosAccountImpl {
         const msg = {
           type: this.msgOpts.send.native.type,
           value: {
-            from_address: this.base.bech32Address,
+            from_address: bech32Address,
             to_address: hexAdjustedRecipient(recipient),
             amount: [
               {
@@ -223,6 +241,7 @@ export class CosmosAccountImpl {
 
         await this.sendMsgs(
           'send',
+          cosChainInfo,
           {
             aminoMsgs: [msg],
             protoMsgs: [
@@ -267,6 +286,7 @@ export class CosmosAccountImpl {
 
   async sendMsgs(
     type: string | 'unknown',
+    cosChainInfo: CosChainInfo,
     msgs:
       | ProtoMsgsOrWithAminoMsgs
       | (() => Promise<ProtoMsgsOrWithAminoMsgs> | ProtoMsgsOrWithAminoMsgs),
@@ -281,7 +301,7 @@ export class CosmosAccountImpl {
           onFulfill?: (tx: any) => void;
         }
   ) {
-    this.base.setTxTypeInProgress(type);
+    // this.base.setTxTypeInProgress(type);
 
     let txHash: Uint8Array;
     let signDoc: StdSignDoc;
@@ -291,6 +311,7 @@ export class CosmosAccountImpl {
       }
 
       const result = await this.broadcastMsgs(
+        cosChainInfo,
         msgs,
         fee,
         memo,
@@ -300,10 +321,10 @@ export class CosmosAccountImpl {
       txHash = result.txHash;
       signDoc = result.signDoc;
     } catch (e: any) {
-      this.base.setTxTypeInProgress('');
+      // this.base.setTxTypeInProgress('');
 
       if (this.txOpts.preTxEvents?.onBroadcastFailed) {
-        this.txOpts.preTxEvents.onBroadcastFailed(this.chainId, e);
+        this.txOpts.preTxEvents.onBroadcastFailed(cosChainInfo.chainId, e);
       }
 
       if (
@@ -330,23 +351,19 @@ export class CosmosAccountImpl {
     }
 
     if (this.txOpts.preTxEvents?.onBroadcasted) {
-      this.txOpts.preTxEvents.onBroadcasted(this.chainId, txHash);
+      this.txOpts.preTxEvents.onBroadcasted(cosChainInfo.chainId, txHash);
     }
     if (onBroadcasted) {
       onBroadcasted(txHash);
     }
 
-    const txTracer = new TendermintTxTracer(
-      this.cosChainInfo.rpc,
-      '/websocket',
-      {
-        wsObject: this.txOpts.wsObject,
-      }
-    );
+    const txTracer = new TendermintTxTracer(cosChainInfo.rpc, '/websocket', {
+      wsObject: this.txOpts.wsObject,
+    });
     txTracer.traceTx(txHash).then((tx) => {
       txTracer.close();
 
-      this.base.setTxTypeInProgress('');
+      // this.base.setTxTypeInProgress('');
 
       // After sending tx, the balances is probably changed due to the fee.
       /*for (const feeAmount of signDoc.fee.amount) {
@@ -367,7 +384,7 @@ export class CosmosAccountImpl {
       }
 
       if (this.txOpts.preTxEvents?.onFulfill) {
-        this.txOpts.preTxEvents.onFulfill(this.chainId, tx);
+        this.txOpts.preTxEvents.onFulfill(cosChainInfo.chainId, tx);
       }
 
       if (onFulfill) {
@@ -377,6 +394,7 @@ export class CosmosAccountImpl {
   }
   // Return the tx hash.
   protected async broadcastMsgs(
+    cosChainInfo: CosChainInfo,
     msgs: ProtoMsgsOrWithAminoMsgs,
     fee: StdFee,
     memo = '',
@@ -386,9 +404,10 @@ export class CosmosAccountImpl {
     txHash: Uint8Array;
     signDoc: StdSignDoc;
   }> {
-    if (this.base.walletStatus !== WalletStatus.Loaded) {
-      throw new Error(`Wallet is not loaded: ${this.base.walletStatus}`);
-    }
+    // TODO: add if
+    // if (this.base.walletStatus !== WalletStatus.Loaded) {
+    //   throw new Error(`Wallet is not loaded: ${this.base.walletStatus}`);
+    // }
 
     const aminoMsgs: Msg[] = msgs.aminoMsgs;
     // fixed type error: const protoMsgs: Any[] = msgs.protoMsgs;
@@ -403,13 +422,22 @@ export class CosmosAccountImpl {
       throw new Error('The length of aminoMsgs and protoMsgs are different');
     }
 
-    const account = await BaseAccount.fetchFromRest(
-      this.instance,
-      this.base.bech32Address,
-      true
+    const k = keyringService.getKeplrCompatibleKey(cosChainInfo.chainId);
+    if (!k) throw Error('no key found');
+    const { bech32Address, pubKey } = k;
+
+    const { account } = await this.getAccounts(
+      cosChainInfo.rest,
+      bech32Address
     );
 
-    const coinType = this.cosChainInfo.coinType;
+    // const account = await BaseAccount.fetchFromRest(
+    //   this.instance(cosChainInfo),
+    //   bech32Address,
+    //   true
+    // );
+
+    const coinType = cosChainInfo.coinType;
 
     // TODO: need remove keplr
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -418,16 +446,16 @@ export class CosmosAccountImpl {
     const signDoc = makeSignDoc(
       aminoMsgs,
       fee,
-      this.chainId,
+      cosChainInfo.chainId,
       memo,
-      account.getAccountNumber().toString(),
-      account.getSequence().toString()
+      account.account_number,
+      account.sequence
     );
 
     // TODO: need remove keplr
     const signResponse = await this.requestSignAmino(
-      this.chainId,
-      this.base.bech32Address,
+      cosChainInfo.chainId,
+      bech32Address,
       signDoc,
       signOptions as KeplrSignOptions
     );
@@ -483,11 +511,7 @@ export class CosmosAccountImpl {
 
     return {
       // TODO: need remove keplr
-      txHash: await this.sendTx(
-        this.cosChainInfo,
-        signedTx,
-        mode as BroadcastMode
-      ),
+      txHash: await this.sendTx(cosChainInfo, signedTx, mode as BroadcastMode),
       signDoc: signResponse.signed,
     };
   }
@@ -537,27 +561,27 @@ export class CosmosAccountImpl {
   //   return this.queriesStore.get(this.chainId);
   // }
 
-  get instance(): AxiosInstance {
-    const chainInfo = this.cosChainInfo;
-    return Axios.create({
-      ...{
-        baseURL: chainInfo.rest,
-      },
-      ...chainInfo.restConfig,
-    });
-  }
+  // instance(cosChainInfo: CosChainInfo): AxiosInstance {
+  //   const chainInfo = cosChainInfo;
+  //   return Axios.create({
+  //     ...{
+  //       baseURL: chainInfo.rest,
+  //     },
+  //     ...chainInfo.restConfig,
+  //   });
+  // }
   async sendTx(
     cosChainInfo: CosChainInfo,
     tx: unknown,
     mode: 'async' | 'sync' | 'block'
   ): Promise<Uint8Array> {
     const chainInfo = cosChainInfo;
-    const restInstance = Axios.create({
-      ...{
-        baseURL: chainInfo.rest,
-      },
-      ...chainInfo.restConfig,
-    });
+    // const restInstance = Axios.create({
+    //   ...{
+    //     baseURL: chainInfo.rest,
+    //   },
+    //   ...chainInfo.restConfig,
+    // });
 
     // this.notification.create({
     //   iconRelativeUrl: "assets/temp-icon.svg",
@@ -589,12 +613,24 @@ export class CosmosAccountImpl {
         };
 
     try {
-      const result = await restInstance.post(
-        isProtoTx ? '/cosmos/tx/v1beta1/txs' : '/txs',
-        params
-      );
+      const fetchUrl = isProtoTx
+        ? `${chainInfo.rest}/cosmos/tx/v1beta1/txs`
+        : `${chainInfo.rest}/txs`;
+      const result = await fetch(fetchUrl, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        body: JSON.stringify(params),
+      }).then((res) => res.json());
+      console.log('--------result--------', result);
+      // const result = await restInstance.post(
+      //   isProtoTx ? '/cosmos/tx/v1beta1/txs' : '/txs',
+      //   params
+      // );
 
-      const txResponse = isProtoTx ? result.data['tx_response'] : result.data;
+      const txResponse = isProtoTx ? result['tx_response'] : result;
 
       if (txResponse.code != null && txResponse.code !== 0) {
         throw new Error(txResponse['raw_log']);
@@ -724,5 +760,14 @@ export class CosmosAccountImpl {
     } finally {
       // this.interactionService.dispatchEvent(APP_PORT, "request-sign-end", {});
     }
+  }
+  async getAccounts(baseURL, address) {
+    return await fetch(`${baseURL}/cosmos/auth/v1beta1/accounts/${address}`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+    }).then((res) => res.json());
   }
 }

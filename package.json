@@ -21,6 +21,7 @@
     "pub": "node build/release.js"
   },
   "dependencies": {
+    "@cosmjs/encoding": "^0.28.7",
     "@cosmjs/launchpad": "^0.27.1",
     "@ethereumjs/common": "^2.5.0",
     "@ethereumjs/tx": "^3.3.2",

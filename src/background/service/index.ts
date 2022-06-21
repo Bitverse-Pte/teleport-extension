@@ -1,6 +1,6 @@
 import { MAINNET_CHAIN_ID } from 'constants/network';
 import TransactionController from './transactions/index';
-import cosmosTxController from './transactions/cosmos';
+import cosmosTxFn from './transactions/cosmos';
 import NetworkController, { NETWORK_EVENTS } from './network/index';
 import keyringController from './keyring';
 import { GasFeeController, ControllerMessenger } from '@metamask/controllers';
@@ -104,6 +104,8 @@ latestBlockDataHub.store.subscribe(({ isBaseFeePerGasExist }) => {
     isBaseFeePerGasExist
   );
 });
+
+const cosmosTxController = cosmosTxFn(networkPreferenceService);
 
 export {
   txController,
