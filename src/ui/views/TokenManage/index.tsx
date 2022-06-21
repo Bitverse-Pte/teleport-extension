@@ -124,15 +124,15 @@ const TokenManage = () => {
   });
 
   const handleNextBtnClick = async () => {
-    if (!isValidAddress(contractAddress)) {
+    /* if (!isValidAddress(contractAddress)) {
       ClickToCloseMessage.error({
         content: 'Invalid contract address',
         key: 'Invalid contract address',
       });
       return;
-    }
+    } */
     if (!contractAddress) return;
-    queryToken(currentChain?.rpcUrl, contractAddress);
+    queryToken(currentChain?.id, contractAddress);
   };
 
   return (

@@ -517,7 +517,11 @@ class TokenService {
     });
   }
 
-  async queryToken(address, rpc, contractAddress): Promise<ERC20Struct> {
+  async queryEvmERC20Token(
+    address,
+    rpc,
+    contractAddress
+  ): Promise<ERC20Struct> {
     const account = await networkPreferenceService
       .getCurrentEth()
       .getCode(address);
@@ -557,6 +561,56 @@ class TokenService {
       }
     }
     return Promise.resolve(token);
+  }
+
+  async queryCosWasmCW20Token(
+    address,
+    urlPrefix,
+    contractAddress
+  ): Promise<ERC20Struct> {
+    const token: ERC20Struct = {
+      name: '',
+      symbol: '',
+      decimals: 0,
+      balanceOf: 0,
+    };
+    const tokenInfoObj = {
+      token_info: {},
+    };
+    const msg = JSON.stringify(tokenInfoObj);
+    const query = Buffer.from(msg).toString('base64');
+    const url = `${urlPrefix}/cosmwasm/wasm/v1/contract/${contractAddress}/smart/${query}`;
+    const res = await fetch(url)
+      .then((res) => res.json())
+      .catch((e) => console.error(e));
+    if (res) {
+      token.name = res.data.name;
+      token.symbol = res.data.symbol;
+      token.decimals = res.data.decimals;
+      token.totalSupply = res.data.total_supply;
+    }
+    return Promise.resolve(token);
+  }
+
+  queryToken(address, chainCustomId, contractAddress) {
+    const chains = networkPreferenceService.getAllProviders();
+    const chain = chains.find((c: Provider) => c.id === chainCustomId);
+    if (chain) {
+      switch (chain.ecosystem) {
+        case Ecosystem.EVM:
+          return this.queryEvmERC20Token(
+            address,
+            chain.rpcUrl,
+            contractAddress
+          );
+        case Ecosystem.COSMOS:
+          return this.queryCosWasmCW20Token(
+            address,
+            chain.ecoSystemParams!.rest,
+            contractAddress
+          );
+      }
+    }
   }
 
   changeCustomTokenProfile(chainCustomId: string, data: Partial<Token>) {

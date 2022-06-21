@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Provider } from 'types/network';
+import { Ecosystem, Provider, VmEnums } from 'types/network';
 import { IdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 import { IconComponent } from '../IconComponents';
 import { useAsyncEffect, useWallet } from 'ui/utils';
@@ -32,7 +32,15 @@ export default (props: ChainSelectProps) => {
     });
     console.log('chain list', chainList);
     if (chainList) {
-      setChains(chainList);
+      setChains(
+        chainList.filter((c: Provider) => {
+          return (
+            c.ecosystem === Ecosystem.EVM ||
+            (c.ecosystem === Ecosystem.COSMOS &&
+              c.ecoSystemParams?.features?.includes(VmEnums.COSM_WASM))
+          );
+        })
+      );
     }
   };
 

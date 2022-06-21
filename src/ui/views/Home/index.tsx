@@ -38,7 +38,7 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import ConnectedSites from '../ConnectedSites';
-import { Ecosystem, Provider } from 'types/network';
+import { Ecosystem, Provider, VmEnums } from 'types/network';
 import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
 import { ErrorCode } from 'constants/code';
@@ -367,7 +367,10 @@ const Home = () => {
                   placeholder="Search"
                 />
               </div>
-              {currentChain.ecosystem === Ecosystem.EVM ? (
+              {currentChain.ecosystem === Ecosystem.EVM ||
+              currentChain.ecoSystemParams?.features?.includes(
+                VmEnums.COSM_WASM
+              ) ? (
                 <img
                   onClick={handleAddTokenBtnClick}
                   src={AddTokenImg}
