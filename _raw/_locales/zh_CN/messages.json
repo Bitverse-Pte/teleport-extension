@@ -332,6 +332,9 @@
   "doYouAllowSiteToAddNetwork" : {
     "message": "是否允许该站点添加网络?"
   },
+  "existedChain": {
+    "message": "你所添加的网络已存在！"
+  },
   "doYouAllowSiteToSwitchNetwork" : {
     "message": "是否允许该站点切换网络?"
   },

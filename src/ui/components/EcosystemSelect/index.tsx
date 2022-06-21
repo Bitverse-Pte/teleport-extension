@@ -53,7 +53,7 @@ export default (props: EcosystemSelectProps) => {
             name: c.ecosystem,
             ecosystem: c.ecosystem,
           };
-          if (c.coinType === CoinType.ETH) {
+          if (c.ecosystem === Ecosystem.EVM) {
             tempEco.originChainId = PresetNetworkId.ETHEREUM;
           } else {
             switch (c.id) {
@@ -66,7 +66,7 @@ export default (props: EcosystemSelectProps) => {
           //Only need one time for EVM
           if (
             ecos.some((e: EcosystemChains) => e.ecosystem === Ecosystem.EVM) &&
-            c.coinType === CoinType.ETH
+            c.ecosystem === Ecosystem.EVM
           )
             return;
           const selectEco = ecos.find(

@@ -178,7 +178,7 @@ class KeyringService extends EventEmitter {
     return this.accounts.some((a: BaseAccount) => a.hdWalletName === name);
   }
 
-  private _checkDuplicatePrivateKeyWalletName(
+  /* private _checkDuplicatePrivateKeyWalletName(
     name: string,
     chainCustomId: PresetNetworkId | string
   ): boolean {
@@ -197,7 +197,7 @@ class KeyringService extends EventEmitter {
         }
       }
     });
-  }
+  } */
 
   /**
    * Get Private Key
@@ -214,11 +214,14 @@ class KeyringService extends EventEmitter {
 
   private _checkDuplicateAccount(
     address: string,
-    accountCreateType: AccountCreateType
+    accountCreateType: AccountCreateType,
+    customChainId?: PresetNetworkId | string
   ): boolean {
     return this.accounts.some(
       (a: BaseAccount) =>
-        a.address === address && accountCreateType === a.accountCreateType
+        a.address === address &&
+        accountCreateType === a.accountCreateType &&
+        (customChainId ? a.chainCustomId === customChainId : true)
     );
   }
 
@@ -986,7 +989,7 @@ class KeyringService extends EventEmitter {
 
   async getCurrentChainAccounts(): Promise<BaseAccount[]> {
     const currentChain: Provider = networkPreferenceService.getProviderConfig();
-    const { coinType, id } = currentChain;
+    const { ecosystem, id } = currentChain;
     const currentAccount = preference.getCurrentAccount();
     let accounts: BaseAccount[] = [];
     if (!currentAccount) {
@@ -994,8 +997,9 @@ class KeyringService extends EventEmitter {
     }
 
     accounts = this.accounts.filter((a: BaseAccount) =>
-      coinType === CoinType.ETH
-        ? a.coinType === coinType && a.hdWalletId === currentAccount.hdWalletId
+      ecosystem === Ecosystem.EVM
+        ? a.ecosystem === Ecosystem.EVM &&
+          a.hdWalletId === currentAccount.hdWalletId
         : a.hdWalletId === currentAccount.hdWalletId && a.chainCustomId === id
     );
     return Promise.resolve(accounts);
@@ -1372,7 +1376,8 @@ class KeyringService extends EventEmitter {
                 if (
                   this._checkDuplicateAccount(
                     keyPair.address,
-                    AccountCreateType.MNEMONIC
+                    AccountCreateType.MNEMONIC,
+                    chain.id
                   )
                 ) {
                   return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
@@ -1445,7 +1450,8 @@ class KeyringService extends EventEmitter {
               if (
                 this._checkDuplicateAccount(
                   keyPair.address,
-                  AccountCreateType.PRIVATE_KEY
+                  AccountCreateType.PRIVATE_KEY,
+                  chain.id
                 )
               ) {
                 return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));

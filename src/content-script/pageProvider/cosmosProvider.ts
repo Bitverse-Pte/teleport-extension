@@ -109,25 +109,32 @@ export class CosmosProvider extends EventEmitter implements Keplr {
     this._requestPromise.check(2);
     return this._requestPromise.call(() => {
       log('[request]', JSON.stringify(proxyMessage, null, 2));
-      this._bcm
+      return this._bcm
         .request(proxyMessage)
         .then((res) => {
-          log('[response: success]', proxyMessage.method, res);
-          return res;
+          const result = JSONUint8Array.unwrap(res);
+          log('[response: success]', proxyMessage.method, result);
+          return result;
         })
         .catch((err) => {
-          log('[response: error]', proxyMessage.method, err);
-          return err;
+          const result = JSONUint8Array.unwrap(err);
+          log('[response: error]', proxyMessage.method, result);
+          return result;
         });
     });
   };
 
   async getKey(chainId: string): Promise<Key> {
+    console.log('=====CosmosProvider.getKey=====');
     return await this.requestMethod('getKey', [chainId]);
   }
 
   async enable(chainIds: string | string[]): Promise<void> {
     await this.requestMethod('enable', [chainIds]);
+  }
+
+  some() {
+    console.log('this:', this);
   }
 
   getOfflineSigner(chainId: string): OfflineSigner & OfflineDirectSigner {

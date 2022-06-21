@@ -95,7 +95,7 @@ class TokenService {
       symbol: tokenParams.symbol,
       decimal: tokenParams.decimal,
       name: tokenParams.name,
-      denom: '',
+      denom: tokenParams.denom || '',
       icon: '',
       chainCustomId: tokenParams.chainCustomId,
       isNative: tokenParams.isNative,

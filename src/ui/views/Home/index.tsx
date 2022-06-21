@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { cloneDeep } from 'lodash';
 import { useHistory } from 'react-router-dom';
 import Jazzicon from 'react-jazzicon';
@@ -74,10 +74,16 @@ const Home = () => {
     if (balances && balances.length) setTokens(balances);
   };
 
+  const intervalRef = useRef<any>(null);
+
+  const setBalanceQueryInterval = () => {
+    intervalRef.current = setInterval(getTokenBalancesAsync, 15000);
+  };
+
   useEffect(() => {
-    const timer = setInterval(getTokenBalancesAsync, 15000);
-    return () => clearInterval(timer);
-  }, []);
+    setBalanceQueryInterval();
+    return () => clearInterval(intervalRef.current);
+  }, [currentChain]);
 
   const queryTokenPrices = async () => {
     const prices = await wallet.queryTokenPrices().catch((e) => {

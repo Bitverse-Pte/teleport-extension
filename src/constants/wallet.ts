@@ -29,22 +29,18 @@ export enum TipButtonEnum {
   LOCK,
 }
 
-export const CoinTypeEcosystemMapping: {
+export const ecosystemMapping: {
   [key in keyof typeof Ecosystem]: {
-    coinType: CoinType[];
     ecosystemName: string;
   };
 } = {
   [Ecosystem.EVM]: {
-    coinType: [CoinType.ETH],
     ecosystemName: 'EVM Networks',
   },
   [Ecosystem.COSMOS]: {
-    coinType: [CoinType.COSMOS, CoinType.SECRET_NETWORK],
     ecosystemName: 'Cosmos Networks',
   },
   [Ecosystem.POLKADOT]: {
-    coinType: [CoinType.POLKADOT],
     ecosystemName: 'Polkadot Networks',
   },
 };

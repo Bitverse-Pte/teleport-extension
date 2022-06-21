@@ -11,14 +11,15 @@ import KavaIconB from 'assets/chain/with-border/kava.svg';
 import OsomosisIconB from 'assets/chain/with-border/osmo.svg';
 import JunoIconB from 'assets/chain/with-border/juno.svg';
 import ScrtIconB from 'assets/chain/with-border/scrt.svg';
+import UmeeIconB from 'assets/chain/with-border/umee.svg';
+import EvmOSIconB from 'assets/chain/with-border/evmos.svg';
 import ArbitrumIcon from 'assets/chain/arbitrum.svg';
 import MaticIcon from 'assets/tokens/matic.svg';
 import CosmosAtomIcon from 'assets/tokens/atom.svg';
 import DefaulutIcon from 'assets/tokens/default.svg';
 import { BigNumber } from 'ethers';
 import { PresetNetworkId } from 'constants/defaultNetwork';
-import { CoinType, Ecosystem } from 'types/network';
-import { CoinTypeEcosystemMapping } from 'constants/wallet';
+import { Ecosystem } from 'types/network';
 
 export function categoryToIconSVG(category?: string): string | undefined {
   switch (category) {
@@ -80,8 +81,10 @@ export function IdToChainLogoSVG(id: PresetNetworkId | string) {
       return JunoIconB;
 
     // @todo: add new case here
-    // case PresetNetworkId.EVMOS:
-    // case PresetNetworkId.UMEE:
+    case PresetNetworkId.EVMOS:
+      return EvmOSIconB;
+    case PresetNetworkId.UMEE:
+      return UmeeIconB;
 
     // @todo: is there a better icon other than this?
     default:
@@ -128,24 +131,6 @@ export function ChainIdToChainLogoSVG(_chainId: string) {
 }
 
 export function ecosystemToIconSVG(ecosystem: Ecosystem) {
-  switch (ecosystem) {
-    case Ecosystem.EVM:
-      return EthIconB;
-    case Ecosystem.COSMOS:
-      return CosmosAtomIcon;
-    case Ecosystem.POLKADOT:
-      return EthIconB;
-    default:
-      return EthIconB;
-  }
-}
-export function coinTypeToIconSVG(coinType: CoinType) {
-  let ecosystem;
-  for (const eco in CoinTypeEcosystemMapping) {
-    if (CoinTypeEcosystemMapping[eco].coinType.includes(coinType)) {
-      ecosystem = eco;
-    }
-  }
   switch (ecosystem) {
     case Ecosystem.EVM:
       return EthIconB;

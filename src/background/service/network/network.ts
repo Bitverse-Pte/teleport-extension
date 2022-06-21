@@ -59,7 +59,7 @@ import { ComposedStorage } from 'background/utils/obsComposeStore';
 import { nanoid } from 'nanoid';
 import { parseStringTemplate } from 'utils/string';
 import { addHexPrefix } from 'ethereumjs-util';
-import { BaseAccount } from 'types/extend';
+import { AccountCreateType, BaseAccount } from 'types/extend';
 // import { ChainUpdaterService, InteractionService } from '../cosmos';
 import { ChainIdHelper } from 'utils/cosmos/chainId';
 import { CosmosChainInfo } from 'types/cosmos';
@@ -723,11 +723,19 @@ class NetworkPreferenceService extends EventEmitter {
     copiedConfig.rpcUrl = parseStringTemplate(copiedConfig.rpcUrl, {
       INFURA_API_KEY: process.env.INFURA_PROJECT_ID as string,
     });
+    if (
+      !(
+        this.getProviderConfig().ecosystem === Ecosystem.EVM &&
+        config.ecosystem === Ecosystem.EVM
+      )
+    ) {
+      this._setDestinationChainAccount(config);
+    }
     this.networkStore.updateState({
       previousProviderStore: this.getProviderConfig(),
       provider: copiedConfig,
     });
-    this._setDestinationChainAccount(config);
+
     if (config.ecosystem === Ecosystem.EVM) {
       /**
        * Only trigger this fn when provider is EVM ecosystem
@@ -739,9 +747,9 @@ class NetworkPreferenceService extends EventEmitter {
   private _checkAccountExistWithChain(chain: Provider): boolean {
     const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
     return (
-      (chain.coinType === CoinType.ETH &&
-        allAccounts.some((a: BaseAccount) => a.coinType === CoinType.ETH)) ||
-      (chain.coinType !== CoinType.ETH &&
+      (chain.ecosystem === Ecosystem.EVM &&
+        allAccounts.some((a: BaseAccount) => a.ecosystem === Ecosystem.EVM)) ||
+      (chain.ecosystem !== Ecosystem.EVM &&
         allAccounts.some((a: BaseAccount) => a.chainCustomId === chain.id))
     );
   }
@@ -750,20 +758,75 @@ class NetworkPreferenceService extends EventEmitter {
     const allAccounts: BaseAccount[] = keyringService.getAccountAllList();
     const currentAccount: BaseAccount | null | undefined =
       preferenceService.getCurrentAccount();
-    if (chain.coinType === CoinType.ETH) {
-      if (currentAccount?.coinType === CoinType.ETH) return;
-      const evmAccounts: BaseAccount[] = allAccounts.filter(
-        (a: BaseAccount) => a.coinType === CoinType.ETH
-      );
-      if (evmAccounts && evmAccounts.length > 0) {
-        preferenceService.setCurrentAccount(evmAccounts[0]);
+    if (!currentAccount) throw Error('current account not found');
+    const { accountCreateType, hdWalletId, hdPathIndex, ecosystem } =
+      currentAccount;
+    if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
+      if (chain.ecosystem === Ecosystem.EVM) {
+        let evmAccounts: BaseAccount[];
+        evmAccounts = allAccounts.filter(
+          (a: BaseAccount) =>
+            a.ecosystem === Ecosystem.EVM &&
+            a.accountCreateType === AccountCreateType.PRIVATE_KEY
+        );
+        if (evmAccounts?.length > 0) {
+          preferenceService.setCurrentAccount(evmAccounts[0]);
+        } else {
+          evmAccounts = allAccounts.filter(
+            (a: BaseAccount) =>
+              a.ecosystem === Ecosystem.EVM &&
+              a.accountCreateType === AccountCreateType.MNEMONIC
+          );
+          preferenceService.setCurrentAccount(evmAccounts[0]);
+        }
+      } else {
+        let accounts: BaseAccount[];
+        if (currentAccount.ecosystem === Ecosystem.EVM) {
+          accounts = allAccounts.filter(
+            (a: BaseAccount) =>
+              a.chainCustomId === chain.id &&
+              a.accountCreateType === AccountCreateType.PRIVATE_KEY
+          );
+          if (accounts?.length === 0) {
+            accounts = allAccounts.filter(
+              (a: BaseAccount) =>
+                a.chainCustomId === chain.id &&
+                a.accountCreateType === AccountCreateType.MNEMONIC
+            );
+          }
+        } else {
+          accounts = allAccounts.filter(
+            (a: BaseAccount) =>
+              a.hdWalletId === currentAccount.hdWalletId &&
+              a.chainCustomId === chain.id
+          );
+        }
+
+        if (accounts && accounts.length > 0) {
+          preferenceService.setCurrentAccount(accounts[0]);
+        }
       }
     } else {
-      const accounts: BaseAccount[] = allAccounts.filter(
-        (a: BaseAccount) => a.chainCustomId === chain.id
-      );
-      if (accounts && accounts.length > 0) {
-        preferenceService.setCurrentAccount(accounts[0]);
+      if (chain.ecosystem === Ecosystem.EVM) {
+        const evmAccounts: BaseAccount[] = allAccounts.filter(
+          (a: BaseAccount) =>
+            a.ecosystem === Ecosystem.EVM &&
+            a.hdWalletId === hdWalletId &&
+            a.hdPathIndex === hdPathIndex
+        );
+        if (evmAccounts && evmAccounts.length > 0) {
+          preferenceService.setCurrentAccount(evmAccounts[0]);
+        }
+      } else {
+        const accounts: BaseAccount[] = allAccounts.filter(
+          (a: BaseAccount) =>
+            a.chainCustomId === chain.id &&
+            a.hdWalletId === hdWalletId &&
+            a.hdPathIndex === hdPathIndex
+        );
+        if (accounts && accounts.length > 0) {
+          preferenceService.setCurrentAccount(accounts[0]);
+        }
       }
     }
   }
@@ -815,14 +878,14 @@ class NetworkPreferenceService extends EventEmitter {
   }
 
   getSupportProviders(): Provider[] {
-    const presetProviders = Object.values(defaultNetworks);
     const supportProviders: Provider[] = [];
-    presetProviders.forEach((p: Provider) => {
+    this.getAllProviders().forEach((p: Provider) => {
       if (
-        supportProviders.every(
-          (subP: Provider) =>
-            !(subP.coinType === p.coinType && subP.coinType === CoinType.ETH)
-        )
+        (p.ecosystem === Ecosystem.EVM &&
+          supportProviders.every(
+            (subP: Provider) => subP.ecosystem !== Ecosystem.EVM
+          )) ||
+        p.ecosystem !== Ecosystem.EVM
       ) {
         supportProviders.push(p);
       }
@@ -1047,9 +1110,10 @@ class NetworkPreferenceService extends EventEmitter {
     });
     // add custom token
     await TokenService.addCustomToken({
-      symbol: newCosmosProvider.ticker as string,
-      name: '',
-      decimal: 18,
+      symbol: chainInfo.currencies[0].coinDenom,
+      name: chainInfo.currencies[0].coinDenom.toUpperCase(),
+      decimal: chainInfo.currencies[0].coinDecimals,
+      denom: chainInfo.currencies[0].coinDenom,
       chainCustomId: newCosmosProvider.id,
       isNative: true,
     });

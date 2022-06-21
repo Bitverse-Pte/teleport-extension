@@ -5,6 +5,7 @@ import {
   permissionService,
 } from 'background/service';
 import { PromiseFlow, underline2Camelcase } from 'background/utils';
+import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
 import cosmosController from './cosmosController';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,11 +48,22 @@ const flowContext = flow
       },
       mapMethod,
     } = ctx;
-    const chainId = args[0];
-    const provider = await networkPreferenceService.getCosmosChainInfo(chainId);
-    console.log('====provider====', provider);
-    console.log('====[chainId, mapMethod]===', chainId, mapMethod);
+    if (Reflect.getMetadata('SkipConnect', cosmosController, mapMethod)) {
+      return next();
+    }
     if (!Reflect.getMetadata('SAFE', cosmosController, mapMethod)) {
+      let chainId = args[0] || networkPreferenceService.getCurrentChainId();
+      if (chainId.chainId) {
+        chainId = chainId.chainId;
+      }
+      const provider = await networkPreferenceService.getCosmosChainInfo(
+        chainId
+      );
+      if (!provider) {
+        throw new Error(
+          `chain id [${chainId}] doesn't has registed provider in wallet`
+        );
+      }
       if (
         !permissionService.hasPerssmion({ origin: origin, chainId: chainId })
       ) {
@@ -70,7 +82,35 @@ const flowContext = flow
     }
     return next();
   })
+  // check need approval
   .use(async (ctx, next) => {
+    const {
+      request: {
+        data: { args, id, method, type },
+        session: { origin, name, icon },
+      },
+      mapMethod,
+    } = ctx;
+    const [approvalType, precheck] =
+      Reflect.getMetadata('APPROVAL', cosmosController, mapMethod) || [];
+    if (approvalType) {
+      const existed = precheck && precheck(ctx.request);
+      ctx.request.requestedApproval = true;
+      ctx.approvalRes = await notificationService.requestApproval({
+        approvalComponent: approvalType,
+        params: {
+          method,
+          data: args,
+          existed: existed,
+          session: { origin, name, icon },
+        },
+        origin,
+      });
+      permissionService.touchConnectedSite(origin);
+    }
+    return next();
+  })
+  .use(async (ctx) => {
     const { approvalRes, mapMethod, request } = ctx;
     const [approvalType] =
       Reflect.getMetadata('APPROVAL', cosmosController, mapMethod) || [];
@@ -92,6 +132,7 @@ const flowContext = flow
   .callback();
 
 export default (request) => {
+  //request = JSONUint8Array.unwrap(request);
   const ctx: any = { request: { ...request, requestedApproval: false } };
   return flowContext(ctx).finally(() => {
     if (ctx.request.rejectApproval) {
