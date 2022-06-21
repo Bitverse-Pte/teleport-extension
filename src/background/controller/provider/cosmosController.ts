@@ -45,6 +45,13 @@ class CosmosProviderController {
   @Reflect.metadata('APPROVAL', ['SignCosmTx'])
   signDirect = async ({ data, session: { origin } }) => {
     //return keyringService.signDirect();
+    return {
+      signed: {
+        chainId: 'string',
+        accountNumber: 'string',
+      },
+      signature: 'some-signature',
+    };
   };
 
   @Reflect.metadata('APPROVAL', ['SignCosmTx'])
