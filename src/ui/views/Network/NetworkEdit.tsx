@@ -25,6 +25,7 @@ import {
 } from 'ui/reducer/appState.reducer';
 import { useChainList } from 'ui/hooks/utils/useChainList';
 import { Ecosystem } from 'types/network';
+import { useNetworkTypeSelectionComponent } from './component/NetworkTypeSelection';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
@@ -232,6 +233,9 @@ const NetworkEdit = () => {
 
   const [symbolWarningMessage, setSymbolWarningMessage] = useState<string>();
 
+  /** @TODO use `selectedNetworkType` later */
+  const { component: NetworkTypeSelector, selectedNetworkType } = useNetworkTypeSelectionComponent(isEdit);
+
   const validateFields = useCallback(
     async (values: typeof fieldsPresetValues) => {
       const errors: any = {};
@@ -351,6 +355,7 @@ const NetworkEdit = () => {
             return (
               <Form className="form-deco">
                 <div className="form-body">
+                  { NetworkTypeSelector }
                   <h1 className="required">{t('Network Name')}</h1>
                   <Field name="networkName" placeholder="Enter Network Name" />
                   <ErrorMessage
