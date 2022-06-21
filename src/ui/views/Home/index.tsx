@@ -152,7 +152,8 @@ const Home = () => {
     sensors.track('teleport_home_send_click', {
       page: location.pathname,
     });
-    history.push({ pathname: '/send-cos' });
+    history.push({ pathname: `/send/${nativeToken?.tokenId}` });
+    // history.push({ pathname: '/send-cos' });
   };
   const handleAccountClick = async (account: BaseAccount) => {
     await wallet.changeAccount(account);
