@@ -8,8 +8,13 @@ import {
   UserPreferencedCurrencyDisplay,
 } from 'ui/components';
 import { HeaderWithFlex } from 'ui/components/Header';
-import { CustomButton } from 'ui/components/Widgets';
-import { useApproval, useAsyncEffect, useWallet } from 'ui/utils';
+import { CustomButton, TokenIcon } from 'ui/components/Widgets';
+import {
+  getTotalPricesByAmountAndPrice,
+  useApproval,
+  useAsyncEffect,
+  useWallet,
+} from 'ui/utils';
 import {
   SignDoc,
   TxBody,
@@ -22,6 +27,10 @@ import {
   showLoadingIndicator,
 } from 'ui/reducer/appState.reducer';
 import { Token } from 'types/token';
+import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
+import BigNumber from 'bignumber.js';
+import { IconComponent } from 'ui/components/IconComponents';
+import { Divider } from 'antd';
 
 interface SignCosmosTxProps {
   data: [string, string, SignCosmosTxMsg];
@@ -55,6 +64,7 @@ const SignCosmTx = ({
   const [signDoc, setSignDoc] = useState<any>();
   const [tokens, setTokens] = useState<Token[]>([]);
   const [prices, setPrices] = useState();
+  const [visible, setVisible] = useState(false);
 
   const initState = async () => {
     dispatch(showLoadingIndicator());
@@ -64,11 +74,9 @@ const SignCosmTx = ({
     const protoSignDoc = new ProtoSignDocDecoder(msg);
     const signDoc = protoSignDoc.toJSON();
     setSignDoc(signDoc);
-    const tokens = await wallet.getTokenBalancesAsync(true);
-    console.log('=======>>>>>>tokens:', tokens);
+    const tokens = await wallet.getTokenBalancesAsync(chainId, from);
     const prices = await wallet.queryTokenPrices();
-    console.log('=======>>>>>>tokens:', tokens);
-    console.log('=======>>>>>>prices:', prices);
+    console.log('====[ tokens, prices]====', tokens, prices);
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
     dispatch(hideLoadingIndicator());
@@ -80,7 +88,9 @@ const SignCosmTx = ({
     return params.data[0];
   }, []);
 
-  console.log('==chainId==', chainId);
+  const from = useMemo(() => {
+    return params.data[1];
+  }, []);
 
   const txBodyMemo = useMemo(() => {
     return signDoc?.txBody;
@@ -101,24 +111,93 @@ const SignCosmTx = ({
   }, [tokens, prices]);
 
   const txToken = useMemo(() => {
-    const symbol = txBodyMemo?.messages[0].amount[0].denom;
-    console.log(
-      '====[symbol, tokens, nativeToken]====',
-      symbol,
-      tokens,
-      nativeToken
-    );
-    const txToken = symbol
-      ? tokens.find((t: Token) => t.symbol === symbol)
-      : nativeToken;
-    return txToken;
+    // const symbol = txBodyMemo?.messages[0].amount[0].denom;
+    // const txToken = symbol
+    //   ? tokens.find((t: Token) => t.symbol === symbol)
+    //   : nativeToken;
+    return nativeToken;
   }, [tokens, txBodyMemo]);
 
+  const totalFeeMemo = useMemo(() => {
+    const multiplier = new BigNumber(10).pow(Number(nativeToken?.decimal || 0));
+    const rate = new BigNumber(1.0).div(multiplier);
+    const fee = new BigNumber(authInfoMemo?.fee.amount[0].amount || 0).times(
+      rate
+    );
+    return fee;
+  }, [authInfoMemo, nativeToken]);
+
+  const amountMemo = useMemo(() => {
+    const multiplier = new BigNumber(10).pow(Number(txToken?.decimal || 0));
+    const rate = new BigNumber(1.0).div(multiplier);
+    const amount = new BigNumber(
+      txBodyMemo?.messages[0].amount[0].amount || 0
+    ).times(rate);
+    return amount;
+  }, [txBodyMemo, txToken]);
+
   const renderContent = () => {
+    const renderTotalMaxAmount = () => {
+      const total = amountMemo.add(totalFeeMemo);
+      return `${total.toString(10)} ${txToken?.symbol || ''}`;
+    };
+
+    const renderTotalGasFeeAmount = () => {
+      return `${totalFeeMemo.toString(10)} ${txToken?.symbol || ''}`;
+    };
+
+    const renderTotalGasFeeFiat = () => {
+      const totalDec = getTotalPricesByAmountAndPrice(
+        totalFeeMemo.toNumber(),
+        nativeToken?.decimal || 0,
+        nativeToken?.price || 0
+      );
+      return `$ ${totalDec}`;
+    };
+
+    const renderTotalMaxFiat = () => {
+      const total = amountMemo.add(totalFeeMemo);
+      const totalDec = getTotalPricesByAmountAndPrice(
+        total.toNumber(),
+        nativeToken?.decimal || 0,
+        nativeToken?.price || 0
+      );
+      return `$ ${totalDec}`;
+    };
+
     return (
-      <div className="tx-details-tab-container">
-        <div></div>
-        <div></div>
+      <div className="tx-details-tab-container flex">
+        <div className="transaction-detail">
+          <div
+            className="gas-edit-button hidden flex ml-auto"
+            onClick={() => {
+              setVisible(true);
+              // sensors.track('teleport_sign_tx_edit_gas', {
+              //   page: location.pathname,
+              // });
+            }}
+          >
+            <IconComponent name="edit" cls="edit-icon" />
+            <div>{t('Edit')}</div>
+          </div>
+          <TransactionDetailItem
+            key="gas-item"
+            detailTitle={t('Estimated gas fee')}
+            subTitle={undefined}
+            detailText={`${renderTotalGasFeeAmount()}`}
+            detailSubText={renderTotalGasFeeFiat()}
+            detailMax={`Max fee: ${renderTotalGasFeeAmount()}`}
+          />
+          <Divider style={{ margin: '16px 0' }} />
+          <TransactionDetailItem
+            key="total-item"
+            detailTitle={t('Sum')}
+            subTitle={t('Amount + gas fee')}
+            detailText={renderTotalMaxAmount()}
+            detailSubText={renderTotalMaxFiat()}
+            detailMax={`Max amount: ${renderTotalMaxAmount()}`}
+          />
+        </div>
       </div>
     );
   };
@@ -175,14 +254,46 @@ const SignCosmTx = ({
 };
 
 const TxSummaryComponent = ({ action, value, token, origin }) => {
-  console.log('==[value, token, origin]==', value, token, origin);
+  const multiplier = new BigNumber(10).pow(token?.decimal || 0);
+  const rate = new BigNumber(1.0).div(multiplier);
+  const amount = new BigNumber(value || 0).times(rate);
   return (
     <div className="tx-summary">
       <div className="tx-summary-origin">
         {origin === 'https://teleport.network' ? null : <div>{origin}</div>}
       </div>
       <div className="tx-summary-currency">
-        <UserPreferencedCurrencyDisplay value={value} token={token} />
+        {token && (
+          <div className="flexR items-end">
+            <TokenIcon token={token} radius={30} />
+            <span className="dec" title={value}>
+              {addEllipsisToEachWordsInTheEnd(amount.toString(10), 8)}{' '}
+            </span>
+            <span className="symbol">{token?.symbol} </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const TransactionDetailItem = ({
+  detailTitle = '',
+  subTitle,
+  detailText,
+  detailSubText,
+  detailMax,
+}) => {
+  return (
+    <div className="transaction-detail-item">
+      <div className="transaction-detail-item-key">
+        <div className="transaction-detail-title">{detailTitle}</div>
+        <div className="transaction-detail-subtitle">{subTitle}</div>
+      </div>
+      <div className="transaction-detail-item-values">
+        <div className="transaction-detail-detailText">{detailText}</div>
+        <div className="transaction-detail-detailSubText">{detailSubText}</div>
+        <div className="transaction-detail-detailMax">{detailMax}</div>
       </div>
     </div>
   );
