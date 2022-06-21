@@ -44,6 +44,8 @@ import { checkAndValidateADR36AminoSignDoc } from '@keplr-wallet/cosmos';
 import { keyringService, networkPreferenceService } from 'background/service';
 import { Bech32Config } from 'types/cosmos';
 import { CosmosKey } from 'background/service/keyManager/cosmos/CosmosKey';
+import { ObservableStorage } from 'background/utils/obsStorage';
+import { nanoid as createId } from 'nanoid';
 
 export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
@@ -135,6 +137,23 @@ export const defaultCosmosMsgOpts: CosmosMsgOpts = {
   },
 };
 
+export interface CosmosTx {
+  id: string;
+  status: string;
+  chainInfo: CosChainInfo;
+  timestamp: number;
+  account?: any;
+  aminoMsgs?: Msg[];
+  fee?: Partial<StdFee>;
+  memo?: string;
+  mode?: string;
+  currency?: AppCurrency;
+  tx_hash?: string;
+}
+interface TransactionState {
+  transactions: Record<string, CosmosTx>;
+}
+
 type ProtoMsgsOrWithAminoMsgs = {
   // TODO: Make `aminoMsgs` nullable
   //       And, make proto sign doc if `aminoMsgs` is null
@@ -144,6 +163,7 @@ type ProtoMsgsOrWithAminoMsgs = {
 
 export class CosmosAccountImpl {
   public broadcastMode: 'sync' | 'async' | 'block' = 'sync';
+  store: ObservableStorage<TransactionState>;
 
   constructor(
     // protected readonly base: AccountSetBaseSuper,
@@ -160,11 +180,40 @@ export class CosmosAccountImpl {
       };
     }
   ) {
+    this.store = new ObservableStorage<TransactionState>(
+      'cosmos_transaction_history',
+      {
+        transactions: {},
+      }
+    );
     // this.base.registerSendTokenFn(this.processSendToken.bind(this));
   }
 
   get msgOpts(): CosmosMsgOpts {
     return this._msgOpts;
+  }
+  getTransaction(txId: string): CosmosTx {
+    const { transactions } = this.store.getState();
+    return transactions[txId];
+  }
+
+  getTransactionList(): Record<string, CosmosTx> {
+    return this.store.getState().transactions;
+  }
+
+  addTransactionToList(txData: CosmosTx) {
+    this.store.updateState({
+      transactions: {
+        ...this.getTransactionList(),
+        [txData.id]: txData,
+      },
+    });
+  }
+
+  addTransactionsToList(txList: CosmosTx[]) {
+    for (const tx of txList) {
+      this.addTransactionToList(tx);
+    }
   }
 
   async processSendToken(
@@ -217,6 +266,17 @@ export class CosmosAccountImpl {
     if (!k) throw Error('no key found');
     const { bech32Address, pubKey } = k;
 
+    const txId = createId();
+    this.addTransactionToList({
+      id: txId,
+      status: 'created',
+      chainInfo: cosChainInfo,
+      timestamp: new Date().getTime(),
+      memo,
+      fee: stdFee,
+      currency,
+    });
+
     switch (denomHelper.type) {
       case 'native':
         const actualAmount = (() => {
@@ -242,6 +302,7 @@ export class CosmosAccountImpl {
         await this.sendMsgs(
           'send',
           cosChainInfo,
+          txId,
           {
             aminoMsgs: [msg],
             protoMsgs: [
@@ -287,6 +348,7 @@ export class CosmosAccountImpl {
   async sendMsgs(
     type: string | 'unknown',
     cosChainInfo: CosChainInfo,
+    txId: string,
     msgs:
       | ProtoMsgsOrWithAminoMsgs
       | (() => Promise<ProtoMsgsOrWithAminoMsgs> | ProtoMsgsOrWithAminoMsgs),
@@ -315,6 +377,7 @@ export class CosmosAccountImpl {
         msgs,
         fee,
         memo,
+        txId,
         signOptions,
         this.broadcastMode
       );
@@ -398,6 +461,7 @@ export class CosmosAccountImpl {
     msgs: ProtoMsgsOrWithAminoMsgs,
     fee: StdFee,
     memo = '',
+    txId: string,
     signOptions?: KeplrSignOptions,
     mode: 'block' | 'async' | 'sync' = 'async'
   ): Promise<{
@@ -430,6 +494,16 @@ export class CosmosAccountImpl {
       cosChainInfo.rest,
       bech32Address
     );
+
+    const currentCosmosTx: CosmosTx = this.getTransaction(txId);
+    console.log('--currentCosmosTx--', currentCosmosTx);
+    this.addTransactionToList({
+      ...currentCosmosTx,
+      status: 'signed',
+      account,
+      aminoMsgs,
+      mode,
+    });
 
     // const account = await BaseAccount.fetchFromRest(
     //   this.instance(cosChainInfo),
@@ -511,7 +585,12 @@ export class CosmosAccountImpl {
 
     return {
       // TODO: need remove keplr
-      txHash: await this.sendTx(cosChainInfo, signedTx, mode as BroadcastMode),
+      txHash: await this.sendTx(
+        cosChainInfo,
+        signedTx,
+        mode as BroadcastMode,
+        txId
+      ),
       signDoc: signResponse.signed,
     };
   }
@@ -573,7 +652,8 @@ export class CosmosAccountImpl {
   async sendTx(
     cosChainInfo: CosChainInfo,
     tx: unknown,
-    mode: 'async' | 'sync' | 'block'
+    mode: 'async' | 'sync' | 'block',
+    txId: string
   ): Promise<Uint8Array> {
     const chainInfo = cosChainInfo;
     // const restInstance = Axios.create({
@@ -639,9 +719,19 @@ export class CosmosAccountImpl {
       const txHash = Buffer.from(txResponse.txhash, 'hex');
 
       const txTracer = new TendermintTxTracer(chainInfo.rpc, '/websocket');
+      console.log('----------------txHash----------------', txHash);
       txTracer.traceTx(txHash).then((tx) => {
+        console.log('----------------traceTx----------------', tx);
         txTracer.close();
         platform.showTransactionNotification(tx, {});
+      });
+
+      const currentCosmosTx: CosmosTx = this.getTransaction(txId);
+      console.log('--currentCosmosTx2222--', currentCosmosTx);
+      this.addTransactionToList({
+        ...currentCosmosTx,
+        status: 'success',
+        tx_hash: txResponse.txhash,
       });
 
       return txHash;
