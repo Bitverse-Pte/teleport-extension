@@ -65,6 +65,7 @@ import { ChainIdHelper } from 'utils/cosmos/chainId';
 import { CosmosChainInfo } from 'types/cosmos';
 import { parsedKeplrChainInfoAsTeleportCosmosProvider } from '../cosmos/utils/provider.utils';
 import { ChainInfoSchema } from './cosmos/validation/chainInfoSchema';
+import { CosmosChainUpdaterService } from './cosmos/updater';
 
 const toHexString = (val: string | number) =>
   addHexPrefix(Number(val).toString(16));
@@ -132,6 +133,7 @@ class NetworkPreferenceService extends EventEmitter {
   private _blockTracker!: PollingBlockTracker | null;
   private _provider!: any;
   private _store: ComposedStorage<NetworkPreferenceStore>;
+  cosmosChainUpdater: CosmosChainUpdaterService;
 
   // UI communication
 
@@ -198,6 +200,11 @@ class NetworkPreferenceService extends EventEmitter {
       );
     });
     this.on(NETWORK_EVENTS.NETWORK_DID_CHANGE, this.lookupNetwork);
+
+    /**
+     * Cosmos related
+     */
+    this.cosmosChainUpdater = new CosmosChainUpdaterService(this);
 
     setTimeout(this._customNetworkStoreMigration.bind(this), 5 * 1000);
   }
@@ -278,6 +285,16 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       orderOfNetworks: _tmpNetworkOrder,
     });
+
+    /**
+     * update (if) current cosmos provider
+     */
+    const currentProvider = this.getProviderConfig();
+    if (currentProvider.ecosystem === Ecosystem.COSMOS) {
+      const updatedProvider =
+        this.cosmosChainUpdater.putUpdatedPropertyToProvider(currentProvider);
+      this.setProviderConfig(updatedProvider);
+    }
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
@@ -869,7 +886,16 @@ class NetworkPreferenceService extends EventEmitter {
       type: 'rpc',
     }));
 
-    return [...presetProviders, ...customProviders];
+    return [...presetProviders, ...customProviders].map((p) => {
+      if (p.ecosystem === Ecosystem.COSMOS) {
+        /**
+         * Apply updated infos to the cosmos provider
+         */
+        return this.cosmosChainUpdater.putUpdatedPropertyToProvider(p);
+      } else {
+        return p;
+      }
+    });
   }
 
   getProvider(id: PresetNetworkId | string): Provider | undefined {
