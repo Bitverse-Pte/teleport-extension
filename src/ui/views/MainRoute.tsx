@@ -23,6 +23,11 @@ const MnemonicCheck = lazy(() => import('ui/views/MnemonicCheck'));
 const ActivityDetail = lazy(
   () => import('ui/views/Transaction/TransactionDetail')
 );
+
+const CosmosActivityDetail = lazy(
+  () => import('ui/views/Transaction/CosmosTransactionDetail')
+);
+
 const Send = lazy(() => import('ui/views/Send'));
 const Receive = lazy(() => import('ui/views/Receive'));
 const GasFee = lazy(() => import('ui/views/GasFee'));
@@ -110,7 +115,9 @@ const Main = () => {
             }}
           />
         </LazyPrivateRoute>
-
+        <LazyPrivateRoute exact path="/mock/cosmosTxDetail">
+          <CosmosActivityDetail />
+        </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/mock/addNetworkPrompt">
           <AddChain
             params={{
