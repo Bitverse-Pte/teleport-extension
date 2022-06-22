@@ -201,7 +201,7 @@ const Send = () => {
 
     history.push({
       pathname: '/confirm-send-cos',
-      state: { amount, recipient: toAddress, memo },
+      state: { amount, recipient: toAddress, memo, token: selectedToken },
     });
     // params.gas = draftTransaction.gas;
     // params.txParam.gas = draftTransaction.gas;

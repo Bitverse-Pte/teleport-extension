@@ -18,6 +18,9 @@ import { TransactionsList } from 'ui/components/TransactionList';
 import './style.less';
 import clsx from 'clsx';
 import { TipButtonEnum } from 'constants/wallet';
+import { Ecosystem, Provider } from 'types/network';
+import { getProvider } from 'ui/selectors/selectors';
+import { useSelector } from 'react-redux';
 
 const SingleToken = () => {
   const wallet = useWallet();
@@ -31,6 +34,7 @@ const SingleToken = () => {
   const [account, setAccount] = useState<BaseAccount>();
   const [token, setToken] = useState<Token>();
   const [prices, setPrices] = useState();
+  const currentChain: Provider = useSelector(getProvider);
 
   /* const getTokenBalanceAsync = async () => {
     const balance = await wallet.getTokenBalanceAsync(tokenId).catch((e) => {
@@ -121,7 +125,11 @@ const SingleToken = () => {
           title="Send"
           type={TipButtonEnum.SEND}
           handleClick={() => {
-            history.push({ pathname: `/send/${tokenId}` });
+            if (currentChain.ecosystem === Ecosystem.EVM) {
+              history.push({ pathname: `/send/${tokenId}` });
+            } else {
+              history.push({ pathname: `/send-cos/${tokenId}` });
+            }
           }}
         />
         <TipButton

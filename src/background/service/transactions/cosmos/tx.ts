@@ -345,6 +345,60 @@ export class CosmosAccountImpl {
     return false;
   }
 
+  async generateMsg(
+    amount: string,
+    currency: AppCurrency,
+    recipient: string,
+    memo: string,
+    stdFee: Partial<StdFee>
+  ) {
+    const {
+      rpcUrl,
+      chainId,
+      ecoSystemParams,
+      prefix: bech32Config,
+      coinType,
+    } = networkPreferenceService.getProviderConfig();
+    const k = keyringService.getKeplrCompatibleKey(chainId);
+    if (!k) throw Error('no key found');
+    const { bech32Address, pubKey } = k;
+
+    const { account: { account_number, sequence } } = await this.getAccounts(
+      ecoSystemParams?.rest,
+      bech32Address
+    );
+
+    const actualAmount = (_amount) => {
+      let dec = new Dec(_amount);
+      dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
+      return dec.truncate().toString();
+    };
+    return {
+      'chain_id': chainId,
+      'account_number': account_number,
+      'sequence': sequence,
+      'fee': stdFee,
+      'from_address': bech32Address,
+      'to_address': recipient,
+      'msgs': [
+        {
+          'type': this.msgOpts.send.native.type,
+          'value': {
+            'from_address': bech32Address,
+            'to_address': recipient,
+            'amount': [
+              {
+                'denom': currency.coinMinimalDenom,
+                'amount': actualAmount(amount)
+              }
+            ]
+          }
+        }
+      ],
+      'memo': memo
+    }
+  }
+
   async sendMsgs(
     type: string | 'unknown',
     cosChainInfo: CosChainInfo,

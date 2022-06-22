@@ -143,6 +143,9 @@ const Main = () => {
         <LazyPrivateRoute exact path="/send-cos">
           <SendCos />
         </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/send-cos/:tokenId">
+          <SendCos />
+        </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/confirm-send-cos">
           <ConfirmSendCos />
         </LazyPrivateRoute>

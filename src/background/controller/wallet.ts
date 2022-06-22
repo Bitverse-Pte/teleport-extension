@@ -595,6 +595,21 @@ export class WalletController extends BaseController {
 
   setManualLocked = (locked: boolean) =>
     preferenceService.setManualLocked(locked);
+  generateCosmosMsg = async (
+    amount: string,
+    currency,
+    recipient: string,
+    memo = '',
+    stdFee = {},
+  ) => {
+    return await cosmosTxController.cosmos.generateMsg(
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee
+    );
+  };
   sendCosmosToken = async (
     amount: string,
     currency,
