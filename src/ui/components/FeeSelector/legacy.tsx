@@ -62,7 +62,7 @@ function FeeSelectorLegacy(props) {
     setGasPrice(gasPrice);
   };
   const fetchNativePrice = async () => {
-    const tokens = await wallet.getTokenBalancesAsync(true);
+    const tokens = await wallet.getTokenBalancesAsync();
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);

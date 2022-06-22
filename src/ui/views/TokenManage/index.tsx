@@ -43,14 +43,14 @@ const TokenManage = () => {
   const wallet = useWallet();
 
   const getTokenBalancesAsync = async () => {
-    const balances = await wallet.getTokenBalancesAsync(true).catch((e) => {
+    const balances = await wallet.getTokenBalancesAsync().catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) setTokens(balances);
   };
 
   const getTokenBalancesSync = async () => {
-    const balances = await wallet.getTokenBalancesSync(true).catch((e) => {
+    const balances = await wallet.getTokenBalancesSync().catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) setTokens(balances);

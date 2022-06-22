@@ -337,9 +337,46 @@ class TokenService {
           }
         }
       }
+      const cw20Tokens: Token[] = allTokens.filter(
+        (t: Token) =>
+          t.chainCustomId === chainCustomId && !t.isNative && t.contractAddress
+      );
+      if (cw20Tokens?.length > 0) {
+        for (const t of cw20Tokens) {
+          const balance = await this._queryCw20TokenBalance(
+            address,
+            cw20Tokens[0].contractAddress as string,
+            urlPrefix
+          ).catch((e) => {
+            console.error(e);
+          });
+          if (balance) {
+            t.amount = balance.data.balance;
+          }
+          currentAccountTokens.push(t);
+        }
+      }
     }
 
     return Promise.resolve(currentAccountTokens);
+  }
+
+  private async _queryCw20TokenBalance(
+    address: string,
+    contractAddress: string,
+    urlPrefix: string
+  ): Promise<any> {
+    const tokenInfoObj = {
+      balance: {
+        address,
+      },
+    };
+    const msg = JSON.stringify(tokenInfoObj);
+    const query = Buffer.from(msg).toString('base64');
+    const url = `${urlPrefix}/cosmwasm/wasm/v1/contract/${contractAddress}/smart/${query}`;
+    return await fetch(url)
+      .then((res) => res.json())
+      .catch((e) => console.error(e));
   }
 
   private async _fetchIbcDenom(hash: string): Promise<IDenomTrace | null> {
@@ -583,11 +620,19 @@ class TokenService {
     const res = await fetch(url)
       .then((res) => res.json())
       .catch((e) => console.error(e));
-    if (res) {
+    const balance = await this._queryCw20TokenBalance(
+      address,
+      contractAddress,
+      urlPrefix
+    ).catch((e) => {
+      console.error(e);
+    });
+    if (res && balance) {
       token.name = res.data.name;
       token.symbol = res.data.symbol;
       token.decimals = res.data.decimals;
       token.totalSupply = res.data.total_supply;
+      token.balanceOf = balance.data.balance;
     }
     return Promise.resolve(token);
   }
