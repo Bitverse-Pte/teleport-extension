@@ -5,7 +5,7 @@ import Axios from 'axios';
 // import { KVStore } from "@keplr-wallet/common";
 // import { ChainsService } from "../chains";
 import NetworkPreferenceService from '../../network';
-import { Ecosystem, Provider } from 'types/network';
+import { CosmosParams, Ecosystem, Provider } from 'types/network';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { ChainIdHelper } from 'utils/cosmos/chainId';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
@@ -50,8 +50,9 @@ export class CosmosChainUpdaterService {
 
     return {
       ...chainInfo,
-      ...{
-        chainId: updatedProperty.chainId || chainInfo.chainId,
+      chainId: updatedProperty.chainId || chainInfo.chainId,
+      ecoSystemParams: {
+        ...(chainInfo.ecoSystemParams as CosmosParams),
         features,
       },
     };
