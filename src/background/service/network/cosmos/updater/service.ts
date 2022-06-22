@@ -162,14 +162,17 @@ export class CosmosChainUpdaterService {
 
   private saveChainEcoSystemProperty(
     identifier: string,
-    chainInfo: Partial<Provider['ecoSystemParams']>
+    updatePayload: Partial<Provider['ecoSystemParams']>
   ) {
     const saved = this.loadChainProperty(identifier);
 
     this.kvStore.updateState({
       [identifier]: {
         ...saved,
-        ...chainInfo,
+        ecoSystemParams: {
+          ...(saved.ecoSystemParams as CosmosParams),
+          ...updatePayload,
+        },
       },
     });
 
