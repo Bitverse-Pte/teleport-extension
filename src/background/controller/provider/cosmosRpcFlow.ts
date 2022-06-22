@@ -96,6 +96,7 @@ const flowContext = flow
     if (approvalType) {
       const existed = precheck && precheck(ctx.request);
       ctx.request.requestedApproval = true;
+      console.log('====[args]===', args);
       ctx.approvalRes = await notificationService.requestApproval({
         approvalComponent: approvalType,
         params: {

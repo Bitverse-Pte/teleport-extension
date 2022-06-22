@@ -49,7 +49,7 @@ interface SignCosmosTxMsg {
   chainId: string;
 }
 
-const SignCosmTx = ({
+const SignDirectCosmTx = ({
   params,
   origin,
 }: {
@@ -238,7 +238,7 @@ const SignCosmTx = ({
           cls="theme tx-btn-container-top"
           block
         >
-          {t('Send')}
+          {t('Confirm')}
         </CustomButton>
         <CustomButton
           type="default"
@@ -299,4 +299,4 @@ const TransactionDetailItem = ({
   );
 };
 
-export default SignCosmTx;
+export default SignDirectCosmTx;
