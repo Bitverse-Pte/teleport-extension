@@ -65,6 +65,7 @@ import { ChainIdHelper } from 'utils/cosmos/chainId';
 import { CosmosChainInfo } from 'types/cosmos';
 import { parsedKeplrChainInfoAsTeleportCosmosProvider } from '../cosmos/utils/provider.utils';
 import { ChainInfoSchema } from './cosmos/validation/chainInfoSchema';
+import { CosmosChainUpdaterService } from './cosmos/updater';
 
 const toHexString = (val: string | number) =>
   addHexPrefix(Number(val).toString(16));
@@ -132,6 +133,7 @@ class NetworkPreferenceService extends EventEmitter {
   private _blockTracker!: PollingBlockTracker | null;
   private _provider!: any;
   private _store: ComposedStorage<NetworkPreferenceStore>;
+  cosmosChainUpdater: CosmosChainUpdaterService;
 
   // UI communication
 
@@ -198,6 +200,12 @@ class NetworkPreferenceService extends EventEmitter {
       );
     });
     this.on(NETWORK_EVENTS.NETWORK_DID_CHANGE, this.lookupNetwork);
+
+    /**
+     * Cosmos related
+     */
+    this.cosmosChainUpdater = new CosmosChainUpdaterService(this);
+
 
     setTimeout(this._customNetworkStoreMigration.bind(this), 5 * 1000);
   }
