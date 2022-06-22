@@ -150,7 +150,7 @@ export class CosmosChainUpdaterService {
     const saved = this.loadChainProperty(identifier);
 
     this.kvStore.updateState({
-      identifier: {
+      [identifier]: {
         ...saved,
         ...chainInfo,
       },
