@@ -158,7 +158,11 @@ const Home = () => {
     sensors.track('teleport_home_send_click', {
       page: location.pathname,
     });
-    history.push({ pathname: `/send/${nativeToken?.tokenId}` });
+    if (currentChain.ecosystem === Ecosystem.EVM) {
+      history.push({ pathname: `/send/${nativeToken?.tokenId}` });
+    } else {
+      history.push({ pathname: `/send-cos/${nativeToken?.tokenId}` });
+    }
   };
   const handleAccountClick = async (account: BaseAccount) => {
     await wallet.changeAccount(account);

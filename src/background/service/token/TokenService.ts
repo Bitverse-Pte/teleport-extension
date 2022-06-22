@@ -254,7 +254,7 @@ class TokenService {
             }
           }
 
-          const denoms = cloneDeep(this.store.getState().denomTrace);
+          let denoms = cloneDeep(this.store.getState().denomTrace);
           const updatedTokens: Token[] = [];
           for (const b of res.balances) {
             if (b.denom.includes('ibc/')) {
@@ -286,6 +286,7 @@ class TokenService {
                       console.error(e);
                     }
                   );
+                  if (!denoms) denoms = {};
                   (denoms as any)[hash] = denomRes;
                   this.store.updateState({
                     denomTrace: denoms,
