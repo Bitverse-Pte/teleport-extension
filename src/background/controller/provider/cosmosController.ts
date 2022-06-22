@@ -1,5 +1,7 @@
 import { keyringService, networkPreferenceService } from 'background/service';
+import { CosmosKey } from 'background/service/keyManager/cosmos/CosmosKey';
 import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
+import { encodeSecp256k1Signature, serializeSignDoc } from '@cosmjs/launchpad';
 
 class CosmosProviderController {
   @Reflect.metadata('SAFE', true)
@@ -39,18 +41,30 @@ class CosmosProviderController {
   }) => {
     await networkPreferenceService.suggestCosmosChainInfo(chainParams, origin);
     keyringService.generateMissedAccounts();
-    console.log('=keyringService.generateMissedAccounts()=');
   };
 
   @Reflect.metadata('APPROVAL', ['SignCosmTx'])
-  signDirect = async ({ data, session: { origin } }) => {
+  signDirect = async ({
+    data: {
+      args: [chainId, from, messages],
+    },
+    session: { origin },
+  }) => {
     //return keyringService.signDirect();
+    console.log('==[chainId, from, messages]==', chainId, from, messages);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const k = keyringService.getKeplrCompatibleKey(chainId);
+    if (!k) throw Error('no key found');
+    const signDoc = JSONUint8Array.unwrap(messages);
+    const pk = await keyringService.getPrivateKeyByAddress(k.bech32Address);
+    const cosmosKey = new CosmosKey();
+    const signature = cosmosKey.generateSignature(
+      serializeSignDoc(signDoc),
+      pk
+    );
     return {
-      signed: {
-        chainId: 'string',
-        accountNumber: 'string',
-      },
-      signature: 'some-signature',
+      signed: JSONUint8Array.wrap(signDoc),
+      signature: encodeSecp256k1Signature(k.pubKey, signature),
     };
   };
 
@@ -59,6 +73,7 @@ class CosmosProviderController {
     //return keyringService.signDirect();
   };
 
+  @Reflect.metadata('SkipConnect', true)
   sendTx = async () => {
     //
   };
