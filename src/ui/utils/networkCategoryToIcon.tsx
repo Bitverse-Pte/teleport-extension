@@ -11,6 +11,8 @@ import KavaIconB from 'assets/chain/with-border/kava.svg';
 import OsomosisIconB from 'assets/chain/with-border/osmo.svg';
 import JunoIconB from 'assets/chain/with-border/juno.svg';
 import ScrtIconB from 'assets/chain/with-border/scrt.svg';
+import UmeeIconB from 'assets/chain/with-border/umee.svg';
+import EvmOSIconB from 'assets/chain/with-border/evmos.svg';
 import ArbitrumIcon from 'assets/chain/arbitrum.svg';
 import MaticIcon from 'assets/tokens/matic.svg';
 import CosmosAtomIcon from 'assets/tokens/atom.svg';
@@ -79,8 +81,10 @@ export function IdToChainLogoSVG(id: PresetNetworkId | string) {
       return JunoIconB;
 
     // @todo: add new case here
-    // case PresetNetworkId.EVMOS:
-    // case PresetNetworkId.UMEE:
+    case PresetNetworkId.EVMOS:
+      return EvmOSIconB;
+    case PresetNetworkId.UMEE:
+      return UmeeIconB;
 
     // @todo: is there a better icon other than this?
     default:

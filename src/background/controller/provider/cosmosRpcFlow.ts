@@ -5,6 +5,7 @@ import {
   permissionService,
 } from 'background/service';
 import { PromiseFlow, underline2Camelcase } from 'background/utils';
+import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
 import cosmosController from './cosmosController';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -131,6 +132,7 @@ const flowContext = flow
   .callback();
 
 export default (request) => {
+  //request = JSONUint8Array.unwrap(request);
   const ctx: any = { request: { ...request, requestedApproval: false } };
   return flowContext(ctx).finally(() => {
     if (ctx.request.rejectApproval) {
