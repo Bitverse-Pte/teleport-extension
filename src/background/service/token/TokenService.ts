@@ -337,9 +337,46 @@ class TokenService {
           }
         }
       }
+      const cw20Tokens: Token[] = allTokens.filter(
+        (t: Token) =>
+          t.chainCustomId === chainCustomId && !t.isNative && t.contractAddress
+      );
+      if (cw20Tokens?.length > 0) {
+        for (const t of cw20Tokens) {
+          const balance = await this._queryCw20TokenBalance(
+            address,
+            cw20Tokens[0].contractAddress as string,
+            urlPrefix
+          ).catch((e) => {
+            console.error(e);
+          });
+          if (balance) {
+            t.amount = balance.data.balance;
+          }
+          currentAccountTokens.push(t);
+        }
+      }
     }
 
     return Promise.resolve(currentAccountTokens);
+  }
+
+  private async _queryCw20TokenBalance(
+    address: string,
+    contractAddress: string,
+    urlPrefix: string
+  ): Promise<any> {
+    const tokenInfoObj = {
+      balance: {
+        address,
+      },
+    };
+    const msg = JSON.stringify(tokenInfoObj);
+    const query = Buffer.from(msg).toString('base64');
+    const url = `${urlPrefix}/cosmwasm/wasm/v1/contract/${contractAddress}/smart/${query}`;
+    return await fetch(url)
+      .then((res) => res.json())
+      .catch((e) => console.error(e));
   }
 
   private async _fetchIbcDenom(hash: string): Promise<IDenomTrace | null> {
@@ -517,7 +554,11 @@ class TokenService {
     });
   }
 
-  async queryToken(address, rpc, contractAddress): Promise<ERC20Struct> {
+  async queryEvmERC20Token(
+    address,
+    rpc,
+    contractAddress
+  ): Promise<ERC20Struct> {
     const account = await networkPreferenceService
       .getCurrentEth()
       .getCode(address);
@@ -557,6 +598,64 @@ class TokenService {
       }
     }
     return Promise.resolve(token);
+  }
+
+  async queryCosWasmCW20Token(
+    address,
+    urlPrefix,
+    contractAddress
+  ): Promise<ERC20Struct> {
+    const token: ERC20Struct = {
+      name: '',
+      symbol: '',
+      decimals: 0,
+      balanceOf: 0,
+    };
+    const tokenInfoObj = {
+      token_info: {},
+    };
+    const msg = JSON.stringify(tokenInfoObj);
+    const query = Buffer.from(msg).toString('base64');
+    const url = `${urlPrefix}/cosmwasm/wasm/v1/contract/${contractAddress}/smart/${query}`;
+    const res = await fetch(url)
+      .then((res) => res.json())
+      .catch((e) => console.error(e));
+    const balance = await this._queryCw20TokenBalance(
+      address,
+      contractAddress,
+      urlPrefix
+    ).catch((e) => {
+      console.error(e);
+    });
+    if (res && balance) {
+      token.name = res.data.name;
+      token.symbol = res.data.symbol;
+      token.decimals = res.data.decimals;
+      token.totalSupply = res.data.total_supply;
+      token.balanceOf = balance.data.balance;
+    }
+    return Promise.resolve(token);
+  }
+
+  queryToken(address, chainCustomId, contractAddress) {
+    const chains = networkPreferenceService.getAllProviders();
+    const chain = chains.find((c: Provider) => c.id === chainCustomId);
+    if (chain) {
+      switch (chain.ecosystem) {
+        case Ecosystem.EVM:
+          return this.queryEvmERC20Token(
+            address,
+            chain.rpcUrl,
+            contractAddress
+          );
+        case Ecosystem.COSMOS:
+          return this.queryCosWasmCW20Token(
+            address,
+            chain.ecoSystemParams!.rest,
+            contractAddress
+          );
+      }
+    }
   }
 
   changeCustomTokenProfile(chainCustomId: string, data: Partial<Token>) {

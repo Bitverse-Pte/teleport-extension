@@ -54,7 +54,7 @@ const itemsCenteredCls = 'flex items-center justify-center';
 const AddToken = ({ params }) => {
   const wallet = useWallet();
   const networkContext = useContext(NetworkProviderContext);
-  const rpcUrl = networkContext?.currentNetworkController?.provider.rpcUrl;
+  const provider = networkContext?.currentNetworkController?.provider;
   const [token, setToken] = useState<TokenProps>();
   const [queryToken, loading] = useWalletRequest(wallet.queryToken, {
     onSuccess(token) {
@@ -83,7 +83,7 @@ const AddToken = ({ params }) => {
 
   useEffect(() => {
     init();
-    queryToken(rpcUrl, data.options.address);
+    queryToken(provider?.id, data.options.address);
   }, []);
 
   if (!inited) return <>Loading</>;
