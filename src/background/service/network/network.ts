@@ -285,6 +285,16 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       orderOfNetworks: _tmpNetworkOrder,
     });
+
+    /**
+     * update (if) current cosmos provider
+     */
+    const currentProvider = this.getProviderConfig();
+    if (currentProvider.ecosystem === Ecosystem.COSMOS) {
+      const updatedProvider =
+        this.cosmosChainUpdater.putUpdatedPropertyToProvider(currentProvider);
+      this.setProviderConfig(updatedProvider);
+    }
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
