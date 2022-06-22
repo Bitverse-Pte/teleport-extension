@@ -206,7 +206,6 @@ class NetworkPreferenceService extends EventEmitter {
      */
     this.cosmosChainUpdater = new CosmosChainUpdaterService(this);
 
-
     setTimeout(this._customNetworkStoreMigration.bind(this), 5 * 1000);
   }
 
@@ -877,7 +876,16 @@ class NetworkPreferenceService extends EventEmitter {
       type: 'rpc',
     }));
 
-    return [...presetProviders, ...customProviders];
+    return [...presetProviders, ...customProviders].map((p) => {
+      if (p.ecosystem === Ecosystem.COSMOS) {
+        /**
+         * Apply updated infos to the cosmos provider
+         */
+        return this.cosmosChainUpdater.putUpdatedPropertyToProvider(p);
+      } else {
+        return p;
+      }
+    });
   }
 
   getProvider(id: PresetNetworkId | string): Provider | undefined {
