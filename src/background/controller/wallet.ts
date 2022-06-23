@@ -12,6 +12,7 @@ import {
   knownMethodService,
   contactBookService,
   latestBlockDataHub,
+  cosmosTxController,
 } from 'background/service';
 import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
@@ -607,6 +608,40 @@ export class WalletController extends BaseController {
 
   setManualLocked = (locked: boolean) =>
     preferenceService.setManualLocked(locked);
+  generateCosmosMsg = async (
+    amount: string,
+    currency,
+    recipient: string,
+    memo = '',
+    stdFee = {},
+  ) => {
+    return await cosmosTxController.cosmos.generateMsg(
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee
+    );
+  };
+  sendCosmosToken = async (
+    amount: string,
+    currency,
+    recipient: string,
+    memo = '',
+    stdFee = {},
+    signOptions,
+    onTxEvents
+  ) => {
+    await cosmosTxController.cosmos.processSendToken(
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee,
+      signOptions,
+      onTxEvents
+    );
+  };
 }
 
 export default new WalletController();
