@@ -57,6 +57,17 @@ export const NetworkProviderContext = React.createContext<{
   getAllProviders: () => Promise<Provider[]>;
 } | null>(null);
 
+export function NetworkErrorCodeToMessageKey(code?: ErrorCode) {
+  switch (code) {
+    case ErrorCode.ACCOUNT_DOES_NOT_EXIST:
+      return 'SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST';
+    case ErrorCode.NORMAL_WALLET_SWITCH_EVM_ONLY:
+      return 'NORMAL_WALLET_SWITCH_EVM_ONLY';
+    default:
+      return 'UNCAUGHT_NETWORK_ERROR';
+  }
+}
+
 /**
  * NetworkStoreProvider
  * @param childrens  children elements into be injected
@@ -74,6 +85,9 @@ export function NetworkStoreProvider({
   const { t } = useTranslation();
 
   const currentNetworkController = useSelector((state) => state.network);
+  const currentAccount = useSelector(
+    (state) => state.preference.currentAccount
+  );
 
   const customProviders = useSelector(getCustomProvidersSelector);
 
@@ -86,9 +100,13 @@ export function NetworkStoreProvider({
         return provider;
       } catch (error: any) {
         console.error('useProviderById::error', error);
-        if (error?.code && error.code === ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+        if (error?.code) {
           ClickToCloseMessage.error(
-            t('SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST')
+            t(NetworkErrorCodeToMessageKey(error.code), {
+              replace: {
+                ecosystem_name: currentAccount?.ecosystem,
+              },
+            })
           );
         }
       } finally {
