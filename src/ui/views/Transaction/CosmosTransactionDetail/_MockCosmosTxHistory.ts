@@ -1,5 +1,28 @@
-export const MockCosmosTxHistory = {
+import { CosmosAppCurrency, CosmosChainInfo } from 'types/cosmos';
+
+export type CosmosTx = {
+  id: string;
+  status: string;
+  chainInfo: Partial<CosmosChainInfo>;
+  timestamp: number;
+  account?: any;
+  aminoMsgs?: any[];
+  fee?: Partial<{
+    amount: {
+      amount: string;
+      denom: string;
+    }[];
+    gas: string;
+  }>;
+  memo?: string;
+  mode?: string;
+  currency?: CosmosAppCurrency;
+  tx_hash?: string;
+};
+
+export const MockCosmosTxHistory: Record<string, CosmosTx | undefined> = {
   _pBWBbRUSHFMqiBDW6xcd: {
+    tx_hash: '114SB51H41SA9A198SX1ASDUNASD0',
     account: {
       '@type': '/cosmos.auth.v1beta1.BaseAccount',
       account_number: '539983',
@@ -60,4 +83,4 @@ export const MockCosmosTxHistory = {
     status: 'signed',
     timestamp: 1655802042037,
   },
-} as const;
+};
