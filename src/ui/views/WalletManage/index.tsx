@@ -64,7 +64,7 @@ const WalletManage: React.FC = () => {
   const [unlockType, setUnlockType] = useState('edit');
 
   const queryWallets = async () => {
-    const accounts: HdAccountStruct[] = await wallet.getWalletList(true);
+    const accounts: HdAccountStruct[] = await wallet.getWalletList();
     const hdWallets: HdAccountStruct[] = [],
       simpleWallets: HdAccountStruct[] = [];
     if (accounts?.length > 0) {
@@ -150,7 +150,11 @@ const WalletManage: React.FC = () => {
       return;
     }
     wallet
-      .changeAccountByWalletId(w.hdWalletId)
+      .changeAccountByWalletId(
+        w.hdWalletId,
+        w.accounts[0].ecosystem,
+        w.accounts[0].accountCreateType
+      )
       .then(() => history.goBack())
       .catch(async (e: BitError) => {
         //There is no account on this chain, which must unlock the keyring, and create a new account;
