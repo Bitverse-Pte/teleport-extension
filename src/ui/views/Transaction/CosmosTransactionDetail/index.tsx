@@ -154,16 +154,21 @@ export function _ActivityDetail() {
                 </div>
               </div>
             )} */}
-            {
-              <TransactionItemDetail
-                name="Time"
-                hoverValueText={date}
-                value={dayjs(transaction.timestamp).format(
-                  'YYYY-MM-DD HH:mm:ss'
-                )}
-              />
-            }
-            {/* <TransactionGasDetail txGroup={transaction} category={category} /> */}
+            <TransactionItemDetail
+              name="Time"
+              hoverValueText={date}
+              value={dayjs(transaction.timestamp).format('YYYY-MM-DD HH:mm:ss')}
+            />
+            <TransactionItemDetail
+              name="Fee"
+              value={`${transaction.fee.amount[0].amount} ${transaction.fee.amount[0].denom}`}
+            />
+            <TransactionItemDetail name="Gas" value={transaction.fee.gas} />
+            <TransactionItemDetail
+              name="Sequence"
+              value={transaction.account.sequence}
+            />
+            <TransactionItemDetail name="Memo" value={transaction.memo} />
           </div>
         </div>
       </div>
