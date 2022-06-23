@@ -2,6 +2,8 @@ import { keyringService, networkPreferenceService } from 'background/service';
 import { CosmosKey } from 'background/service/keyManager/cosmos/CosmosKey';
 import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
 import { encodeSecp256k1Signature, serializeSignDoc } from '@cosmjs/launchpad';
+import BitError from 'error';
+import { ErrorCode } from 'constants/code';
 
 class CosmosProviderController {
   @Reflect.metadata('SAFE', true)
@@ -54,8 +56,8 @@ class CosmosProviderController {
     const k = keyringService.getKeplrCompatibleKey(chainId);
     if (!k) throw Error('no key found');
     const signDoc = JSONUint8Array.unwrap(messages);
-    const pk = await keyringService.getPrivateKeyByAddress(k.bech32Address);
-    if (!pk) throw Error('no private key found');
+    const pk = keyringService.getPrivateKeyByAddress(k.bech32Address);
+    if (!pk) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
     const cosmosKey = new CosmosKey();
     const signature = cosmosKey.generateSignature(
       serializeSignDoc(signDoc),
@@ -78,8 +80,8 @@ class CosmosProviderController {
     const k = keyringService.getKeplrCompatibleKey(chainId);
     if (!k) throw Error('no key found');
     const signDoc = JSONUint8Array.unwrap(messages);
-    const pk = await keyringService.getPrivateKeyByAddress(k.bech32Address);
-    if (!pk) throw Error('no private key found');
+    const pk = keyringService.getPrivateKeyByAddress(k.bech32Address);
+    if (!pk) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
     const cosmosKey = new CosmosKey();
     const signature = cosmosKey.generateSignature(
       serializeSignDoc(signDoc),
