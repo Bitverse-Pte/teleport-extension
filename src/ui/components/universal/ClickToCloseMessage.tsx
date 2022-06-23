@@ -1,6 +1,7 @@
 import { message } from 'antd';
 import { ArgsProps } from 'antd/lib/message';
 import { nanoid } from 'nanoid';
+import './style.less';
 
 function isArgsProps(jc: React.ReactNode | ArgsProps): jc is ArgsProps {
   return typeof jc === 'object' && Boolean((jc as any).content);
