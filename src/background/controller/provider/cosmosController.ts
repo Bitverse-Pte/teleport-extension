@@ -55,6 +55,7 @@ class CosmosProviderController {
     if (!k) throw Error('no key found');
     const signDoc = JSONUint8Array.unwrap(messages);
     const pk = await keyringService.getPrivateKeyByAddress(k.bech32Address);
+    if (!pk) throw Error('no private key found');
     const cosmosKey = new CosmosKey();
     const signature = cosmosKey.generateSignature(
       serializeSignDoc(signDoc),
@@ -78,6 +79,7 @@ class CosmosProviderController {
     if (!k) throw Error('no key found');
     const signDoc = JSONUint8Array.unwrap(messages);
     const pk = await keyringService.getPrivateKeyByAddress(k.bech32Address);
+    if (!pk) throw Error('no private key found');
     const cosmosKey = new CosmosKey();
     const signature = cosmosKey.generateSignature(
       serializeSignDoc(signDoc),
