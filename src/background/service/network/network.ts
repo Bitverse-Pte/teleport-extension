@@ -425,7 +425,7 @@ class NetworkPreferenceService extends EventEmitter {
     return newSettings;
   }
 
-  removeCustomNetwork(idToBeRm: string): boolean {
+  async removeCustomNetwork(idToBeRm: string): Promise<boolean> {
     const { networks, orderOfNetworks } = this.customNetworksStore.getState();
     const providerToBeRemoved = this._getCustomNetwork(idToBeRm);
     if (!providerToBeRemoved) {
@@ -434,6 +434,15 @@ class NetworkPreferenceService extends EventEmitter {
     const removedCustomNetworks = networks.filter(
       (n) => n.id !== providerToBeRemoved.id
     );
+    /**
+     * Cleanup account for old provider
+     * only when it's a Cosmos Provider
+     */
+    if (providerToBeRemoved.ecosystem === Ecosystem.COSMOS) {
+      await keyringService.deleteAccountsByChainCustomId(
+        providerToBeRemoved.id
+      );
+    }
     const removedCustomOrdering = orderOfNetworks[
       providerToBeRemoved.ecosystem
     ].filter((nId) => nId !== providerToBeRemoved.id);

@@ -12,6 +12,8 @@ import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import { TransactionItemDetail } from '../components/TransactionItemDetail.component';
 import { MockCosmosTxHistory } from './_MockCosmosTxHistory';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
+import { Tooltip } from 'antd';
+import { CosmosTx } from 'background/service/transactions/cosmos/tx';
 const { sensors } = skynet;
 
 const activityId = '_pBWBbRUSHFMqiBDW6xcd';
@@ -54,20 +56,14 @@ export default function ActivityDetail() {
       </div>
     );
   } else {
-    return (
-      <_ActivityDetail
-      // transaction={transaction}
-      />
-    );
+    return <_ActivityDetail transaction={transaction} />;
   }
 }
 
-export function _ActivityDetail() {
-  //   {
-  //   transaction,
-  // }: {
-  //   transaction: TransactionGroup;
-  // }
+const shortenedStr = (str: string, digits = 6, isHex = true) =>
+  `${str.slice(0, isHex ? digits + 2 : digits)}...${str.slice(-digits)}`;
+
+export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
   const {
     title,
     // subtitle,
@@ -137,33 +133,34 @@ export function _ActivityDetail() {
               <IconComponent name="arrow-right" cls="to-icon" />
               <AddressCard title="To" address={recipientAddress} />
             </div>
-            {/** @TODO transaction need `hash`` property  */}
-            {/* {(transaction as any).hash && (
+            {transaction.tx_hash && (
               <div className="row">
                 <div className="field-name">Transaction ID</div>
                 <div className="field-value">
-                  <Tooltip placement="topRight" title={primaryTransaction.hash}>
-                    {shortenedStr(primaryTransaction.hash, 4)}
+                  <Tooltip placement="topRight" title={transaction.tx_hash}>
+                    {shortenedStr(transaction.tx_hash, 4)}
                   </Tooltip>
-                  <CopyOrOpenInScan
+                  {/* <CopyOrOpenInScan
                     handleExplorerClick={() =>
                       handleExplorerClick('tx', primaryTransaction.hash!)
                     }
                     textToBeCopy={primaryTransaction.hash}
-                  />
+                  /> */}
                 </div>
               </div>
-            )} */}
+            )}
             <TransactionItemDetail
               name="Time"
               hoverValueText={date}
               value={dayjs(transaction.timestamp).format('YYYY-MM-DD HH:mm:ss')}
             />
-            <TransactionItemDetail
-              name="Fee"
-              value={`${transaction.fee.amount[0].amount} ${transaction.fee.amount[0].denom}`}
-            />
-            <TransactionItemDetail name="Gas" value={transaction.fee.gas} />
+            {transaction.fee?.amount && (
+              <TransactionItemDetail
+                name="Fee"
+                value={`${transaction.fee.amount[0].amount} ${transaction.fee.amount[0].denom}`}
+              />
+            )}
+            <TransactionItemDetail name="Gas" value={transaction.fee?.gas} />
             <TransactionItemDetail
               name="Sequence"
               value={transaction.account.sequence}

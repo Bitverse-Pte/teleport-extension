@@ -1,5 +1,8 @@
-export const MockCosmosTxHistory = {
+import { CosmosTx } from 'background/service/transactions/cosmos/tx';
+
+export const MockCosmosTxHistory: Record<string, CosmosTx | undefined> = {
   _pBWBbRUSHFMqiBDW6xcd: {
+    tx_hash: '114SB51H41SA9A198SX1ASDUNASD0',
     account: {
       '@type': '/cosmos.auth.v1beta1.BaseAccount',
       account_number: '539983',
@@ -60,4 +63,4 @@ export const MockCosmosTxHistory = {
     status: 'signed',
     timestamp: 1655802042037,
   },
-} as const;
+};
