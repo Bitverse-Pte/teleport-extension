@@ -277,14 +277,14 @@ export class CosmosAccountImpl {
       currency,
     });
 
-    switch (denomHelper.type) {
-      case 'native':
-        const actualAmount = (() => {
-          let dec = new Dec(amount);
-          dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
-          return dec.truncate().toString();
-        })();
+    const actualAmount = () => {
+      let dec = new Dec(amount);
+      dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
+      return dec.truncate().toString();
+    };
 
+    switch (denomHelper.type) {
+      case 'native': {
         const msg = {
           type: this.msgOpts.send.native.type,
           value: {
@@ -293,7 +293,7 @@ export class CosmosAccountImpl {
             amount: [
               {
                 denom: currency.coinMinimalDenom,
-                amount: actualAmount,
+                amount: actualAmount(),
               },
             ],
           },
@@ -340,6 +340,7 @@ export class CosmosAccountImpl {
           })
         );
         return true;
+      }
     }
 
     return false;
@@ -363,10 +364,9 @@ export class CosmosAccountImpl {
     if (!k) throw Error('no key found');
     const { bech32Address, pubKey } = k;
 
-    const { account: { account_number, sequence } } = await this.getAccounts(
-      ecoSystemParams?.rest,
-      bech32Address
-    );
+    const {
+      account: { account_number, sequence },
+    } = await this.getAccounts(ecoSystemParams?.rest, bech32Address);
 
     const actualAmount = (_amount) => {
       let dec = new Dec(_amount);
@@ -374,29 +374,29 @@ export class CosmosAccountImpl {
       return dec.truncate().toString();
     };
     return {
-      'chain_id': chainId,
-      'account_number': account_number,
-      'sequence': sequence,
-      'fee': stdFee,
-      'from_address': bech32Address,
-      'to_address': recipient,
-      'msgs': [
+      chain_id: chainId,
+      account_number: account_number,
+      sequence: sequence,
+      fee: stdFee,
+      from_address: bech32Address,
+      to_address: recipient,
+      msgs: [
         {
-          'type': this.msgOpts.send.native.type,
-          'value': {
-            'from_address': bech32Address,
-            'to_address': recipient,
-            'amount': [
+          type: this.msgOpts.send.native.type,
+          value: {
+            from_address: bech32Address,
+            to_address: recipient,
+            amount: [
               {
-                'denom': currency.coinMinimalDenom,
-                'amount': actualAmount(amount)
-              }
-            ]
-          }
-        }
+                denom: currency.coinMinimalDenom,
+                amount: actualAmount(amount),
+              },
+            ],
+          },
+        },
       ],
-      'memo': memo
-    }
+      memo: memo,
+    };
   }
 
   async sendMsgs(
