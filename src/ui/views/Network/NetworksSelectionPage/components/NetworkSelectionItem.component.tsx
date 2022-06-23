@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Provider } from 'types/network';
+import { Ecosystem, Provider } from 'types/network';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { ReactComponent as IconTrash } from 'assets/action-icon/trash.svg';
@@ -120,6 +120,11 @@ const NetworkActions = ({ network }: { network: Provider }) => {
     'display-on-hover': !isSelectedNetwork,
   };
 
+  /**
+   * Current only support editing EVM network provider
+   */
+  const isProviderEditable = [Ecosystem.EVM].includes(network.ecosystem);
+
   return (
     <span className="actions flex">
       <div className="flex justify-center items-center">
@@ -132,17 +137,19 @@ const NetworkActions = ({ network }: { network: Provider }) => {
           <IconTrash width={16} fill={isSelectedNetwork ? '#5E6C8A' : '#000'} />
         </Button>
 
-        <Button
-          className={clsx(hoverToDisplayProperties, 'narrow-padding')}
-          type="text"
-          onClick={(e) => {
-            // stop the parent's onClick event
-            e.stopPropagation();
-            jumpToExpandedView(`/network/edit/${network.id}`);
-          }}
-        >
-          <IconEdit width={16} />
-        </Button>
+        {isProviderEditable && (
+          <Button
+            className={clsx(hoverToDisplayProperties, 'narrow-padding')}
+            type="text"
+            onClick={(e) => {
+              // stop the parent's onClick event
+              e.stopPropagation();
+              jumpToExpandedView(`/network/edit/${network.id}`);
+            }}
+          >
+            <IconEdit width={16} />
+          </Button>
+        )}
         <Button
           className={clsx('narrow-padding', !isSelectedNetwork && 'hidden')}
           type="text"

@@ -65,6 +65,7 @@ import { ChainIdHelper } from 'utils/cosmos/chainId';
 import { CosmosChainInfo } from 'types/cosmos';
 import { parsedKeplrChainInfoAsTeleportCosmosProvider } from '../cosmos/utils/provider.utils';
 import { ChainInfoSchema } from './cosmos/validation/chainInfoSchema';
+import { CosmosChainUpdaterService } from './cosmos/updater';
 
 const toHexString = (val: string | number) =>
   addHexPrefix(Number(val).toString(16));
@@ -132,6 +133,7 @@ class NetworkPreferenceService extends EventEmitter {
   private _blockTracker!: PollingBlockTracker | null;
   private _provider!: any;
   private _store: ComposedStorage<NetworkPreferenceStore>;
+  cosmosChainUpdater: CosmosChainUpdaterService;
 
   // UI communication
 
@@ -198,6 +200,11 @@ class NetworkPreferenceService extends EventEmitter {
       );
     });
     this.on(NETWORK_EVENTS.NETWORK_DID_CHANGE, this.lookupNetwork);
+
+    /**
+     * Cosmos related
+     */
+    this.cosmosChainUpdater = new CosmosChainUpdaterService(this);
 
     setTimeout(this._customNetworkStoreMigration.bind(this), 5 * 1000);
   }
@@ -278,6 +285,16 @@ class NetworkPreferenceService extends EventEmitter {
     this.customNetworksStore.updateState({
       orderOfNetworks: _tmpNetworkOrder,
     });
+
+    /**
+     * update (if) current cosmos provider
+     */
+    const currentProvider = this.getProviderConfig();
+    if (currentProvider.ecosystem === Ecosystem.COSMOS) {
+      const updatedProvider =
+        this.cosmosChainUpdater.putUpdatedPropertyToProvider(currentProvider);
+      this.setProviderConfig(updatedProvider);
+    }
   }
 
   checkIsCustomNetworkNameLegit(newNickname: string) {
@@ -716,14 +733,18 @@ class NetworkPreferenceService extends EventEmitter {
   /**
    * Sets the provider config and switches the network.
    */
-  setProviderConfig(config: Provider) {
+  setProviderConfig(config: Provider, shouldSetDestinationChainAccount = true) {
     if (!this._checkAccountExistWithChain(config))
       throw new BitError(ErrorCode.ACCOUNT_DOES_NOT_EXIST);
+    if (!this._isSameEcosystemForCurrentAccount(config)) {
+      throw new BitError(ErrorCode.NORMAL_WALLET_SWITCH_EVM_ONLY);
+    }
     const copiedConfig = config;
     copiedConfig.rpcUrl = parseStringTemplate(copiedConfig.rpcUrl, {
       INFURA_API_KEY: process.env.INFURA_PROJECT_ID as string,
     });
     if (
+      shouldSetDestinationChainAccount &&
       !(
         this.getProviderConfig().ecosystem === Ecosystem.EVM &&
         config.ecosystem === Ecosystem.EVM
@@ -752,6 +773,24 @@ class NetworkPreferenceService extends EventEmitter {
       (chain.ecosystem !== Ecosystem.EVM &&
         allAccounts.some((a: BaseAccount) => a.chainCustomId === chain.id))
     );
+  }
+
+  private _isSameEcosystemForCurrentAccount(chain: Provider): boolean {
+    const currentWallet = preferenceService.getCurrentAccount();
+    const isNormalWallet =
+      currentWallet?.accountCreateType === AccountCreateType.PRIVATE_KEY;
+    /**
+     * MNEMONIC account do not care about ecosystem,
+     * only normal wallet (wallet that imported by private key)
+     */
+    if (!isNormalWallet) return true;
+
+    /**
+     * `true` that if:
+     * - is normal wallet
+     * - or it's same ecosystem with current wallet
+     */
+    return currentWallet.ecosystem === chain.ecosystem;
   }
 
   private _setDestinationChainAccount(chain: Provider) {
@@ -869,12 +908,34 @@ class NetworkPreferenceService extends EventEmitter {
       type: 'rpc',
     }));
 
-    return [...presetProviders, ...customProviders];
+    return [...presetProviders, ...customProviders].map((p) => {
+      if (p.ecosystem === Ecosystem.COSMOS) {
+        /**
+         * Apply updated infos to the cosmos provider
+         */
+        return this.cosmosChainUpdater.putUpdatedPropertyToProvider(p);
+      } else {
+        return p;
+      }
+    });
   }
 
   getProvider(id: PresetNetworkId | string): Provider | undefined {
     const networks = this.getAllProviders();
     return networks.find((n) => n.id === id);
+  }
+
+  useProviderById(id: PresetNetworkId | string, shouldSetDestChainAcc = true) {
+    const provider = this.getProvider(id);
+    if (!provider) {
+      throw new BitError(
+        Object.values(PresetNetworkId).includes(id as PresetNetworkId)
+          ? ErrorCode.DEFAULT_NETWORK_PROVIDER_PRESET_MISSING
+          : ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING
+      );
+    }
+    this.setProviderConfig(provider, shouldSetDestChainAcc);
+    return provider;
   }
 
   getSupportProviders(): Provider[] {

@@ -1,5 +1,6 @@
 import { MAINNET_CHAIN_ID } from 'constants/network';
 import TransactionController from './transactions/index';
+import cosmosTxFn from './transactions/cosmos';
 import NetworkController, { NETWORK_EVENTS } from './network/index';
 import keyringController from './keyring';
 import { GasFeeController, ControllerMessenger } from '@metamask/controllers';
@@ -17,7 +18,6 @@ import platform from './extension';
 import knownMethodService from './knownMethod';
 import { LatestBlockDataHubService } from './network/latestBlockDataHub';
 import contactBookService from './contactBook';
-import { CosmosChainUpdaterService } from './network/cosmos/updater';
 
 const controllerMessenger = new ControllerMessenger();
 
@@ -91,18 +91,14 @@ const latestBlockDataHub = new LatestBlockDataHubService({
   networkProviderStore: networkController.networkStore,
 });
 
-/**
- * Cosmos related
- */
-
-const cosmosChainUpdater = new CosmosChainUpdaterService(networkController);
-
 latestBlockDataHub.store.subscribe(({ isBaseFeePerGasExist }) => {
   networkPreferenceService.markCurrentNetworkEIPStatus(
     '1559',
     isBaseFeePerGasExist
   );
 });
+
+const cosmosTxController = cosmosTxFn(networkPreferenceService);
 
 export {
   txController,
@@ -114,12 +110,12 @@ export {
   preferenceService,
   networkPreferenceService,
   sessionService,
-  cosmosChainUpdater,
   i18n,
   knownMethodService,
   TokenService,
   latestBlockDataHub,
   contactBookService,
+  cosmosTxController,
 };
 
 async function newUnapprovedTransaction(txParams, req) {

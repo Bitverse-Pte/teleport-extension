@@ -76,6 +76,7 @@ const Send = () => {
   const [fromAccount, setFromAccount] = useState<BaseAccount>();
   const [amount, setAmount] = useState<string>('0');
   const [toAddress, setToAddress] = useState<string>();
+  const [memo, setMemo] = useState<string>();
   const [showToList, setShowToList] = useState<boolean>(false);
   const [balance, setBalance] = useState<Token[]>([]);
   const [accountSelectPopupVisible, setAccountSelectPopupVisible] =
@@ -91,19 +92,19 @@ const Send = () => {
   );
   const isSupport1559 = useSelector((state) => state.send.eip1559support);
   console.debug('isSupport1559: ', isSupport1559);
-  const isGasEstimateLoading = useSelector(
-    (state) => state.send.gas.isGasEstimateLoading
-  );
+  // const isGasEstimateLoading = useSelector(
+  //   (state) => state.send.gas.isGasEstimateLoading
+  // );
 
   const cleanup = useCallback(() => {
     dispatch(resetSendState());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (chainId !== undefined) {
-      dispatch(initializeSendState({ assetId: tokenId }));
-    }
-  }, [chainId, dispatch, cleanup]);
+  // useEffect(() => {
+  //   if (chainId !== undefined) {
+  //     dispatch(initializeSendState({ assetId: tokenId }));
+  //   }
+  // }, [chainId, dispatch, cleanup]);
 
   useEffect(() => {
     return () => {
@@ -119,7 +120,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const balances = await wallet.getTokenBalancesAsync().catch((e) => {
+    const balances = await wallet.getTokenBalancesAsync(true).catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) {
@@ -132,7 +133,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const balances = await wallet.getTokenBalancesSync().catch((e) => {
+    const balances = await wallet.getTokenBalancesSync(true).catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) {
@@ -169,55 +170,59 @@ const Send = () => {
       setUnlockPopupVisible(true);
       return;
     }
-    const hexAmountValue = getHexAmount(amount);
+    // const hexAmountValue = getHexAmount(amount);
 
-    const type = isSupport1559
-      ? TransactionEnvelopeTypes.FEE_MARKET
-      : TransactionEnvelopeTypes.LEGACY;
-    const params: Record<string, any> = {
-      from: fromAccount?.address,
-      value: TransactionEnvelopeTypes.LEGACY,
-      isSend: true,
-      type: type,
-    };
-    if (selectedToken?.isNative) {
-      params.to = toAddress;
-      params.value = hexAmountValue;
-    } else {
-      // erc-20 tokens
-      params.to = selectedToken?.contractAddress;
-      params.data = generateTokenTransferData({
-        toAddress: toAddress,
-        amount: hexAmountValue,
-      });
-    }
-    params.txParam = {
-      from: fromAccount?.address,
-      to: toAddress,
-      value: hexAmountValue,
-      type: type,
-      symbol: selectedToken?.symbol,
-    };
-    params.gas = draftTransaction.gas;
-    params.txParam.gas = draftTransaction.gas;
-    if (isSupport1559) {
-      delete params.gasPrice;
-    } else {
-      delete params.maxFeePerGas;
-      delete params.maxPriorityFeePerGas;
-    }
-    await wallet.addContactByDefaultName(toAddress);
-    wallet.sendRequest({
-      method: 'eth_sendTransaction',
-      params: [params],
+    // const type = isSupport1559
+    //   ? TransactionEnvelopeTypes.FEE_MARKET
+    //   : TransactionEnvelopeTypes.LEGACY;
+    // const params: Record<string, any> = {
+    //   from: fromAccount?.address,
+    //   value: TransactionEnvelopeTypes.LEGACY,
+    //   isSend: true,
+    //   type: type,
+    // };
+    // if (selectedToken?.isNative) {
+    //   params.to = toAddress;
+    //   params.value = hexAmountValue;
+    // } else {
+    //   // erc-20 tokens
+    //   params.to = selectedToken?.contractAddress;
+    //   params.data = generateTokenTransferData({
+    //     toAddress: toAddress,
+    //     amount: hexAmountValue,
+    //   });
+    // }
+    // const txParams = {
+    //   from: fromAccount?.address,
+    //   to: toAddress,
+    //   value: amount,
+    //   symbol: selectedToken?.symbol,
+    // };
+
+    history.push({
+      pathname: '/confirm-send-cos',
+      state: { amount, recipient: toAddress, memo, token: selectedToken },
     });
-    sensors.track('teleport_send_next', {
-      page: location.pathname,
-      from: params.txParam.from,
-      to: params.txParam.to,
-      symbol: params.txParam.symbol,
-    });
-    history.push('/confirm-transaction');
+    // params.gas = draftTransaction.gas;
+    // params.txParam.gas = draftTransaction.gas;
+    // if (isSupport1559) {
+    //   delete params.gasPrice;
+    // } else {
+    //   delete params.maxFeePerGas;
+    //   delete params.maxPriorityFeePerGas;
+    // }
+    // await wallet.addContactByDefaultName(toAddress);
+    // wallet.sendRequest({
+    //   method: 'eth_sendTransaction',
+    //   params: [params],
+    // });
+    // sensors.track('teleport_send_next', {
+    //   page: location.pathname,
+    //   from: params.txParam.from,
+    //   to: params.txParam.to,
+    //   symbol: params.txParam.symbol,
+    // });
+    // history.push('/confirm-transaction');
   };
 
   const myAccountsSelect = () => {
@@ -252,6 +257,10 @@ const Send = () => {
     }
   };
 
+  const handleMemoChanged = (val) => {
+    setMemo(val);
+  };
+
   const handleAmountChanged = (val) => {
     setAmount(val);
     const hexVal = getHexAmount(val);
@@ -263,7 +272,6 @@ const Send = () => {
       !isValidAddress(toAddress || '0x0') ||
       !amount ||
       !selectedToken ||
-      isGasEstimateLoading ||
       (selectedToken.amount &&
         new BigNumber(
           utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
@@ -387,6 +395,14 @@ const Send = () => {
             MAX
           </button>
         </div>
+        <p className="send-form-title">{t('Memo')}(Optional)</p>
+        <Input
+          placeholder={t('Enter memo')}
+          value={memo}
+          className="customInputStyle"
+          onClick={(e) => e.stopPropagation()}
+          onChange={(e) => setMemo(e.target.value)}
+        />
         <p className="send-form-title">{t('To')}</p>
         <Input
           placeholder={t('Enter Address')}
@@ -436,19 +452,9 @@ const Send = () => {
         />
         <div className="button-container send-btn-con">
           <div className="button-inner">
-            <div className="gas-limit-container flexR">
-              <div className="gas-limit-title">Estimated Gas Limit:</div>
-              {isGasEstimateLoading ? (
-                <Spin size="small" />
-              ) : (
-                <div className="gas-limit-value">
-                  {Number(draftTransaction.gas)}
-                </div>
-              )}
-            </div>
             <CustomButton
               type="primary"
-              disabled={invalidate()}
+              // disabled={invalidate()}
               onClick={next}
               cls="theme"
               block
