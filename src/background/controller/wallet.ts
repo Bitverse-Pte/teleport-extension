@@ -13,6 +13,7 @@ import {
   contactBookService,
   latestBlockDataHub,
   cosmosTxController,
+  cosmosFeeService,
 } from 'background/service';
 import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
@@ -651,6 +652,16 @@ export class WalletController extends BaseController {
       signOptions,
       onTxEvents
     );
+  };
+
+  getCosmosStdFee = (feeType, sendCurrency) => {
+    return cosmosFeeService.toStdFee(feeType, sendCurrency);
+  };
+  getCosmosFeeTypePrimitive = (feeType, sendCurrency) => {
+    return cosmosFeeService.getFeeTypePrimitive(feeType, sendCurrency);
+  };
+  getCosmosFeeTypePretty = (feeType, sendCurrency) => {
+    return cosmosFeeService.getFeeTypePretty(feeType, sendCurrency);
   };
 }
 

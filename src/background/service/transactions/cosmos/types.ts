@@ -26,3 +26,46 @@ export interface CosChainInfo {
   readonly bech32Config: Bech32Config;
   readonly coinType: number;
 }
+
+export type FeeType = 'high' | 'average' | 'low';
+
+export interface MsgOpt {
+  readonly type: string;
+  readonly gas: number;
+}
+
+export interface CosmosMsgOpts {
+  readonly send: {
+    readonly native: MsgOpt;
+  };
+  readonly ibcTransfer: MsgOpt;
+  readonly delegate: MsgOpt;
+  readonly undelegate: MsgOpt;
+  readonly redelegate: MsgOpt;
+  // The gas multiplication per rewards.
+  readonly withdrawRewards: MsgOpt;
+  readonly govVote: MsgOpt;
+}
+
+export interface SecretMsgOpts {
+  readonly send: {
+    readonly secret20: Pick<MsgOpt, 'gas'>;
+  };
+
+  readonly createSecret20ViewingKey: Pick<MsgOpt, 'gas'>;
+  readonly executeSecretWasm: Pick<MsgOpt, 'type'>;
+}
+
+export interface CosmwasmMsgOpts {
+  readonly send: {
+    readonly cw20: Pick<MsgOpt, 'gas'>;
+  };
+
+  readonly executeWasm: Pick<MsgOpt, 'type'>;
+}
+
+export interface GasPriceStep {
+  low: number;
+  average: number;
+  high: number;
+}

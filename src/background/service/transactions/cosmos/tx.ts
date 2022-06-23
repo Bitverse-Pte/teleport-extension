@@ -277,14 +277,14 @@ export class CosmosAccountImpl {
       currency,
     });
 
-    switch (denomHelper.type) {
-      case 'native':
-        const actualAmount = (() => {
-          let dec = new Dec(amount);
-          dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
-          return dec.truncate().toString();
-        })();
+    const actualAmount = () => {
+      let dec = new Dec(amount);
+      dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
+      return dec.truncate().toString();
+    };
 
+    switch (denomHelper.type) {
+      case 'native': {
         const msg = {
           type: this.msgOpts.send.native.type,
           value: {
@@ -293,7 +293,7 @@ export class CosmosAccountImpl {
             amount: [
               {
                 denom: currency.coinMinimalDenom,
-                amount: actualAmount,
+                amount: actualAmount(),
               },
             ],
           },
@@ -340,6 +340,7 @@ export class CosmosAccountImpl {
           })
         );
         return true;
+      }
     }
 
     return false;
