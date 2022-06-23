@@ -1,24 +1,4 @@
-import { CosmosAppCurrency, CosmosChainInfo } from 'types/cosmos';
-
-export type CosmosTx = {
-  id: string;
-  status: string;
-  chainInfo: Partial<CosmosChainInfo>;
-  timestamp: number;
-  account?: any;
-  aminoMsgs?: any[];
-  fee?: Partial<{
-    amount: {
-      amount: string;
-      denom: string;
-    }[];
-    gas: string;
-  }>;
-  memo?: string;
-  mode?: string;
-  currency?: CosmosAppCurrency;
-  tx_hash?: string;
-};
+import { CosmosTx } from "background/service/transactions/cosmos/tx";
 
 export const MockCosmosTxHistory: Record<string, CosmosTx | undefined> = {
   _pBWBbRUSHFMqiBDW6xcd: {

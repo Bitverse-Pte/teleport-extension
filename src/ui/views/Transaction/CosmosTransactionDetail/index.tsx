@@ -10,9 +10,10 @@ import { useTranslation } from 'react-i18next';
 import skynet from 'utils/skynet';
 import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import { TransactionItemDetail } from '../components/TransactionItemDetail.component';
-import { CosmosTx, MockCosmosTxHistory } from './_MockCosmosTxHistory';
+import { MockCosmosTxHistory } from './_MockCosmosTxHistory';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
+import { CosmosTx } from 'background/service/transactions/cosmos/tx';
 const { sensors } = skynet;
 
 const activityId = '_pBWBbRUSHFMqiBDW6xcd';
