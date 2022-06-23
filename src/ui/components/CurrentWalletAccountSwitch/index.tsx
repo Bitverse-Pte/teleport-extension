@@ -14,13 +14,16 @@ import siteActiveIcon from 'assets/siteActive.svg';
 import classnames from 'classnames';
 import skynet from 'utils/skynet';
 import { getUnit10ByAddress } from 'background/utils';
+import { Divider } from 'antd';
 
 const { sensors } = skynet;
 
 interface AccountSwitchProps {
   handleAccountClick?: (account: BaseAccount) => void;
   handleSiteClick?: (account: BaseAccount) => void;
+  handleSiteClickCosm?: () => void;
   visible?: boolean;
+  isEvm?: boolean;
 }
 
 const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
@@ -65,6 +68,31 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
       >
         {walletName}
       </WalletName>
+      {!props.isEvm && (
+        <div className="connected-sites flexR">
+          <div className="connected-sites-left flexR">Connected Sites</div>
+          <div className="connected-sites-right flexR">
+            <div
+              className="connected-sites-action cursor flexR"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (props.handleSiteClickCosm) {
+                  sensors.track('teleport_account_switch_connected_sites', {
+                    page: location.pathname,
+                  });
+                  props.handleSiteClickCosm();
+                }
+              }}
+            >
+              <img
+                src={siteDefaultIcon}
+                className="connected-sites-action-icon key-default-icon"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      {!props.isEvm && <Divider style={{ margin: '16px 20px' }} />}
       <div className="accounts flexCol">
         {accountList?.map(
           (a: Object.Merge<BaseAccount, { selected?: boolean }>) => {
@@ -121,30 +149,32 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
                       className="account-item-action-icon key-active-icon"
                     />
                   </div>
-                  <div
-                    className="account-item-action cursor flexR"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (props.handleSiteClick) {
-                        sensors.track(
-                          'teleport_account_switch_connected_sites',
-                          {
-                            page: location.pathname,
-                          }
-                        );
-                        props.handleSiteClick(a);
-                      }
-                    }}
-                  >
-                    <img
-                      src={siteDefaultIcon}
-                      className="account-item-action-icon key-default-icon"
-                    />
-                    <img
-                      src={siteActiveIcon}
-                      className="account-item-action-icon key-active-icon"
-                    />
-                  </div>
+                  {props.isEvm && (
+                    <div
+                      className="account-item-action cursor flexR"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (props.handleSiteClick) {
+                          sensors.track(
+                            'teleport_account_switch_connected_sites',
+                            {
+                              page: location.pathname,
+                            }
+                          );
+                          props.handleSiteClick(a);
+                        }
+                      }}
+                    >
+                      <img
+                        src={siteDefaultIcon}
+                        className="account-item-action-icon key-default-icon"
+                      />
+                      <img
+                        src={siteActiveIcon}
+                        className="account-item-action-icon key-active-icon"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             );

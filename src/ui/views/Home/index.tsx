@@ -177,6 +177,10 @@ const Home = () => {
     console.log(account);
   };
 
+  const handleSiteClickCosm = async () => {
+    setConnectedSitePopupVisible(true);
+  };
+
   const handleReceiveBtnClick = () => {
     sensors.track('teleport_home_receive_click', {
       page: location.pathname,
@@ -514,9 +518,11 @@ const Home = () => {
             </div>
 
             <CurrentWalletAccountSwitch
+              isEvm={currentChain.ecosystem === Ecosystem.EVM}
               visible={accountPopupVisible}
               handleAccountClick={handleAccountClick}
               handleSiteClick={handleSiteClick}
+              handleSiteClickCosm={handleSiteClickCosm}
             />
           </div>
           <Drawer
@@ -539,6 +545,8 @@ const Home = () => {
           >
             <div style={{ width: '100%', height: '100%' }}>
               <ConnectedSites
+                isEvm={currentChain.ecosystem === Ecosystem.EVM}
+                chainId={currentChain.chainId}
                 account={account2ConnectedSite}
                 visible={connectedSitePopupVisible}
                 handleOnClose={() => {

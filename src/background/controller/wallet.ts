@@ -217,8 +217,14 @@ export class WalletController extends BaseController {
   getConnectedSitesByAccount = (account: string) =>
     permissionService.getConnectedSitesByAccount(account);
 
+  getConnectedSitesByChainId = (chainId: string) =>
+    permissionService.getConnectedSitesByChainId(chainId);
+
   removeConnectedSite = (origin: string, account: string) =>
     permissionService.removeConnectedSite(origin, account);
+
+  removeConnectedSiteByChainId = (origin: string, chainId: string) =>
+    permissionService.removeConnectedSiteByChainId(origin, chainId);
 
   getPrivateKey = async (password: string, hdWalletId: string) => {
     await this.verifyPassword(password);
