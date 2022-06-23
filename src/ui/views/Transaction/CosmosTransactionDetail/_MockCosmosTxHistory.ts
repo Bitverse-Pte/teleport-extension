@@ -1,4 +1,4 @@
-import { CosmosTx } from "background/service/transactions/cosmos/tx";
+import { CosmosTx } from 'background/service/transactions/cosmos/tx';
 
 export const MockCosmosTxHistory: Record<string, CosmosTx | undefined> = {
   _pBWBbRUSHFMqiBDW6xcd: {
