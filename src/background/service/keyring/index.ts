@@ -1048,6 +1048,7 @@ class KeyringService extends EventEmitter {
       if (!account) throw Error('no account found');
       preferenceService.setCurrentAccount(account);
       const provider = networkPreferenceService.getProvider(destChainCustomId);
+      if (provider) networkPreferenceService.setProviderConfig(provider, false);
     }
   }
 

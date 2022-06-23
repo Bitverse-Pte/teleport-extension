@@ -613,7 +613,7 @@ export class WalletController extends BaseController {
     currency,
     recipient: string,
     memo = '',
-    stdFee = {},
+    stdFee = {}
   ) => {
     return await cosmosTxController.cosmos.generateMsg(
       amount,
