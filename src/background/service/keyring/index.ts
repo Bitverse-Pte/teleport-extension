@@ -642,7 +642,7 @@ class KeyringService extends EventEmitter {
    */
   private async _persistAllAccount(): Promise<boolean> {
     if (!this.password) {
-      return Promise.reject(new Error('no password found'));
+      return Promise.reject(new BitError(ErrorCode.WALLET_WAS_LOCKED));
     }
     const encryptedSecret = await encrypt.encrypt(
       this.password as string,
@@ -1245,6 +1245,16 @@ class KeyringService extends EventEmitter {
     });
     this.secrets = this.secrets.filter(
       (a: Secret) => !shouldDeleteAccountAddressSet.has(a.address)
+    );
+    await this._persistAllAccount();
+  }
+
+  async deleteAccountsByChainCustomId(chainCustomId: string): Promise<void> {
+    if (!this.password) {
+      return Promise.reject(new BitError(ErrorCode.WALLET_WAS_LOCKED));
+    }
+    this.accounts = this.accounts.filter(
+      (a: BaseAccount) => a.chainCustomId !== chainCustomId
     );
     await this._persistAllAccount();
   }

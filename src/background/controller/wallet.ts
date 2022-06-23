@@ -353,6 +353,10 @@ export class WalletController extends BaseController {
     return keyringService.deleteDisplayAccount(hdWalletId, addressIndex);
   }
 
+  public deleteAccountsByChainCustomId(chainCustomId: string): Promise<void> {
+    return keyringService.deleteAccountsByChainCustomId(chainCustomId);
+  }
+
   public renameDisplayAccount(
     hdWalletId: string,
     name: string,
