@@ -733,7 +733,7 @@ class NetworkPreferenceService extends EventEmitter {
   /**
    * Sets the provider config and switches the network.
    */
-  setProviderConfig(config: Provider) {
+  setProviderConfig(config: Provider, shouldSetDestinationChainAccount = true) {
     if (!this._checkAccountExistWithChain(config))
       throw new BitError(ErrorCode.ACCOUNT_DOES_NOT_EXIST);
     if (!this._isSameEcosystemForCurrentAccount(config)) {
@@ -744,6 +744,7 @@ class NetworkPreferenceService extends EventEmitter {
       INFURA_API_KEY: process.env.INFURA_PROJECT_ID as string,
     });
     if (
+      shouldSetDestinationChainAccount &&
       !(
         this.getProviderConfig().ecosystem === Ecosystem.EVM &&
         config.ecosystem === Ecosystem.EVM
@@ -922,6 +923,19 @@ class NetworkPreferenceService extends EventEmitter {
   getProvider(id: PresetNetworkId | string): Provider | undefined {
     const networks = this.getAllProviders();
     return networks.find((n) => n.id === id);
+  }
+
+  useProviderById(id: PresetNetworkId | string, shouldSetDestChainAcc = true) {
+    const provider = this.getProvider(id);
+    if (!provider) {
+      throw new BitError(
+        Object.values(PresetNetworkId).includes(id as PresetNetworkId)
+          ? ErrorCode.DEFAULT_NETWORK_PROVIDER_PRESET_MISSING
+          : ErrorCode.CUSTOM_NETWORK_PROVIDER_MISSING
+      );
+    }
+    this.setProviderConfig(provider, shouldSetDestChainAcc);
+    return provider;
   }
 
   getSupportProviders(): Provider[] {
