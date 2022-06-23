@@ -1007,25 +1007,49 @@ class KeyringService extends EventEmitter {
     return Promise.resolve(accounts);
   }
 
-  changeAccountByWallet(hdWalletId: string) {
+  changeAccountByWallet(
+    destHdWalletId: string,
+    destEcosystem: Ecosystem,
+    accountCreateType: AccountCreateType
+  ) {
     const { id, ecosystem } = networkPreferenceService.getProviderConfig();
-    const currentWalletAccounts: BaseAccount[] = cloneDeep(
-      this.accounts
-    ).filter((a: BaseAccount) => a.hdWalletId === hdWalletId);
-    let account: BaseAccount | undefined;
-    if (ecosystem === Ecosystem.EVM) {
-      account = currentWalletAccounts.find(
-        (a: BaseAccount) => a.ecosystem === Ecosystem.EVM
-      );
-    } else {
-      account = currentWalletAccounts.find(
-        (a: BaseAccount) => a.chainCustomId === id
-      );
-    }
-    if (account) {
+    const currentAccount = preference.getCurrentAccount();
+
+    if (
+      accountCreateType === AccountCreateType.MNEMONIC ||
+      (accountCreateType === AccountCreateType.PRIVATE_KEY &&
+        ecosystem === destEcosystem)
+    ) {
+      const account = this.accounts.find((a: BaseAccount) => {
+        return (
+          a.hdWalletId === destHdWalletId &&
+          a.chainCustomId === id &&
+          (accountCreateType === AccountCreateType.MNEMONIC
+            ? a.hdPathIndex === currentAccount?.hdPathIndex
+            : true)
+        );
+      });
+      if (!account) throw Error('no account found');
       preferenceService.setCurrentAccount(account);
     } else {
-      throw new BitError(ErrorCode.ACCOUNT_DOES_NOT_EXIST);
+      const ethChainCustomId: PresetNetworkId | string =
+          PresetNetworkId.ETHEREUM,
+        cosmosChainId: PresetNetworkId | string = PresetNetworkId.COSMOS_HUB;
+      let destChainCustomId;
+      if (destEcosystem === Ecosystem.COSMOS) {
+        destChainCustomId = cosmosChainId;
+      } else if (destEcosystem === Ecosystem.EVM) {
+        destChainCustomId = ethChainCustomId;
+      }
+      const account = this.accounts.find((a: BaseAccount) => {
+        return (
+          a.hdWalletId === destHdWalletId &&
+          a.chainCustomId === destChainCustomId
+        );
+      });
+      if (!account) throw Error('no account found');
+      preferenceService.setCurrentAccount(account);
+      const provider = networkPreferenceService.getProvider(destChainCustomId);
     }
   }
 

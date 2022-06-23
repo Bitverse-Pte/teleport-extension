@@ -17,6 +17,7 @@ import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
 import { INTERNAL_REQUEST_ORIGIN } from 'constants/index';
 import {
+  AccountCreateType,
   BaseAccount,
   CreateAccountOpts,
   DisplayAccountManage,
@@ -273,8 +274,16 @@ export class WalletController extends BaseController {
   changeAccount = (account: BaseAccount) =>
     preferenceService.setCurrentAccount(account);
 
-  changeAccountByWalletId = (hdWalletId: string) => {
-    return keyringService.changeAccountByWallet(hdWalletId);
+  changeAccountByWalletId = (
+    hdWalletId: string,
+    ecosystem: Ecosystem,
+    accountCreateType: AccountCreateType
+  ) => {
+    return keyringService.changeAccountByWallet(
+      hdWalletId,
+      ecosystem,
+      accountCreateType
+    );
   };
 
   addCurrentChainAccountByWalletId = async (hdWalletId) => {
