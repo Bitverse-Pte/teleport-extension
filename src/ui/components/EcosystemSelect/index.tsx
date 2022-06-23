@@ -133,7 +133,7 @@ export default (props: EcosystemSelectProps) => {
           }}
         >
           <div className="mask-container-header flexR">
-            <span className="mask-container-title">Networks</span>
+            <span className="mask-container-title">Chain Type</span>
             <IconComponent
               name="close"
               cls="base-text-color"

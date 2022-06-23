@@ -12,11 +12,13 @@ import {
   knownMethodService,
   contactBookService,
   latestBlockDataHub,
+  cosmosTxController,
 } from 'background/service';
 import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
 import { INTERNAL_REQUEST_ORIGIN } from 'constants/index';
 import {
+  AccountCreateType,
   BaseAccount,
   CreateAccountOpts,
   DisplayAccountManage,
@@ -273,8 +275,16 @@ export class WalletController extends BaseController {
   changeAccount = (account: BaseAccount) =>
     preferenceService.setCurrentAccount(account);
 
-  changeAccountByWalletId = (hdWalletId: string) => {
-    return keyringService.changeAccountByWallet(hdWalletId);
+  changeAccountByWalletId = (
+    hdWalletId: string,
+    ecosystem: Ecosystem,
+    accountCreateType: AccountCreateType
+  ) => {
+    return keyringService.changeAccountByWallet(
+      hdWalletId,
+      ecosystem,
+      accountCreateType
+    );
   };
 
   addCurrentChainAccountByWalletId = async (hdWalletId) => {
@@ -341,6 +351,10 @@ export class WalletController extends BaseController {
     addressIndex: number
   ): Promise<void> {
     return keyringService.deleteDisplayAccount(hdWalletId, addressIndex);
+  }
+
+  public deleteAccountsByChainCustomId(chainCustomId: string): Promise<void> {
+    return keyringService.deleteAccountsByChainCustomId(chainCustomId);
   }
 
   public renameDisplayAccount(
@@ -454,10 +468,14 @@ export class WalletController extends BaseController {
     }
   };
 
-  queryToken = (rpc: string, contractAddress: string) => {
+  queryToken = (chainCustomId: string, contractAddress: string) => {
     const account = preferenceService.getCurrentAccount();
     if (account) {
-      return TokenService.queryToken(account.address, rpc, contractAddress);
+      return TokenService.queryToken(
+        account.address,
+        chainCustomId,
+        contractAddress
+      );
     } else {
       return Promise.reject(new Error('no account found'));
     }
@@ -594,6 +612,40 @@ export class WalletController extends BaseController {
 
   setManualLocked = (locked: boolean) =>
     preferenceService.setManualLocked(locked);
+  generateCosmosMsg = async (
+    amount: string,
+    currency,
+    recipient: string,
+    memo = '',
+    stdFee = {}
+  ) => {
+    return await cosmosTxController.cosmos.generateMsg(
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee
+    );
+  };
+  sendCosmosToken = async (
+    amount: string,
+    currency,
+    recipient: string,
+    memo = '',
+    stdFee = {},
+    signOptions,
+    onTxEvents
+  ) => {
+    await cosmosTxController.cosmos.processSendToken(
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee,
+      signOptions,
+      onTxEvents
+    );
+  };
 }
 
 export default new WalletController();

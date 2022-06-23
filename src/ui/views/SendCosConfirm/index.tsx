@@ -1,0 +1,392 @@
+import React, { useState, useMemo, useRef } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
+import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
+import { Divider } from 'antd';
+import { utils } from 'ethers';
+import { useTranslation } from 'react-i18next';
+import {
+  useWallet,
+  useApproval,
+  useAsyncEffect,
+  getTotalPricesByAmountAndPrice,
+} from 'ui/utils';
+import {
+  NetworkDisplay,
+  SenderToRecipient,
+  UserPreferencedCurrencyDisplay,
+} from 'ui/components';
+import {
+  getValueFromWeiHex,
+  addHexes,
+  multipyHexes,
+  decGWEIToHexWEI,
+  addCurrencies,
+  conversionUtil,
+  hexWeiToDecGWEI,
+} from 'ui/utils/conversion';
+import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
+import { Token } from 'types/token';
+import { CustomButton, CustomTab } from 'ui/components/Widgets';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  showLoadingIndicator,
+  hideLoadingIndicator,
+} from 'ui/reducer/appState.reducer';
+import { BaseAccount } from 'types/extend';
+import { IconComponent } from 'ui/components/IconComponents';
+import FeeSelector from 'ui/components/FeeSelector';
+
+import { useMethodData } from 'ui/hooks/wallet/useMethodData';
+import { HeaderWithFlex } from 'ui/components/Header';
+import { GAS_ESTIMATE_TYPES } from 'constants/gas';
+import {
+  getGasPriceInHexWei,
+  getRoundedGasPrice,
+} from 'ui/reducer/gas.reducer';
+import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
+import skynet from 'utils/skynet';
+import { Tabs } from 'constants/wallet';
+import './style.less';
+const { sensors } = skynet;
+
+const TxSummaryComponent = ({ value, token, origin }) => {
+  return (
+    <div className="tx-summary">
+      <div className="tx-summary-origin">
+        {origin === 'https://teleport.network' ? null : <div>{origin}</div>}
+      </div>
+      <div className="tx-summary-currency">
+        <UserPreferencedCurrencyDisplay
+          value={value}
+          token={token}
+          isEVM={false}
+        />
+      </div>
+    </div>
+  );
+};
+
+const valueToDisplay = (tx) => {
+  if ((tx.value === '0x' || tx.value === '0x0') && tx.txParam.value) {
+    return tx.txParam.value;
+  }
+  return tx.value;
+};
+
+const ConfirmTx = () => {
+  const history = useHistory();
+  // amount, recipient: toAddress, memo
+  const { state, pathname } = useLocation<{
+    amount: string;
+    recipient: string;
+    memo: string;
+    token: any;
+  }>();
+  const { amount, recipient, memo, token } = state;
+  console.log(amount, recipient, memo, token);
+  const stdFee = {
+    amount: [
+      {
+        denom: token?.denom,
+        amount: '2500',
+      },
+    ],
+    gas: '200000',
+  };
+  const currency = {
+    coinDenom: token?.symbol || 'ATOM',
+    coinMinimalDenom: token?.denom || 'uatom',
+    coinDecimals: token?.decimal || 6,
+  };
+
+  // const next = async () => {
+  //   // const amount = 0.001;
+  //   // chainInfo.currencies[0];
+  //   const currency = {
+  //     coinDenom: 'OSMO',
+  //     coinMinimalDenom: 'uosmo',
+  //     coinDecimals: 6,
+  //     coinGeckoId: 'osmosis',
+  //   };
+  //   // const recipient = 'osmo17lds9mrleuqq3g88wwkxt4x97q6mcg80e35d5l';
+  //   // const memo = 'hello123';
+  //   const stdFee = {
+  //     amount: [
+  //       {
+  //         denom: 'uosmo',
+  //         amount: '2500',
+  //       },
+  //     ],
+  //     gas: '200000',
+  //   };
+  //   const signOptions = {
+  //     preferNoSetFee: true,
+  //     preferNoSetMemo: true,
+  //   };
+  //   const onTxEvents = {
+  //     onBroadcasted: (txHash) => {
+  //       console.log('--------------onBroadcasted--------------', txHash);
+  //     },
+  //     onFulfil: (tx) => {
+  //       console.log('--------------onBroadcasted--------------', tx);
+  //     },
+  //   };
+  //   wallet.sendCosmosToken(
+  //     amount,
+  //     currency,
+  //     recipient,
+  //     memo,
+  //     stdFee,
+  //     signOptions,
+  //     onTxEvents
+  //   );
+  //   history.push('/home');
+  // };
+  const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));
+  const location = useLocation();
+  const { t } = useTranslation();
+  const [getApproval, resolveApproval, rejectApproval] = useApproval();
+  const dispatch = useDispatch();
+  const wallet = useWallet();
+  const [senderName, setSenderName] = useState('');
+  const [recipientName, setRecipientName] = useState('');
+  const [tokens, setTokens] = useState<Token[]>([]);
+  const [prices, setPrices] = useState();
+  const gasState: any = useSelector((state) => state.gas);
+  const [visible, setVisible] = useState(false);
+  const [sendMsg, setSendMsg] = useState({ from_address: '', to_address: '' });
+
+  const handleAllow = async () => {
+    const signOptions = {
+      preferNoSetFee: true,
+      preferNoSetMemo: true,
+    };
+    const onTxEvents = {
+      onBroadcasted: (txHash) => {
+        console.log('--------------onBroadcasted--------------', txHash);
+      },
+      onFulfil: (tx) => {
+        console.log('--------------onBroadcasted--------------', tx);
+      },
+    };
+    dispatch(showLoadingIndicator());
+    await wallet.sendCosmosToken(
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee,
+      signOptions,
+      onTxEvents
+    );
+    dispatch(hideLoadingIndicator());
+    history.push('/home');
+  };
+
+  const handleCancel = () => {
+    sensors.track('teleport_sign_tx_declined', {
+      page: location.pathname,
+    });
+    dispatch(showLoadingIndicator());
+    rejectApproval('User rejected the request.')
+      .then(() => delay(1000))
+      .then(() => dispatch(hideLoadingIndicator()));
+  };
+
+  const fetchNativePrice = async () => {
+    dispatch(showLoadingIndicator());
+    const tokens = await wallet.getTokenBalancesAsync(true);
+    console.log('tokens:', tokens);
+    const prices = await wallet.queryTokenPrices();
+    if (prices) setPrices(prices);
+    if (tokens) setTokens(tokens);
+    dispatch(hideLoadingIndicator());
+  };
+
+  useAsyncEffect(fetchNativePrice, []);
+
+  const nativeToken = useMemo(() => {
+    const nativeToken = tokens.find((t: Token) => t.isNative);
+    if (prices && nativeToken) {
+      if (nativeToken!.symbol.toUpperCase() in prices) {
+        nativeToken!.price = prices[nativeToken!.symbol.toUpperCase()];
+      }
+    }
+    return nativeToken;
+  }, [tokens, prices]);
+
+  const txToken = useMemo(() => {
+    const symbol = token.symbol;
+    const txToken = symbol
+      ? tokens.find((t: Token) => t.symbol === symbol)
+      : nativeToken;
+    return txToken;
+  }, [tokens, prices]);
+  const [tabType, setTabType] = useState<Tabs>(Tabs.FIRST);
+
+  useAsyncEffect(async () => {
+    const result = await wallet.generateCosmosMsg(
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee
+    );
+    setSendMsg(result);
+  }, [txToken]);
+
+  const origin = 'https://teleport.network';
+
+  return (
+    <div className="approval">
+      <div className="approval-tx flexCol">
+        <div className="top-part-container flexCol flex-wrap items-center">
+          <HeaderWithFlex
+            title={<NetworkDisplay />}
+            handleBackClick={handleCancel}
+          />
+          <SenderToRecipient
+            senderAddress={sendMsg?.from_address}
+            senderName={''}
+            recipientName={''}
+            recipientAddress={recipient}
+          />
+
+          <TxSummaryComponent value={amount} token={txToken} origin={origin} />
+        </div>
+        <div className="tx-details-tab-container">
+          <CustomTab
+            tab1="Details"
+            tab2="Data"
+            currentTab={tabType}
+            handleTabClick={setTabType}
+          />
+          {tabType === Tabs.FIRST && (
+            <TxDetailComponent
+              amount={amount}
+              txToken={txToken}
+              nativeToken={nativeToken}
+              setVisible={setVisible}
+              currency={nativeToken?.symbol}
+              stdFee={stdFee}
+            />
+          )}
+          {tabType === Tabs.SECOND && <TxDataComponent msg={sendMsg} />}
+        </div>
+        <div className="tx-button-container flexCol">
+          <CustomButton
+            type="primary"
+            onClick={handleAllow}
+            cls="theme tx-btn-container-top"
+            block
+          >
+            {t('Send')}
+          </CustomButton>
+          <CustomButton
+            type="default"
+            cls="custom-button-default"
+            onClick={handleCancel}
+            block
+          >
+            {t('Decline')}
+          </CustomButton>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TxDataComponent = ({ msg }) => {
+  return (
+    <div className="transaction-data flexCol">
+      <div className="transaction-data-title">{'Function Type: '}</div>
+      <div className="transaction-data-params">
+        <div>{msg?.msgs[0]?.type}</div>
+      </div>
+      <div className="transaction-data-title">Hex Data:</div>
+      <div className="transaction-data-value">{JSON.stringify(msg)}</div>
+    </div>
+  );
+};
+
+const TxDetailComponent = ({
+  amount,
+  txToken,
+  nativeToken,
+  setVisible,
+  currency,
+  stdFee,
+}: {
+  amount: any;
+  txToken: Token | undefined;
+  nativeToken: Token | undefined;
+  setVisible: any;
+  currency: any;
+  stdFee: any;
+}) => {
+  console.log('stdFee: ', stdFee);
+  const { t } = useTranslation();
+  const fee = utils.formatUnits(stdFee?.amount[0].amount, txToken?.decimal);
+  const tokenPrice = Number(txToken?.price);
+  const feePrice = Number(fee) * tokenPrice;
+  const totalToken = Number(fee) + Number(amount);
+  const totalPrice = totalToken * tokenPrice;
+
+  return (
+    <div className="transaction-detail">
+      <div
+        className="gas-edit-button flex ml-auto"
+        onClick={() => {
+          setVisible(true);
+          sensors.track('teleport_sign_tx_edit_gas', {
+            page: location.pathname,
+          });
+        }}
+      >
+        <IconComponent name="edit" cls="edit-icon" />
+        <div>{t('Edit')}</div>
+      </div>
+      <TransactionDetailItem
+        key="gas-item"
+        detailTitle={t('Estimated gas fee')}
+        subTitle={undefined}
+        detailText={fee}
+        detailSubText={feePrice}
+        detailMax={'Max fee: ' + fee}
+      />
+      <Divider style={{ margin: '16px 0' }} />
+      <TransactionDetailItem
+        key="total-item"
+        detailTitle={t('Sum')}
+        subTitle={t('Amount + gas fee')}
+        detailText={totalToken}
+        detailSubText={totalPrice}
+        detailMax={'Max amount: ' + totalToken}
+      />
+    </div>
+  );
+};
+
+const TransactionDetailItem = ({
+  detailTitle = '',
+  subTitle,
+  detailText,
+  detailSubText,
+  detailMax,
+}) => {
+  return (
+    <div className="transaction-detail-item">
+      <div className="transaction-detail-item-key">
+        <div className="transaction-detail-title">{detailTitle}</div>
+        <div className="transaction-detail-subtitle">{subTitle}</div>
+      </div>
+      <div className="transaction-detail-item-values">
+        <div className="transaction-detail-detailText">{detailText}</div>
+        <div className="transaction-detail-detailSubText">{detailSubText}</div>
+        <div className="transaction-detail-detailMax">{detailMax}</div>
+      </div>
+    </div>
+  );
+};
+
+export default ConfirmTx;

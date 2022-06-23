@@ -5,6 +5,7 @@ import {
   permissionService,
 } from 'background/service';
 import { PromiseFlow, underline2Camelcase } from 'background/utils';
+import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
 import cosmosController from './cosmosController';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -95,6 +96,7 @@ const flowContext = flow
     if (approvalType) {
       const existed = precheck && precheck(ctx.request);
       ctx.request.requestedApproval = true;
+      console.log('====[args]===', args);
       ctx.approvalRes = await notificationService.requestApproval({
         approvalComponent: approvalType,
         params: {
@@ -109,6 +111,7 @@ const flowContext = flow
     }
     return next();
   })
+  // process request
   .use(async (ctx) => {
     const { approvalRes, mapMethod, request } = ctx;
     const [approvalType] =
@@ -131,6 +134,7 @@ const flowContext = flow
   .callback();
 
 export default (request) => {
+  //request = JSONUint8Array.unwrap(request);
   const ctx: any = { request: { ...request, requestedApproval: false } };
   return flowContext(ctx).finally(() => {
     if (ctx.request.rejectApproval) {

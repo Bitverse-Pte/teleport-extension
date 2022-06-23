@@ -281,8 +281,8 @@ const AccountRecover = () => {
             cls="private-key-input"
           />
         </div>
-        {importType === Tabs.SECOND && policyShow ? (
-          <p className="account-recover-title">Ecosystems</p>
+        {importType === Tabs.SECOND ? (
+          <p className="account-recover-title">Chain Type</p>
         ) : null}
         <EcosystemSelect
           style={importType === Tabs.FIRST ? { display: 'none' } : {}}

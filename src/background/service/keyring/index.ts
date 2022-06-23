@@ -199,6 +199,19 @@ class KeyringService extends EventEmitter {
     });
   } */
 
+  /**
+   * Get Private Key
+   *
+   * Get private key by address
+   *
+   * @param {string} address - the current account address
+   *
+   * @returns {Promise<String>} the current account private key.
+   */
+  public getPrivateKeyByAddress(address) {
+    return this.secrets.find((s) => s.address === address)?.privateKey;
+  }
+
   private _checkDuplicateAccount(
     address: string,
     accountCreateType: AccountCreateType,
@@ -629,7 +642,7 @@ class KeyringService extends EventEmitter {
    */
   private async _persistAllAccount(): Promise<boolean> {
     if (!this.password) {
-      return Promise.reject(new Error('no password found'));
+      return Promise.reject(new BitError(ErrorCode.WALLET_WAS_LOCKED));
     }
     const encryptedSecret = await encrypt.encrypt(
       this.password as string,
@@ -769,21 +782,6 @@ class KeyringService extends EventEmitter {
         return Promise.reject(new BitError(ErrorCode.WRONG_PSD));
       });
     return Promise.resolve(Boolean(checksumPassed));
-  }
-
-  /**
-   * Get Private Key
-   *
-   * Get private key by address
-   *
-   * @param {string} address - the current account address
-   *
-   * @returns {Promise<String>} the current account private key.
-   */
-  getPrivateKeyByAddress(address: string): Promise<string> {
-    const secret = this.secrets.find((s: Secret) => s.address === address);
-    if (secret) return Promise.resolve(secret.privateKey);
-    return Promise.resolve('');
   }
 
   /**
@@ -1007,25 +1005,50 @@ class KeyringService extends EventEmitter {
     return Promise.resolve(accounts);
   }
 
-  changeAccountByWallet(hdWalletId: string) {
+  changeAccountByWallet(
+    destHdWalletId: string,
+    destEcosystem: Ecosystem,
+    accountCreateType: AccountCreateType
+  ) {
     const { id, ecosystem } = networkPreferenceService.getProviderConfig();
-    const currentWalletAccounts: BaseAccount[] = cloneDeep(
-      this.accounts
-    ).filter((a: BaseAccount) => a.hdWalletId === hdWalletId);
-    let account: BaseAccount | undefined;
-    if (ecosystem === Ecosystem.EVM) {
-      account = currentWalletAccounts.find(
-        (a: BaseAccount) => a.ecosystem === Ecosystem.EVM
-      );
-    } else {
-      account = currentWalletAccounts.find(
-        (a: BaseAccount) => a.chainCustomId === id
-      );
-    }
-    if (account) {
+    const currentAccount = preference.getCurrentAccount();
+
+    if (
+      accountCreateType === AccountCreateType.MNEMONIC ||
+      (accountCreateType === AccountCreateType.PRIVATE_KEY &&
+        ecosystem === destEcosystem)
+    ) {
+      const account = this.accounts.find((a: BaseAccount) => {
+        return (
+          a.hdWalletId === destHdWalletId &&
+          a.chainCustomId === id &&
+          (accountCreateType === AccountCreateType.MNEMONIC
+            ? a.hdPathIndex === currentAccount?.hdPathIndex
+            : true)
+        );
+      });
+      if (!account) throw Error('no account found');
       preferenceService.setCurrentAccount(account);
     } else {
-      throw new BitError(ErrorCode.ACCOUNT_DOES_NOT_EXIST);
+      const ethChainCustomId: PresetNetworkId | string =
+          PresetNetworkId.ETHEREUM,
+        cosmosChainId: PresetNetworkId | string = PresetNetworkId.COSMOS_HUB;
+      let destChainCustomId;
+      if (destEcosystem === Ecosystem.COSMOS) {
+        destChainCustomId = cosmosChainId;
+      } else if (destEcosystem === Ecosystem.EVM) {
+        destChainCustomId = ethChainCustomId;
+      }
+      const account = this.accounts.find((a: BaseAccount) => {
+        return (
+          a.hdWalletId === destHdWalletId &&
+          a.chainCustomId === destChainCustomId
+        );
+      });
+      if (!account) throw Error('no account found');
+      preferenceService.setCurrentAccount(account);
+      const provider = networkPreferenceService.getProvider(destChainCustomId);
+      if (provider) networkPreferenceService.setProviderConfig(provider, false);
     }
   }
 
@@ -1222,6 +1245,16 @@ class KeyringService extends EventEmitter {
     });
     this.secrets = this.secrets.filter(
       (a: Secret) => !shouldDeleteAccountAddressSet.has(a.address)
+    );
+    await this._persistAllAccount();
+  }
+
+  async deleteAccountsByChainCustomId(chainCustomId: string): Promise<void> {
+    if (!this.password) {
+      return Promise.reject(new BitError(ErrorCode.WALLET_WAS_LOCKED));
+    }
+    this.accounts = this.accounts.filter(
+      (a: BaseAccount) => a.chainCustomId !== chainCustomId
     );
     await this._persistAllAccount();
   }

@@ -24,6 +24,12 @@ export enum Ecosystem {
   POLKADOT = 'POLKADOT',
 }
 
+export enum VmEnums {
+  EVM = 'evm',
+  COSM_WASM = 'cosmwasm',
+  SECRET_WASM = 'secretwasm',
+}
+
 export interface Network {
   // MetaMask use HexString for ChainId, so we should do the same
   chainId: string;

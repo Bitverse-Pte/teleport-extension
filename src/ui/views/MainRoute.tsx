@@ -29,6 +29,8 @@ const CosmosActivityDetail = lazy(
 );
 
 const Send = lazy(() => import('ui/views/Send'));
+const SendCos = lazy(() => import('ui/views/SendCos'));
+const ConfirmSendCos = lazy(() => import('ui/views/SendCosConfirm'));
 const Receive = lazy(() => import('ui/views/Receive'));
 const GasFee = lazy(() => import('ui/views/GasFee'));
 const Policy = lazy(() => import('ui/views/Policy'));
@@ -144,6 +146,15 @@ const Main = () => {
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/send">
           <Send />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/send-cos">
+          <SendCos />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/send-cos/:tokenId">
+          <SendCos />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/confirm-send-cos">
+          <ConfirmSendCos />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/send/:tokenId">
           <Send />
