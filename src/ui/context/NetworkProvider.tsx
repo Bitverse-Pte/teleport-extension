@@ -101,7 +101,7 @@ export function NetworkStoreProvider({
       } catch (error: any) {
         console.error('useProviderById::error', error);
         if (error?.code) {
-          ClickToCloseMessage.error(
+          ClickToCloseMessage.info(
             t(NetworkErrorCodeToMessageKey(error.code), {
               replace: {
                 ecosystem_name: currentAccount?.ecosystem,
