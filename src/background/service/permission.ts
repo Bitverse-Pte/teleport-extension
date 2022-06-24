@@ -200,6 +200,24 @@ class PermissionService {
     this.sync();
   };
 
+  removeConnectedSiteByChainId = (origin: string, chainId: string) => {
+    if (!this.lruCache) return;
+    const site = this.lruCache.get(origin);
+    if (!site) {
+      return;
+    }
+    const i = site.chainIds.indexOf(chainId);
+    if (i > -1) {
+      site.chainIds.splice(i, 1);
+    }
+    if (!site.chainIds?.length) {
+      this.lruCache.del(origin);
+    } else {
+      this.lruCache.set(origin, site);
+    }
+    this.sync();
+  };
+
   getConnectedSite = (origin: string) => {
     return this.lruCache?.get(origin);
   };
@@ -207,6 +225,11 @@ class PermissionService {
   getConnectedSitesByAccount = (account: string): ConnectedSite[] => {
     const values = this.lruCache?.values() || [];
     return values.filter((item) => item.accounts.includes(account));
+  };
+
+  getConnectedSitesByChainId = (chainId: string): ConnectedSite[] => {
+    const values = this.lruCache?.values() || [];
+    return values.filter((item) => item.chainIds.includes(chainId));
   };
 }
 

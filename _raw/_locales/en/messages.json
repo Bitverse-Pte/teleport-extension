@@ -19,6 +19,9 @@
   "SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST": {
     "message": "You do not have account in that network"
   },
+  "NORMAL_WALLET_SWITCH_EVM_ONLY": {
+    "message": "Only support switching between {{ecosystem_name}} networks for current normal wallet"
+  },
   "History": {
     "message": "History"
   },

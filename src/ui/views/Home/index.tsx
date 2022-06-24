@@ -38,7 +38,7 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import ConnectedSites from '../ConnectedSites';
-import { Ecosystem, Provider } from 'types/network';
+import { Ecosystem, Provider, VmEnums } from 'types/network';
 import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
 import { ErrorCode } from 'constants/code';
@@ -179,6 +179,10 @@ const Home = () => {
     setAccount2ConnectedSite(account);
     setConnectedSitePopupVisible(true);
     console.log(account);
+  };
+
+  const handleSiteClickCosm = async () => {
+    setConnectedSitePopupVisible(true);
   };
 
   const handleReceiveBtnClick = () => {
@@ -371,7 +375,10 @@ const Home = () => {
                   placeholder="Search"
                 />
               </div>
-              {currentChain.ecosystem === Ecosystem.EVM ? (
+              {currentChain.ecosystem === Ecosystem.EVM ||
+              currentChain.ecoSystemParams?.features?.includes(
+                VmEnums.COSM_WASM
+              ) ? (
                 <img
                   onClick={handleAddTokenBtnClick}
                   src={AddTokenImg}
@@ -518,9 +525,11 @@ const Home = () => {
             </div>
 
             <CurrentWalletAccountSwitch
+              isEvm={currentChain.ecosystem === Ecosystem.EVM}
               visible={accountPopupVisible}
               handleAccountClick={handleAccountClick}
               handleSiteClick={handleSiteClick}
+              handleSiteClickCosm={handleSiteClickCosm}
             />
           </div>
           <Drawer
@@ -543,6 +552,8 @@ const Home = () => {
           >
             <div style={{ width: '100%', height: '100%' }}>
               <ConnectedSites
+                isEvm={currentChain.ecosystem === Ecosystem.EVM}
+                chainId={currentChain.chainId}
                 account={account2ConnectedSite}
                 visible={connectedSitePopupVisible}
                 handleOnClose={() => {

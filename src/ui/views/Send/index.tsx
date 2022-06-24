@@ -119,7 +119,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const balances = await wallet.getTokenBalancesAsync(true).catch((e) => {
+    const balances = await wallet.getTokenBalancesAsync().catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) {
@@ -132,7 +132,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const balances = await wallet.getTokenBalancesSync(true).catch((e) => {
+    const balances = await wallet.getTokenBalancesSync().catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) {

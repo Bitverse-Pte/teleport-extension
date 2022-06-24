@@ -5,7 +5,7 @@ import Axios from 'axios';
 // import { KVStore } from "@keplr-wallet/common";
 // import { ChainsService } from "../chains";
 import NetworkPreferenceService from '../../network';
-import { Ecosystem, Provider } from 'types/network';
+import { CosmosParams, Ecosystem, Provider } from 'types/network';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { ChainIdHelper } from 'utils/cosmos/chainId';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
@@ -27,10 +27,8 @@ export class CosmosChainUpdaterService {
     });
   }
 
-  async putUpdatedPropertyToProvider(chainInfo: Provider): Promise<Provider> {
-    const updatedProperty = await this.getUpdatedChainProperty(
-      chainInfo.chainId
-    );
+  putUpdatedPropertyToProvider(chainInfo: Provider): Provider {
+    const updatedProperty = this.getUpdatedChainProperty(chainInfo.chainId);
 
     const chainId = ChainIdHelper.parse(chainInfo.chainId);
     const updatedChainId = ChainIdHelper.parse(
@@ -52,8 +50,9 @@ export class CosmosChainUpdaterService {
 
     return {
       ...chainInfo,
-      ...{
-        chainId: updatedProperty.chainId || chainInfo.chainId,
+      chainId: updatedProperty.chainId || chainInfo.chainId,
+      ecoSystemParams: {
+        ...(chainInfo.ecoSystemParams as CosmosParams),
         features,
       },
     };
@@ -105,7 +104,7 @@ export class CosmosChainUpdaterService {
         }
 
         if (updates.features && updates.features.length > 0) {
-          const savedChainProperty = await this.getUpdatedChainProperty(
+          const savedChainProperty = this.getUpdatedChainProperty(
             chainInfo.chainId
           );
 
@@ -123,7 +122,7 @@ export class CosmosChainUpdaterService {
             updateFeatures
           );
 
-          await this.saveChainEcoSystemProperty(currentVersion.identifier, {
+          this.saveChainEcoSystemProperty(currentVersion.identifier, {
             features: updateFeatures,
           });
         }
@@ -139,35 +138,17 @@ export class CosmosChainUpdaterService {
     }
   }
 
-  private async getUpdatedChainProperty(
-    chainId: string
-  ): Promise<Partial<Provider>> {
+  private getUpdatedChainProperty(chainId: string): Partial<Provider> {
     const version = ChainIdHelper.parse(chainId);
 
-    return await this.loadChainProperty(version.identifier);
+    return this.loadChainProperty(version.identifier);
   }
 
   private async saveChainProperty(
     identifier: string,
     chainInfo: Partial<Provider>
   ) {
-    const saved = await this.loadChainProperty(identifier);
-
-    this.kvStore.updateState({
-      identifier: {
-        ...saved,
-        ...chainInfo,
-      },
-    });
-
-    // this.chainsService.clearCachedProviders();
-  }
-
-  private async saveChainEcoSystemProperty(
-    identifier: string,
-    chainInfo: Partial<Provider['ecoSystemParams']>
-  ) {
-    const saved = await this.loadChainProperty(identifier);
+    const saved = this.loadChainProperty(identifier);
 
     this.kvStore.updateState({
       [identifier]: {
@@ -179,9 +160,26 @@ export class CosmosChainUpdaterService {
     // this.chainsService.clearCachedProviders();
   }
 
-  private async loadChainProperty(
-    identifier: string
-  ): Promise<Partial<Provider>> {
+  private saveChainEcoSystemProperty(
+    identifier: string,
+    updatePayload: Partial<Provider['ecoSystemParams']>
+  ) {
+    const saved = this.loadChainProperty(identifier);
+
+    this.kvStore.updateState({
+      [identifier]: {
+        ...saved,
+        ecoSystemParams: {
+          ...(saved.ecoSystemParams as CosmosParams),
+          ...updatePayload,
+        },
+      },
+    });
+
+    // this.chainsService.clearCachedProviders();
+  }
+
+  private loadChainProperty(identifier: string): Partial<Provider> {
     const state = this.kvStore.getState();
     const chainInfo = state[identifier];
     if (!chainInfo) return {};
