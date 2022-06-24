@@ -85,8 +85,8 @@ export function NetworkStoreProvider({
   const { t } = useTranslation();
 
   const currentNetworkController = useSelector((state) => state.network);
-  const currentAccount = useSelector(
-    (state) => state.preference.currentAccount
+  const currentEcosystem = useSelector(
+    (state) => state.network.provider.ecosystem
   );
 
   const customProviders = useSelector(getCustomProvidersSelector);
@@ -104,7 +104,7 @@ export function NetworkStoreProvider({
           ClickToCloseMessage.info(
             t(NetworkErrorCodeToMessageKey(error.code), {
               replace: {
-                ecosystem_name: currentAccount?.ecosystem,
+                ecosystem_name: currentEcosystem,
               },
             })
           );
