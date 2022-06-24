@@ -800,74 +800,17 @@ class NetworkPreferenceService extends EventEmitter {
     if (!currentAccount) throw Error('current account not found');
     const { accountCreateType, hdWalletId, hdPathIndex, ecosystem } =
       currentAccount;
-    if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
-      if (chain.ecosystem === Ecosystem.EVM) {
-        let evmAccounts: BaseAccount[];
-        evmAccounts = allAccounts.filter(
-          (a: BaseAccount) =>
-            a.ecosystem === Ecosystem.EVM &&
-            a.accountCreateType === AccountCreateType.PRIVATE_KEY
-        );
-        if (evmAccounts?.length > 0) {
-          preferenceService.setCurrentAccount(evmAccounts[0]);
-        } else {
-          evmAccounts = allAccounts.filter(
-            (a: BaseAccount) =>
-              a.ecosystem === Ecosystem.EVM &&
-              a.accountCreateType === AccountCreateType.MNEMONIC
-          );
-          preferenceService.setCurrentAccount(evmAccounts[0]);
-        }
-      } else {
-        let accounts: BaseAccount[];
-        if (currentAccount.ecosystem === Ecosystem.EVM) {
-          accounts = allAccounts.filter(
-            (a: BaseAccount) =>
-              a.chainCustomId === chain.id &&
-              a.accountCreateType === AccountCreateType.PRIVATE_KEY
-          );
-          if (accounts?.length === 0) {
-            accounts = allAccounts.filter(
-              (a: BaseAccount) =>
-                a.chainCustomId === chain.id &&
-                a.accountCreateType === AccountCreateType.MNEMONIC
-            );
-          }
-        } else {
-          accounts = allAccounts.filter(
-            (a: BaseAccount) =>
-              a.hdWalletId === currentAccount.hdWalletId &&
-              a.chainCustomId === chain.id
-          );
-        }
-
-        if (accounts && accounts.length > 0) {
-          preferenceService.setCurrentAccount(accounts[0]);
-        }
-      }
-    } else {
-      if (chain.ecosystem === Ecosystem.EVM) {
-        const evmAccounts: BaseAccount[] = allAccounts.filter(
-          (a: BaseAccount) =>
-            a.ecosystem === Ecosystem.EVM &&
-            a.hdWalletId === hdWalletId &&
-            a.hdPathIndex === hdPathIndex
-        );
-        if (evmAccounts && evmAccounts.length > 0) {
-          preferenceService.setCurrentAccount(evmAccounts[0]);
-        }
-      } else {
-        const accounts: BaseAccount[] = allAccounts.filter(
-          (a: BaseAccount) =>
-            a.chainCustomId === chain.id &&
-            a.hdWalletId === hdWalletId &&
-            a.hdPathIndex === hdPathIndex
-        );
-        if (accounts && accounts.length > 0) {
-          preferenceService.setCurrentAccount(accounts[0]);
-        }
-      }
-    }
+    const destAccount = allAccounts.find((a: BaseAccount) => {
+      return (
+        a.hdWalletId === hdWalletId &&
+        chain.id === a.chainCustomId &&
+        (accountCreateType === AccountCreateType.MNEMONIC
+          ? a.hdPathIndex === hdPathIndex
+          : true)
+      );
+    });
+    if (!destAccount) throw Error('account not found');
+    preferenceService.setCurrentAccount(destAccount);
   }
 
   rollbackToPreviousProvider() {
