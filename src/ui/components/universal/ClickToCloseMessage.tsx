@@ -18,6 +18,8 @@ const createCTCMessage =
     if (!isArgsProps(params[0])) {
       content = {
         content: params[0],
+        duration: params[1],
+        onClose: params[2],
       } as ArgsProps;
     }
 
@@ -45,15 +47,7 @@ const createCTCMessage =
     content.content = (
       <div className="flex items-center">
         <span className="message">{content.content}</span>
-        <div
-          style={{
-            borderRadius: '100%',
-            background: '#E1E8F0',
-            width: 16,
-            height: 16,
-          }}
-          className="flex cursor-pointer justify-center items-center ml-auto closeButton"
-        >
+        <div className="flex cursor-pointer justify-center items-center ml-auto toast-close-button">
           <IconComponent
             name="close"
             cls="closeIcon base-text-color"
