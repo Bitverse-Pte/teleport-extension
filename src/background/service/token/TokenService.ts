@@ -229,6 +229,7 @@ class TokenService {
       const nativeToken = allTokens.find(
         (t: Token) => t.chainCustomId === chainCustomId && t.isNative
       );
+      const currentChainTokens = allTokens.filter((t: Token)=> t.chainCustomId === chainCustomId && !t.isNative)
       if (nativeToken) {
         if (!balances[address] || balances[address]?.length === 0) {
           nativeToken.amount = 0;
@@ -332,8 +333,17 @@ class TokenService {
                 });
               }
             } else {
-              const token = currentAccountTokens.find((t: Token) => t.isNative);
-              if (token) token.amount = b.amount;
+              if(b.denom === nativeToken.denom){
+                const token = currentAccountTokens.find((t: Token) => t.isNative);
+                if (token) token.amount = b.amount;
+              }else {
+                const t = currentChainTokens.find((st: Token)=> st.denom === b.denom);
+                if(t){
+                  t.amount = b.amount;
+                  currentAccountTokens.push(t);
+                }
+              }
+              
             }
           }
         }
