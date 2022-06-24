@@ -20,6 +20,7 @@ import {
   OfflineSigner,
   StdSignature,
   StdSignDoc,
+  StdTx,
 } from '@cosmjs/launchpad';
 import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import deepmerge from 'deepmerge';
@@ -208,7 +209,7 @@ export class CosmosProvider extends EventEmitter implements Keplr {
 
   async sendTx(
     chainId: string,
-    tx: Uint8Array,
+    tx: StdTx | Uint8Array,
     mode: BroadcastMode
   ): Promise<Uint8Array> {
     if (!('length' in tx)) {
