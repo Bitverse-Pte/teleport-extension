@@ -228,25 +228,26 @@ function FeeSelector(props) {
                 key={1}
                 className="tel-collapse-panel"
               >
-                <Form
-                  layout="vertical"
-                  onFinish={() => {
-                    console.log('onFinish');
-                  }}
-                  requiredMark="optional"
-                >
-                  <Form.Item
-                    required
-                    label="Gas Limit"
-                    name="gasLimit"
-                    className="gas-form"
-                    tooltip="Gas limit is the maximum units of gas you are willing to use. Units of gas are a multiplier to “Max priority fee” and “Max fee”."
+                <div className="custom-fee">
+                  <Form
+                    layout="vertical"
+                    onFinish={() => {
+                      console.log('onFinish');
+                    }}
+                    requiredMark="optional"
                   >
-                    <div className="numeric-input">
-                      <input type="number"></input>
-                    </div>
-                  </Form.Item>
-                </Form>
+                    <Form.Item
+                      required
+                      label="Gas"
+                      name="gas"
+                      className="gas-form"
+                    >
+                      <div className="numeric-input">
+                        <input type="number"></input>
+                      </div>
+                    </Form.Item>
+                  </Form>
+                </div>
               </Collapse.Panel>
             </Collapse>
           </div>
