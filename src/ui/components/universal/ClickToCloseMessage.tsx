@@ -18,6 +18,8 @@ const createCTCMessage =
     if (!isArgsProps(params[0])) {
       content = {
         content: params[0],
+        duration: params[1],
+        onClose: params[2],
       } as ArgsProps;
     }
 
