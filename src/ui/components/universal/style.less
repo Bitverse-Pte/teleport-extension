@@ -58,11 +58,13 @@ div.ant-message-notice-content {
     .ant-message-custom-content span:last-child {
       width: 100%;
 
-      .closeButton {
-        border-radius: '100%';
-        background: "#E1E8F0";
+      .toast-close-button {
+        border-radius: 100%;
+        background: #E1E8F0;
         width: 16px;
         height: 16px;
+        // make sure it's not squeezed by other elements
+        flex: 0 0 16px;
       }
     }
 }
