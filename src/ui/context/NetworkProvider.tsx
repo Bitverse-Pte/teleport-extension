@@ -85,15 +85,14 @@ export function NetworkStoreProvider({
   const { t } = useTranslation();
 
   const currentNetworkController = useSelector((state) => state.network);
-  const currentEcosystem = useSelector(
-    (state) => state.network.provider.ecosystem
-  );
 
   const customProviders = useSelector(getCustomProvidersSelector);
 
   const useProviderById = useCallback(
     async (networkId: string) => {
       dispatch(showLoadingIndicator());
+      const currentProvider = await wallet.getCurrentChain();
+      const currentEcosystem = currentProvider.ecosystem;
       try {
         const provider = await wallet.useProviderById(networkId);
         await wallet.fetchLatestBlockDataNow();
