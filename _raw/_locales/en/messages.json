@@ -20,7 +20,7 @@
     "message": "You do not have account in that network"
   },
   "NORMAL_WALLET_SWITCH_EVM_ONLY": {
-    "message": "Only support switching between {{ecosystem_name}} networks for current normal wallet"
+    "message": "Please switch between {{ecosystem_name}} networks"
   },
   "History": {
     "message": "History"

@@ -85,15 +85,14 @@ export function NetworkStoreProvider({
   const { t } = useTranslation();
 
   const currentNetworkController = useSelector((state) => state.network);
-  const currentAccount = useSelector(
-    (state) => state.preference.currentAccount
-  );
 
   const customProviders = useSelector(getCustomProvidersSelector);
 
   const useProviderById = useCallback(
     async (networkId: string) => {
       dispatch(showLoadingIndicator());
+      const currentProvider = await wallet.getCurrentChain();
+      const currentEcosystem = currentProvider.ecosystem;
       try {
         const provider = await wallet.useProviderById(networkId);
         await wallet.fetchLatestBlockDataNow();
@@ -101,10 +100,10 @@ export function NetworkStoreProvider({
       } catch (error: any) {
         console.error('useProviderById::error', error);
         if (error?.code) {
-          ClickToCloseMessage.error(
+          ClickToCloseMessage.info(
             t(NetworkErrorCodeToMessageKey(error.code), {
               replace: {
-                ecosystem_name: currentAccount?.ecosystem,
+                ecosystem_name: currentEcosystem,
               },
             })
           );

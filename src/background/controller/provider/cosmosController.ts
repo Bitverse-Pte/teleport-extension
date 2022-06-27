@@ -1,7 +1,13 @@
-import { keyringService, networkPreferenceService } from 'background/service';
+import {
+  keyringService,
+  networkPreferenceService,
+  cosmosTxController,
+} from 'background/service';
 import { CosmosKey } from 'background/service/keyManager/cosmos/CosmosKey';
 import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
 import { encodeSecp256k1Signature, serializeSignDoc } from '@cosmjs/launchpad';
+import { nanoid as createId } from 'nanoid';
+import { CosChainInfo } from 'background/service/transactions/cosmos/types';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 
@@ -94,8 +100,34 @@ class CosmosProviderController {
   };
 
   @Reflect.metadata('SkipConnect', true)
-  sendTx = async () => {
-    //
+  sendTx = async ({
+    data: {
+      args: [id, tx, mode],
+    },
+    session: { origin },
+  }) => {
+    const {
+      rpcUrl,
+      chainId,
+      ecoSystemParams,
+      prefix: bech32Config,
+      coinType,
+    } = networkPreferenceService.getCosmosChainInfo(id);
+    const cosChainInfo = {
+      rpc: rpcUrl,
+      chainId,
+      rest: ecoSystemParams?.rest,
+      bech32Config,
+      coinType,
+    } as CosChainInfo;
+    const txId = createId();
+    const txHash = await cosmosTxController.cosmos.sendTx(
+      cosChainInfo,
+      tx,
+      mode,
+      txId
+    );
+    return txHash;
   };
 }
 
