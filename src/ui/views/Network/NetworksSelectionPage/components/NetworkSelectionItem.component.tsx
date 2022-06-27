@@ -12,7 +12,10 @@ import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Ecosystem, Provider } from 'types/network';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
-import { NetworkProviderContext } from 'ui/context/NetworkProvider';
+import {
+  NetworkErrorCodeToMessageKey,
+  NetworkProviderContext,
+} from 'ui/context/NetworkProvider';
 import { ReactComponent as IconTrash } from 'assets/action-icon/trash.svg';
 import { ReactComponent as IconEdit } from 'assets/action-icon/edit.svg';
 import { ReactComponent as CheckIcon } from 'assets/action-icon/check.svg';
@@ -45,6 +48,8 @@ export function NetworkSelectionItem({
    * Some data source hooks
    */
   const providerContext = useContext(NetworkProviderContext);
+  const { t } = useTranslation();
+  const wallet = useWallet();
   const history = useHistory();
   const location = useLocation();
   const currentProviderId = useSelector((s) => s.network.provider.id);
@@ -53,20 +58,31 @@ export function NetworkSelectionItem({
     [network, currentProviderId]
   );
 
-  const selectProvider = useCallback(
-    async (network: Provider) => {
-      console.debug(`Selected Chain ${network.chainId}`);
+  const selectProvider = async () => {
+    console.debug(`Selected Chain ${network.chainId}`);
+    const currentProvider = await wallet.getCurrentChain();
+    const currentEcosystem = currentProvider.ecosystem;
+    try {
       await providerContext?.useProviderById(network.id);
-      sensors.track('teleport_network_selected', {
-        page: location.pathname,
-        chainId: network.chainId,
-        chainName: network.chainName,
-      });
-      // jump back previous page
-      history.goBack();
-    },
-    [providerContext, history]
-  );
+    } catch (error: any) {
+      if (error?.code) {
+        ClickToCloseMessage.info(
+          t(NetworkErrorCodeToMessageKey(error.code), {
+            replace: {
+              ecosystem_name: currentEcosystem,
+            },
+          })
+        );
+      }
+    }
+    sensors.track('teleport_network_selected', {
+      page: location.pathname,
+      chainId: network.chainId,
+      chainName: network.chainName,
+    });
+    // jump back previous page
+    history.goBack();
+  };
   return (
     <div
       {...props.draggableProps}
@@ -76,7 +92,7 @@ export function NetworkSelectionItem({
         'network-item-active': isSelectedNetwork,
         'is-dragging': props.isDragging,
       })}
-      onClick={() => selectProvider(network)}
+      onClick={selectProvider}
     >
       <div
         className={clsx('drag-handle', {
