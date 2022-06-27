@@ -51,44 +51,69 @@ export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
 }
 
-export const CosmosAccount = {
-  use(options: {
-    msgOptsCreator?: (
-      chainId: string
-    ) => DeepPartial<CosmosMsgOpts> | undefined;
-    // queriesStore: IQueriesStore<CosmosQueries>;
-    wsObject?: new (url: string, protocols?: string | string[]) => WebSocket;
-    preTxEvents?: {
-      onBroadcastFailed?: (chainId: string, e?: Error) => void;
-      onBroadcasted?: (chainId: string, txHash: Uint8Array) => void;
-      onFulfill?: (chainId: string, tx: any) => void;
-    };
-  }): (
-    base: AccountSetBaseSuper,
-    cosChainInfo: CosChainInfo,
-    chainId: string
-  ) => CosmosAccount {
-    return (base, cosChainInfo, chainId) => {
-      const msgOptsFromCreator = options.msgOptsCreator
-        ? options.msgOptsCreator(chainId)
-        : undefined;
+// export const CosmosAccount = {
+//   use(options: {
+//     msgOptsCreator?: (
+//       chainId: string
+//     ) => DeepPartial<CosmosMsgOpts> | undefined;
+//     // queriesStore: IQueriesStore<CosmosQueries>;
+//     wsObject?: new (url: string, protocols?: string | string[]) => WebSocket;
+//     preTxEvents?: {
+//       onBroadcastFailed?: (chainId: string, e?: Error) => void;
+//       onBroadcasted?: (chainId: string, txHash: Uint8Array) => void;
+//       onFulfill?: (chainId: string, tx: any) => void;
+//     };
+//   }): (
+//     base: AccountSetBaseSuper,
+//     cosChainInfo: CosChainInfo,
+//     chainId: string
+//   ) => CosmosAccount {
+//     return (base, cosChainInfo, chainId) => {
+//       const msgOptsFromCreator = options.msgOptsCreator
+//         ? options.msgOptsCreator(chainId)
+//         : undefined;
 
-      return {
-        cosmos: new CosmosAccountImpl(
-          // base,
-          // cosChainInfo,
-          // chainId,
-          // options.queriesStore,
-          deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
-            defaultCosmosMsgOpts,
-            msgOptsFromCreator ? msgOptsFromCreator : {}
-          ),
-          options
-        ),
-      };
-    };
-  },
-};
+//       return {
+//         cosmos: new CosmosAccountImpl(
+//           // base,
+//           // cosChainInfo,
+//           // chainId,
+//           // options.queriesStore,
+//           deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
+//             defaultCosmosMsgOpts,
+//             msgOptsFromCreator ? msgOptsFromCreator : {}
+//           ),
+//           options
+//         ),
+//       };
+//     };
+//   },
+// };
+
+export const CosmosAccount = (options: {
+  chainId: string,
+  msgOptsCreator?: (
+    chainId: string
+  ) => DeepPartial<CosmosMsgOpts> | undefined;
+  // queriesStore: IQueriesStore<CosmosQueries>;
+  wsObject?: new (url: string, protocols?: string | string[]) => WebSocket;
+  preTxEvents?: {
+    onBroadcastFailed?: (chainId: string, e?: Error) => void;
+    onBroadcasted?: (chainId: string, txHash: Uint8Array) => void;
+    onFulfill?: (chainId: string, tx: any) => void;
+  };
+}) => {
+  const msgOptsFromCreator = options.msgOptsCreator
+        ? options.msgOptsCreator(options.chainId)
+        : undefined;
+  return new CosmosAccountImpl(
+    deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
+      defaultCosmosMsgOpts,
+      msgOptsFromCreator ? msgOptsFromCreator : {}
+    ),
+    options
+  )
+}
 
 export interface CosmosMsgOpts {
   readonly send: {

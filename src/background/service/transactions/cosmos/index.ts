@@ -1,120 +1,127 @@
-import { CosmosAccount } from './tx';
-import { CosChainInfo } from './types';
-import { AccountSetBaseSuper } from './base';
+import { CosmosAccount, CosmosAccountImpl } from './cosmos';
+import { CosmwasmAccount, CosmwasmAccountImpl } from './cosmwasm';
+import { DenomHelper } from '@keplr-wallet/common';
+import { getGasByCosmos } from './fee';
 
-const cosmosTxFn = (networkPreferenceService) => {
-  const {
-    rpcUrl,
-    chainId,
-    ecoSystemParams,
-    prefix: bech32Config,
-    coinType,
-  } = networkPreferenceService.getProviderConfig();
-  // console.log('-----------rpcUrl, chainId: -----------', rpcUrl, chainId, coinType);
-  const cosChainInfo = {
-    rpc: rpcUrl,
-    chainId,
-    rest: ecoSystemParams?.rest,
-    bech32Config,
-    coinType,
-  } as CosChainInfo;
+// const cosmosTxFn = (networkPreferenceService) => {
+//   const {
+//     rpcUrl,
+//     chainId,
+//     ecoSystemParams,
+//     prefix: bech32Config,
+//     coinType,
+//   } = networkPreferenceService.getProviderConfig();
+//   // console.log('-----------rpcUrl, chainId: -----------', rpcUrl, chainId, coinType);
+//   const cosChainInfo = {
+//     rpc: rpcUrl,
+//     chainId,
+//     rest: ecoSystemParams?.rest,
+//     bech32Config,
+//     coinType,
+//   } as CosChainInfo;
 
-  const accountSetBase = new AccountSetBaseSuper(chainId, {
-    suggestChain: false,
-    autoInit: true,
-  });
-
-  const cosmosAccountFn = CosmosAccount.use({
-    msgOptsCreator: (chainId) => {
-      // In certik, change the msg type of the MsgSend to "bank/MsgSend"
-      if (chainId.startsWith('shentu-')) {
-        return {
-          send: {
-            native: {
-              type: 'bank/MsgSend',
-            },
-          },
-        };
+//   const accountSetBase = new AccountSetBaseSuper(chainId, {
+//     suggestChain: false,
+//     autoInit: true,
+//   });
+class cosmosController {
+  cosmosAccount: CosmosAccountImpl;
+  cosmwasmAccount: CosmwasmAccountImpl;
+  constructor(networkPreferenceService) {
+    const {
+      chainId
+    } = networkPreferenceService.getProviderConfig();
+    const cosmosAccount = CosmosAccount({
+      chainId,
+      msgOptsCreator: getGasByCosmos
+    })
+    this.cosmosAccount = cosmosAccount;
+    const cosmwasmAccount = CosmwasmAccount({
+      base: cosmosAccount,
+      chainId,
+    })
+    this.cosmwasmAccount = cosmwasmAccount;
+  }
+  sendToken(
+    amount: string,
+    currency,
+    recipient: string,
+    memo = '',
+    stdFee = {},
+    signOptions,
+    onTxEvents
+  ) {
+    const denomHelper = new DenomHelper(currency.coinMinimalDenom);
+    // cw20, secret20, native
+    switch (denomHelper.type) {
+      case 'native': {
+        return this.cosmosAccount.processSendToken(
+          amount,
+          currency,
+          recipient,
+          memo,
+          stdFee,
+          signOptions,
+          onTxEvents
+        )
       }
-
-      // In akash or sifchain, increase the default gas for sending
-      if (chainId.startsWith('akashnet-') || chainId.startsWith('sifchain')) {
-        return {
-          send: {
-            native: {
-              gas: 120000,
-            },
-          },
-        };
+      case 'cw20': {
+        return this.cosmwasmAccount.processSendToken(
+          amount,
+          currency,
+          recipient,
+          memo,
+          stdFee,
+          signOptions,
+          onTxEvents
+        )
       }
-
-      if (chainId.startsWith('secret-')) {
-        return {
-          send: {
-            native: {
-              gas: 20000,
-            },
-          },
-          withdrawRewards: {
-            gas: 25000,
-          },
-        };
+      default: 
+        return false;
+    }
+  }
+  async generateMsg (options: {
+    amount: string,
+    currency,
+    recipient: string,
+    memo: string,
+    stdFee,
+    contractAddress?: string,
+  }) {
+    const {
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee,
+      contractAddress
+    } = options;
+    const denomHelper = new DenomHelper(currency.coinMinimalDenom);
+    // cw20, secret20, native
+    switch (denomHelper.type) {
+      case 'native': {
+        return this.cosmosAccount.generateMsg(
+          amount,
+          currency,
+          recipient,
+          memo,
+          stdFee
+        );
       }
-
-      // For terra related chains
-      if (chainId.startsWith('bombay-') || chainId.startsWith('columbus-')) {
-        return {
-          send: {
-            native: {
-              type: 'bank/MsgSend',
-            },
-          },
-        };
+      case 'cw20': {
+        return this.cosmwasmAccount.generateMsg(
+          amount,
+          currency,
+          recipient,
+          contractAddress,
+          memo,
+          stdFee
+        );
       }
+      default: 
+        return false;
+    }
+  }
+}
 
-      if (chainId.startsWith('evmos_')) {
-        return {
-          send: {
-            native: {
-              gas: 140000,
-            },
-          },
-          withdrawRewards: {
-            gas: 200000,
-          },
-        };
-      }
-
-      if (chainId.startsWith('osmosis')) {
-        return {
-          send: {
-            native: {
-              gas: 100000,
-            },
-          },
-          withdrawRewards: {
-            gas: 300000,
-          },
-        };
-      }
-
-      if (chainId.startsWith('stargaze-')) {
-        return {
-          send: {
-            native: {
-              gas: 100000,
-            },
-          },
-          withdrawRewards: {
-            gas: 200000,
-          },
-        };
-      }
-    },
-  });
-
-  const cosmosAccount = cosmosAccountFn(accountSetBase, cosChainInfo, chainId);
-  return cosmosAccount;
-};
-
-export default cosmosTxFn;
+export default cosmosController;

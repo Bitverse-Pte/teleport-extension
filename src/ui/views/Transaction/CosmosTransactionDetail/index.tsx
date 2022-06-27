@@ -13,7 +13,7 @@ import { TransactionItemDetail } from '../components/TransactionItemDetail.compo
 import { MockCosmosTxHistory } from './_MockCosmosTxHistory';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
-import { CosmosTx } from 'background/service/transactions/cosmos/tx';
+import { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 const { sensors } = skynet;
 
 const activityId = '_pBWBbRUSHFMqiBDW6xcd';

@@ -1,16 +1,18 @@
-import { AccountSetBase, AccountSetBaseSuper, MsgOpt } from "./base";
+import { AccountSetBase, AccountSetBaseSuper, MsgOpt } from './base';
 // import { CosmwasmQueries, IQueriesStore, QueriesSetBase } from "../query";
 // import { ChainGetter, CoinPrimitive } from "../common";
-import { StdFee } from "@cosmjs/launchpad";
-import { DenomHelper } from "@keplr-wallet/common";
-import { Dec, DecUtils } from "@keplr-wallet/unit";
-import { AppCurrency, KeplrSignOptions } from "@keplr-wallet/types";
-import { DeepPartial, DeepReadonly, Optional } from "utility-types";
-import { MsgExecuteContract } from "@keplr-wallet/proto-types/cosmwasm/wasm/v1/tx";
-import { Buffer } from "buffer/";
-import deepmerge from "deepmerge";
-import { CosmosAccount } from "./tx";
-
+import { StdFee } from '@cosmjs/launchpad';
+import { DenomHelper } from '@keplr-wallet/common';
+import { Dec, DecUtils } from '@keplr-wallet/unit';
+import { AppCurrency, KeplrSignOptions } from '@keplr-wallet/types';
+import { DeepPartial, DeepReadonly, Optional } from 'utility-types';
+import { MsgExecuteContract } from '@keplr-wallet/proto-types/cosmwasm/wasm/v1/tx';
+import { Buffer } from 'buffer/';
+import deepmerge from 'deepmerge';
+import { CosmosAccountImpl } from './cosmos';
+import { nanoid as createId } from 'nanoid';
+import { CosChainInfo } from './types';
+import { keyringService, networkPreferenceService } from 'background/service';
 export interface CosmwasmAccount {
   cosmwasm: CosmwasmAccountImpl;
 }
@@ -20,44 +22,64 @@ export type CoinPrimitive = {
   amount: string;
 };
 
-export const CosmwasmAccount = {
-  use(options: {
-    msgOptsCreator?: (
-      chainId: string
-    ) => DeepPartial<CosmwasmMsgOpts> | undefined;
-    // queriesStore: IQueriesStore<CosmwasmQueries>;
-  }): (
-    base: AccountSetBaseSuper & CosmosAccount,
-    // chainGetter: ChainGetter,
-    chainId: string
-  ) => CosmwasmAccount {
-    return (base, chainId) => {
-      const msgOptsFromCreator = options.msgOptsCreator
-        ? options.msgOptsCreator(chainId)
-        : undefined;
+// export const CosmwasmAccount = {
+//   use(options: {
+//     msgOptsCreator?: (
+//       chainId: string
+//     ) => DeepPartial<CosmwasmMsgOpts> | undefined;
+//     // queriesStore: IQueriesStore<CosmwasmQueries>;
+//   }): (
+//     base: AccountSetBaseSuper & CosmosAccount,
+//     // chainGetter: ChainGetter,
+//     chainId: string
+//   ) => CosmwasmAccount {
+//     return (base, chainId) => {
+//       const msgOptsFromCreator = options.msgOptsCreator
+//         ? options.msgOptsCreator(chainId)
+//         : undefined;
 
-      return {
-        cosmwasm: new CosmwasmAccountImpl(
-          base,
-          // chainGetter,
-          chainId,
-          // options.queriesStore,
-          deepmerge<CosmwasmMsgOpts, DeepPartial<CosmwasmMsgOpts>>(
-            defaultCosmwasmMsgOpts,
-            msgOptsFromCreator ? msgOptsFromCreator : {}
-          )
-        ),
-      };
-    };
-  },
-};
+//       return {
+//         cosmwasm: new CosmwasmAccountImpl(
+//           base,
+//           // chainGetter,
+//           chainId,
+//           // options.queriesStore,
+//           deepmerge<CosmwasmMsgOpts, DeepPartial<CosmwasmMsgOpts>>(
+//             defaultCosmwasmMsgOpts,
+//             msgOptsFromCreator ? msgOptsFromCreator : {}
+//           )
+//         ),
+//       };
+//     };
+//   },
+// };
+
+export const CosmwasmAccount = (options: {
+  base: CosmosAccountImpl,
+  chainId: string,
+  msgOptsCreator?: (
+    chainId: string
+  ) => DeepPartial<CosmwasmMsgOpts> | undefined;
+}) => {
+  const msgOptsFromCreator = options.msgOptsCreator
+    ? options.msgOptsCreator(options.chainId)
+    : undefined;
+
+  return new CosmwasmAccountImpl(
+    options.base,
+    deepmerge<CosmwasmMsgOpts, DeepPartial<CosmwasmMsgOpts>>(
+      defaultCosmwasmMsgOpts,
+      msgOptsFromCreator ? msgOptsFromCreator : {}
+    )
+  )
+}
 
 export interface CosmwasmMsgOpts {
   readonly send: {
-    readonly cw20: Pick<MsgOpt, "gas">;
+    readonly cw20: Pick<MsgOpt, 'gas'>;
   };
 
-  readonly executeWasm: Pick<MsgOpt, "type">;
+  readonly executeWasm: Pick<MsgOpt, 'type'>;
 }
 
 export const defaultCosmwasmMsgOpts: CosmwasmMsgOpts = {
@@ -68,26 +90,26 @@ export const defaultCosmwasmMsgOpts: CosmwasmMsgOpts = {
   },
 
   executeWasm: {
-    type: "wasm/MsgExecuteContract",
+    type: 'wasm/MsgExecuteContract',
   },
 };
 
 export class CosmwasmAccountImpl {
   constructor(
-    protected readonly base: AccountSetBase & CosmosAccount,
+    protected readonly base: CosmosAccountImpl,
     // protected readonly chainGetter: ChainGetter,
-    protected readonly chainId: string,
+    // protected readonly chainId: string,
     // protected readonly queriesStore: IQueriesStore<CosmwasmQueries>,
     protected readonly _msgOpts: CosmwasmMsgOpts
   ) {
-    this.base.registerSendTokenFn(this.processSendToken.bind(this));
+    // this.base.registerSendTokenFn(this.processSendToken.bind(this));
   }
 
   get msgOpts(): CosmwasmMsgOpts {
     return this._msgOpts;
   }
 
-  protected async processSendToken(
+  async processSendToken(
     amount: string,
     currency: AppCurrency,
     recipient: string,
@@ -103,19 +125,37 @@ export class CosmwasmAccountImpl {
   ): Promise<boolean> {
     const denomHelper = new DenomHelper(currency.coinMinimalDenom);
 
+    const {
+      rpcUrl,
+      chainId,
+      ecoSystemParams,
+      prefix: bech32Config,
+      coinType,
+    } = networkPreferenceService.getProviderConfig();
+    const cosChainInfo = {
+      rpc: rpcUrl,
+      chainId,
+      rest: ecoSystemParams?.rest,
+      bech32Config,
+      coinType,
+    } as CosChainInfo;
+    const txId = createId();
+
     switch (denomHelper.type) {
-      case "cw20":
+      case 'cw20': {
         const actualAmount = (() => {
           let dec = new Dec(amount);
           dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
           return dec.truncate().toString();
         })();
 
-        if (!("type" in currency) || currency.type !== "cw20") {
-          throw new Error("Currency is not cw20");
+        if (!('type' in currency) || currency.type !== 'cw20') {
+          throw new Error('Currency is not cw20');
         }
         await this.sendExecuteContractMsg(
-          "send",
+          'send',
+          cosChainInfo,
+          txId,
           currency.contractAddress,
           {
             transfer: {
@@ -140,7 +180,6 @@ export class CosmwasmAccountImpl {
               //       bal.currency.coinMinimalDenom === currency.coinMinimalDenom
               //     );
               //   });
-
               // if (queryBalance) {
               //   queryBalance.fetch();
               // }
@@ -148,20 +187,78 @@ export class CosmwasmAccountImpl {
           })
         );
         return true;
+      }
     }
 
     return false;
   }
 
+  async generateMsg(
+    amount: string,
+    currency: AppCurrency,
+    recipient: string,
+    contractAddress: string | undefined,
+    memo: string,
+    stdFee: Partial<StdFee>
+  ) {
+    const {
+      rpcUrl,
+      chainId,
+      ecoSystemParams,
+      prefix: bech32Config,
+      coinType,
+    } = networkPreferenceService.getProviderConfig();
+    const k = keyringService.getKeplrCompatibleKey(chainId);
+    if (!k) throw Error('no key found');
+    const { bech32Address, pubKey } = k;
+
+    const {
+      account: { account_number, sequence },
+    } = await this.base.getAccounts(ecoSystemParams?.rest, bech32Address);
+
+    const actualAmount = (_amount) => {
+      let dec = new Dec(_amount);
+      dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
+      return dec.truncate().toString();
+    };
+    return {
+      chain_id: chainId,
+      account_number: account_number,
+      sequence: sequence,
+      fee: stdFee,
+      from_address: bech32Address,
+      to_address: recipient,
+      msgs: [
+        {
+          type: this.msgOpts.executeWasm.type,
+          value: {
+            sender: bech32Address,
+            contract: contractAddress,
+            msg: {
+              transfer: {
+                recipient: recipient,
+                amount: actualAmount(amount),
+              },
+            },
+            funds: {},
+          },
+        }
+      ],
+      memo: memo,
+    };
+  }
+
   async sendExecuteContractMsg(
     // This arg can be used to override the type of sending tx if needed.
-    type: keyof CosmwasmMsgOpts | "unknown" = "executeWasm",
+    type: keyof CosmwasmMsgOpts | 'unknown' = 'executeWasm',
+    cosChainInfo: CosChainInfo,
+    txId: string,
     contractAddress: string,
     // eslint-disable-next-line @typescript-eslint/ban-types
     obj: object,
     funds: CoinPrimitive[],
-    memo: string = "",
-    stdFee: Optional<StdFee, "amount">,
+    memo = '',
+    stdFee: Optional<StdFee, 'amount'>,
     signOptions?: KeplrSignOptions,
     onTxEvents?:
       | ((tx: any) => void)
@@ -170,23 +267,29 @@ export class CosmwasmAccountImpl {
           onFulfill?: (tx: any) => void;
         }
   ): Promise<void> {
+    const k = keyringService.getKeplrCompatibleKey(cosChainInfo.chainId);
+    if (!k) throw Error('no key found');
+    const { bech32Address, pubKey } = k;
+
     const msg = {
       type: this.msgOpts.executeWasm.type,
       value: {
-        sender: this.base.bech32Address,
+        sender: bech32Address,
         contract: contractAddress,
         msg: obj,
         funds,
       },
     };
 
-    await this.base.cosmos.sendMsgs(
+    await this.base.sendMsgs(
       type,
+      cosChainInfo,
+      txId,
       {
         aminoMsgs: [msg],
         protoMsgs: [
           {
-            typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
             value: MsgExecuteContract.encode({
               sender: msg.value.sender,
               contract: msg.value.contract,
@@ -226,9 +329,9 @@ export class CosmwasmAccountImpl {
     }
 
     const onBroadcasted =
-      typeof onTxEvents === "function" ? undefined : onTxEvents.onBroadcasted;
+      typeof onTxEvents === 'function' ? undefined : onTxEvents.onBroadcasted;
     const onFulfill =
-      typeof onTxEvents === "function" ? onTxEvents : onTxEvents.onFulfill;
+      typeof onTxEvents === 'function' ? onTxEvents : onTxEvents.onFulfill;
 
     return {
       onBroadcasted,

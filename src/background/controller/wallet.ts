@@ -619,20 +619,22 @@ export class WalletController extends BaseController {
 
   setManualLocked = (locked: boolean) =>
     preferenceService.setManualLocked(locked);
-  generateCosmosMsg = async (
-    amount: string,
+  generateCosmosMsg = async ({
+    amount,
     currency,
-    recipient: string,
+    recipient,
     memo = '',
-    stdFee = {}
-  ) => {
-    return await cosmosTxController.cosmos.generateMsg(
+    stdFee = {},
+    contractAddress
+  }) => {
+    return await cosmosTxController.generateMsg({
       amount,
       currency,
       recipient,
       memo,
-      stdFee
-    );
+      stdFee,
+      contractAddress
+    });
   };
   sendCosmosToken = async (
     amount: string,
@@ -643,7 +645,7 @@ export class WalletController extends BaseController {
     signOptions,
     onTxEvents
   ) => {
-    await cosmosTxController.cosmos.processSendToken(
+    await cosmosTxController.sendToken(
       amount,
       currency,
       recipient,
