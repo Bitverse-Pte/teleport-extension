@@ -2,28 +2,8 @@ import { CosmosAccount, CosmosAccountImpl } from './cosmos';
 import { CosmwasmAccount, CosmwasmAccountImpl } from './cosmwasm';
 import { DenomHelper } from '@keplr-wallet/common';
 import { getGasByCosmos } from './fee';
+import { CosChainInfo } from './types';
 
-// const cosmosTxFn = (networkPreferenceService) => {
-//   const {
-//     rpcUrl,
-//     chainId,
-//     ecoSystemParams,
-//     prefix: bech32Config,
-//     coinType,
-//   } = networkPreferenceService.getProviderConfig();
-//   // console.log('-----------rpcUrl, chainId: -----------', rpcUrl, chainId, coinType);
-//   const cosChainInfo = {
-//     rpc: rpcUrl,
-//     chainId,
-//     rest: ecoSystemParams?.rest,
-//     bech32Config,
-//     coinType,
-//   } as CosChainInfo;
-
-//   const accountSetBase = new AccountSetBaseSuper(chainId, {
-//     suggestChain: false,
-//     autoInit: true,
-//   });
 class cosmosController {
   cosmosAccount: CosmosAccountImpl;
   cosmwasmAccount: CosmwasmAccountImpl;
@@ -70,7 +50,7 @@ class cosmosController {
           {
             ...currency,
             type: 'cw20',
-            contractAddress
+            contractAddress,
           },
           recipient,
           memo,
@@ -118,6 +98,14 @@ class cosmosController {
       default:
         return false;
     }
+  }
+  async sendTx(
+    cosChainInfo: CosChainInfo,
+    tx: unknown,
+    mode: 'async' | 'sync' | 'block',
+    txId: string
+  ): Promise<Uint8Array> {
+    return this.cosmosAccount.sendTx(cosChainInfo, tx, mode, txId);
   }
 }
 

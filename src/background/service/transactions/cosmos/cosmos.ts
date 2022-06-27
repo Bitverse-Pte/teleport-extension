@@ -799,8 +799,13 @@ export class CosmosAccountImpl {
       console.log('----------------txHash----------------', txHash);
       txTracer.traceTx(txHash).then((tx) => {
         console.log('----------------traceTx----------------', tx);
+        // platform.showTransactionNotification(tx, {});
+        if (tx.code && !tx.data) {
+          platform._showNotification('Tx Failed', tx.log);
+        } else {
+          platform._showNotification('Tx Success', tx.log);
+        }
         txTracer.close();
-        platform.showTransactionNotification(tx, {});
       });
 
       const currentCosmosTx: CosmosTx = this.getTransaction(txId);
@@ -814,7 +819,8 @@ export class CosmosAccountImpl {
       return txHash;
     } catch (e) {
       console.log(e);
-      platform.showTransactionNotification(e, {});
+      platform._showNotification('Tx Failed', e);
+      // platform.showTransactionNotification(e, {});
       throw e;
     }
   }
