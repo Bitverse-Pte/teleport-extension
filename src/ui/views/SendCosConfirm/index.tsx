@@ -4,12 +4,8 @@ import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
 import { Divider } from 'antd';
 import { utils } from 'ethers';
 import { useTranslation } from 'react-i18next';
-import {
-  useWallet,
-  useApproval,
-  useAsyncEffect,
-  getTotalPricesByAmountAndPrice,
-} from 'ui/utils';
+import BigNumber from 'bignumber.js';
+import { useWallet, useApproval, useAsyncEffect } from 'ui/utils';
 import {
   NetworkDisplay,
   SenderToRecipient,
@@ -82,12 +78,17 @@ const ConfirmTx = () => {
     memo: string;
     token: any;
   }>();
-  // const { amount, recipient, memo, token } = state;
-  const amount = '0.1';
-  const recipient = 'osmo1zcph3rkpnjpdyjdzd98yds2l4wn68spajxxfay';
-  const memo = '';
-  const token = { symbol: 'OSMO', denom: 'uosmo', decimal: 6 };
-  console.log(amount, recipient, memo, token);
+  const { amount, recipient, memo, token } = state;
+  // const amount = '0.1';
+  // const recipient = 'osmo1zcph3rkpnjpdyjdzd98yds2l4wn68spajxxfay';
+  // const memo = '';
+  // const token = {
+  //   symbol: 'HULC',
+  //   denom:
+  //     'cw20:juno1pshrvuw5ng2q4nwcsuceypjkp48d95gmcgjdxlus2ytm4k5kvz2s7t9ldx:HULCAT',
+  //   decimal: 6,
+  // };
+  console.log(state, amount, recipient, memo, token);
   const currency = {
     coinDenom: token?.symbol || 'ATOM',
     coinMinimalDenom: token?.denom || 'uatom',
@@ -134,6 +135,7 @@ const ConfirmTx = () => {
       amount,
       currency,
       recipient,
+      state.token.contractAddress || '',
       memo,
       stdFee,
       signOptions,
@@ -176,7 +178,6 @@ const ConfirmTx = () => {
     dispatch(showLoadingIndicator());
     const feeType = fixedFeeType(gasState.gasType);
     const _stdFee = await wallet.getCosmosStdFee(feeType, currency);
-    console.log('_stdFee:', _stdFee);
     setStdFee(_stdFee);
     dispatch(hideLoadingIndicator());
   };
@@ -205,13 +206,14 @@ const ConfirmTx = () => {
   const [tabType, setTabType] = useState<Tabs>(Tabs.FIRST);
 
   useAsyncEffect(async () => {
-    const result = await wallet.generateCosmosMsg(
+    const result = await wallet.generateCosmosMsg({
       amount,
       currency,
       recipient,
       memo,
-      stdFee
-    );
+      stdFee,
+      contractAddress: state.token.contractAddress,
+    });
     setSendMsg(result);
   }, [txToken]);
 
@@ -310,13 +312,42 @@ const TxDetailComponent = ({
   currency: any;
   stdFee: any;
 }) => {
-  console.log('stdFee: ', stdFee);
+  console.log(amount, txToken, nativeToken, setVisible, currency, stdFee);
   const { t } = useTranslation();
   const fee = utils.formatUnits(stdFee?.amount[0].amount, txToken?.decimal);
-  const tokenPrice = Number(txToken?.price || 0);
-  const feePrice = Number(fee) * tokenPrice;
-  const totalToken = Number(fee) + Number(amount);
-  const totalPrice = totalToken * tokenPrice;
+  const txTokenPrice = Number(txToken?.price || 0);
+  const nativeTokenPrice = Number(nativeToken?.price || 0);
+
+  const renderTotalGasFeeAmount = () => {
+    return `${fee} ${nativeToken?.symbol || ''}`;
+  };
+  const renderTotalGasFeeFiat = () => {
+    const feePrice = new BigNumber(fee);
+    return `$ ${feePrice.times(nativeTokenPrice).toString()}`;
+  };
+  const renderTotalMaxAmount = () => {
+    if (txToken?.isNative) {
+      const total = new BigNumber(amount).plus(fee);
+      return `${total.toString()} ${nativeToken?.symbol || ''}`;
+    }
+    return `${amount} ${txToken?.symbol} + ${renderTotalGasFeeAmount()}`;
+  };
+
+  const renderTotalMaxFiat = () => {
+    let total = '0';
+    if (txToken?.isNative) {
+      total = new BigNumber(amount)
+        .plus(fee)
+        .times(nativeTokenPrice)
+        .toString();
+    } else {
+      total = new BigNumber(fee)
+        .times(nativeTokenPrice)
+        .plus(new BigNumber(amount).times(txTokenPrice))
+        .toString();
+    }
+    return `$ ${total}`;
+  };
 
   return (
     <div className="transaction-detail">
@@ -336,18 +367,18 @@ const TxDetailComponent = ({
         key="gas-item"
         detailTitle={t('Estimated gas fee')}
         subTitle={undefined}
-        detailText={fee}
-        detailSubText={feePrice}
-        detailMax={'Max fee: ' + fee}
+        detailText={renderTotalGasFeeAmount()}
+        detailSubText={renderTotalGasFeeFiat()}
+        detailMax={'Max fee: ' + renderTotalGasFeeAmount()}
       />
       <Divider style={{ margin: '16px 0' }} />
       <TransactionDetailItem
         key="total-item"
         detailTitle={t('Sum')}
         subTitle={t('Amount + gas fee')}
-        detailText={totalToken}
-        detailSubText={totalPrice}
-        detailMax={'Max amount: ' + totalToken}
+        detailText={renderTotalMaxAmount()}
+        detailSubText={renderTotalMaxFiat()}
+        detailMax={'Max amount: ' + renderTotalMaxAmount()}
       />
     </div>
   );
