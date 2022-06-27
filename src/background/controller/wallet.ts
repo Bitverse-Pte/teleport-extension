@@ -625,7 +625,7 @@ export class WalletController extends BaseController {
     recipient,
     memo = '',
     stdFee = {},
-    contractAddress
+    contractAddress,
   }) => {
     return await cosmosTxController.generateMsg({
       amount,
@@ -633,13 +633,14 @@ export class WalletController extends BaseController {
       recipient,
       memo,
       stdFee,
-      contractAddress
+      contractAddress,
     });
   };
   sendCosmosToken = async (
     amount: string,
     currency,
     recipient: string,
+    contractAddress,
     memo = '',
     stdFee = {},
     signOptions,
@@ -649,6 +650,7 @@ export class WalletController extends BaseController {
       amount,
       currency,
       recipient,
+      contractAddress,
       memo,
       stdFee,
       signOptions,

@@ -78,16 +78,16 @@ const ConfirmTx = () => {
     memo: string;
     token: any;
   }>();
-  // const { amount, recipient, memo, token } = state;
-  const amount = '0.1';
-  const recipient = 'osmo1zcph3rkpnjpdyjdzd98yds2l4wn68spajxxfay';
-  const memo = '';
-  const token = {
-    symbol: 'HULC',
-    denom:
-      'cw20:juno1pshrvuw5ng2q4nwcsuceypjkp48d95gmcgjdxlus2ytm4k5kvz2s7t9ldx:HULCAT',
-    decimal: 6,
-  };
+  const { amount, recipient, memo, token } = state;
+  // const amount = '0.1';
+  // const recipient = 'osmo1zcph3rkpnjpdyjdzd98yds2l4wn68spajxxfay';
+  // const memo = '';
+  // const token = {
+  //   symbol: 'HULC',
+  //   denom:
+  //     'cw20:juno1pshrvuw5ng2q4nwcsuceypjkp48d95gmcgjdxlus2ytm4k5kvz2s7t9ldx:HULCAT',
+  //   decimal: 6,
+  // };
   console.log(state, amount, recipient, memo, token);
   const currency = {
     coinDenom: token?.symbol || 'ATOM',
@@ -135,6 +135,7 @@ const ConfirmTx = () => {
       amount,
       currency,
       recipient,
+      state.token.contractAddress || '',
       memo,
       stdFee,
       signOptions,

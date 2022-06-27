@@ -55,8 +55,8 @@ export type CoinPrimitive = {
 // };
 
 export const CosmwasmAccount = (options: {
-  base: CosmosAccountImpl,
-  chainId: string,
+  base: CosmosAccountImpl;
+  chainId: string;
   msgOptsCreator?: (
     chainId: string
   ) => DeepPartial<CosmwasmMsgOpts> | undefined;
@@ -71,8 +71,8 @@ export const CosmwasmAccount = (options: {
       defaultCosmwasmMsgOpts,
       msgOptsFromCreator ? msgOptsFromCreator : {}
     )
-  )
-}
+  );
+};
 
 export interface CosmwasmMsgOpts {
   readonly send: {
@@ -242,7 +242,7 @@ export class CosmwasmAccountImpl {
             },
             funds: {},
           },
-        }
+        },
       ],
       memo: memo,
     };

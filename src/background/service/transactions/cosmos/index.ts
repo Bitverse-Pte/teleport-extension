@@ -28,24 +28,23 @@ class cosmosController {
   cosmosAccount: CosmosAccountImpl;
   cosmwasmAccount: CosmwasmAccountImpl;
   constructor(networkPreferenceService) {
-    const {
-      chainId
-    } = networkPreferenceService.getProviderConfig();
+    const { chainId } = networkPreferenceService.getProviderConfig();
     const cosmosAccount = CosmosAccount({
       chainId,
-      msgOptsCreator: getGasByCosmos
-    })
+      msgOptsCreator: getGasByCosmos,
+    });
     this.cosmosAccount = cosmosAccount;
     const cosmwasmAccount = CosmwasmAccount({
       base: cosmosAccount,
       chainId,
-    })
+    });
     this.cosmwasmAccount = cosmwasmAccount;
   }
   sendToken(
     amount: string,
     currency,
     recipient: string,
+    contractAddress,
     memo = '',
     stdFee = {},
     signOptions,
@@ -63,39 +62,37 @@ class cosmosController {
           stdFee,
           signOptions,
           onTxEvents
-        )
+        );
       }
       case 'cw20': {
         return this.cosmwasmAccount.processSendToken(
           amount,
-          currency,
+          {
+            ...currency,
+            type: 'cw20',
+            contractAddress
+          },
           recipient,
           memo,
           stdFee,
           signOptions,
           onTxEvents
-        )
+        );
       }
-      default: 
+      default:
         return false;
     }
   }
-  async generateMsg (options: {
-    amount: string,
-    currency,
-    recipient: string,
-    memo: string,
-    stdFee,
-    contractAddress?: string,
+  async generateMsg(options: {
+    amount: string;
+    currency;
+    recipient: string;
+    memo: string;
+    stdFee;
+    contractAddress?: string;
   }) {
-    const {
-      amount,
-      currency,
-      recipient,
-      memo,
-      stdFee,
-      contractAddress
-    } = options;
+    const { amount, currency, recipient, memo, stdFee, contractAddress } =
+      options;
     const denomHelper = new DenomHelper(currency.coinMinimalDenom);
     // cw20, secret20, native
     switch (denomHelper.type) {
@@ -118,7 +115,7 @@ class cosmosController {
           stdFee
         );
       }
-      default: 
+      default:
         return false;
     }
   }

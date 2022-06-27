@@ -91,10 +91,8 @@ export interface CosmosAccount {
 // };
 
 export const CosmosAccount = (options: {
-  chainId: string,
-  msgOptsCreator?: (
-    chainId: string
-  ) => DeepPartial<CosmosMsgOpts> | undefined;
+  chainId: string;
+  msgOptsCreator?: (chainId: string) => DeepPartial<CosmosMsgOpts> | undefined;
   // queriesStore: IQueriesStore<CosmosQueries>;
   wsObject?: new (url: string, protocols?: string | string[]) => WebSocket;
   preTxEvents?: {
@@ -104,16 +102,16 @@ export const CosmosAccount = (options: {
   };
 }) => {
   const msgOptsFromCreator = options.msgOptsCreator
-        ? options.msgOptsCreator(options.chainId)
-        : undefined;
+    ? options.msgOptsCreator(options.chainId)
+    : undefined;
   return new CosmosAccountImpl(
     deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
       defaultCosmosMsgOpts,
       msgOptsFromCreator ? msgOptsFromCreator : {}
     ),
     options
-  )
-}
+  );
+};
 
 export interface CosmosMsgOpts {
   readonly send: {
