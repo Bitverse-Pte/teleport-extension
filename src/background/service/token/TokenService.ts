@@ -224,8 +224,8 @@ class TokenService {
         denomTrace: denoms,
       });
       if (denomRes) denomTrace = denomRes;
-      return Promise.resolve(denomTrace);
     }
+    return Promise.resolve(denomTrace);
   }
 
   private _getPresetTokenCfgByDenom(denom: string): {
@@ -311,7 +311,6 @@ class TokenService {
             return true;
           }
         });
-
         for (const b of res.balances) {
           // ibc tokens
           if (b.denom.includes('ibc/')) {
@@ -322,7 +321,7 @@ class TokenService {
             if (token) {
               token.amount = b.amount;
             } else {
-              const token: Token = {
+              const t: Token = {
                 symbol: '',
                 decimal: 6,
                 name: '',
@@ -336,17 +335,16 @@ class TokenService {
               };
               // Cache denom trace
               const denomTrace: any = await this._cacheDenomTrace(hash);
-
               if (denomTrace) {
                 const tokenInfo = this._getPresetTokenCfgByDenom(
                   denomTrace.denom
                 );
-                token.chainName = tokenInfo.chainName;
-                token.symbol = tokenInfo.symbol;
-                token.name = tokenInfo.name;
-                token.trace = denomTrace;
-                currentAccountTokens.push(token);
+                t.chainName = tokenInfo.chainName;
+                t.symbol = tokenInfo.symbol;
+                t.name = tokenInfo.name;
+                t.trace = denomTrace;
               }
+              currentAccountTokens.push(t);
             }
           } else {
             const token = currentAccountTokens.find(
@@ -367,13 +365,13 @@ class TokenService {
         }
       }
       // Native token must display in list
-      if (currentAccountTokens?.length === 0) {
+      if (currentAccountTokens?.every((t: Token) => !t.isNative)) {
         const nativeToken = allTokens.find(
           (t: Token) => t.chainCustomId === chainCustomId && t.isNative
         );
         if (nativeToken) {
           nativeToken.amount = 0;
-          currentAccountTokens = [cloneDeep(nativeToken)];
+          currentAccountTokens.push(cloneDeep(nativeToken));
         }
       }
 

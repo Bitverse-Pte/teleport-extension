@@ -1,5 +1,5 @@
 import './style.less';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import Header from 'ui/components/Header';
 import { useAsyncEffect, useWallet } from 'ui/utils';
@@ -84,6 +84,11 @@ const WalletManage: React.FC = () => {
     const current: BaseAccount = await wallet.getCurrentAccount();
     if (current) {
       setCurrentAccount(current);
+      if (current.accountCreateType === AccountCreateType.MNEMONIC) {
+        setAccountType(Tabs.FIRST);
+      } else {
+        setAccountType(Tabs.SECOND);
+      }
     }
     return {
       current,
@@ -91,24 +96,8 @@ const WalletManage: React.FC = () => {
     };
   };
 
-  const setDefaultTab = (current, hdWalletAccounts) => {
-    console.log(hdWalletAccounts);
-    if (
-      hdWalletAccounts?.some((account) =>
-        account.accounts.some(
-          (subAccount) => subAccount.address === current.address
-        )
-      )
-    ) {
-      setAccountType(Tabs.FIRST);
-    } else {
-      setAccountType(Tabs.SECOND);
-    }
-  };
-
-  useAsyncEffect(async () => {
-    const { current, hdWalletAccounts } = await queryWallets();
-    setDefaultTab(current, hdWalletAccounts);
+  useEffect(() => {
+    queryWallets();
   }, []);
 
   const handleCreateBtnClick = async () => {
