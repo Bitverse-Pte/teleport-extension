@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { CosmosTx } from 'background/service/transactions/cosmos/tx';
+import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 
 export const cosmosTransactionsSlice = createSlice<
   Record<string, CosmosTx>,

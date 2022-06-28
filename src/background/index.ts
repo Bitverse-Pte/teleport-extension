@@ -23,8 +23,7 @@ import i18n from './service/i18n';
 import eventBus from 'eventBus';
 import DataSyncService from './service/dataSyncService';
 import { UPDATE_BADGE } from './service/notification';
-import { cosmosTxHistoryStorage } from './service/transactions/cosmos/tx';
-
+import { cosmosTxHistoryStorage } from './service/transactions/cosmos/cosmos';
 const { PortMessage } = Message;
 
 let appStoreLoaded = false;

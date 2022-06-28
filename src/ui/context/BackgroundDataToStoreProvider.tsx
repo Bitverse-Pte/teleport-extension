@@ -15,7 +15,7 @@ import { updateNetworkController } from 'ui/reducer/network.reducer';
 import { setCustomNetworks } from 'ui/reducer/customNetwork.reducer';
 import { setCurrentGasLimit, setGasEstimates } from 'ui/reducer/block.reducer';
 import type { BlockData } from 'background/service/network/latestBlockDataHub';
-import type { CosmosTx } from 'background/service/transactions/cosmos/tx';
+import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 import { setCosmosTransactions } from 'ui/reducer/cosmosTxs.reducer';
 
 /**
