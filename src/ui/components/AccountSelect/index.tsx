@@ -15,11 +15,13 @@ import Jazzicon from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
 import { Drawer } from 'antd';
 import * as _ from 'lodash';
+import { useSelector } from 'react-redux';
 import { CustomTab, WalletName } from '../Widgets';
 import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import ChainIcons from '../ChainIcons';
-import { findIndex } from 'lodash';
+import { getProvider } from 'ui/selectors/selectors';
+import { Ecosystem, Provider } from 'types/network';
 
 interface AccountSelectProps {
   onClose: (selected?: BaseAccount) => void;
@@ -32,6 +34,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
 ) => {
   const wallet = useWallet();
   const [accountCreateType, setAccountCreateType] = useState(Tabs.FIRST);
+  const currentChain: Provider = useSelector(getProvider);
   const [displayAccounts, setDisplayAccount] = useState<any>({});
   const { t } = useTranslation();
   const isMnemonic = useMemo(() => {
@@ -91,17 +94,30 @@ const AccountSelect: React.FC<AccountSelectProps> = (
   }, [props.visible]);
 
   const accountList = useMemo(() => {
+    let list = [];
     if (accountCreateType === Tabs.SECOND) {
-      return displayAccounts?.simpleAccount;
+      list = displayAccounts?.simpleAccount;
     } else {
-      return (
+      list =
         displayAccounts?.hdAccount?.find(
           (a: Object.Merge<HdAccountStruct, { selected?: boolean }>) =>
             a.selected
-        )?.accounts || []
-      );
+        )?.accounts || [];
     }
+    console.log('currentChain', currentChain, list);
+    if (currentChain.ecosystem === Ecosystem.EVM) {
+      return list.filter((item: any) => {
+        return item?.ecosystem === Ecosystem.EVM;
+      });
+    }
+    if (currentChain.ecosystem === Ecosystem.COSMOS) {
+      return list.filter((item: any) => {
+        return item?.chainCustomId === currentChain.id;
+      });
+    }
+    return list;
   }, [displayAccounts, accountCreateType]);
+  // console.log('accountList:', accountList, currentChain);
 
   const handleTabClick = (type: Tabs) => {
     setAccountCreateType(type);
