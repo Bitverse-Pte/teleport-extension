@@ -15,6 +15,8 @@ import { updateNetworkController } from 'ui/reducer/network.reducer';
 import { setCustomNetworks } from 'ui/reducer/customNetwork.reducer';
 import { setCurrentGasLimit, setGasEstimates } from 'ui/reducer/block.reducer';
 import type { BlockData } from 'background/service/network/latestBlockDataHub';
+import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
+import { setCosmosTransactions } from 'ui/reducer/cosmosTxs.reducer';
 
 /**
  * BackgroundDataSyncMiddleware
@@ -40,6 +42,11 @@ export function BackgroundDataSyncMiddleware() {
     // only for the beginning of this hook
     const onTxServiceBackgroundMessage = (txs: TransactionHistoryStore) => {
       dispatch(setTransactions(txs.transactions));
+    };
+    const onCosmosTxHistoryUpdate = (txs: {
+      transactions: Record<string, CosmosTx>;
+    }) => {
+      dispatch(setCosmosTransactions(txs.transactions));
     };
     const onTokenServiceBackgroundMessage = (s: ITokenStore) => {
       dispatch(setTokenServiceState(s));
@@ -74,6 +81,10 @@ export function BackgroundDataSyncMiddleware() {
       onTxServiceBackgroundMessage
     );
     eventBus.addEventListener(
+      'dataSyncService.cosmosTxHistory',
+      onCosmosTxHistoryUpdate
+    );
+    eventBus.addEventListener(
       'dataSyncService.tokenStore',
       onTokenServiceBackgroundMessage
     );
@@ -92,6 +103,7 @@ export function BackgroundDataSyncMiddleware() {
       onCurrentBlockStore
     );
 
+    fetchStorageDataFromBackground('cosmosTxHistory');
     fetchStorageDataFromBackground('transactionHistory');
     fetchStorageDataFromBackground('tokenStore');
     fetchStorageDataFromBackground('knownMethod');
@@ -114,6 +126,10 @@ export function BackgroundDataSyncMiddleware() {
       eventBus.removeEventListener(
         'dataSyncService.transactionHistory',
         onTxServiceBackgroundMessage
+      );
+      eventBus.removeEventListener(
+        'dataSyncService.cosmosTxHistory',
+        onCosmosTxHistoryUpdate
       );
       eventBus.removeEventListener(
         'dataSyncService.tokenStore',

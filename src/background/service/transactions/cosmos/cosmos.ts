@@ -51,6 +51,13 @@ export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
 }
 
+export const cosmosTxHistoryStorage = new ObservableStorage<TransactionState>(
+  'cosmos_transaction_history',
+  {
+    transactions: {},
+  }
+);
+
 // export const CosmosAccount = {
 //   use(options: {
 //     msgOptsCreator?: (
@@ -109,7 +116,8 @@ export const CosmosAccount = (options: {
       defaultCosmosMsgOpts,
       msgOptsFromCreator ? msgOptsFromCreator : {}
     ),
-    options
+    options,
+    cosmosTxHistoryStorage
   );
 };
 
@@ -186,7 +194,6 @@ type ProtoMsgsOrWithAminoMsgs = {
 
 export class CosmosAccountImpl {
   public broadcastMode: 'sync' | 'async' | 'block' = 'sync';
-  store: ObservableStorage<TransactionState>;
 
   constructor(
     // protected readonly base: AccountSetBaseSuper,
@@ -201,14 +208,9 @@ export class CosmosAccountImpl {
         onBroadcasted?: (chainId: string, txHash: Uint8Array) => void;
         onFulfill?: (chainId: string, tx: any) => void;
       };
-    }
+    },
+    readonly store: ObservableStorage<TransactionState>
   ) {
-    this.store = new ObservableStorage<TransactionState>(
-      'cosmos_transaction_history',
-      {
-        transactions: {},
-      }
-    );
     // this.base.registerSendTokenFn(this.processSendToken.bind(this));
   }
 
