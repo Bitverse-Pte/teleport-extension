@@ -23,6 +23,7 @@ import i18n from './service/i18n';
 import eventBus from 'eventBus';
 import DataSyncService from './service/dataSyncService';
 import { UPDATE_BADGE } from './service/notification';
+import { cosmosTxHistoryStorage } from './service/transactions/cosmos/tx';
 
 const { PortMessage } = Message;
 
@@ -75,6 +76,7 @@ async function restoreAppState() {
     networkStore: networkPreferenceService.networkStore,
     customNetworksStore: networkPreferenceService.customNetworksStore,
     latestBlockData: latestBlockDataHub.store,
+    cosmosTxHistory: cosmosTxHistoryStorage,
   });
 
   appStoreLoaded = true;
