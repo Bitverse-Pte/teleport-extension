@@ -335,10 +335,10 @@ export class WalletController extends BaseController {
     return keyringService.getMnemonicByHdWalletId(name);
   }
 
-  public addNewDisplayAccountByExistKeyring(
+  public async addNewDisplayAccountByExistKeyring(
     hdWalletId: string,
     accountName: string
-  ): Promise<boolean> {
+  ) {
     let hdWalletName = '';
     const currentHdWalletIdAccounts = keyringService
       .getAccountAllList()
@@ -346,11 +346,12 @@ export class WalletController extends BaseController {
     if (currentHdWalletIdAccounts && currentHdWalletIdAccounts.length > 0) {
       hdWalletName = currentHdWalletIdAccounts[0].hdWalletName;
     }
-    return keyringService.addAccount({
+    const newAccount = await keyringService.addAccount({
       hdWalletId,
       hdWalletName,
       accountName,
     });
+    preferenceService.setCurrentAccount(newAccount);
   }
 
   public deleteDisplayAccountByExistKeyringAndIndex(
