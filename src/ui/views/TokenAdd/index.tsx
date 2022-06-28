@@ -16,6 +16,9 @@ import './style.less';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
+import { getProvider } from 'ui/selectors/selectors';
+import { useSelector } from 'react-redux';
+import { Ecosystem, Provider } from 'types/network';
 
 const TokenAdd = () => {
   const { state, pathname } = useLocation<{
@@ -30,6 +33,7 @@ const TokenAdd = () => {
 
   const history = useHistory();
   const wallet = useWallet();
+  const { ecosystem }: Provider = useSelector(getProvider);
 
   const [addToken, addTokenLoading] = useWalletRequest(wallet.addCustomToken, {
     onSuccess() {
@@ -60,6 +64,9 @@ const TokenAdd = () => {
       contractAddress: state.contractAddress,
       isNative: false,
     };
+    if (ecosystem === Ecosystem.COSMOS) {
+      customToken.denom = `cw20:${state.contractAddress}:${state.name}`;
+    }
     addToken(customToken);
   };
 

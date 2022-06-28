@@ -121,7 +121,7 @@ class CosmosProviderController {
       coinType,
     } as CosChainInfo;
     const txId = createId();
-    const txHash = await cosmosTxController.cosmos.sendTx(
+    const txHash = await cosmosTxController.sendTx(
       cosChainInfo,
       tx,
       mode,
