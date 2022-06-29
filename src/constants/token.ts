@@ -652,7 +652,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     decimal: 6,
     name: 'SCRT',
     denom: 'uscrt',
-    icon: '',
+    icon: 'https://dhj8dql1kzq2v.cloudfront.net/white/secret.png',
     chainCustomId: PresetNetworkId.SECRET_NETWORK,
     isNative: true,
     isCustom: false,
@@ -670,7 +670,18 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     isNative: true,
     isCustom: false,
     contractAddress: '',
-
+    display: true,
+  },
+  {
+    symbol: 'ION',
+    decimal: 6,
+    name: 'ION',
+    denom: 'uion',
+    icon: 'https://dhj8dql1kzq2v.cloudfront.net/white/osmosis-ion.png',
+    chainCustomId: PresetNetworkId.OSMOSIS,
+    isNative: false,
+    isCustom: false,
+    contractAddress: '',
     display: true,
   },
   {

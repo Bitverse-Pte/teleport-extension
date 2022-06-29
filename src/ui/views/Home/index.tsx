@@ -226,6 +226,26 @@ const Home = () => {
     return nativeToken;
   }, [tokens, prices]);
 
+  const handleExplorerLinkClick = () => {
+    console.log(currentChain);
+    if (!currentChain?.rpcPrefs?.blockExplorerUrl) {
+      ClickToCloseMessage.success('Please set your block explorer');
+      return;
+    }
+    switch (currentChain.ecosystem) {
+      case Ecosystem.EVM:
+        window.open(
+          `${currentChain?.rpcPrefs?.blockExplorerUrl}/address/${account?.address}`
+        );
+        break;
+      case Ecosystem.COSMOS:
+        window.open(
+          `${currentChain?.rpcPrefs?.blockExplorerUrl}/account/${account?.address}`
+        );
+        break;
+    }
+  };
+
   const displayTokenList = useMemo(() => {
     const t = tokenList.filter((t: Token) => t.display);
     if (
@@ -318,6 +338,11 @@ const Home = () => {
                 <CopyToClipboard text={account?.address} onCopy={onCopy}>
                   <IconComponent name="copy" cls="copy" />
                 </CopyToClipboard>
+                <IconComponent
+                  name="external-link"
+                  cls="explorer"
+                  onClick={handleExplorerLinkClick}
+                />
               </div>
             </div>
             <div className="home-preview-balance flexR">

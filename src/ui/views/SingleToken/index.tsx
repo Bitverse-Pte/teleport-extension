@@ -91,6 +91,20 @@ const SingleToken = () => {
       </span>
     </div>
   );
+
+  const ibcChainInfoStr = useMemo(() => {
+    let ibcStr;
+    if (token?.chainName && (token?.trace?.trace as any).length > 0) {
+      const trace = (token as any)?.trace.trace[
+        (token as any)?.trace.trace.length - 1
+      ];
+      if (trace) {
+        ibcStr = `(${token?.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`;
+      }
+    }
+    return ibcStr;
+  }, [token]);
+
   return (
     <div className="single-token flexCol">
       <Header title={title} />
@@ -107,7 +121,10 @@ const SingleToken = () => {
                 updatedToken?.decimal || 0
               )}
             </span>
-            <span className="single-symbol">{updatedToken?.symbol}</span>
+            <span className="single-symbol">
+              {updatedToken?.symbol}
+              {ibcChainInfoStr ? ibcChainInfoStr : null}
+            </span>
           </div>
           <span className="estimate">
             ≈{' '}

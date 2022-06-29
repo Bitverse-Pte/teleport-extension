@@ -51,43 +51,74 @@ export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
 }
 
-export const CosmosAccount = {
-  use(options: {
-    msgOptsCreator?: (
-      chainId: string
-    ) => DeepPartial<CosmosMsgOpts> | undefined;
-    // queriesStore: IQueriesStore<CosmosQueries>;
-    wsObject?: new (url: string, protocols?: string | string[]) => WebSocket;
-    preTxEvents?: {
-      onBroadcastFailed?: (chainId: string, e?: Error) => void;
-      onBroadcasted?: (chainId: string, txHash: Uint8Array) => void;
-      onFulfill?: (chainId: string, tx: any) => void;
-    };
-  }): (
-    base: AccountSetBaseSuper,
-    cosChainInfo: CosChainInfo,
-    chainId: string
-  ) => CosmosAccount {
-    return (base, cosChainInfo, chainId) => {
-      const msgOptsFromCreator = options.msgOptsCreator
-        ? options.msgOptsCreator(chainId)
-        : undefined;
+export const cosmosTxHistoryStorage = new ObservableStorage<TransactionState>(
+  'cosmos_transaction_history',
+  {
+    transactions: {},
+  }
+);
 
-      return {
-        cosmos: new CosmosAccountImpl(
-          // base,
-          // cosChainInfo,
-          // chainId,
-          // options.queriesStore,
-          deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
-            defaultCosmosMsgOpts,
-            msgOptsFromCreator ? msgOptsFromCreator : {}
-          ),
-          options
-        ),
-      };
-    };
-  },
+// export const CosmosAccount = {
+//   use(options: {
+//     msgOptsCreator?: (
+//       chainId: string
+//     ) => DeepPartial<CosmosMsgOpts> | undefined;
+//     // queriesStore: IQueriesStore<CosmosQueries>;
+//     wsObject?: new (url: string, protocols?: string | string[]) => WebSocket;
+//     preTxEvents?: {
+//       onBroadcastFailed?: (chainId: string, e?: Error) => void;
+//       onBroadcasted?: (chainId: string, txHash: Uint8Array) => void;
+//       onFulfill?: (chainId: string, tx: any) => void;
+//     };
+//   }): (
+//     base: AccountSetBaseSuper,
+//     cosChainInfo: CosChainInfo,
+//     chainId: string
+//   ) => CosmosAccount {
+//     return (base, cosChainInfo, chainId) => {
+//       const msgOptsFromCreator = options.msgOptsCreator
+//         ? options.msgOptsCreator(chainId)
+//         : undefined;
+
+//       return {
+//         cosmos: new CosmosAccountImpl(
+//           // base,
+//           // cosChainInfo,
+//           // chainId,
+//           // options.queriesStore,
+//           deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
+//             defaultCosmosMsgOpts,
+//             msgOptsFromCreator ? msgOptsFromCreator : {}
+//           ),
+//           options
+//         ),
+//       };
+//     };
+//   },
+// };
+
+export const CosmosAccount = (options: {
+  chainId: string;
+  msgOptsCreator?: (chainId: string) => DeepPartial<CosmosMsgOpts> | undefined;
+  // queriesStore: IQueriesStore<CosmosQueries>;
+  wsObject?: new (url: string, protocols?: string | string[]) => WebSocket;
+  preTxEvents?: {
+    onBroadcastFailed?: (chainId: string, e?: Error) => void;
+    onBroadcasted?: (chainId: string, txHash: Uint8Array) => void;
+    onFulfill?: (chainId: string, tx: any) => void;
+  };
+}) => {
+  const msgOptsFromCreator = options.msgOptsCreator
+    ? options.msgOptsCreator(options.chainId)
+    : undefined;
+  return new CosmosAccountImpl(
+    deepmerge<CosmosMsgOpts, DeepPartial<CosmosMsgOpts>>(
+      defaultCosmosMsgOpts,
+      msgOptsFromCreator ? msgOptsFromCreator : {}
+    ),
+    options,
+    cosmosTxHistoryStorage
+  );
 };
 
 export interface CosmosMsgOpts {
@@ -163,7 +194,6 @@ type ProtoMsgsOrWithAminoMsgs = {
 
 export class CosmosAccountImpl {
   public broadcastMode: 'sync' | 'async' | 'block' = 'sync';
-  store: ObservableStorage<TransactionState>;
 
   constructor(
     // protected readonly base: AccountSetBaseSuper,
@@ -178,14 +208,9 @@ export class CosmosAccountImpl {
         onBroadcasted?: (chainId: string, txHash: Uint8Array) => void;
         onFulfill?: (chainId: string, tx: any) => void;
       };
-    }
+    },
+    readonly store: ObservableStorage<TransactionState>
   ) {
-    this.store = new ObservableStorage<TransactionState>(
-      'cosmos_transaction_history',
-      {
-        transactions: {},
-      }
-    );
     // this.base.registerSendTokenFn(this.processSendToken.bind(this));
   }
 
@@ -277,14 +302,14 @@ export class CosmosAccountImpl {
       currency,
     });
 
-    switch (denomHelper.type) {
-      case 'native':
-        const actualAmount = (() => {
-          let dec = new Dec(amount);
-          dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
-          return dec.truncate().toString();
-        })();
+    const actualAmount = () => {
+      let dec = new Dec(amount);
+      dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
+      return dec.truncate().toString();
+    };
 
+    switch (denomHelper.type) {
+      case 'native': {
         const msg = {
           type: this.msgOpts.send.native.type,
           value: {
@@ -293,7 +318,7 @@ export class CosmosAccountImpl {
             amount: [
               {
                 denom: currency.coinMinimalDenom,
-                amount: actualAmount,
+                amount: actualAmount(),
               },
             ],
           },
@@ -340,6 +365,7 @@ export class CosmosAccountImpl {
           })
         );
         return true;
+      }
     }
 
     return false;
@@ -775,8 +801,13 @@ export class CosmosAccountImpl {
       console.log('----------------txHash----------------', txHash);
       txTracer.traceTx(txHash).then((tx) => {
         console.log('----------------traceTx----------------', tx);
+        // platform.showTransactionNotification(tx, {});
+        if (tx.code && !tx.data) {
+          platform._showNotification('Tx Failed', tx.log);
+        } else {
+          platform._showNotification('Tx Success', tx.log);
+        }
         txTracer.close();
-        platform.showTransactionNotification(tx, {});
       });
 
       const currentCosmosTx: CosmosTx = this.getTransaction(txId);
@@ -790,7 +821,8 @@ export class CosmosAccountImpl {
       return txHash;
     } catch (e) {
       console.log(e);
-      platform.showTransactionNotification(e, {});
+      platform._showNotification('Tx Failed', e);
+      // platform.showTransactionNotification(e, {});
       throw e;
     }
   }

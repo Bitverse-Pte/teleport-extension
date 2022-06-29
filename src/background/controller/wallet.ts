@@ -13,6 +13,7 @@ import {
   contactBookService,
   latestBlockDataHub,
   cosmosTxController,
+  cosmosFeeService,
 } from 'background/service';
 import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
@@ -334,10 +335,10 @@ export class WalletController extends BaseController {
     return keyringService.getMnemonicByHdWalletId(name);
   }
 
-  public addNewDisplayAccountByExistKeyring(
+  public async addNewDisplayAccountByExistKeyring(
     hdWalletId: string,
     accountName: string
-  ): Promise<boolean> {
+  ) {
     let hdWalletName = '';
     const currentHdWalletIdAccounts = keyringService
       .getAccountAllList()
@@ -345,11 +346,12 @@ export class WalletController extends BaseController {
     if (currentHdWalletIdAccounts && currentHdWalletIdAccounts.length > 0) {
       hdWalletName = currentHdWalletIdAccounts[0].hdWalletName;
     }
-    return keyringService.addAccount({
+    const newAccount = await keyringService.addAccount({
       hdWalletId,
       hdWalletName,
       accountName,
     });
+    preferenceService.setCurrentAccount(newAccount);
   }
 
   public deleteDisplayAccountByExistKeyringAndIndex(
@@ -618,39 +620,53 @@ export class WalletController extends BaseController {
 
   setManualLocked = (locked: boolean) =>
     preferenceService.setManualLocked(locked);
-  generateCosmosMsg = async (
-    amount: string,
+  generateCosmosMsg = async ({
+    amount,
     currency,
-    recipient: string,
-    memo = '',
-    stdFee = {}
-  ) => {
-    return await cosmosTxController.cosmos.generateMsg(
-      amount,
-      currency,
-      recipient,
-      memo,
-      stdFee
-    );
-  };
-  sendCosmosToken = async (
-    amount: string,
-    currency,
-    recipient: string,
+    recipient,
     memo = '',
     stdFee = {},
-    signOptions,
-    onTxEvents
-  ) => {
-    await cosmosTxController.cosmos.processSendToken(
+    contractAddress,
+  }) => {
+    return await cosmosTxController.generateMsg({
       amount,
       currency,
       recipient,
       memo,
       stdFee,
+      contractAddress,
+    });
+  };
+  sendCosmosToken = async (
+    amount: string,
+    currency,
+    recipient: string,
+    contractAddress,
+    memo = '',
+    stdFee = {},
+    signOptions,
+    onTxEvents
+  ) => {
+    await cosmosTxController.sendToken(
+      amount,
+      currency,
+      recipient,
+      contractAddress,
+      memo,
+      stdFee,
       signOptions,
       onTxEvents
     );
+  };
+
+  getCosmosStdFee = (feeType, sendCurrency) => {
+    return cosmosFeeService.toStdFee(feeType, sendCurrency);
+  };
+  getCosmosFeeTypePrimitive = (feeType, sendCurrency) => {
+    return cosmosFeeService.getFeeTypePrimitive(feeType, sendCurrency);
+  };
+  getCosmosFeeTypePretty = (feeType, sendCurrency) => {
+    return cosmosFeeService.getFeeTypePretty(feeType, sendCurrency);
   };
 }
 

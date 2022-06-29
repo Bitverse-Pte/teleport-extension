@@ -1,12 +1,21 @@
 import { Button, Modal, Tooltip } from 'antd';
 import clsx from 'clsx';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, {
+  Fragment,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Ecosystem, Provider } from 'types/network';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
-import { NetworkProviderContext } from 'ui/context/NetworkProvider';
+import {
+  NetworkErrorCodeToMessageKey,
+  NetworkProviderContext,
+} from 'ui/context/NetworkProvider';
 import { ReactComponent as IconTrash } from 'assets/action-icon/trash.svg';
 import { ReactComponent as IconEdit } from 'assets/action-icon/edit.svg';
 import { ReactComponent as CheckIcon } from 'assets/action-icon/check.svg';
@@ -18,6 +27,8 @@ import type {
   DraggableProvidedDraggableProps,
   DraggableProvidedDragHandleProps,
 } from 'react-beautiful-dnd';
+import { useWallet } from 'ui/utils';
+import { UnlockModal } from 'ui/components/UnlockModal';
 const { sensors } = skynet;
 
 interface NetworkSelectionItemProps {
@@ -37,6 +48,8 @@ export function NetworkSelectionItem({
    * Some data source hooks
    */
   const providerContext = useContext(NetworkProviderContext);
+  const { t } = useTranslation();
+  const wallet = useWallet();
   const history = useHistory();
   const location = useLocation();
   const currentProviderId = useSelector((s) => s.network.provider.id);
@@ -45,20 +58,31 @@ export function NetworkSelectionItem({
     [network, currentProviderId]
   );
 
-  const selectProvider = useCallback(
-    async (network: Provider) => {
-      console.debug(`Selected Chain ${network.chainId}`);
+  const selectProvider = async () => {
+    console.debug(`Selected Chain ${network.chainId}`);
+    const currentProvider = await wallet.getCurrentChain();
+    const currentEcosystem = currentProvider.ecosystem;
+    try {
       await providerContext?.useProviderById(network.id);
-      sensors.track('teleport_network_selected', {
-        page: location.pathname,
-        chainId: network.chainId,
-        chainName: network.chainName,
-      });
-      // jump back previous page
-      history.goBack();
-    },
-    [providerContext, history]
-  );
+    } catch (error: any) {
+      if (error?.code) {
+        ClickToCloseMessage.info(
+          t(NetworkErrorCodeToMessageKey(error.code), {
+            replace: {
+              ecosystem_name: currentEcosystem,
+            },
+          })
+        );
+      }
+    }
+    sensors.track('teleport_network_selected', {
+      page: location.pathname,
+      chainId: network.chainId,
+      chainName: network.chainName,
+    });
+    // jump back previous page
+    history.goBack();
+  };
   return (
     <div
       {...props.draggableProps}
@@ -68,7 +92,7 @@ export function NetworkSelectionItem({
         'network-item-active': isSelectedNetwork,
         'is-dragging': props.isDragging,
       })}
-      onClick={() => selectProvider(network)}
+      onClick={selectProvider}
     >
       <div
         className={clsx('drag-handle', {
@@ -92,21 +116,33 @@ const NetworkActions = ({ network }: { network: Provider }) => {
   const jumpToExpandedView = useJumpToExpandedView();
   const providerContext = useContext(NetworkProviderContext);
   const { t } = useTranslation();
+  const wallet = useWallet();
+  const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const isSelectedNetwork = useMemo(() => {
     return network.id === currentProviderId;
   }, [network, currentProviderId]);
 
+  const removeProvider = async () => {
+    await providerContext?.removeCustomProvider(network.id);
+    ClickToCloseMessage.success(t('remove_custom_provider_success'));
+  };
+
   const handleRemove = useCallback(
-    (e: React.MouseEvent<any>) => {
+    async (e: React.MouseEvent<any>) => {
       // stop the parent's onClick event
       e.stopPropagation();
+      e.preventDefault();
+      const isCosmosProvider = network.ecosystem === Ecosystem.COSMOS;
+      const isUnlocked = await wallet.isUnlocked();
+      // unlock first
+      if (isCosmosProvider && !isUnlocked) {
+        setUnlockPopupVisible(true);
+        return;
+      }
       Modal.confirm({
         title: t('Delete_Provider_Ask_Title'),
         content: t('Delete_Provider_Ask_Content'),
-        onOk: async () => {
-          await providerContext?.removeCustomProvider(network.id);
-          ClickToCloseMessage.success(t('remove_custom_provider_success'));
-        },
+        onOk: removeProvider,
         onCancel: () => {
           ClickToCloseMessage.info(t('remove_custom_provider_cancel'));
         },
@@ -126,7 +162,7 @@ const NetworkActions = ({ network }: { network: Provider }) => {
   const isProviderEditable = [Ecosystem.EVM].includes(network.ecosystem);
 
   return (
-    <span className="actions flex">
+    <span className="actions flex" onClick={(e) => e.stopPropagation()}>
       <div className="flex justify-center items-center">
         <Button
           className={clsx(hoverToDisplayProperties, 'narrow-padding')}
@@ -157,6 +193,14 @@ const NetworkActions = ({ network }: { network: Provider }) => {
           <CheckIcon width={16} />
         </Button>
       </div>
+      <UnlockModal
+        title="Unlock Wallet to continue"
+        visible={unlockPopupVisible}
+        setVisible={(v) => {
+          setUnlockPopupVisible(v);
+        }}
+        unlocked={removeProvider}
+      />
     </span>
   );
 };

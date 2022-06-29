@@ -366,7 +366,7 @@ class KeyringService extends EventEmitter {
    * @param {IAddAccountOpts}
    * @returns {Promise<Boolean>}
    */
-  async addAccount(opts: IAddAccountOpts): Promise<boolean> {
+  async addAccount(opts: IAddAccountOpts): Promise<BaseAccount> {
     const currentHdWalletSecret: Secret[] = this.secrets.filter(
       (a: Secret) => a.hdWalletId === opts.hdWalletId
     );
@@ -398,11 +398,11 @@ class KeyringService extends EventEmitter {
       accountName: opts.accountName,
     };
 
-    await this._createAccountByImportMnemonic(
+    const newAccount = await this._createAccountByImportMnemonic(
       createOpts,
       opts.hdWalletId as string
     );
-    return Promise.resolve(true);
+    return Promise.resolve(newAccount);
   }
 
   /**

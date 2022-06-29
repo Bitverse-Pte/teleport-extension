@@ -209,13 +209,72 @@ class TokenService {
     return Promise.resolve(tokens);
   }
 
+  private async _cacheDenomTrace(hash): Promise<any> {
+    let denomTrace: any;
+    let denoms = cloneDeep(this.store.getState().denomTrace);
+    if (denoms && denoms[hash]) {
+      denomTrace = denoms[hash];
+    } else {
+      const denomRes = await this._fetchIbcDenom(hash).catch((e) => {
+        console.error(e);
+      });
+      if (!denoms) denoms = {};
+      (denoms as any)[hash] = denomRes;
+      this.store.updateState({
+        denomTrace: denoms,
+      });
+      if (denomRes) denomTrace = denomRes;
+    }
+    return Promise.resolve(denomTrace);
+  }
+
+  private _getPresetTokenCfgByDenom(denom: string): {
+    chainName: string;
+    name: string;
+    symbol: string;
+  } {
+    const extra: {
+      chainName: string;
+      name: string;
+      symbol: string;
+    } = {
+      chainName: '',
+      name: '',
+      symbol: '',
+    };
+    const currentToken = EmbedChainInfos.find((e: AppChainInfo) => {
+      return (
+        e.stakeCurrency.coinMinimalDenom === denom ||
+        e.currencies.some((c) => c.coinMinimalDenom === denom)
+      );
+    });
+    if (currentToken) {
+      extra.chainName = currentToken.chainName;
+      if (currentToken.stakeCurrency.coinMinimalDenom === denom) {
+        extra.symbol = currentToken.stakeCurrency.coinDenom.toUpperCase();
+        extra.name = currentToken.stakeCurrency.coinDenom.toUpperCase();
+      } else {
+        currentToken.currencies.forEach((c) => {
+          if (c.coinMinimalDenom === denom) {
+            extra.symbol = c.coinDenom.toUpperCase();
+            extra.name = c.coinDenom.toUpperCase();
+          }
+        });
+      }
+    }
+    return extra;
+  }
+
   async getCosmosEcosystemBalancesAsync(
     address: string,
     chainCustomId: string | PresetNetworkId
   ): Promise<Token[]> {
-    let currentAccountTokens: Token[] = [];
     const chain: Network | undefined =
       networkPreferenceService.getProvider(chainCustomId);
+    const balances = cloneDeep(this.store.getState().balances || {});
+    // defined tokens from cache
+    let currentAccountTokens: Token[] = balances[address] || [];
+    const allTokens = cloneDeep(this.store.getState().tokens);
     if (chain && chain.ecoSystemParams?.rest) {
       const urlPrefix = chain.ecoSystemParams.rest;
       //cosmos1nckqhfp8k67qzvats2slqvtaf3kynz66ze6up4
@@ -224,120 +283,98 @@ class TokenService {
         .then((res) => res.json())
         .catch((e) => console.error(e));
       console.log('balance', res);
-      const balances = cloneDeep(this.store.getState().balances || {});
-      const allTokens = cloneDeep(this.store.getState().tokens);
-      const nativeToken = allTokens.find(
-        (t: Token) => t.chainCustomId === chainCustomId && t.isNative
+      const currentChainTokens = allTokens.filter(
+        (t: Token) => t.chainCustomId === chainCustomId
       );
-      if (nativeToken) {
-        if (!balances[address] || balances[address]?.length === 0) {
-          nativeToken.amount = 0;
-          balances[address] = [cloneDeep(nativeToken)];
-        }
-        currentAccountTokens = balances[address];
-        if (res && res.balances?.length >= 0) {
-          //current balance is 0, which is not 0 ever;
-          for (let i = 0; i < currentAccountTokens.length; i++) {
-            if (
-              !currentAccountTokens[i].isNative &&
-              res.balances
-                .filter((b: { denom: string; amount }) => {
-                  return b.denom.includes('ibc/');
-                })
-                .every((b: { denom: string; amount }) => {
-                  const hash = b.denom.split('ibc/')[1];
-                  return currentAccountTokens[i]?.trace?.hash !== hash;
-                })
-            ) {
-              currentAccountTokens.splice(i, 1);
-              i--;
-            }
-          }
 
-          let denoms = cloneDeep(this.store.getState().denomTrace);
-          const updatedTokens: Token[] = [];
-          for (const b of res.balances) {
-            if (b.denom.includes('ibc/')) {
-              const hash = b.denom.split('ibc/')[1];
-              const token = currentAccountTokens.find(
-                (t: Token) => t.trace?.hash === hash
-              );
-              if (token) {
-                token.amount = b.amount;
-              } else {
-                const token: Token = {
-                  symbol: '',
-                  decimal: 6,
-                  name: '',
-                  denom: b.denom,
-                  chainCustomId,
-                  isNative: false,
-                  isCustom: false,
-                  display: true,
-                  tokenId: nanoid(),
-                  amount: b.amount,
-                };
-                let denomTrace: any;
-                if (denoms && denoms[hash]) {
-                  denomTrace = denoms[hash];
-                } else {
-                  const denomRes = await this._fetchIbcDenom(hash).catch(
-                    (e) => {
-                      console.error(e);
-                    }
-                  );
-                  if (!denoms) denoms = {};
-                  (denoms as any)[hash] = denomRes;
-                  this.store.updateState({
-                    denomTrace: denoms,
-                  });
-                  if (denomRes) denomTrace = denomRes;
-                }
-                if (denomTrace) {
-                  const currentToken = EmbedChainInfos.find(
-                    (e: AppChainInfo) => {
-                      return (
-                        e.stakeCurrency.coinMinimalDenom === denomTrace.denom ||
-                        e.currencies.some(
-                          (c) => c.coinMinimalDenom === denomTrace.denom
-                        )
-                      );
-                    }
-                  );
-                  if (currentToken) {
-                    token.chainName = currentToken.chainName;
-                    if (
-                      currentToken.stakeCurrency.coinMinimalDenom ===
-                      denomTrace.denom
-                    ) {
-                      token.symbol =
-                        currentToken.stakeCurrency.coinDenom.toUpperCase();
-                      token.name =
-                        currentToken.stakeCurrency.coinDenom.toUpperCase();
-                    } else {
-                      currentToken.currencies.forEach((c) => {
-                        if (c.coinMinimalDenom === denomTrace.denom) {
-                          token.symbol = c.coinDenom.toUpperCase();
-                          token.name = c.coinDenom.toUpperCase();
-                        }
-                      });
-                    }
-                  }
-                  token.trace = denomTrace;
-                  currentAccountTokens.push(token);
-                }
-                updatedTokens.push(token);
-                this.store.updateState({
-                  tokens: [...allTokens, ...updatedTokens],
-                });
+      if (res && res.balances?.length >= 0) {
+        //current balance is 0, which is not 0 ever;
+        currentAccountTokens = currentAccountTokens.filter((t: Token) => {
+          if (
+            t?.trace?.hash &&
+            res.balances.some((b: { denom: string; amount }) => {
+              if (b.denom.includes('ibc/')) {
+                const hash = b.denom.split('ibc/')[1];
+                return t?.trace?.hash === hash;
               }
+            })
+          ) {
+            return true;
+          } else if (
+            !t?.trace?.hash &&
+            res.balances.some((b: { denom: string; amount }) => {
+              if (!b.denom.includes('ibc/')) {
+                return t?.denom === b.denom;
+              }
+            })
+          ) {
+            return true;
+          }
+        });
+        for (const b of res.balances) {
+          // ibc tokens
+          if (b.denom.includes('ibc/')) {
+            const hash = b.denom.split('ibc/')[1];
+            const token = currentAccountTokens.find(
+              (t: Token) => t.trace?.hash === hash
+            );
+            if (token) {
+              token.amount = b.amount;
             } else {
-              const token = currentAccountTokens.find((t: Token) => t.isNative);
-              if (token) token.amount = b.amount;
+              const t: Token = {
+                symbol: '',
+                decimal: 6,
+                name: '',
+                denom: b.denom,
+                chainCustomId,
+                isNative: false,
+                isCustom: false,
+                display: true,
+                tokenId: nanoid(),
+                amount: b.amount,
+              };
+              // Cache denom trace
+              const denomTrace: any = await this._cacheDenomTrace(hash);
+              if (denomTrace) {
+                const tokenInfo = this._getPresetTokenCfgByDenom(
+                  denomTrace.denom
+                );
+                t.chainName = tokenInfo.chainName;
+                t.symbol = tokenInfo.symbol;
+                t.name = tokenInfo.name;
+                t.trace = denomTrace;
+              }
+              currentAccountTokens.push(t);
+            }
+          } else {
+            const token = currentAccountTokens.find(
+              (t: Token) => t.denom === b.denom
+            );
+            if (token) {
+              token.amount = b.amount;
+            } else {
+              const t = currentChainTokens.find(
+                (st: Token) => st.denom === b.denom
+              );
+              if (t) {
+                t.amount = b.amount;
+                currentAccountTokens.push(t);
+              }
             }
           }
         }
       }
+      // Native token must display in list
+      if (currentAccountTokens?.every((t: Token) => !t.isNative)) {
+        const nativeToken = allTokens.find(
+          (t: Token) => t.chainCustomId === chainCustomId && t.isNative
+        );
+        if (nativeToken) {
+          nativeToken.amount = 0;
+          currentAccountTokens.push(cloneDeep(nativeToken));
+        }
+      }
+
       const cw20Tokens: Token[] = allTokens.filter(
         (t: Token) =>
           t.chainCustomId === chainCustomId && !t.isNative && t.contractAddress
@@ -346,19 +383,25 @@ class TokenService {
         for (const t of cw20Tokens) {
           const balance = await this._queryCw20TokenBalance(
             address,
-            cw20Tokens[0].contractAddress as string,
+            t.contractAddress as string,
             urlPrefix
           ).catch((e) => {
             console.error(e);
           });
           if (balance) {
-            t.amount = balance.data.balance;
+            const cw20Token = currentAccountTokens.find(
+              (token: Token) => token.contractAddress === t.contractAddress
+            );
+            if (cw20Token) {
+              cw20Token.amount = balance.data.balance;
+            } else {
+              t.amount = balance.data.balance;
+              currentAccountTokens.push(t);
+            }
           }
-          currentAccountTokens.push(t);
         }
       }
     }
-
     return Promise.resolve(currentAccountTokens);
   }
 

@@ -4,12 +4,8 @@ import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
 import { Divider } from 'antd';
 import { utils } from 'ethers';
 import { useTranslation } from 'react-i18next';
-import {
-  useWallet,
-  useApproval,
-  useAsyncEffect,
-  getTotalPricesByAmountAndPrice,
-} from 'ui/utils';
+import BigNumber from 'bignumber.js';
+import { useWallet, useApproval, useAsyncEffect } from 'ui/utils';
 import {
   NetworkDisplay,
   SenderToRecipient,
@@ -83,65 +79,21 @@ const ConfirmTx = () => {
     token: any;
   }>();
   const { amount, recipient, memo, token } = state;
-  console.log(amount, recipient, memo, token);
-  const stdFee = {
-    amount: [
-      {
-        denom: token?.denom,
-        amount: '2500',
-      },
-    ],
-    gas: '200000',
-  };
+  // const amount = '0.1';
+  // const recipient = 'osmo1zcph3rkpnjpdyjdzd98yds2l4wn68spajxxfay';
+  // const memo = '';
+  // const token = {
+  //   symbol: 'HULC',
+  //   denom:
+  //     'cw20:juno1pshrvuw5ng2q4nwcsuceypjkp48d95gmcgjdxlus2ytm4k5kvz2s7t9ldx:HULCAT',
+  //   decimal: 6,
+  // };
+  console.log(state, amount, recipient, memo, token);
   const currency = {
     coinDenom: token?.symbol || 'ATOM',
     coinMinimalDenom: token?.denom || 'uatom',
     coinDecimals: token?.decimal || 6,
   };
-
-  // const next = async () => {
-  //   // const amount = 0.001;
-  //   // chainInfo.currencies[0];
-  //   const currency = {
-  //     coinDenom: 'OSMO',
-  //     coinMinimalDenom: 'uosmo',
-  //     coinDecimals: 6,
-  //     coinGeckoId: 'osmosis',
-  //   };
-  //   // const recipient = 'osmo17lds9mrleuqq3g88wwkxt4x97q6mcg80e35d5l';
-  //   // const memo = 'hello123';
-  //   const stdFee = {
-  //     amount: [
-  //       {
-  //         denom: 'uosmo',
-  //         amount: '2500',
-  //       },
-  //     ],
-  //     gas: '200000',
-  //   };
-  //   const signOptions = {
-  //     preferNoSetFee: true,
-  //     preferNoSetMemo: true,
-  //   };
-  //   const onTxEvents = {
-  //     onBroadcasted: (txHash) => {
-  //       console.log('--------------onBroadcasted--------------', txHash);
-  //     },
-  //     onFulfil: (tx) => {
-  //       console.log('--------------onBroadcasted--------------', tx);
-  //     },
-  //   };
-  //   wallet.sendCosmosToken(
-  //     amount,
-  //     currency,
-  //     recipient,
-  //     memo,
-  //     stdFee,
-  //     signOptions,
-  //     onTxEvents
-  //   );
-  //   history.push('/home');
-  // };
   const delay = (t) => new Promise((resolve) => setTimeout(resolve, t));
   const location = useLocation();
   const { t } = useTranslation();
@@ -150,11 +102,20 @@ const ConfirmTx = () => {
   const wallet = useWallet();
   const [senderName, setSenderName] = useState('');
   const [recipientName, setRecipientName] = useState('');
+  const gasState: any = useSelector((state) => state.gas);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [prices, setPrices] = useState();
-  const gasState: any = useSelector((state) => state.gas);
   const [visible, setVisible] = useState(false);
   const [sendMsg, setSendMsg] = useState({ from_address: '', to_address: '' });
+  const [stdFee, setStdFee] = useState({
+    amount: [
+      {
+        denom: 'uatom',
+        amount: '2500',
+      },
+    ],
+    gas: '200000',
+  });
 
   const handleAllow = async () => {
     const signOptions = {
@@ -174,6 +135,7 @@ const ConfirmTx = () => {
       amount,
       currency,
       recipient,
+      state.token.contractAddress || '',
       memo,
       stdFee,
       signOptions,
@@ -204,6 +166,23 @@ const ConfirmTx = () => {
   };
 
   useAsyncEffect(fetchNativePrice, []);
+  const fixedFeeType = (feeType) => {
+    // export type FeeType = "high" | "average" | "low";
+    if (feeType === 'medium') {
+      return 'average';
+    }
+    return feeType;
+  };
+
+  const fetchStdFee = async () => {
+    dispatch(showLoadingIndicator());
+    const feeType = fixedFeeType(gasState.gasType);
+    const _stdFee = await wallet.getCosmosStdFee(feeType, currency);
+    setStdFee(_stdFee);
+    dispatch(hideLoadingIndicator());
+  };
+
+  useAsyncEffect(fetchStdFee, [gasState]);
 
   const nativeToken = useMemo(() => {
     const nativeToken = tokens.find((t: Token) => t.isNative);
@@ -212,6 +191,7 @@ const ConfirmTx = () => {
         nativeToken!.price = prices[nativeToken!.symbol.toUpperCase()];
       }
     }
+    console.log('----nativeToken----', nativeToken);
     return nativeToken;
   }, [tokens, prices]);
 
@@ -222,16 +202,18 @@ const ConfirmTx = () => {
       : nativeToken;
     return txToken;
   }, [tokens, prices]);
+
   const [tabType, setTabType] = useState<Tabs>(Tabs.FIRST);
 
   useAsyncEffect(async () => {
-    const result = await wallet.generateCosmosMsg(
+    const result = await wallet.generateCosmosMsg({
       amount,
       currency,
       recipient,
       memo,
-      stdFee
-    );
+      stdFee,
+      contractAddress: state.token.contractAddress,
+    });
     setSendMsg(result);
   }, [txToken]);
 
@@ -273,6 +255,12 @@ const ConfirmTx = () => {
           )}
           {tabType === Tabs.SECOND && <TxDataComponent msg={sendMsg} />}
         </div>
+        <FeeSelector
+          isCosmos={true}
+          visible={visible}
+          onClose={() => setVisible(false)}
+          currency={currency}
+        />
         <div className="tx-button-container flexCol">
           <CustomButton
             type="primary"
@@ -324,13 +312,42 @@ const TxDetailComponent = ({
   currency: any;
   stdFee: any;
 }) => {
-  console.log('stdFee: ', stdFee);
+  console.log(amount, txToken, nativeToken, setVisible, currency, stdFee);
   const { t } = useTranslation();
   const fee = utils.formatUnits(stdFee?.amount[0].amount, txToken?.decimal);
-  const tokenPrice = Number(txToken?.price);
-  const feePrice = Number(fee) * tokenPrice;
-  const totalToken = Number(fee) + Number(amount);
-  const totalPrice = totalToken * tokenPrice;
+  const txTokenPrice = Number(txToken?.price || 0);
+  const nativeTokenPrice = Number(nativeToken?.price || 0);
+
+  const renderTotalGasFeeAmount = () => {
+    return `${fee} ${nativeToken?.symbol || ''}`;
+  };
+  const renderTotalGasFeeFiat = () => {
+    const feePrice = new BigNumber(fee);
+    return `$ ${feePrice.times(nativeTokenPrice).toString()}`;
+  };
+  const renderTotalMaxAmount = () => {
+    if (txToken?.isNative) {
+      const total = new BigNumber(amount).plus(fee);
+      return `${total.toString()} ${nativeToken?.symbol || ''}`;
+    }
+    return `${amount} ${txToken?.symbol} + ${renderTotalGasFeeAmount()}`;
+  };
+
+  const renderTotalMaxFiat = () => {
+    let total = '0';
+    if (txToken?.isNative) {
+      total = new BigNumber(amount)
+        .plus(fee)
+        .times(nativeTokenPrice)
+        .toString();
+    } else {
+      total = new BigNumber(fee)
+        .times(nativeTokenPrice)
+        .plus(new BigNumber(amount).times(txTokenPrice))
+        .toString();
+    }
+    return `$ ${total}`;
+  };
 
   return (
     <div className="transaction-detail">
@@ -350,18 +367,18 @@ const TxDetailComponent = ({
         key="gas-item"
         detailTitle={t('Estimated gas fee')}
         subTitle={undefined}
-        detailText={fee}
-        detailSubText={feePrice}
-        detailMax={'Max fee: ' + fee}
+        detailText={renderTotalGasFeeAmount()}
+        detailSubText={renderTotalGasFeeFiat()}
+        detailMax={'Max fee: ' + renderTotalGasFeeAmount()}
       />
       <Divider style={{ margin: '16px 0' }} />
       <TransactionDetailItem
         key="total-item"
         detailTitle={t('Sum')}
         subTitle={t('Amount + gas fee')}
-        detailText={totalToken}
-        detailSubText={totalPrice}
-        detailMax={'Max amount: ' + totalToken}
+        detailText={renderTotalMaxAmount()}
+        detailSubText={renderTotalMaxFiat()}
+        detailMax={'Max amount: ' + renderTotalMaxAmount()}
       />
     </div>
   );

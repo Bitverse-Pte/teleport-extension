@@ -64,7 +64,7 @@ export const defaultNetworks: {
     ticker: 'ETH',
     nickname: 'Arbitrum One',
     rpcPrefs: {
-      blockExplorerUrl: 'https://arbiscan.io/',
+      blockExplorerUrl: 'https://arbiscan.io',
     },
     ...EVMProviderSharedProperties,
   },
@@ -100,7 +100,7 @@ export const defaultNetworks: {
     ticker: 'AVAX',
     nickname: 'Avalanche Network',
     rpcPrefs: {
-      blockExplorerUrl: 'https://snowtrace.io',
+      blockExplorerUrl: 'https://explorer.avax.network',
     },
     ...EVMProviderSharedProperties,
   },
@@ -112,7 +112,7 @@ export const defaultNetworks: {
     ticker: 'ETH',
     nickname: 'Optimistic Ethereum',
     rpcPrefs: {
-      blockExplorerUrl: 'https://optimistic.ethereum.io',
+      blockExplorerUrl: 'https://optimistic.etherscan.io',
     },
     ...EVMProviderSharedProperties,
   },
@@ -124,7 +124,7 @@ export const defaultNetworks: {
     ticker: 'ATOM',
     nickname: 'Cosmos Hub',
     rpcPrefs: {
-      blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+      blockExplorerUrl: 'https://www.mintscan.io/cosmos',
     },
     chainName: 'COSMOS',
     coinType: CoinType.COSMOS,
@@ -174,7 +174,7 @@ export const defaultNetworks: {
     ticker: 'OSMO',
     nickname: 'Osmosis',
     rpcPrefs: {
-      blockExplorerUrl: 'https://www.mintscan.io/osmosis/',
+      blockExplorerUrl: 'https://www.mintscan.io/osmosis',
     },
     chainName: 'OSMOSIS',
     coinType: CoinType.COSMOS,
@@ -234,8 +234,7 @@ export const defaultNetworks: {
     ticker: 'SCRT',
     nickname: 'Secret Network',
     rpcPrefs: {
-      // did not see any scan for secret network
-      //   blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+      blockExplorerUrl: 'https://www.mintscan.io/secret',
     },
     chainName: 'SECRET',
     coinType: CoinType.SECRET_NETWORK,
@@ -296,7 +295,7 @@ export const defaultNetworks: {
     ticker: 'JUNO',
     nickname: 'Juno',
     rpcPrefs: {
-      // blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+      blockExplorerUrl: 'https://www.mintscan.io/juno',
     },
     chainId: 'juno-1',
     chainName: 'Juno',
@@ -352,7 +351,7 @@ export const defaultNetworks: {
     ticker: 'EVMOS',
     nickname: 'EVMOS',
     rpcPrefs: {
-      blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+      blockExplorerUrl: 'https://www.mintscan.io/evmos',
     },
     coinType: CoinType.ETH,
     ecosystem: Ecosystem.COSMOS,
@@ -403,7 +402,7 @@ export const defaultNetworks: {
     ticker: 'UMEE',
     nickname: 'Umee',
     rpcPrefs: {
-      // blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+      blockExplorerUrl: 'https://www.mintscan.io/umee',
     },
     chainName: 'Umee',
     coinType: CoinType.COSMOS,
@@ -454,7 +453,7 @@ export const defaultNetworks: {
     ticker: 'KAVA',
     nickname: 'Kava',
     rpcPrefs: {
-      // blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+      blockExplorerUrl: 'https://www.mintscan.io/kava',
     },
     chainName: 'Kava',
     coinType: CoinType.KAVA,
@@ -545,7 +544,7 @@ export const defaultNetworks: {
     ticker: 'CRO',
     nickname: 'Crypto.org',
     rpcPrefs: {
-      // blockExplorerUrl: 'https://www.mintscan.io/cosmos/',
+      blockExplorerUrl: 'https://www.mintscan.io/crypto-org',
     },
     chainName: 'Crypto.org',
     coinType: CoinType.CRYPTO_ORG,

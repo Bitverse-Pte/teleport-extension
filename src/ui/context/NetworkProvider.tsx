@@ -1,8 +1,12 @@
 import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
-import { CoinType, NetworkController, Provider } from 'types/network';
+import {
+  CoinType,
+  Ecosystem,
+  NetworkController,
+  Provider,
+} from 'types/network';
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useInterval } from 'react-use';
 import { useWallet } from '../utils';
 import {
   hideLoadingIndicator,
@@ -13,8 +17,6 @@ import {
   getEnabledProvidersSelector,
 } from 'ui/selectors/network.selector';
 import { ErrorCode } from 'constants/code';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
-import { useTranslation } from 'react-i18next';
 
 /**
  * Design was based on MetaMask
@@ -82,12 +84,7 @@ export function NetworkStoreProvider({
 
   const dispatch = useDispatch();
 
-  const { t } = useTranslation();
-
   const currentNetworkController = useSelector((state) => state.network);
-  const currentAccount = useSelector(
-    (state) => state.preference.currentAccount
-  );
 
   const customProviders = useSelector(getCustomProvidersSelector);
 
@@ -96,19 +93,12 @@ export function NetworkStoreProvider({
       dispatch(showLoadingIndicator());
       try {
         const provider = await wallet.useProviderById(networkId);
-        await wallet.fetchLatestBlockDataNow();
+        if (provider.ecosystem === Ecosystem.EVM)
+          await wallet.fetchLatestBlockDataNow();
         return provider;
       } catch (error: any) {
         console.error('useProviderById::error', error);
-        if (error?.code) {
-          ClickToCloseMessage.error(
-            t(NetworkErrorCodeToMessageKey(error.code), {
-              replace: {
-                ecosystem_name: currentAccount?.ecosystem,
-              },
-            })
-          );
-        }
+        throw error;
       } finally {
         dispatch(hideLoadingIndicator());
       }
