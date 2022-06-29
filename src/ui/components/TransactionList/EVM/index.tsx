@@ -2,7 +2,7 @@ import { utils } from 'ethers';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React, { MouseEvent, useCallback, useMemo, useState } from 'react';
-import './style.less';
+import '../style.less';
 import { TxDirectionLogo } from '../TxDirectionLogo';
 import { useSelector } from 'react-redux';
 import {
@@ -31,6 +31,7 @@ import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-displa
 import CancelSpeedupPopover from '../CancelAndSpeedUp/CancelAndSpeedUp.popover';
 import { EDIT_GAS_MODES } from 'constants/gas';
 import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
+import { ActivitiesListParams, TransactionItemParams } from '../typing';
 
 dayjs.extend(relativeTime);
 
