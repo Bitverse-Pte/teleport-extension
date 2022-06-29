@@ -10,16 +10,12 @@ import { useTranslation } from 'react-i18next';
 import skynet from 'utils/skynet';
 import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import { TransactionItemDetail } from '../components/TransactionItemDetail.component';
-import { MockCosmosTxHistory } from './_MockCosmosTxHistory';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
 import { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 import { useParams } from 'react-router-dom';
 import { getCosmosTransactions } from 'ui/selectors/cosmos-transaction.selector';
 const { sensors } = skynet;
-
-const activityId = '_pBWBbRUSHFMqiBDW6xcd';
-const transaction = MockCosmosTxHistory[activityId];
 
 export default function ActivityDetail() {
   /**
@@ -28,17 +24,6 @@ export default function ActivityDetail() {
    */
   const { activityId } = useParams<{ activityId: string }>();
   const transactions = useSelector(getCosmosTransactions);
-  // const activityId = '_pBWBbRUSHFMqiBDW6xcd';
-  // const unfilteredPendingTransactions = useSelector(
-  //   nonceSortedPendingTransactionsSelector
-  // );
-  // const unfilteredCompletedTransactions = useSelector(
-  //   nonceSortedCompletedTransactionsSelector
-  // );
-  // const transactions = useMemo(
-  //   () => unfilteredPendingTransactions.concat(unfilteredCompletedTransactions),
-  //   [unfilteredPendingTransactions, unfilteredCompletedTransactions]
-  // );
 
   const transaction = useMemo(() => {
     const target = transactions.find((tx) => {
