@@ -217,12 +217,17 @@ class KeyringService extends EventEmitter {
     accountCreateType: AccountCreateType,
     customChainId?: PresetNetworkId | string
   ): boolean {
-    return this.accounts.some(
+    const exist = this.accounts.some(
       (a: BaseAccount) =>
         a.address === address &&
         accountCreateType === a.accountCreateType &&
         (customChainId ? a.chainCustomId === customChainId : true)
     );
+    if (exist) {
+      console.error('this address is duplicated', address);
+      console.error(this.accounts);
+    }
+    return exist;
   }
 
   private _checkDuplicateIndexName(
