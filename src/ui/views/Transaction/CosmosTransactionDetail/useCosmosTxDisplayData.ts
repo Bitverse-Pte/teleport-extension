@@ -12,9 +12,10 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     ? formatDateWithWeekContext(transaction?.timestamp)
     : undefined;
 
-  const primaryCurrency = transaction?.aminoMsgs
-    ? transaction?.aminoMsgs[0].value.amount[0]
-    : undefined;
+  const primaryCurrency: { amount: string; denom: number } | undefined =
+    transaction?.aminoMsgs
+      ? transaction?.aminoMsgs[0].value.amount[0]
+      : undefined;
 
   /** @TODO refine displayedStatusKey */
   const displayedStatusKey = transaction?.status;

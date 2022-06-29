@@ -65,9 +65,9 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     // isPending,
     senderAddress,
     token,
-  } = useCosmosTxDisplayData();
+  } = useCosmosTxDisplayData(transaction);
   // transaction
-
+  console.debug('primaryCurrency', primaryCurrency);
   const { t } = useTranslation();
 
   const {
@@ -92,6 +92,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
    */
   const displayPrimaryCurrency = useMemo(() => {
     // split by space
+    if (!primaryCurrency) return { amount: '--.--', unit: '' };
     const { amount, denom: unit } = primaryCurrency;
     return { amount, unit };
   }, [primaryCurrency]);

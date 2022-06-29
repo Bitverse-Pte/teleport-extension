@@ -60,6 +60,15 @@ export function CosmosTransactionItem({
   }, [displayedStatusKey]);
 
   const isEvenStyle = idx % 2 == 0 ? 'is-even' : '';
+
+  /**
+   * This fn is only build for UI
+   */
+  const displayPrimaryCurrency = useMemo(() => {
+    // split by space
+    if (!primaryCurrency) return '--.--';
+    return `${primaryCurrency.amount} ${primaryCurrency?.denom}`;
+  }, [primaryCurrency]);
   /**
    * Usually the amount of approval is so big and irrelavnt.
    * so we just hide the amount in the list like MetaMask did.
@@ -87,8 +96,8 @@ export function CosmosTransactionItem({
         id={`tx-${idx}`}
       >
         <p className="tx-title capitalize">{title}</p>
-        <p className="tx-value ml-auto" title={primaryCurrency}>
-          {primaryCurrency.amount} {primaryCurrency.denom}
+        <p className="tx-value ml-auto" title={displayPrimaryCurrency}>
+          {displayPrimaryCurrency}
         </p>
         {/* hide if recipientAddress not exist e.g contract deploy */}
         {recipientAddress && (
