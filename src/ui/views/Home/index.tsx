@@ -240,7 +240,7 @@ const Home = () => {
         break;
       case Ecosystem.COSMOS:
         window.open(
-          `${currentChain?.rpcPrefs?.blockExplorerUrl}/osmosis/account/${account?.address}`
+          `${currentChain?.rpcPrefs?.blockExplorerUrl}/account/${account?.address}`
         );
         break;
     }
