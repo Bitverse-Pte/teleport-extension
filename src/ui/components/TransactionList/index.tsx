@@ -1,5 +1,6 @@
 import React from 'react';
 import { Ecosystem } from 'types/network';
+import { CosmosTransactionsList } from './Cosmos';
 import { EvmTransactionsList } from './EVM';
 import { ActivitiesListParams } from './typing';
 
@@ -14,6 +15,8 @@ export function TransactionListRouter({
   switch (ecosystem) {
     case Ecosystem.EVM:
       return <EvmTransactionsList {...props} />;
+    case Ecosystem.COSMOS:
+      return <CosmosTransactionsList {...props} />;
     default:
       return (
         <div>
