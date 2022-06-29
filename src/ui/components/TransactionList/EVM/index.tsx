@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React, { MouseEvent, useCallback, useMemo, useState } from 'react';
 import './style.less';
-import { TxDirectionLogo } from './TxDirectionLogo';
+import { TxDirectionLogo } from '../TxDirectionLogo';
 import { useSelector } from 'react-redux';
 import {
   TOKEN_CATEGORY_HASH,
@@ -24,11 +24,11 @@ import {
 import { isEqualCaseInsensitive, shortenAddress } from 'ui/utils/utils';
 import { useShouldShowSpeedUp } from 'ui/hooks/wallet/useShouldShowSpeedUp';
 import { Button, Tooltip } from 'antd';
-import { NoContent } from '../universal/NoContent';
-import { IconComponent } from '../IconComponents';
+import { NoContent } from '../../universal/NoContent';
+import { IconComponent } from '../../IconComponents';
 import clsx from 'clsx';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
-import CancelSpeedupPopover from './CancelAndSpeedUp/CancelAndSpeedUp.popover';
+import CancelSpeedupPopover from '../CancelAndSpeedUp/CancelAndSpeedUp.popover';
 import { EDIT_GAS_MODES } from 'constants/gas';
 import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
 
@@ -85,25 +85,7 @@ const getFilteredTransactionGroups = (
   return transactionGroups;
 };
 
-interface ActivitiesListParams {
-  listContiannerHeight: string | number;
-  hideTokenTransactions?: boolean;
-  tokenAddress?: string;
-  dateFilter?: {
-    from: Date;
-    to: Date;
-  };
-  txData?: string;
-}
-
-interface TransactionItemParams {
-  transactionGroup: TransactionGroup;
-  idx: number;
-  style?: React.CSSProperties;
-  isEarliestNonce?: boolean;
-}
-
-function TransactionItem({
+function EvmTransactionItem({
   transactionGroup,
   idx,
   style,
@@ -273,7 +255,7 @@ function TransactionItem({
   );
 }
 
-export function TransactionsList({
+export function EvmTransactionsList({
   listContiannerHeight = '100%',
   tokenAddress,
   hideTokenTransactions,
@@ -409,7 +391,7 @@ export function TransactionsList({
       onScroll={onContainnerScroll}
     >
       {transactions.map((tx, idx) => (
-        <TransactionItem
+        <EvmTransactionItem
           transactionGroup={tx}
           idx={idx}
           key={tx.initialTransaction.id}
