@@ -117,7 +117,7 @@ const Main = () => {
             }}
           />
         </LazyPrivateRoute>
-        <LazyPrivateRoute exact path="/mock/cosmosTxDetail">
+        <LazyPrivateRoute exact path="/cosmos/activity/:activityId">
           <CosmosActivityDetail />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/mock/addNetworkPrompt">

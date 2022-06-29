@@ -14,6 +14,8 @@ import { MockCosmosTxHistory } from './_MockCosmosTxHistory';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
 import { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
+import { useParams } from 'react-router-dom';
+import { getCosmosTransactions } from 'ui/selectors/cosmos-transaction.selector';
 const { sensors } = skynet;
 
 const activityId = '_pBWBbRUSHFMqiBDW6xcd';
@@ -24,7 +26,8 @@ export default function ActivityDetail() {
    * Dirty hard work here.
    * UI related Logic please go to _ActivityDetail below
    */
-  // const { activityId } = useParams<{ activityId: string }>();
+  const { activityId } = useParams<{ activityId: string }>();
+  const transactions = useSelector(getCosmosTransactions);
   // const activityId = '_pBWBbRUSHFMqiBDW6xcd';
   // const unfilteredPendingTransactions = useSelector(
   //   nonceSortedPendingTransactionsSelector
@@ -37,14 +40,14 @@ export default function ActivityDetail() {
   //   [unfilteredPendingTransactions, unfilteredCompletedTransactions]
   // );
 
-  // const transaction = useMemo(() => {
-  //   const target = transactions.find((txg) => {
-  //     return txg.transactions.findIndex((tx) => tx.id === activityId) > -1;
-  //   });
-  //   // const target = transactions[activityId]
-  //   console.debug('transaction data:', target);
-  //   return target;
-  // }, [transactions, activityId]);
+  const transaction = useMemo(() => {
+    const target = transactions.find((tx) => {
+      return tx.id === activityId;
+    });
+    // const target = transactions[activityId]
+    console.debug('transaction data:', target);
+    return target;
+  }, [transactions, activityId]);
   // const transaction = MockCosmosTxHistory[activityId];
 
   // no if return before a hook, so let's do this
