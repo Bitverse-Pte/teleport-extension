@@ -95,6 +95,9 @@ const flowContext = flow
       Reflect.getMetadata('APPROVAL', cosmosController, mapMethod) || [];
     if (approvalType) {
       const existed = precheck && precheck(ctx.request);
+      if (existed) {
+        return next();
+      }
       ctx.request.requestedApproval = true;
       console.log('====[args]===', args);
       ctx.approvalRes = await notificationService.requestApproval({

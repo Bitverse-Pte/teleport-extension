@@ -120,7 +120,7 @@ export class CosmosProvider extends EventEmitter implements Keplr {
         .catch((err) => {
           const result = JSONUint8Array.unwrap(err);
           log('[response: error]', proxyMessage.method, result);
-          return result;
+          throw result;
         });
     });
   };
