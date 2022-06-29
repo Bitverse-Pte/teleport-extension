@@ -104,7 +104,6 @@ const AccountSelect: React.FC<AccountSelectProps> = (
             a.selected
         )?.accounts || [];
     }
-    console.log('currentChain', currentChain, list);
     if (currentChain.ecosystem === Ecosystem.EVM) {
       return list.filter((item: any) => {
         return item?.ecosystem === Ecosystem.EVM;
@@ -117,7 +116,6 @@ const AccountSelect: React.FC<AccountSelectProps> = (
     }
     return list;
   }, [displayAccounts, accountCreateType]);
-  // console.log('accountList:', accountList, currentChain);
 
   const handleTabClick = (type: Tabs) => {
     setAccountCreateType(type);
