@@ -467,6 +467,8 @@ class KeyringService extends EventEmitter {
       ecosystem: Ecosystem.EVM,
     };
     const { id } = networkPreferenceService.getProviderConfig();
+    const accountList: BaseAccount[] = [];
+    const secretList: Secret[] = [];
     for (const p of supportProviders) {
       let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
       hdPath.coinType = p.coinType;
@@ -535,9 +537,11 @@ class KeyringService extends EventEmitter {
         hdWalletId: hdWalletId as string,
       };
 
-      this.accounts.push(account);
-      this.secrets.push(secret);
+      accountList.push(account);
+      secretList.push(secret);
     }
+    this.accounts = [...accountList, ...this.accounts];
+    this.secrets = [...secretList, ...this.secrets];
     this.setUnlocked();
     this._persistAllAccount();
     return Promise.resolve(newDisplayAccount);
