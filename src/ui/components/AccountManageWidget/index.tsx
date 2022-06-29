@@ -14,7 +14,7 @@ import * as _ from 'lodash';
 import { IconComponent } from 'ui/components/IconComponents';
 import clsx from 'clsx';
 import { WalletName } from 'ui/components/Widgets';
-import { CoinType, Ecosystem, Provider } from 'types/network';
+import { Ecosystem, Provider } from 'types/network';
 import {
   ecosystemToIconSVG,
   IdToChainLogoSVG,
@@ -57,7 +57,6 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
     const accounts: ICustomChain[] = await wallet.getAccountListByHdWalletId(
       hdWalletId
     );
-    console.log(accounts);
     const currentAccount: BaseAccount | null = await wallet.getCurrentAccount();
     const displayAccounts: IDisplayAccountManage[] = [];
 
@@ -154,7 +153,6 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
     isEmpty: boolean,
     isCurrentAccount
   ) => {
-    console.log(isCurrentAccount);
     if (isCurrentAccount || isEmpty) return;
     let account;
     const currentChain: Provider | null = await wallet.getCurrentChain();

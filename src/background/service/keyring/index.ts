@@ -540,8 +540,8 @@ class KeyringService extends EventEmitter {
       accountList.push(account);
       secretList.push(secret);
     }
-    this.accounts = [...accountList, ...this.accounts];
-    this.secrets = [...secretList, ...this.secrets];
+    this.accounts = [...this.accounts, ...accountList];
+    this.secrets = [...this.secrets, ...secretList];
     this.setUnlocked();
     this._persistAllAccount();
     return Promise.resolve(newDisplayAccount);
