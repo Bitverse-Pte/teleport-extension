@@ -96,7 +96,7 @@ const flowContext = flow
     if (approvalType) {
       const existed = precheck && precheck(ctx.request);
       if (existed) {
-        return next();
+        return 'existed';
       }
       ctx.request.requestedApproval = true;
       console.log('====[args]===', args);
