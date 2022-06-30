@@ -5,9 +5,10 @@ import { ReactComponent as IconSent } from '../../../assets/send.svg';
 import { ReactComponent as IconReceive } from '../../../assets/receive.svg';
 
 import './style.less';
+import { CosmosTxStatus } from 'background/service/transactions/cosmos/cosmos';
 
 interface TxLogoParams {
-  status: TransactionStatuses | 'cancelled';
+  status: TransactionStatuses | CosmosTxStatus | 'cancelled';
   type: 'send' | 'receive';
   size?: number;
 }
@@ -17,16 +18,16 @@ export function TxDirectionLogo({ status, type, size = 48 }: TxLogoParams) {
     switch (status) {
       case TransactionStatuses.ON_CHAIN_FALIURE:
       case TransactionStatuses.REJECTED:
-      case TransactionStatuses.FAILED: {
+      case CosmosTxStatus.FAILED:
+      case TransactionStatuses.FAILED:
         return Red['07'];
-      }
-      case TransactionStatuses.SUBMITTED: {
+      case CosmosTxStatus.CREATED:
+      case CosmosTxStatus.SIGNED:
+      case TransactionStatuses.SUBMITTED:
         return Orange['02'];
-      }
       // success is default
-      default: {
+      default:
         return Grey['07'];
-      }
     }
   }, [status]);
   const iconStyle = useMemo(() => {

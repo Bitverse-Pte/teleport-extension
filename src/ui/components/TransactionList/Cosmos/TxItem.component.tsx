@@ -13,6 +13,7 @@ import { useHistory } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import { TxDirectionLogo } from '../TxDirectionLogo';
 import { useCosmosTxDisplayData } from 'ui/views/Transaction/CosmosTransactionDetail/useCosmosTxDisplayData';
+import { CosmosTxStatus } from 'background/service/transactions/cosmos/cosmos';
 
 dayjs.extend(relativeTime);
 
@@ -48,11 +49,10 @@ export function CosmosTransactionItem({
 
   const colorByStatus = useMemo(() => {
     switch (displayedStatusKey) {
-      case TransactionStatuses.DROPPED:
-      case TransactionStatuses.FAILED:
-      case TransactionStatuses.ON_CHAIN_FALIURE:
+      case CosmosTxStatus.FAILED:
         return 'error';
-      case TransactionStatuses.SUBMITTED:
+      case CosmosTxStatus.SIGNED:
+      case CosmosTxStatus.CREATED:
         return 'pending';
       default:
         return 'default';
@@ -84,8 +84,7 @@ export function CosmosTransactionItem({
       onClick={() => history.push(`/cosmos/activity/${transaction.id}`)}
     >
       <TxDirectionLogo
-        // status={displayedStatusKey}
-        status="cancelled"
+        status={displayedStatusKey}
         type={
           category === TransactionGroupCategories.RECEIVE ? 'receive' : 'send'
         }

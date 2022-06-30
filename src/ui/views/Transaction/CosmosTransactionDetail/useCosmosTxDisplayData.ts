@@ -1,4 +1,7 @@
-import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
+import {
+  CosmosTx,
+  CosmosTxStatus,
+} from 'background/service/transactions/cosmos/cosmos';
 import { TransactionGroupCategories } from 'constants/transaction';
 import { useSelector } from 'react-redux';
 import { formatDateWithWeekContext } from 'ui/utils/utils';
@@ -18,7 +21,7 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
       : undefined;
 
   /** @TODO refine displayedStatusKey */
-  const displayedStatusKey = transaction?.status || '';
+  const displayedStatusKey = transaction?.status || CosmosTxStatus.CREATED;
 
   const knownTokens = useSelector((state) => state.tokens.tokens);
 

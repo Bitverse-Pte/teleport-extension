@@ -12,7 +12,10 @@ import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import { TransactionItemDetail } from '../components/TransactionItemDetail.component';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
-import { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
+import {
+  CosmosTx,
+  CosmosTxStatus,
+} from 'background/service/transactions/cosmos/cosmos';
 import { useParams } from 'react-router-dom';
 import { getCosmosTransactions } from 'ui/selectors/cosmos-transaction.selector';
 const { sensors } = skynet;
@@ -75,16 +78,15 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
   } = useSelector((state) => state.network);
 
   const statusBackground = useMemo(() => {
-    // switch (displayedStatusKey) {
-    //   case TransactionStatuses.DROPPED:
-    //   case TransactionStatuses.FAILED:
-    //   case TransactionStatuses.ON_CHAIN_FALIURE:
-    //     return 'error';
-    //   case TransactionStatuses.SUBMITTED:
-    //     return 'pending';
-    // default:
-    return 'default';
-    // }
+    switch (displayedStatusKey) {
+      case CosmosTxStatus.FAILED:
+        return 'error';
+      case CosmosTxStatus.CREATED:
+      case CosmosTxStatus.SIGNED:
+        return 'pending';
+      default:
+        return 'default';
+    }
   }, [displayedStatusKey]);
 
   /**
