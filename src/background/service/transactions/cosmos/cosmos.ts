@@ -168,9 +168,16 @@ export const defaultCosmosMsgOpts: CosmosMsgOpts = {
   },
 };
 
+export enum CosmosTxStatus {
+  CREATED = 'created',
+  SIGNED = 'signed',
+  SUCCESS = 'success',
+  FAILED = 'failed',
+}
+
 export interface CosmosTx {
   id: string;
-  status: string;
+  status: CosmosTxStatus;
   chainInfo: CosChainInfo;
   timestamp: number;
   account?: any;
@@ -294,7 +301,7 @@ export class CosmosAccountImpl {
     const txId = createId();
     this.addTransactionToList({
       id: txId,
-      status: 'created',
+      status: CosmosTxStatus.CREATED,
       chainInfo: cosChainInfo,
       timestamp: new Date().getTime(),
       memo,
@@ -578,7 +585,7 @@ export class CosmosAccountImpl {
     console.log('--currentCosmosTx--', currentCosmosTx);
     this.addTransactionToList({
       ...currentCosmosTx,
-      status: 'signed',
+      status: CosmosTxStatus.SIGNED,
       account,
       aminoMsgs,
       mode,
@@ -814,7 +821,7 @@ export class CosmosAccountImpl {
       console.log('--currentCosmosTx2222--', currentCosmosTx);
       this.addTransactionToList({
         ...currentCosmosTx,
-        status: 'success',
+        status: CosmosTxStatus.SUCCESS,
         tx_hash: txResponse.txhash,
       });
 
