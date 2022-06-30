@@ -369,6 +369,8 @@ class TokenService {
         const nativeToken = allTokens.find(
           (t: Token) => t.chainCustomId === chainCustomId && t.isNative
         );
+        console.log('all tokens', allTokens);
+        console.log('native token', nativeToken);
         if (nativeToken) {
           nativeToken.amount = 0;
           currentAccountTokens.push(cloneDeep(nativeToken));
