@@ -5,8 +5,7 @@ import { ReactComponent as IconSent } from '../../../assets/send.svg';
 import { ReactComponent as IconReceive } from '../../../assets/receive.svg';
 
 import './style.less';
-import { CosmosTxStatus } from 'background/service/transactions/cosmos/cosmos';
-
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 interface TxLogoParams {
   status: TransactionStatuses | CosmosTxStatus | 'cancelled';
   type: 'send' | 'receive';

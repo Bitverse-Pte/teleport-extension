@@ -1,9 +1,7 @@
-import {
-  CosmosTx,
-  CosmosTxStatus,
-} from 'background/service/transactions/cosmos/cosmos';
+import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 import { TransactionGroupCategories } from 'constants/transaction';
 import { useSelector } from 'react-redux';
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 import { formatDateWithWeekContext } from 'ui/utils/utils';
 
 export function useCosmosTxDisplayData(transaction?: CosmosTx) {

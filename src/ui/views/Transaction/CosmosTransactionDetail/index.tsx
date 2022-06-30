@@ -12,12 +12,10 @@ import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import { TransactionItemDetail } from '../components/TransactionItemDetail.component';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
-import {
-  CosmosTx,
-  CosmosTxStatus,
-} from 'background/service/transactions/cosmos/cosmos';
+import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 import { useParams } from 'react-router-dom';
 import { getCosmosTransactions } from 'ui/selectors/cosmos-transaction.selector';
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 const { sensors } = skynet;
 
 export default function ActivityDetail() {

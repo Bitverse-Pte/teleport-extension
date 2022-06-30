@@ -13,8 +13,7 @@ import { useHistory } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import { TxDirectionLogo } from '../TxDirectionLogo';
 import { useCosmosTxDisplayData } from 'ui/views/Transaction/CosmosTransactionDetail/useCosmosTxDisplayData';
-import { CosmosTxStatus } from 'background/service/transactions/cosmos/cosmos';
-
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 dayjs.extend(relativeTime);
 
 const shortenedStr = (str: string, digits = 6, isHex = true) =>

@@ -46,6 +46,7 @@ import { Bech32Config } from 'types/cosmos';
 import { CosmosKey } from 'background/service/keyManager/cosmos/CosmosKey';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { nanoid as createId } from 'nanoid';
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 
 export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
@@ -167,13 +168,6 @@ export const defaultCosmosMsgOpts: CosmosMsgOpts = {
     gas: 250000,
   },
 };
-
-export enum CosmosTxStatus {
-  CREATED = 'created',
-  SIGNED = 'signed',
-  SUCCESS = 'success',
-  FAILED = 'failed',
-}
 
 export interface CosmosTx {
   id: string;
