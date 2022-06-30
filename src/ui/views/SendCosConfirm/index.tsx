@@ -88,7 +88,6 @@ const ConfirmTx = () => {
   //     'cw20:juno1pshrvuw5ng2q4nwcsuceypjkp48d95gmcgjdxlus2ytm4k5kvz2s7t9ldx:HULCAT',
   //   decimal: 6,
   // };
-  console.log(state, amount, recipient, memo, token);
   const currency = {
     coinDenom: token?.symbol || 'ATOM',
     coinMinimalDenom: token?.denom || 'uatom',
@@ -158,7 +157,6 @@ const ConfirmTx = () => {
   const fetchNativePrice = async () => {
     dispatch(showLoadingIndicator());
     const tokens = await wallet.getTokenBalancesAsync(true);
-    console.log('tokens:', tokens);
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
@@ -184,6 +182,15 @@ const ConfirmTx = () => {
 
   useAsyncEffect(fetchStdFee, [gasState]);
 
+  useAsyncEffect(async () => {
+    const from: BaseAccount = await wallet.getAccountByAddress(
+      sendMsg?.from_address
+    );
+    const to: BaseAccount = await wallet.getAccountByAddress(recipient);
+    setSenderName(from?.accountName);
+    setRecipientName(to?.accountName);
+  }, [sendMsg]);
+
   const nativeToken = useMemo(() => {
     const nativeToken = tokens.find((t: Token) => t.isNative);
     if (prices && nativeToken) {
@@ -191,7 +198,6 @@ const ConfirmTx = () => {
         nativeToken!.price = prices[nativeToken!.symbol.toUpperCase()];
       }
     }
-    console.log('----nativeToken----', nativeToken);
     return nativeToken;
   }, [tokens, prices]);
 
@@ -229,9 +235,10 @@ const ConfirmTx = () => {
           />
           <SenderToRecipient
             senderAddress={sendMsg?.from_address}
-            senderName={''}
-            recipientName={''}
+            senderName={senderName}
+            recipientName={recipientName}
             recipientAddress={recipient}
+            needChecksum={false}
           />
 
           <TxSummaryComponent value={amount} token={txToken} origin={origin} />
@@ -312,7 +319,6 @@ const TxDetailComponent = ({
   currency: any;
   stdFee: any;
 }) => {
-  console.log(amount, txToken, nativeToken, setVisible, currency, stdFee);
   const { t } = useTranslation();
   const fee = utils.formatUnits(stdFee?.amount[0].amount, txToken?.decimal);
   const txTokenPrice = Number(txToken?.price || 0);

@@ -14,7 +14,7 @@ import { Token } from 'types/token';
 import Header from 'ui/components/Header';
 import teleportLogo from 'assets/teleportBg.svg';
 import { TipButton, TokenIcon, WalletName } from 'ui/components/Widgets';
-import { TransactionsList } from 'ui/components/TransactionList';
+import { TransactionListRouter } from 'ui/components/TransactionList';
 import './style.less';
 import clsx from 'clsx';
 import { TipButtonEnum } from 'constants/wallet';
@@ -166,7 +166,8 @@ const SingleToken = () => {
 
       <div className="token-tx-list">
         <h2 className="title">{t('Activity')}</h2>
-        <TransactionsList
+        <TransactionListRouter
+          ecosystem={currentChain.ecosystem}
           listContiannerHeight={240}
           tokenAddress={token?.contractAddress}
           // hideTokenTransactions is true = show native token transfer

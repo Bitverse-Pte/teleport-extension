@@ -40,9 +40,14 @@ const SenderToRecipient = ({
   senderName,
   recipientName,
   recipientAddress,
+  needChecksum = true,
 }) => {
-  const checksummedSenderAddress = toChecksumHexAddress(senderAddress);
-  const checksummedRecipientAddress = toChecksumHexAddress(recipientAddress);
+  const checksummedSenderAddress = needChecksum
+    ? toChecksumHexAddress(senderAddress)
+    : senderAddress;
+  const checksummedRecipientAddress = needChecksum
+    ? toChecksumHexAddress(recipientAddress)
+    : recipientAddress;
   return (
     <div className="sender-to-recipient flexR">
       <Address

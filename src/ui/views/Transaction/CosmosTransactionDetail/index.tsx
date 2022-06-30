@@ -10,41 +10,30 @@ import { useTranslation } from 'react-i18next';
 import skynet from 'utils/skynet';
 import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import { TransactionItemDetail } from '../components/TransactionItemDetail.component';
-import { MockCosmosTxHistory } from './_MockCosmosTxHistory';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
-import { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
+import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
+import { useParams } from 'react-router-dom';
+import { getCosmosTransactions } from 'ui/selectors/cosmos-transaction.selector';
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 const { sensors } = skynet;
-
-const activityId = '_pBWBbRUSHFMqiBDW6xcd';
-const transaction = MockCosmosTxHistory[activityId];
 
 export default function ActivityDetail() {
   /**
    * Dirty hard work here.
    * UI related Logic please go to _ActivityDetail below
    */
-  // const { activityId } = useParams<{ activityId: string }>();
-  // const activityId = '_pBWBbRUSHFMqiBDW6xcd';
-  // const unfilteredPendingTransactions = useSelector(
-  //   nonceSortedPendingTransactionsSelector
-  // );
-  // const unfilteredCompletedTransactions = useSelector(
-  //   nonceSortedCompletedTransactionsSelector
-  // );
-  // const transactions = useMemo(
-  //   () => unfilteredPendingTransactions.concat(unfilteredCompletedTransactions),
-  //   [unfilteredPendingTransactions, unfilteredCompletedTransactions]
-  // );
+  const { activityId } = useParams<{ activityId: string }>();
+  const transactions = useSelector(getCosmosTransactions);
 
-  // const transaction = useMemo(() => {
-  //   const target = transactions.find((txg) => {
-  //     return txg.transactions.findIndex((tx) => tx.id === activityId) > -1;
-  //   });
-  //   // const target = transactions[activityId]
-  //   console.debug('transaction data:', target);
-  //   return target;
-  // }, [transactions, activityId]);
+  const transaction = useMemo(() => {
+    const target = transactions.find((tx) => {
+      return tx.id === activityId;
+    });
+    // const target = transactions[activityId]
+    console.debug('transaction data:', target);
+    return target;
+  }, [transactions, activityId]);
   // const transaction = MockCosmosTxHistory[activityId];
 
   // no if return before a hook, so let's do this
@@ -77,9 +66,9 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     // isPending,
     senderAddress,
     token,
-  } = useCosmosTxDisplayData();
+  } = useCosmosTxDisplayData(transaction);
   // transaction
-
+  console.debug('primaryCurrency', primaryCurrency);
   const { t } = useTranslation();
 
   const {
@@ -87,16 +76,15 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
   } = useSelector((state) => state.network);
 
   const statusBackground = useMemo(() => {
-    // switch (displayedStatusKey) {
-    //   case TransactionStatuses.DROPPED:
-    //   case TransactionStatuses.FAILED:
-    //   case TransactionStatuses.ON_CHAIN_FALIURE:
-    //     return 'error';
-    //   case TransactionStatuses.SUBMITTED:
-    //     return 'pending';
-    // default:
-    return 'default';
-    // }
+    switch (displayedStatusKey) {
+      case CosmosTxStatus.FAILED:
+        return 'error';
+      case CosmosTxStatus.CREATED:
+      case CosmosTxStatus.SIGNED:
+        return 'pending';
+      default:
+        return 'default';
+    }
   }, [displayedStatusKey]);
 
   /**
@@ -104,6 +92,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
    */
   const displayPrimaryCurrency = useMemo(() => {
     // split by space
+    if (!primaryCurrency) return { amount: '--.--', unit: '' };
     const { amount, denom: unit } = primaryCurrency;
     return { amount, unit };
   }, [primaryCurrency]);

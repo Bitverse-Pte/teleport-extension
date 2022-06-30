@@ -1,23 +1,17 @@
-import React, {
-  useState,
-  createContext,
-  useEffect,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { useState, createContext } from 'react';
 import { Input, InputNumber, Select, Spin } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
-import { addHexPrefix, isValidAddress } from 'ethereumjs-util';
+// import { addHexPrefix } from 'ethereumjs-util';
 
-import {
-  EthDenomination,
-  getWeiHexFromDecimalValue,
-  multiplyCurrencies,
-} from 'ui/utils/conversion';
-import Header from 'ui/components/Header';
+// import {
+//   EthDenomination,
+//   getWeiHexFromDecimalValue,
+//   multiplyCurrencies,
+// } from 'ui/utils/conversion';
+// import Header from 'ui/components/Header';
 import {
   useWallet,
   useAsyncEffect,
@@ -27,15 +21,15 @@ import {
 import { transferAddress2Display } from 'ui/utils';
 import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
 import AccountSelect from 'ui/components/AccountSelect';
-import {
-  ETH,
-  HexString,
-  Transaction,
-  TransactionEnvelopeTypes,
-} from 'constants/transaction';
+// import {
+//   ETH,
+//   HexString,
+//   Transaction,
+//   TransactionEnvelopeTypes,
+// } from 'constants/transaction';
 import { BaseAccount } from 'types/extend';
 import { Token } from 'types/token';
-import { generateTokenTransferData } from 'ui/context/send.utils';
+// import { generateTokenTransferData } from 'ui/context/send.utils';
 import { CustomButton, TokenIcon, WalletName } from 'ui/components/Widgets';
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import './style.less';
@@ -43,16 +37,20 @@ import BigNumber from 'bignumber.js';
 import { utils } from 'ethers';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentChainId } from 'ui/selectors/selectors';
-import {
-  initializeSendState,
-  resetSendState,
-  updateRecipient,
-  updateSendAsset,
-  updateSendAmount,
-} from 'ui/reducer/send.reducer';
-import { shortenAddress } from 'ui/utils/utils';
+// import {
+//   initializeSendState,
+//   resetSendState,
+//   updateRecipient,
+//   updateSendAsset,
+//   updateSendAmount,
+// } from 'ui/reducer/send.reducer';
+// import { shortenAddress } from 'ui/utils/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
+import { Bech32Address } from '@keplr-wallet/cosmos';
+import { getProvider } from 'ui/selectors/selectors';
+import { Provider } from 'types/network';
+
 const { sensors } = skynet;
 
 export const AccountSelectContext = createContext<{
@@ -92,13 +90,26 @@ const Send = () => {
   );
   const isSupport1559 = useSelector((state) => state.send.eip1559support);
   console.debug('isSupport1559: ', isSupport1559);
-  // const isGasEstimateLoading = useSelector(
-  //   (state) => state.send.gas.isGasEstimateLoading
-  // );
+  const currentChain: Provider = useSelector(getProvider);
 
-  const cleanup = useCallback(() => {
-    dispatch(resetSendState());
-  }, [dispatch]);
+  // const cleanup = useCallback(() => {
+  //   dispatch(resetSendState());
+  // }, [dispatch]);
+
+  const isValidAddress = (recipient) => {
+    const prefix = currentChain.prefix;
+    let bech32Prefix = '';
+    if (typeof prefix !== 'string') {
+      bech32Prefix = prefix.bech32PrefixAccAddr;
+    }
+    try {
+      Bech32Address.validate(recipient, bech32Prefix);
+      return true;
+    } catch (e) {
+      // console.error(e);
+      return false;
+    }
+  };
 
   // useEffect(() => {
   //   if (chainId !== undefined) {
@@ -106,11 +117,11 @@ const Send = () => {
   //   }
   // }, [chainId, dispatch, cleanup]);
 
-  useEffect(() => {
-    return () => {
-      dispatch(resetSendState());
-    };
-  }, [dispatch, cleanup]);
+  // useEffect(() => {
+  //   return () => {
+  //     dispatch(resetSendState());
+  //   };
+  // }, [dispatch, cleanup]);
 
   useAsyncEffect(async () => {
     const current: BaseAccount | undefined = await wallet.getCurrentAccount();
@@ -153,76 +164,27 @@ const Send = () => {
     setRecentAddressList(recentAddress);
   }, []);
 
-  const getHexAmount = (amount: string): HexString => {
-    const multiplier = Math.pow(10, Number(selectedToken?.decimal || 0));
-    const hexAmountValue = addHexPrefix(
-      multiplyCurrencies(amount || 0, multiplier, {
-        multiplicandBase: 10,
-        multiplierBase: 10,
-        toNumericBase: 'hex',
-      })
-    );
-    return hexAmountValue;
-  };
+  // const getHexAmount = (amount: string): HexString => {
+  //   const multiplier = Math.pow(10, Number(selectedToken?.decimal || 0));
+  //   const hexAmountValue = addHexPrefix(
+  //     multiplyCurrencies(amount || 0, multiplier, {
+  //       multiplicandBase: 10,
+  //       multiplierBase: 10,
+  //       toNumericBase: 'hex',
+  //     })
+  //   );
+  //   return hexAmountValue;
+  // };
 
   const next = async () => {
     if (!(await wallet.isUnlocked())) {
       setUnlockPopupVisible(true);
       return;
     }
-    // const hexAmountValue = getHexAmount(amount);
-
-    // const type = isSupport1559
-    //   ? TransactionEnvelopeTypes.FEE_MARKET
-    //   : TransactionEnvelopeTypes.LEGACY;
-    // const params: Record<string, any> = {
-    //   from: fromAccount?.address,
-    //   value: TransactionEnvelopeTypes.LEGACY,
-    //   isSend: true,
-    //   type: type,
-    // };
-    // if (selectedToken?.isNative) {
-    //   params.to = toAddress;
-    //   params.value = hexAmountValue;
-    // } else {
-    //   // erc-20 tokens
-    //   params.to = selectedToken?.contractAddress;
-    //   params.data = generateTokenTransferData({
-    //     toAddress: toAddress,
-    //     amount: hexAmountValue,
-    //   });
-    // }
-    // const txParams = {
-    //   from: fromAccount?.address,
-    //   to: toAddress,
-    //   value: amount,
-    //   symbol: selectedToken?.symbol,
-    // };
-
     history.push({
       pathname: '/confirm-send-cos',
       state: { amount, recipient: toAddress, memo, token: selectedToken },
     });
-    // params.gas = draftTransaction.gas;
-    // params.txParam.gas = draftTransaction.gas;
-    // if (isSupport1559) {
-    //   delete params.gasPrice;
-    // } else {
-    //   delete params.maxFeePerGas;
-    //   delete params.maxPriorityFeePerGas;
-    // }
-    // await wallet.addContactByDefaultName(toAddress);
-    // wallet.sendRequest({
-    //   method: 'eth_sendTransaction',
-    //   params: [params],
-    // });
-    // sensors.track('teleport_send_next', {
-    //   page: location.pathname,
-    //   from: params.txParam.from,
-    //   to: params.txParam.to,
-    //   symbol: params.txParam.symbol,
-    // });
-    // history.push('/confirm-transaction');
   };
 
   const myAccountsSelect = () => {
@@ -246,30 +208,26 @@ const Send = () => {
     const selected = tokens.find((t: Token) => t.symbol === val);
     if (selected) {
       setSelectedToken(selected);
-      dispatch(updateSendAsset(selected));
+      // dispatch(updateSendAsset(selected));
     }
   };
 
   const handleToAddressChanged = (val) => {
     setToAddress(val);
-    if (isValidAddress(val)) {
-      dispatch(updateRecipient({ address: val, nickname: '' }));
-    }
-  };
-
-  const handleMemoChanged = (val) => {
-    setMemo(val);
+    // if (isValidAddress(val)) {
+    //   dispatch(updateRecipient({ address: val, nickname: '' }));
+    // }
   };
 
   const handleAmountChanged = (val) => {
     setAmount(val);
-    const hexVal = getHexAmount(val);
-    dispatch(updateSendAmount(hexVal));
+    // const hexVal = getHexAmount(val);
+    // dispatch(updateSendAmount(hexVal));
   };
 
   const invalidate = () => {
     return (
-      !isValidAddress(toAddress || '0x0') ||
+      !isValidAddress(toAddress) ||
       !amount ||
       !selectedToken ||
       (selectedToken.amount &&
@@ -454,7 +412,7 @@ const Send = () => {
           <div className="button-inner">
             <CustomButton
               type="primary"
-              // disabled={invalidate()}
+              disabled={invalidate()}
               onClick={next}
               cls="theme"
               block

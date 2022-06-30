@@ -46,6 +46,7 @@ import { Bech32Config } from 'types/cosmos';
 import { CosmosKey } from 'background/service/keyManager/cosmos/CosmosKey';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { nanoid as createId } from 'nanoid';
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 
 export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
@@ -170,7 +171,7 @@ export const defaultCosmosMsgOpts: CosmosMsgOpts = {
 
 export interface CosmosTx {
   id: string;
-  status: string;
+  status: CosmosTxStatus;
   chainInfo: CosChainInfo;
   timestamp: number;
   account?: any;
@@ -294,7 +295,7 @@ export class CosmosAccountImpl {
     const txId = createId();
     this.addTransactionToList({
       id: txId,
-      status: 'created',
+      status: CosmosTxStatus.CREATED,
       chainInfo: cosChainInfo,
       timestamp: new Date().getTime(),
       memo,
@@ -578,7 +579,7 @@ export class CosmosAccountImpl {
     console.log('--currentCosmosTx--', currentCosmosTx);
     this.addTransactionToList({
       ...currentCosmosTx,
-      status: 'signed',
+      status: CosmosTxStatus.SIGNED,
       account,
       aminoMsgs,
       mode,
@@ -814,7 +815,7 @@ export class CosmosAccountImpl {
       console.log('--currentCosmosTx2222--', currentCosmosTx);
       this.addTransactionToList({
         ...currentCosmosTx,
-        status: 'success',
+        status: CosmosTxStatus.SUCCESS,
         tx_hash: txResponse.txhash,
       });
 

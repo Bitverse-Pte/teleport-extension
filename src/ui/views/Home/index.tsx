@@ -25,7 +25,7 @@ import {
   TokenIcon,
   WalletName,
 } from 'ui/components/Widgets';
-import { TransactionsList } from 'ui/components/TransactionList';
+import { TransactionListRouter } from 'ui/components/TransactionList';
 import './style.less';
 import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
@@ -484,7 +484,8 @@ const Home = () => {
           )}
           {tabType === Tabs.SECOND && (
             <div className="transaction-list">
-              <TransactionsList
+              <TransactionListRouter
+                ecosystem={currentChain.ecosystem}
                 listContiannerHeight={206}
                 txData={filterCondition}
               />

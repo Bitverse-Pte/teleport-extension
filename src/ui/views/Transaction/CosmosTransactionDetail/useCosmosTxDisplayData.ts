@@ -1,12 +1,10 @@
+import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 import { TransactionGroupCategories } from 'constants/transaction';
 import { useSelector } from 'react-redux';
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 import { formatDateWithWeekContext } from 'ui/utils/utils';
-import { MockCosmosTxHistory } from './_MockCosmosTxHistory';
 
-const activityId = '_pBWBbRUSHFMqiBDW6xcd';
-const transaction = MockCosmosTxHistory[activityId];
-
-export function useCosmosTxDisplayData() {
+export function useCosmosTxDisplayData(transaction?: CosmosTx) {
   const senderAddress = transaction?.account.address;
   const recipientAddress = transaction?.aminoMsgs
     ? transaction?.aminoMsgs[0].value.to_address
@@ -15,12 +13,13 @@ export function useCosmosTxDisplayData() {
     ? formatDateWithWeekContext(transaction?.timestamp)
     : undefined;
 
-  const primaryCurrency = transaction?.aminoMsgs
-    ? transaction?.aminoMsgs[0].value.amount[0]
-    : undefined;
+  const primaryCurrency: { amount: string; denom: number } | undefined =
+    transaction?.aminoMsgs
+      ? transaction?.aminoMsgs[0].value.amount[0]
+      : undefined;
 
   /** @TODO refine displayedStatusKey */
-  const displayedStatusKey = transaction?.status;
+  const displayedStatusKey = transaction?.status || CosmosTxStatus.CREATED;
 
   const knownTokens = useSelector((state) => state.tokens.tokens);
 
