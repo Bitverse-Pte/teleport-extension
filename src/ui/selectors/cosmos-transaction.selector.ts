@@ -18,8 +18,10 @@ export const getTransactionsForCurrentProvider = createSelector(
       ChainIdHelper.parse(chainId).identifier;
     return transactions.filter(
       (tx) =>
-        ChainIdHelper.parse(tx.chainInfo.chainId).identifier ===
-        currentCosmosChainIdentifier
+        tx.chainInfo &&
+        tx.chainInfo.chainId &&
+        ChainIdHelper.parse(tx.chainInfo?.chainId).identifier ===
+          currentCosmosChainIdentifier
     );
   }
 );
