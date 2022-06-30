@@ -108,7 +108,10 @@ const SingleToken = () => {
   return (
     <div className="single-token flexCol">
       <Header title={title} />
-      <div className="summary flexCol content-wrap-padding">
+      <div
+        className="summary flexCol content-wrap-padding"
+        style={ibcChainInfoStr ? { height: '190px' } : {}}
+      >
         <div className="top">
           <TokenIcon token={updatedToken} radius={42} />
           {/* <img src={teleportLogo} className="logo" /> */}
@@ -121,11 +124,14 @@ const SingleToken = () => {
                 updatedToken?.decimal || 0
               )}
             </span>
-            <span className="single-symbol">
-              {updatedToken?.symbol}
-              {ibcChainInfoStr ? ibcChainInfoStr : null}
-            </span>
+            <span className="single-symbol">{updatedToken?.symbol}</span>
           </div>
+          <span
+            className="ibc-denomanation ellipsis"
+            style={ibcChainInfoStr ? {} : { display: 'none' }}
+          >
+            {ibcChainInfoStr}
+          </span>
           <span className="estimate">
             ≈{' '}
             {getTotalPricesByAmountAndPrice(
