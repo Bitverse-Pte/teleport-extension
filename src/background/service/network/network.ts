@@ -442,6 +442,7 @@ class NetworkPreferenceService extends EventEmitter {
       await keyringService.deleteAccountsByChainCustomId(
         providerToBeRemoved.id
       );
+      TokenService.removeTokensByCustomChainId(providerToBeRemoved.id);
     }
     const removedCustomOrdering = orderOfNetworks[
       providerToBeRemoved.ecosystem
@@ -1126,7 +1127,7 @@ class NetworkPreferenceService extends EventEmitter {
       symbol: chainInfo.currencies[0].coinDenom,
       name: chainInfo.currencies[0].coinDenom.toUpperCase(),
       decimal: chainInfo.currencies[0].coinDecimals,
-      denom: chainInfo.currencies[0].coinDenom,
+      denom: chainInfo.currencies[0].coinMinimalDenom,
       chainCustomId: newCosmosProvider.id,
       isNative: true,
     });
