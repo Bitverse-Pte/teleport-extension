@@ -18,7 +18,7 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
       : undefined;
 
   /** @TODO refine displayedStatusKey */
-  const displayedStatusKey = transaction?.status;
+  const displayedStatusKey = transaction?.status || '';
 
   const knownTokens = useSelector((state) => state.tokens.tokens);
 

@@ -116,7 +116,7 @@ export function CosmosTransactionItem({
           </div>
         )}
         <span className={clsx('status capitalize', colorByStatus)}>
-          {/* {t(displayedStatusKey)} */}
+          {t(displayedStatusKey || '')}
         </span>
         <span className="date">
           {dayjs(transaction.timestamp).format('YYYY-MM-DD HH:mm:ss')}
