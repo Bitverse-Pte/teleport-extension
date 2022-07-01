@@ -34,6 +34,42 @@ class TokenService {
       balances: null,
       denomTrace: {},
     });
+
+    setTimeout(this.keepIconInBalancesUpdated.bind(this), 5 * 1000);
+  }
+
+  async keepIconInBalancesUpdated() {
+    const { balances } = this.store.getState();
+    // skip if null
+    if (!balances) return;
+
+    /**
+     * update `icon` in `balances`
+     */
+    Object.keys(balances).forEach((key) => {
+      balances[key] = balances[key].map((tokenBalanceDetail) => {
+        const matchedPresetTokenProfile = DEFAULT_TOKEN_CONFIG.find(
+          (tokenInPreset) =>
+            tokenBalanceDetail.chainCustomId === tokenInPreset.chainCustomId &&
+            tokenBalanceDetail.symbol === tokenInPreset.symbol &&
+            tokenBalanceDetail.contractAddress === tokenInPreset.contractAddress
+        );
+        /** skip if it was not preset token */
+        if (!matchedPresetTokenProfile) return tokenBalanceDetail;
+        else {
+          /* extract data that needs to be updated */
+          const { icon, name, decimal, denom, display } =
+            matchedPresetTokenProfile;
+          /** old data first, then override them with new data */
+          return { ...tokenBalanceDetail, icon, name, decimal, denom, display };
+        }
+      });
+    });
+
+    this.store.updateState({
+      balances,
+    });
+    console.debug(`keepIconInBalancesUpdated: updated`);
   }
 
   async init(): Promise<TokenService> {
