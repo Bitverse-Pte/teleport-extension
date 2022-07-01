@@ -79,6 +79,14 @@ class TokenService {
     );
   }
 
+  removeTokensByCustomChainId(customChainId: PresetNetworkId | string) {
+    let tokens = cloneDeep(this.store.getState().tokens);
+    tokens = tokens.filter((t: Token) => t.chainCustomId !== customChainId);
+    this.store.updateState({
+      tokens: tokens,
+    });
+  }
+
   addCustomToken(tokenParams: AddTokenOpts): Promise<boolean> {
     if (
       !tokenParams.isNative &&
@@ -359,6 +367,14 @@ class TokenService {
               if (t) {
                 t.amount = b.amount;
                 currentAccountTokens.push(t);
+              } else {
+                const t = currentChainTokens.find(
+                  (st: Token) => st.denom === b.denom
+                );
+                if (t) {
+                  t.amount = b.amount;
+                  currentAccountTokens.push(cloneDeep(t));
+                }
               }
             }
           }

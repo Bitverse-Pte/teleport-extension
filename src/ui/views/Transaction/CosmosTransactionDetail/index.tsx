@@ -14,7 +14,7 @@ import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
 import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 import { useParams } from 'react-router-dom';
-import { getCosmosTransactions } from 'ui/selectors/cosmos-transaction.selector';
+import { getCosmosTransactionById } from 'ui/selectors/cosmos-transaction.selector';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
 const { sensors } = skynet;
 
@@ -24,16 +24,8 @@ export default function ActivityDetail() {
    * UI related Logic please go to _ActivityDetail below
    */
   const { activityId } = useParams<{ activityId: string }>();
-  const transactions = useSelector(getCosmosTransactions);
 
-  const transaction = useMemo(() => {
-    const target = transactions.find((tx) => {
-      return tx.id === activityId;
-    });
-    // const target = transactions[activityId]
-    console.debug('transaction data:', target);
-    return target;
-  }, [transactions, activityId]);
+  const transaction = useSelector(getCosmosTransactionById(activityId));
   // const transaction = MockCosmosTxHistory[activityId];
 
   // no if return before a hook, so let's do this
@@ -60,6 +52,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     date,
     category,
     primaryCurrency,
+    formattedFee,
     recipientAddress,
     // secondaryCurrency,
     displayedStatusKey,
@@ -143,10 +136,10 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
               hoverValueText={date}
               value={dayjs(transaction.timestamp).format('YYYY-MM-DD HH:mm:ss')}
             />
-            {transaction.fee?.amount && (
+            {formattedFee && (
               <TransactionItemDetail
                 name="Fee"
-                value={`${transaction.fee.amount[0].amount} ${transaction.fee.amount[0].denom}`}
+                value={`${formattedFee.amount} ${formattedFee.denom}`}
               />
             )}
             <TransactionItemDetail name="Gas" value={transaction.fee?.gas} />
