@@ -126,7 +126,7 @@ export function NetworkStoreProvider({
     ) => {
       dispatch(showLoadingIndicator());
       try {
-        await wallet.addCustomNetwork(
+        await wallet.addCustomEthereumProvider(
           nickname,
           rpcUrl,
           chainId,
