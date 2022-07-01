@@ -1,8 +1,10 @@
 import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 import { TransactionGroupCategories } from 'constants/transaction';
+import { utils } from 'ethers';
 import { useSelector } from 'react-redux';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
 import { formatDateWithWeekContext } from 'ui/utils/utils';
+import { useCosmosValueFormatter } from './useCosmosValueFormatter';
 
 export function useCosmosTxDisplayData(transaction?: CosmosTx) {
   const senderAddress = transaction?.account.address;
@@ -13,11 +15,6 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     ? formatDateWithWeekContext(transaction?.timestamp)
     : undefined;
 
-  const primaryCurrency: { amount: string; denom: number } | undefined =
-    transaction?.aminoMsgs
-      ? transaction?.aminoMsgs[0].value.amount[0]
-      : undefined;
-
   /** @TODO refine displayedStatusKey */
   const displayedStatusKey = transaction?.status || CosmosTxStatus.CREATED;
 
@@ -25,7 +22,18 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
 
   /** @TODO support other than native token */
   const token = knownTokens.find(
-    ({ denom }) => denom === transaction?.currency?.coinDenom
+    ({ denom }) => denom === transaction?.currency?.coinMinimalDenom
+  );
+  console.debug('matched token: ', token);
+
+  const transactionValue = transaction?.aminoMsgs
+    ? transaction?.aminoMsgs[0].value.amount[0]
+    : undefined;
+  const primaryCurrency: { amount: string; denom: string } | undefined =
+    useCosmosValueFormatter(transactionValue);
+
+  const formattedFee = useCosmosValueFormatter(
+    transaction?.fee?.amount ? transaction?.fee.amount[0] : undefined
   );
 
   return {
@@ -33,6 +41,7 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     category: TransactionGroupCategories.SEND,
     date,
     primaryCurrency,
+    formattedFee,
     senderAddress,
     recipientAddress,
     //   (isTokenCategory && !tokenFiatAmount) ||
