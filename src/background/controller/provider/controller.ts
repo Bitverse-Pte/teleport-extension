@@ -429,7 +429,7 @@ class ProviderController extends BaseController {
      * chainParams are the data from the dapp,
      * so the type of `chainParams` is `AddEthereumChainParameter`
      */
-    const network = networkPreferenceService.addCustomNetwork(
+    const network = networkPreferenceService.addCustomEthereumProvider(
       newChainName,
       chainParams.rpcUrls[0],
       chainParams.chainId,

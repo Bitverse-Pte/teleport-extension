@@ -100,14 +100,14 @@ export class WalletController extends BaseController {
   moveNetwork = (e: Ecosystem, f: number, d: number) =>
     networkPreferenceService.moveNetwork(e, f, d);
 
-  addCustomNetwork = async (
+  addCustomEthereumProvider = async (
     nickname: string,
     rpcUrl: string,
     chainId: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => {
-    const network = networkPreferenceService.addCustomNetwork(
+    const network = networkPreferenceService.addCustomEthereumProvider(
       nickname,
       rpcUrl,
       chainId,
@@ -137,28 +137,7 @@ export class WalletController extends BaseController {
     return network;
   };
 
-  addCustomCosmosNetwork = async (chainInfo: CosmosChainInfo) => {
-    /** @TODO this is for test only.
-     * remove this function only when
-     * `window.keplr.suggestChainInfo` was implemented
-     */
-    try {
-      const network = await networkPreferenceService.suggestCosmosChainInfo(
-        chainInfo,
-        'foo'
-      );
-      networkPreferenceService.setProviderConfig(network);
-      return network;
-    } catch (error: any) {
-      /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
-      if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
-        console.debug('account not exist, shall create here...');
-      }
-      console.error('addCustomCosmosNetwork::error: ', error);
-    }
-  };
-
-  editCustomNetwork = (
+  editCustomEthereumProvider = (
     id: string,
     newNickname: string,
     rpcUrl: string,
@@ -168,7 +147,7 @@ export class WalletController extends BaseController {
     coinType = CoinType.ETH,
     chainName = 'ETH'
   ) => {
-    networkPreferenceService.editCustomNetwork(
+    networkPreferenceService.editCustomEthereumProvider(
       id,
       newNickname,
       rpcUrl,

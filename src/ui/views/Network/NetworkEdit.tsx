@@ -161,7 +161,7 @@ const NetworkEdit = () => {
       dispatch(showLoadingIndicator());
       if (isEdit) {
         console.debug(`Editing Custom Provider ID ${id}`);
-        await networkContext?.editCustomProvider(
+        await networkContext?.editCustomEthereumProvider(
           id,
           networkName as string,
           rpcUrl,
@@ -178,7 +178,7 @@ const NetworkEdit = () => {
         });
       } else {
         console.debug('Adding Custom Provider');
-        await networkContext?.addCustomProvider(
+        await networkContext?.addCustomEthereumProvider(
           networkName as string,
           rpcUrl,
           chainId,
