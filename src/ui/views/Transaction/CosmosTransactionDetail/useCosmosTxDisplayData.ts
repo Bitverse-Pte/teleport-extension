@@ -38,6 +38,9 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     transaction?.fee?.amount ? transaction?.fee.amount[0] : undefined
   );
 
+  const ibcChannel: string | undefined =
+    token?.trace?.trace[0].channelId || undefined;
+
   return {
     title: TransactionGroupCategories.SEND,
     category: TransactionGroupCategories.SEND,
@@ -54,5 +57,6 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     // isPending,
     // isSubmitted,
     token,
+    ibcChannel,
   };
 }

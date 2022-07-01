@@ -1129,6 +1129,7 @@ class NetworkPreferenceService extends EventEmitter {
       decimal: chainInfo.currencies[0].coinDecimals,
       denom: chainInfo.currencies[0].coinMinimalDenom,
       chainCustomId: newCosmosProvider.id,
+      icon: chainInfo.currencies[0].coinImageUrl,
       isNative: true,
     });
     /** @TODO add account for this network needed, so no error in `setProviderConfig` */
