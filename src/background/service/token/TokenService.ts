@@ -35,6 +35,7 @@ class TokenService {
       denomTrace: {},
     });
 
+    /** @TODO get rid of this, when we go `feature` */
     setTimeout(this.keepIconInBalancesUpdated.bind(this), 5 * 1000);
   }
 
