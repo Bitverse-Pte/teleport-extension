@@ -3,6 +3,7 @@ import { TransactionGroupCategories } from 'constants/transaction';
 import { utils } from 'ethers';
 import { useSelector } from 'react-redux';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
+import { getTokenBalancesOfCurrentAccount } from 'ui/selectors/token.selector';
 import { formatDateWithWeekContext } from 'ui/utils/utils';
 import { useCosmosValueFormatter } from './useCosmosValueFormatter';
 
@@ -15,13 +16,14 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     ? formatDateWithWeekContext(transaction?.timestamp)
     : undefined;
 
-  /** @TODO refine displayedStatusKey */
   const displayedStatusKey = transaction?.status || CosmosTxStatus.CREATED;
 
-  const knownTokens = useSelector((state) => state.tokens.tokens);
-
-  /** @TODO support other than native token */
-  const token = knownTokens.find(
+  const balances = useSelector(getTokenBalancesOfCurrentAccount);
+  /**
+   * IBC token transferred internally supported
+   * @TODO it's there any more types of token to be supported?
+   */
+  const token = balances.find(
     ({ denom }) => denom === transaction?.currency?.coinMinimalDenom
   );
   console.debug('matched token: ', token);

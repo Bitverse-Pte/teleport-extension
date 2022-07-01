@@ -1,11 +1,12 @@
 import { utils } from 'ethers';
 import { useSelector } from 'react-redux';
+import { getTokenBalancesOfCurrentAccount } from 'ui/selectors/token.selector';
 
 export function useCosmosValueFormatter(transactionValue?: {
   amount: string;
   denom: string;
 }) {
-  const knownTokens = useSelector((state) => state.tokens.tokens);
+  const knownTokens = useSelector(getTokenBalancesOfCurrentAccount);
 
   const token = knownTokens.find(
     ({ denom }) => denom === transactionValue?.denom
