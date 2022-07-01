@@ -304,7 +304,7 @@ class NetworkPreferenceService extends EventEmitter {
     }
   }
 
-  addCustomNetwork(
+  addCustomEthereumProvider(
     nickname: string,
     rpcUrl: string,
     chainId: string,
@@ -363,7 +363,7 @@ class NetworkPreferenceService extends EventEmitter {
     });
   }
 
-  editCustomNetwork(
+  editCustomEthereumProvider(
     providerId: string,
     newNickname: string,
     rpcUrl: string,
