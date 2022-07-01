@@ -61,7 +61,7 @@ function _getDefaultIcon(
     </span>
   );
   let contractAddress = '';
-  if ('contractAddress' in token) {
+  if (!token.icon && 'contractAddress' in token) {
     if (!token.isNative && !token.contractAddress) return defaultIcon;
     try {
       contractAddress = (token as any)?.contractAddress.startsWith('0x')
