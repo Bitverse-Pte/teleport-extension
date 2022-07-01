@@ -52,6 +52,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     date,
     category,
     primaryCurrency,
+    formattedFee,
     recipientAddress,
     // secondaryCurrency,
     displayedStatusKey,
@@ -135,10 +136,10 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
               hoverValueText={date}
               value={dayjs(transaction.timestamp).format('YYYY-MM-DD HH:mm:ss')}
             />
-            {transaction.fee?.amount && (
+            {formattedFee && (
               <TransactionItemDetail
                 name="Fee"
-                value={`${transaction.fee.amount[0].amount} ${transaction.fee.amount[0].denom}`}
+                value={`${formattedFee.amount} ${formattedFee.denom}`}
               />
             )}
             <TransactionItemDetail name="Gas" value={transaction.fee?.gas} />
