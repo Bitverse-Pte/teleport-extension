@@ -24,6 +24,7 @@ export interface AddTokenOpts {
   contractAddress?: string;
   isNative: boolean;
   denom?: string;
+  icon?: string;
 }
 
 export interface ITokenStore {
