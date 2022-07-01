@@ -59,6 +59,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     // isPending,
     senderAddress,
     token,
+    ibcChannel,
   } = useCosmosTxDisplayData(transaction);
   // transaction
   console.debug('primaryCurrency', primaryCurrency);
@@ -148,6 +149,9 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
               value={transaction.account.sequence}
             />
             <TransactionItemDetail name="Memo" value={transaction.memo} />
+            {ibcChannel && (
+              <TransactionItemDetail name="IBC Channel" value={ibcChannel} />
+            )}
           </div>
         </div>
       </div>
