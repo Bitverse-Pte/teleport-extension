@@ -1,8 +1,8 @@
 import { Grey, Orange, Red } from 'constants/colorPalette';
 import { TransactionStatuses } from 'constants/transaction';
 import React, { CSSProperties, useMemo } from 'react';
-import { ReactComponent as IconSent } from '../../../assets/send.svg';
-import { ReactComponent as IconReceive } from '../../../assets/receive.svg';
+import { ReactComponent as IconSent } from '../../../assets/sendOuter.svg';
+import { ReactComponent as IconReceive } from '../../../assets/receiveOuter.svg';
 
 import './style.less';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
