@@ -811,9 +811,13 @@ class NetworkPreferenceService extends EventEmitter {
     const { accountCreateType, hdWalletId, hdPathIndex, ecosystem } =
       currentAccount;
     const destAccount = allAccounts.find((a: BaseAccount) => {
+      const isBothSideEVM =
+        chain.ecosystem === Ecosystem.EVM && a.ecosystem === Ecosystem.EVM;
       return (
         a.hdWalletId === hdWalletId &&
-        chain.id === a.chainCustomId &&
+        /** account that matched to the provider,
+         * or they are both EVM eco, so stick with ETH mainnet account */
+        (chain.id === a.chainCustomId || isBothSideEVM) &&
         (accountCreateType === AccountCreateType.MNEMONIC
           ? a.hdPathIndex === hdPathIndex
           : true)
