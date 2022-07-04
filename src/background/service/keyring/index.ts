@@ -1017,47 +1017,102 @@ class KeyringService extends EventEmitter {
   changeAccountByWallet(
     destHdWalletId: string,
     destEcosystem: Ecosystem,
-    accountCreateType: AccountCreateType
+    destAccountCreateType: AccountCreateType
   ) {
+    let srcAccountCreateType: AccountCreateType, srcEcosystem: Ecosystem;
     const { id, ecosystem } = networkPreferenceService.getProviderConfig();
     const currentAccount = preference.getCurrentAccount();
 
-    if (
-      accountCreateType === AccountCreateType.MNEMONIC ||
-      (accountCreateType === AccountCreateType.PRIVATE_KEY &&
-        ecosystem === destEcosystem)
-    ) {
-      const account = this.accounts.find((a: BaseAccount) => {
-        return (
-          a.hdWalletId === destHdWalletId &&
-          a.chainCustomId === id &&
-          (accountCreateType === AccountCreateType.MNEMONIC
-            ? a.hdPathIndex === currentAccount?.hdPathIndex
-            : true)
-        );
-      });
-      if (!account) throw Error('no account found');
-      preferenceService.setCurrentAccount(account);
-    } else {
-      const ethChainCustomId: PresetNetworkId | string =
-          PresetNetworkId.ETHEREUM,
-        cosmosChainId: PresetNetworkId | string = PresetNetworkId.COSMOS_HUB;
-      let destChainCustomId;
-      if (destEcosystem === Ecosystem.COSMOS) {
-        destChainCustomId = cosmosChainId;
-      } else if (destEcosystem === Ecosystem.EVM) {
-        destChainCustomId = ethChainCustomId;
+    const ethChainCustomId: PresetNetworkId | string = PresetNetworkId.ETHEREUM,
+      cosmosChainId: PresetNetworkId | string = PresetNetworkId.COSMOS_HUB;
+    let destChainCustomId;
+    if (destEcosystem === Ecosystem.COSMOS) {
+      destChainCustomId = cosmosChainId;
+    } else if (destEcosystem === Ecosystem.EVM) {
+      destChainCustomId = ethChainCustomId;
+    }
+
+    if (!currentAccount) throw Error('no current account found');
+    srcEcosystem = ecosystem;
+    srcAccountCreateType = currentAccount?.accountCreateType;
+
+    if (srcAccountCreateType === AccountCreateType.MNEMONIC) {
+      if (destAccountCreateType === AccountCreateType.MNEMONIC) {
+        const account = this.accounts.find((a: BaseAccount) => {
+          return (
+            a.hdWalletId === destHdWalletId &&
+            a.hdPathIndex === currentAccount?.hdPathIndex &&
+            ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
+              srcEcosystem === Ecosystem.EVM)
+          );
+        });
+        if (!account) throw Error('no account found');
+        preferenceService.setCurrentAccount(account);
+      } else {
+        if (srcEcosystem === destEcosystem) {
+          const account = this.accounts.find((a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
+                srcEcosystem === Ecosystem.EVM)
+            );
+          });
+          if (!account) throw Error('no account found');
+          preferenceService.setCurrentAccount(account);
+        } else {
+          const account = this.accounts.find((a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              a.chainCustomId === destChainCustomId
+            );
+          });
+          if (!account) throw Error('no account found');
+          preferenceService.setCurrentAccount(account);
+          const provider =
+            networkPreferenceService.getProvider(destChainCustomId);
+          if (provider)
+            networkPreferenceService.setProviderConfig(provider, false);
+        }
       }
-      const account = this.accounts.find((a: BaseAccount) => {
-        return (
-          a.hdWalletId === destHdWalletId &&
-          a.chainCustomId === destChainCustomId
+    } else if (srcAccountCreateType === AccountCreateType.PRIVATE_KEY) {
+      if (destAccountCreateType === AccountCreateType.MNEMONIC) {
+        const accounts: BaseAccount[] = this.accounts.filter(
+          (a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
+                srcEcosystem === Ecosystem.EVM)
+            );
+          }
         );
-      });
-      if (!account) throw Error('no account found');
-      preferenceService.setCurrentAccount(account);
-      const provider = networkPreferenceService.getProvider(destChainCustomId);
-      if (provider) networkPreferenceService.setProviderConfig(provider, false);
+        if (!accounts?.length) throw Error('no account found');
+        preferenceService.setCurrentAccount(accounts[0]);
+      } else {
+        if (srcEcosystem === destEcosystem) {
+          const account = this.accounts.find((a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
+                srcEcosystem === Ecosystem.EVM)
+            );
+          });
+          if (!account) throw Error('no account found');
+          preferenceService.setCurrentAccount(account);
+        } else {
+          const account = this.accounts.find((a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              a.chainCustomId === destChainCustomId
+            );
+          });
+          if (!account) throw Error('no account found');
+          preferenceService.setCurrentAccount(account);
+          const provider =
+            networkPreferenceService.getProvider(destChainCustomId);
+          if (provider)
+            networkPreferenceService.setProviderConfig(provider, false);
+        }
+      }
     }
   }
 

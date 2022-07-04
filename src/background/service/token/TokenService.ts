@@ -69,7 +69,7 @@ class TokenService {
     this.store.updateState({
       balances,
     });
-    console.debug(`keepIconInBalancesUpdated: updated`);
+    console.debug('keepIconInBalancesUpdated: updated');
   }
 
   async init(): Promise<TokenService> {
