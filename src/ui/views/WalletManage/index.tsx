@@ -146,21 +146,7 @@ const WalletManage: React.FC = () => {
       )
       .then(() => history.goBack())
       .catch(async (e: BitError) => {
-        //There is no account on this chain, which must unlock the keyring, and create a new account;
-        if (e?.code === ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
-          setCurrentHdWalletId(w.hdWalletId);
-          if (!(await wallet.isUnlocked())) {
-            setUnlockType('add');
-            setUnlockPopupVisible(true);
-          } else {
-            await wallet
-              .addCurrentChainAccountByWalletId(currentHdWalletId)
-              .then(() => history.goBack())
-              .catch((e) => {
-                console.error(e);
-              });
-          }
-        }
+        console.error(e);
       });
   };
 
