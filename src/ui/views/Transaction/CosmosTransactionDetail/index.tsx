@@ -150,7 +150,16 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
             />
             <TransactionItemDetail name="Memo" value={transaction.memo} />
             {ibcChannel && (
-              <TransactionItemDetail name="IBC Channel" value={ibcChannel} />
+              <TransactionItemDetail
+                name="IBC Channel"
+                value={ibcChannel.channelId}
+              />
+            )}
+            {ibcChannel && (
+              <TransactionItemDetail
+                name="IBC Port"
+                value={ibcChannel.portId}
+              />
             )}
           </div>
         </div>

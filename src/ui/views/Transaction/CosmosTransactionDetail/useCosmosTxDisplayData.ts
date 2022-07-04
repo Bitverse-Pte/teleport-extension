@@ -38,8 +38,7 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     transaction?.fee?.amount ? transaction?.fee.amount[0] : undefined
   );
 
-  const ibcChannel: string | undefined =
-    token?.trace?.trace[0].channelId || undefined;
+  const ibcChannel = token?.trace?.trace[0] || undefined;
 
   return {
     title: TransactionGroupCategories.SEND,
