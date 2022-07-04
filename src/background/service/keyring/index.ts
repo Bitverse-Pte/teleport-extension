@@ -1019,7 +1019,6 @@ class KeyringService extends EventEmitter {
     destEcosystem: Ecosystem,
     destAccountCreateType: AccountCreateType
   ) {
-    let srcAccountCreateType: AccountCreateType, srcEcosystem: Ecosystem;
     const { id, ecosystem } = networkPreferenceService.getProviderConfig();
     const currentAccount = preference.getCurrentAccount();
 
@@ -1033,8 +1032,8 @@ class KeyringService extends EventEmitter {
     }
 
     if (!currentAccount) throw Error('no current account found');
-    srcEcosystem = ecosystem;
-    srcAccountCreateType = currentAccount?.accountCreateType;
+    const srcEcosystem = ecosystem;
+    const srcAccountCreateType = currentAccount?.accountCreateType;
 
     if (srcAccountCreateType === AccountCreateType.MNEMONIC) {
       if (destAccountCreateType === AccountCreateType.MNEMONIC) {
