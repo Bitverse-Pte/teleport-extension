@@ -5,12 +5,14 @@ import { useSelector } from 'react-redux';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
 import { getTokenBalancesOfCurrentAccount } from 'ui/selectors/token.selector';
 import { formatDateWithWeekContext } from 'ui/utils/utils';
+import { useCosmosActivityValue } from './useCosmosActivityValue';
 import { useCosmosValueFormatter } from './useCosmosValueFormatter';
 
 export function useCosmosTxDisplayData(transaction?: CosmosTx) {
   const senderAddress = transaction?.account.address;
-  const recipientAddress = transaction?.aminoMsgs
-    ? transaction?.aminoMsgs[0].value.to_address
+  const transactionValue = useCosmosActivityValue(transaction);
+  const recipientAddress = transactionValue
+    ? transactionValue.recipient
     : undefined;
   const date = transaction
     ? formatDateWithWeekContext(transaction?.timestamp)
@@ -20,17 +22,13 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
 
   const balances = useSelector(getTokenBalancesOfCurrentAccount);
   /**
-   * IBC token transferred internally supported
-   * @TODO it's there any more types of token to be supported?
+   * IBC token / CW20 transfer are supported
    */
   const token = balances.find(
     ({ denom }) => denom === transaction?.currency?.coinMinimalDenom
   );
   console.debug('matched token: ', token);
 
-  const transactionValue = transaction?.aminoMsgs
-    ? transaction?.aminoMsgs[0].value.amount[0]
-    : undefined;
   const primaryCurrency: { amount: string; denom: string } | undefined =
     useCosmosValueFormatter(transactionValue);
 
