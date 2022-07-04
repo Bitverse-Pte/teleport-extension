@@ -1043,7 +1043,7 @@ class KeyringService extends EventEmitter {
             a.hdWalletId === destHdWalletId &&
             a.hdPathIndex === currentAccount?.hdPathIndex &&
             ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
-              srcEcosystem === Ecosystem.EVM)
+              (srcEcosystem === Ecosystem.EVM && a.ecosystem === Ecosystem.EVM))
           );
         });
         if (!account) throw Error('no account found');

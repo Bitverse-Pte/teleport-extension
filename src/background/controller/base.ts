@@ -16,7 +16,8 @@ class BaseController {
       preferenceService.setCurrentAccount(account);
     } else if (accounts.length && account) {
       account = accounts.find(
-        (a: BaseAccount) => a.address === account!.address
+        (a: BaseAccount) =>
+          a.hdWalletId === account!.hdWalletId && a.address === account!.address
       );
     } else if (!accounts.length) {
       account = null;
