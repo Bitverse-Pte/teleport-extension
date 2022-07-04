@@ -13,6 +13,7 @@ import { CosmosAccountImpl } from './cosmos';
 import { nanoid as createId } from 'nanoid';
 import { CosChainInfo } from './types';
 import { keyringService, networkPreferenceService } from 'background/service';
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 export interface CosmwasmAccount {
   cosmwasm: CosmwasmAccountImpl;
 }
@@ -140,6 +141,16 @@ export class CosmwasmAccountImpl {
       coinType,
     } as CosChainInfo;
     const txId = createId();
+
+    this.base.addTransactionToList({
+      id: txId,
+      status: CosmosTxStatus.CREATED,
+      chainInfo: cosChainInfo,
+      timestamp: new Date().getTime(),
+      memo,
+      fee: stdFee,
+      currency,
+    });
 
     switch (denomHelper.type) {
       case 'cw20': {
