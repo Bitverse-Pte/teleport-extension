@@ -1037,14 +1037,15 @@ class KeyringService extends EventEmitter {
 
     if (srcAccountCreateType === AccountCreateType.MNEMONIC) {
       if (destAccountCreateType === AccountCreateType.MNEMONIC) {
-        const account = this.accounts.find((a: BaseAccount) => {
+        const accounts = this.accounts.filter((a: BaseAccount) => {
           return (
             a.hdWalletId === destHdWalletId &&
-            a.hdPathIndex === currentAccount?.hdPathIndex &&
             ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
               (srcEcosystem === Ecosystem.EVM && a.ecosystem === Ecosystem.EVM))
           );
         });
+        let account = accounts.find((a: BaseAccount)=> a.hdPathIndex === currentAccount?.hdPathIndex);
+        if(!account) account = accounts[0];
         if (!account) throw Error('no account found');
         preferenceService.setCurrentAccount(account);
       } else {
