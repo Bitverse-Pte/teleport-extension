@@ -242,12 +242,20 @@ const Send = () => {
   );
 
   const assetsOptions = tokens.map((t: Token) => {
+    let ibcChainInfoStr = '';
+    if (t.chainName && (t.trace?.trace as any).length > 0) {
+      const trace = (t as any).trace.trace[(t as any).trace.trace.length - 1];
+      if (trace) {
+        ibcChainInfoStr = `(${t.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`;
+      }
+    }
     return {
       label: (
         <div className="assets-option flexR">
           <div className="assets-option-left flexR">
             <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
+            {ibcChainInfoStr ? ibcChainInfoStr : null}
           </div>
           <span className="assets-option-right">
             {`${denom2SymbolRatio(t?.amount || 0, t?.decimal || 0)}  `}
@@ -259,6 +267,7 @@ const Send = () => {
           <div className="assets-option-left flexR">
             <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
+            {ibcChainInfoStr ? ibcChainInfoStr : null}
           </div>
         </div>
       ),
