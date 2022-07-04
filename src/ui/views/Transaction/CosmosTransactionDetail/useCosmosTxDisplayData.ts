@@ -37,6 +37,7 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
   );
 
   const ibcChannel = token?.trace?.trace[0] || undefined;
+  const ibcChainName = token?.chainName;
 
   return {
     title: TransactionGroupCategories.SEND,
@@ -55,5 +56,6 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     // isSubmitted,
     token,
     ibcChannel,
+    ibcChainName,
   };
 }

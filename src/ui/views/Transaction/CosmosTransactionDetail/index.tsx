@@ -60,6 +60,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     senderAddress,
     token,
     ibcChannel,
+    ibcChainName,
   } = useCosmosTxDisplayData(transaction);
   // transaction
   console.debug('primaryCurrency', primaryCurrency);
@@ -155,11 +156,8 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
                 value={ibcChannel.channelId}
               />
             )}
-            {ibcChannel && (
-              <TransactionItemDetail
-                name="IBC Port"
-                value={ibcChannel.portId}
-              />
+            {ibcChainName && (
+              <TransactionItemDetail name="IBC Chain" value={ibcChainName} />
             )}
           </div>
         </div>
