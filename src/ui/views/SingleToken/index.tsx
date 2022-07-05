@@ -168,7 +168,7 @@ const SingleToken = () => {
         <h2 className="title">{t('Activity')}</h2>
         <TransactionListRouter
           ecosystem={currentChain.ecosystem}
-          listContiannerHeight={223}
+          listContiannerHeight={200}
           tokenId={token?.tokenId}
         />
       </div>
