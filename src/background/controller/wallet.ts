@@ -592,6 +592,7 @@ export class WalletController extends BaseController {
     contactBookService.removeContact(address);
   };
   listContact = () => contactBookService.listContacts();
+  listContactsByChain = () => contactBookService.listContactsByChain();
   getContactByAddress = (address: string) =>
     contactBookService.getContactByAddress(address);
 
