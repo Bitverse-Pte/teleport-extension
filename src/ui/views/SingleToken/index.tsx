@@ -169,9 +169,7 @@ const SingleToken = () => {
         <TransactionListRouter
           ecosystem={currentChain.ecosystem}
           listContiannerHeight={223}
-          tokenAddress={token?.contractAddress}
-          // hideTokenTransactions is true = show native token transfer
-          hideTokenTransactions={token?.isNative}
+          tokenId={token?.tokenId}
         />
       </div>
     </div>
