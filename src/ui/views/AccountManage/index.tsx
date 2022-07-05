@@ -24,6 +24,7 @@ import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
+import { useHistory } from 'react-router-dom';
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -37,6 +38,7 @@ const AccountManage: React.FC = () => {
   const accountManageWidgetRef = useRef();
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
+  const history = useHistory();
 
   const { state, pathname } = useLocation<{
     hdWalletId: string;
@@ -65,12 +67,13 @@ const AccountManage: React.FC = () => {
     wallet.addNewDisplayAccountByExistKeyring,
     {
       onSuccess: () => {
-        setAddPopupVisible(false);
-        queryAccounts();
-        (accountManageWidgetRef.current as any).queryAccounts();
+        //setAddPopupVisible(false);
+        //queryAccounts();
+        //(accountManageWidgetRef.current as any).queryAccounts();
         sensors.track('teleport_account_manage_add_confirm', {
           page: pathname,
         });
+        history.go(-1);
       },
       onError: (e) => {
         console.error(e.code);
