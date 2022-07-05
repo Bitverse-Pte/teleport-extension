@@ -193,15 +193,18 @@ export const DefaultGasPriceStep: {
 class FeeConfig {
   toStdFee(feeType: FeeType, sendCurrency: Currency, customGas?: number) {
     const amount = this.getFeeTypePrimitive(feeType, sendCurrency, customGas);
+    const gas = customGas
+      ? customGas.toString()
+      : this.gas(sendCurrency).toString();
     if (!amount) {
       return {
-        gas: this.gas(sendCurrency).toString(),
+        gas,
         amount: [],
       };
     }
 
     return {
-      gas: this.gas(sendCurrency).toString(),
+      gas,
       amount: [amount],
     };
   }
