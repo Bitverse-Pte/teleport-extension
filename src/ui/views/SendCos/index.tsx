@@ -157,7 +157,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const list = await wallet.listContact();
+    const list = await wallet.listContactsByChain();
     const recentAddress = list.map((item) => {
       return item.address;
     });
@@ -181,6 +181,7 @@ const Send = () => {
       setUnlockPopupVisible(true);
       return;
     }
+    await wallet.addContactByDefaultName(toAddress);
     history.push({
       pathname: '/confirm-send-cos',
       state: { amount, recipient: toAddress, memo, token: selectedToken },

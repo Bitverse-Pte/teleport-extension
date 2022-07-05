@@ -69,6 +69,16 @@ const valueToDisplay = (tx) => {
   return tx.value;
 };
 
+const defaultStdFee = {
+  amount: [
+    {
+      denom: 'uatom',
+      amount: '2500',
+    },
+  ],
+  gas: '200000',
+};
+
 const ConfirmTx = () => {
   const history = useHistory();
   // amount, recipient: toAddress, memo
@@ -106,15 +116,7 @@ const ConfirmTx = () => {
   const [prices, setPrices] = useState();
   const [visible, setVisible] = useState(false);
   const [sendMsg, setSendMsg] = useState({ from_address: '', to_address: '' });
-  const [stdFee, setStdFee] = useState({
-    amount: [
-      {
-        denom: 'uatom',
-        amount: '2500',
-      },
-    ],
-    gas: '200000',
-  });
+  const [stdFee, setStdFee] = useState(defaultStdFee);
 
   const handleAllow = async () => {
     const signOptions = {
@@ -175,7 +177,16 @@ const ConfirmTx = () => {
   const fetchStdFee = async () => {
     dispatch(showLoadingIndicator());
     const feeType = fixedFeeType(gasState.gasType);
-    const _stdFee = await wallet.getCosmosStdFee(feeType, currency);
+    let _stdFee = defaultStdFee;
+    if (gasState.customType) {
+      _stdFee = await wallet.getCosmosStdFee(
+        feeType,
+        currency,
+        Number(gasState.cosmosCustomsGas)
+      );
+    } else {
+      _stdFee = await wallet.getCosmosStdFee(feeType, currency);
+    }
     setStdFee(_stdFee);
     dispatch(hideLoadingIndicator());
   };
