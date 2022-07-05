@@ -32,6 +32,8 @@ import CancelSpeedupPopover from '../CancelAndSpeedUp/CancelAndSpeedUp.popover';
 import { EDIT_GAS_MODES } from 'constants/gas';
 import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
 import { ActivitiesListParams, TransactionItemParams } from '../typing';
+import { getTokenBalancesOfCurrentAccount } from 'ui/selectors/token.selector';
+import { Token } from 'types/token';
 
 dayjs.extend(relativeTime);
 
@@ -258,8 +260,7 @@ function EvmTransactionItem({
 
 export function EvmTransactionsList({
   listContiannerHeight = '100%',
-  tokenAddress,
-  hideTokenTransactions,
+  tokenId,
   ...otherFilter
 }: ActivitiesListParams) {
   // const _transactions = useSelector(state => state.transactions)
@@ -275,36 +276,27 @@ export function EvmTransactionsList({
   //     unfilteredPendingTransactions.concat(unfilteredCompletedTransactions),
   // [unfilteredPendingTransactions, unfilteredCompletedTransactions])
   const chainId = useSelector(getCurrentChainId);
-
+  const balances = useSelector(getTokenBalancesOfCurrentAccount);
+  const matchedToken = balances.find((t) => t.tokenId === tokenId);
   const pendingTransactions = useMemo(
     () =>
       getFilteredTransactionGroups(
         unfilteredPendingTransactions,
-        hideTokenTransactions,
-        tokenAddress,
+        matchedToken?.isNative,
+        matchedToken?.contractAddress,
         chainId
       ),
-    [
-      hideTokenTransactions,
-      tokenAddress,
-      unfilteredPendingTransactions,
-      chainId,
-    ]
+    [matchedToken, unfilteredPendingTransactions, chainId]
   );
   const completedTransactions = useMemo(
     () =>
       getFilteredTransactionGroups(
         unfilteredCompletedTransactions,
-        hideTokenTransactions,
-        tokenAddress,
+        matchedToken?.isNative,
+        matchedToken?.contractAddress,
         chainId
       ),
-    [
-      hideTokenTransactions,
-      tokenAddress,
-      unfilteredCompletedTransactions,
-      chainId,
-    ]
+    [matchedToken, unfilteredCompletedTransactions, chainId]
   );
   const rawTransactionsGroup = useMemo(
     () => pendingTransactions.concat(completedTransactions),
