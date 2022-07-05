@@ -16,6 +16,7 @@ import type { CosmosTx } from 'background/service/transactions/cosmos/cosmos';
 import { useParams } from 'react-router-dom';
 import { getCosmosTransactionById } from 'ui/selectors/cosmos-transaction.selector';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
+import CopyOrOpenInScan from 'ui/components/universal/copyOrOpenInScan';
 const { sensors } = skynet;
 
 export default function ActivityDetail() {
@@ -92,6 +93,10 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     return { amount, unit };
   }, [primaryCurrency]);
 
+  const handleExplorerClick = (type: string, hash: string) => {
+    window.open(`${rpcPrefs.blockExplorerUrl}/${type}/${hash}`);
+  };
+
   const matchedNativeToken = useSelector(getCurrentProviderNativeToken);
 
   return (
@@ -124,12 +129,12 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
                   <Tooltip placement="topRight" title={transaction.tx_hash}>
                     {shortenedStr(transaction.tx_hash, 4)}
                   </Tooltip>
-                  {/* <CopyOrOpenInScan
+                  <CopyOrOpenInScan
                     handleExplorerClick={() =>
-                      handleExplorerClick('tx', primaryTransaction.hash!)
+                      handleExplorerClick('txs', transaction.tx_hash!)
                     }
-                    textToBeCopy={primaryTransaction.hash}
-                  /> */}
+                    textToBeCopy={transaction.tx_hash}
+                  />
                 </div>
               </div>
             )}
