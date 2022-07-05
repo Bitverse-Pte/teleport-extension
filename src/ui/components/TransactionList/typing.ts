@@ -3,8 +3,7 @@ import { TransactionGroup } from 'constants/transaction';
 
 export interface ActivitiesListParams {
   listContiannerHeight: string | number;
-  hideTokenTransactions?: boolean;
-  tokenAddress?: string;
+  tokenId?: string;
   dateFilter?: {
     from: Date;
     to: Date;
