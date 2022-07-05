@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { Tooltip } from 'antd';
 import skynet from 'utils/skynet';
 import { useTranslation } from 'react-i18next';
+import { Ecosystem } from 'types/network';
 const { sensors } = skynet;
 interface AddressCardParameters extends HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -27,10 +28,11 @@ export function AddressCard({
 }: AddressCardParameters) {
   const { t } = useTranslation();
   const {
-    provider: { rpcPrefs },
+    provider: { rpcPrefs, ecosystem },
   } = useSelector((state) => state.network);
+  const whichAddress = ecosystem === Ecosystem.COSMOS ? 'account' : 'address';
   const handleExplorerClick = useCallback(
-    (type: 'address' | 'tx', hash: string) => {
+    (type: 'address' | 'account', hash: string) => {
       sensors.track('teleport_activity_open_' + type, {
         page: location.pathname,
       });
@@ -48,7 +50,7 @@ export function AddressCard({
       {address && (
         <CopyOrOpenInScan
           handleExplorerClick={() => {
-            handleExplorerClick('address', address);
+            handleExplorerClick(whichAddress, address);
           }}
           textToBeCopy={address}
           className="ml-auto"
