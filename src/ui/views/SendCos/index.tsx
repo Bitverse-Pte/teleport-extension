@@ -230,6 +230,7 @@ const Send = () => {
     return (
       !isValidAddress(toAddress) ||
       !amount ||
+      Number(amount) <= 0 ||
       !selectedToken ||
       (selectedToken.amount &&
         new BigNumber(
