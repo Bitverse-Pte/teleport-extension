@@ -1044,8 +1044,10 @@ class KeyringService extends EventEmitter {
               (srcEcosystem === Ecosystem.EVM && a.ecosystem === Ecosystem.EVM))
           );
         });
-        let account = accounts.find((a: BaseAccount)=> a.hdPathIndex === currentAccount?.hdPathIndex);
-        if(!account) account = accounts[0];
+        let account = accounts.find(
+          (a: BaseAccount) => a.hdPathIndex === currentAccount?.hdPathIndex
+        );
+        if (!account) account = accounts[0];
         if (!account) throw Error('no account found');
         preferenceService.setCurrentAccount(account);
       } else {
