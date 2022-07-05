@@ -10,6 +10,7 @@ export const SET_CUSTOM_GAS_PRICE = 'gas/SET_CUSTOM_GAS_PRICE';
 export const SET_GAS_TYPE = 'gas/SET_GAS_TYPE';
 export const RESET_GAS_TYPE = 'gas/SET_GAS_TYPE';
 export const SET_CUSTOM_TYPE = 'gas/SET_CUSTOM_TYPE';
+export const SET_COSMOS_CUSTOM_GAS = 'gas/SET_COSMOS_CUSTOM_GAS';
 export const SET_LEGACY_GAS = 'gas/SET_LEGACY_GAS';
 
 const initState = {
@@ -24,6 +25,7 @@ const initState = {
     gasPrice: 0,
     gasLimit: 21000,
   },
+  cosmosCustomsGas: 0,
 };
 
 // Reducer
@@ -49,6 +51,11 @@ export default function reducer(state = initState, action) {
       return {
         ...state,
         customType: action.value,
+      };
+    case SET_COSMOS_CUSTOM_GAS:
+      return {
+        ...state,
+        cosmosCustomsGas: action.value,
       };
     case SET_CUSTOM_DATA:
       return {
