@@ -31,6 +31,7 @@ import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
 import ArrowRight from '../../../assets/arrowRight.svg';
+import Guide from '../../../assets/guide.png';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
@@ -66,6 +67,7 @@ const Home = () => {
   const [prices, setPrices] = useState();
   const currentChain: Provider = useSelector(getProvider);
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+  const [guideVisible, setGuideVisisble] = useState(false);
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -84,6 +86,13 @@ const Home = () => {
     setBalanceQueryInterval();
     return () => clearInterval(intervalRef.current);
   }, [currentChain]);
+
+  useEffect(() => {
+    const read = localStorage.getItem('guide_read');
+    if (!read || read === 'false') {
+      setGuideVisisble(true);
+    }
+  });
 
   const queryTokenPrices = async () => {
     const prices = await wallet.queryTokenPrices().catch((e) => {
@@ -281,9 +290,26 @@ const Home = () => {
     });
   }, [tokenList]);
 
+  const handleGuideReadClick = () => {
+    setGuideVisisble(false);
+    localStorage.setItem('guide_read', 'true');
+  };
+
   return (
     <div className="home flexCol">
       <Spin spinning={createAccountLoading}>
+        <div
+          className="guide_container"
+          style={guideVisible ? {} : { display: 'none' }}
+        >
+          <img src={Guide} className="home-guide" />
+          <span
+            className="home-guide-close cursor"
+            onClick={handleGuideReadClick}
+          >
+            Understand
+          </span>
+        </div>
         <HomeHeader
           menuOnClick={() => {
             sensors.track('teleport_home_menus', { page: location.pathname });
