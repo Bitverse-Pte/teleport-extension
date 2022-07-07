@@ -181,6 +181,7 @@ export interface CosmosTx {
   mode?: string;
   currency?: AppCurrency;
   tx_hash?: string;
+  error?: any;
 }
 interface TransactionState {
   transactions: Record<string, CosmosTx>;
@@ -772,6 +773,8 @@ export class CosmosAccountImpl {
           mode: mode,
         };
 
+    const currentCosmosTx: CosmosTx = this.getTransaction(txId);
+
     try {
       const fetchUrl = isProtoTx
         ? `${chainInfo.rest}/cosmos/tx/v1beta1/txs`
@@ -793,7 +796,14 @@ export class CosmosAccountImpl {
       const txResponse = isProtoTx ? result['tx_response'] : result;
 
       if (txResponse.code != null && txResponse.code !== 0) {
-        throw new Error(txResponse['raw_log']);
+        // throw new Error(txResponse['raw_log']);
+        this.addTransactionToList({
+          ...currentCosmosTx,
+          status: CosmosTxStatus.FAILED,
+          error: txResponse,
+        });
+        platform._showNotification('Tx Failed', txResponse);
+        return txResponse;
       }
 
       const txHash = Buffer.from(txResponse.txhash, 'hex');
@@ -810,8 +820,6 @@ export class CosmosAccountImpl {
         }
         txTracer.close();
       });
-
-      const currentCosmosTx: CosmosTx = this.getTransaction(txId);
       console.log('--currentCosmosTx2222--', currentCosmosTx);
       this.addTransactionToList({
         ...currentCosmosTx,
@@ -822,6 +830,12 @@ export class CosmosAccountImpl {
       return txHash;
     } catch (e) {
       console.log(e);
+      // throw new Error(txResponse['raw_log']);
+      this.addTransactionToList({
+        ...currentCosmosTx,
+        status: CosmosTxStatus.FAILED,
+        error: e,
+      });
       platform._showNotification('Tx Failed', e);
       // platform.showTransactionNotification(e, {});
       throw e;

@@ -145,7 +145,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const list = await wallet.listContact();
+    const list = await wallet.listContactsByChain();
     const recentAddress = list.map((item) => {
       return item.address;
     });

@@ -191,17 +191,20 @@ export const DefaultGasPriceStep: {
 };
 
 class FeeConfig {
-  toStdFee(feeType: FeeType, sendCurrency: Currency) {
-    const amount = this.getFeeTypePrimitive(feeType, sendCurrency);
+  toStdFee(feeType: FeeType, sendCurrency: Currency, customGas?: number) {
+    const amount = this.getFeeTypePrimitive(feeType, sendCurrency, customGas);
+    const gas = customGas
+      ? customGas.toString()
+      : this.gas(sendCurrency).toString();
     if (!amount) {
       return {
-        gas: this.gas(sendCurrency).toString(),
+        gas,
         amount: [],
       };
     }
 
     return {
-      gas: this.gas(sendCurrency).toString(),
+      gas,
       amount: [amount],
     };
   }
@@ -218,13 +221,18 @@ class FeeConfig {
       : DefaultGasPriceStep;
   }
 
-  getFeeTypePrimitive(feeType: FeeType, sendCurrency: Currency) {
+  getFeeTypePrimitive(
+    feeType: FeeType,
+    sendCurrency: Currency,
+    customGas?: number
+  ) {
     if (!this.feeCurrency) {
       throw new Error('Fee currency not set');
     }
 
     const gasPrice = new Dec(this.gasPriceStep[feeType].toString());
-    const feeAmount = gasPrice.mul(new Dec(this.gas(sendCurrency)));
+    const gas = customGas ? customGas : this.gas(sendCurrency);
+    const feeAmount = gasPrice.mul(new Dec(gas));
 
     return {
       denom: this.feeCurrency.coinMinimalDenom,
@@ -232,13 +240,22 @@ class FeeConfig {
     };
   }
 
-  getFeeTypePretty(feeType: FeeType, sendCurrency: Currency) {
+  getFeeTypePretty(
+    feeType: FeeType,
+    sendCurrency: Currency,
+    customGas?: number
+  ) {
     if (!this.feeCurrency) {
       throw new Error('Fee currency not set');
     }
 
-    const feeTypePrimitive = this.getFeeTypePrimitive(feeType, sendCurrency);
+    const feeTypePrimitive = this.getFeeTypePrimitive(
+      feeType,
+      sendCurrency,
+      customGas
+    );
     const feeCurrency = this.feeCurrency;
+    console.log('feeTypePrimitive:', feeTypePrimitive, feeCurrency);
 
     return new CoinPretty(feeCurrency, new Int(feeTypePrimitive.amount))
       .maxDecimals(feeCurrency.coinDecimals)

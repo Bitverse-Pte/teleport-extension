@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { SET_GAS_TYPE, SET_CUSTOM_TYPE } from 'ui/reducer/gas.reducer';
+import {
+  SET_GAS_TYPE,
+  SET_CUSTOM_TYPE,
+  SET_COSMOS_CUSTOM_GAS,
+} from 'ui/reducer/gas.reducer';
 import { Button, Drawer, Collapse, Form } from 'antd';
 import { Token } from 'types/token';
 // import FeeItem from './feeItem';
@@ -78,31 +82,43 @@ function FeeSelector(props) {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [prices, setPrices] = useState();
   const [customVisible, setCustomVisible] = useState(false);
+  const [customGas, setCustomGas] = useState('0');
   // const [baseFee, setBaseFee] = useState(0);
   const [feeList, setFeeList] = useState<Fee[]>([]);
   const onSelect = (type) => {
     dispatch({ type: SET_CUSTOM_TYPE, value: true });
     setSelectFee(type);
   };
+  const fetchStdFee = async () => {
+    const stdFee = await wallet.getCosmosStdFee('low', currency);
+    setCustomGas(stdFee.gas);
+  };
+  useEffect(() => {
+    fetchStdFee();
+  }, []);
   const fetchGasFeeEstimates = async () => {
-    const lowFee = await wallet.getCosmosFeeTypePretty('low', currency);
-    const averageFee = await wallet.getCosmosFeeTypePretty('average', currency);
-    const highFee = await wallet.getCosmosFeeTypePretty('high', currency);
+    const cGas = Number(customGas);
+    let lowFee = '0';
+    let aveFee = '0';
+    let highFee = '0';
+    if (cGas > 0) {
+      lowFee = await wallet.getCosmosFeeTypePretty('low', currency, cGas);
+      aveFee = await wallet.getCosmosFeeTypePretty('average', currency, cGas);
+      highFee = await wallet.getCosmosFeeTypePretty('high', currency, cGas);
+    } else {
+      lowFee = await wallet.getCosmosFeeTypePretty('low', currency);
+      aveFee = await wallet.getCosmosFeeTypePretty('average', currency);
+      highFee = await wallet.getCosmosFeeTypePretty('high', currency);
+    }
     setFeeList([
-      {
-        type: 'high',
-        gas: highFee,
-      },
-      {
-        type: 'medium',
-        gas: averageFee,
-      },
-      {
-        type: 'low',
-        gas: lowFee,
-      },
+      { type: 'high', gas: highFee },
+      { type: 'medium', gas: aveFee },
+      { type: 'low', gas: lowFee },
     ]);
   };
+  useEffect(() => {
+    fetchGasFeeEstimates();
+  }, [customGas]);
   const fetchNativePrice = async () => {
     const tokens = await wallet.getTokenBalancesAsync();
     const prices = await wallet.queryTokenPrices();
@@ -123,56 +139,33 @@ function FeeSelector(props) {
   //   maxFee = Number(maxFee);
   //   return Math.min(maxPriorityFee + baseFee, maxFee);
   // };
-  const onSaveCustom = () => {
-    setCustomVisible(false);
-    setSelectFee('custom');
+  const onSaveCustom = (e) => {
+    const value = e.target.value;
+    setCustomGas(value);
     sensors.track('teleport_gas_edit_save_custom', { page: location.pathname });
   };
-  const setGasType = () => {
+  const onConfirm = () => {
+    const cGas = Number(customGas);
+    if (cGas > 0) {
+      dispatch({ type: SET_CUSTOM_TYPE, value: true });
+      dispatch({ type: SET_COSMOS_CUSTOM_GAS, value: cGas });
+    } else {
+      dispatch({ type: SET_CUSTOM_TYPE, value: false });
+    }
     dispatch({ type: SET_GAS_TYPE, value: selectFee });
     setCustomVisible(false);
     onClose();
     sensors.track('teleport_gas_edit_confirmed', { page: location.pathname });
   };
   useEffect(() => {
-    fetchGasFeeEstimates();
     fetchNativePrice();
   }, []);
   // useEffect(() => {
   //   if (gasState.customType) {
-  //     const {
-  //       customData: {
-  //         gasLimit,
-  //         suggestedMaxPriorityFeePerGas: maxPriorityFee,
-  //         suggestedMaxFeePerGas: maxFee,
-  //       },
-  //     } = gasState;
-  //     const gasPrice = getCustomGasPrice(maxPriorityFee, maxFee);
-  //     let customItem: any = null;
-  //     for (const item of feeList) {
-  //       if (item.type === 'custom') {
-  //         customItem = item;
-  //       }
-  //     }
-  //     if (customItem === null) {
-  //       setFeeList([
-  //         ...feeList.filter((f) => f.type !== 'custom'),
-  //         {
-  //           type: 'custom',
-  //           time: 30,
-  //           gasPrice,
-  //           gasLimit: Number(gasLimit),
-  //           suggestedMaxPriorityFeePerGas: maxPriorityFee,
-  //           suggestedMaxFeePerGas: maxFee,
-  //         },
-  //       ]);
   //     } else {
-  //       customItem.gasPrice = gasPrice;
-  //       customItem.gasLimit = Number(gasLimit);
-  //       setFeeList(feeList);
   //     }
   //   }
-  // }, [gasState.customData]);
+  // }, [gasState.cosmosCustomGas]);
   return (
     <Drawer
       placement="bottom"
@@ -243,7 +236,13 @@ function FeeSelector(props) {
                       className="gas-form"
                     >
                       <div className="numeric-input">
-                        <input type="number"></input>
+                        <input
+                          type="number"
+                          defaultValue={customGas}
+                          onChange={(e) => {
+                            onSaveCustom(e);
+                          }}
+                        ></input>
                       </div>
                     </Form.Item>
                   </Form>
@@ -258,7 +257,7 @@ function FeeSelector(props) {
           type="primary"
           block
           className="gas-fee-btn"
-          onClick={setGasType}
+          onClick={onConfirm}
         >
           Confirm
         </Button>
