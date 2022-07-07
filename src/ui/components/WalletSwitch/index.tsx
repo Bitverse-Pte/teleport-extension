@@ -1,4 +1,4 @@
-import '../../views/walletManage/style.less';
+import '../../views/WalletManage/style.less';
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useAsyncEffect, useWallet } from 'ui/utils';
