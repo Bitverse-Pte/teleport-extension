@@ -8,6 +8,8 @@ import { formatDateWithWeekContext } from 'ui/utils/utils';
 import { useCosmosActivityValue } from './useCosmosActivityValue';
 import { useCosmosValueFormatter } from './useCosmosValueFormatter';
 
+type CosmosTxType = 'sign' | 'send';
+
 export function useCosmosTxDisplayData(transaction?: CosmosTx) {
   const senderAddress = transaction?.account.address;
   const transactionValue = useCosmosActivityValue(transaction);
@@ -39,8 +41,16 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
   const ibcChannel = token?.trace?.trace[0] || undefined;
   const ibcChainName = token?.chainName;
 
+  /**
+   * @TODO
+   * These are props for Sign type
+   * furthermore need to play with albert for sign tx's data stroage and its type
+   */
+  const title: CosmosTxType = TransactionGroupCategories.SEND;
+  const fromDapp: string | undefined = undefined;
+
   return {
-    title: TransactionGroupCategories.SEND,
+    title: title as CosmosTxType,
     category: TransactionGroupCategories.SEND,
     date,
     primaryCurrency,
@@ -57,5 +67,7 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     token,
     ibcChannel,
     ibcChainName,
+
+    fromDapp,
   };
 }
