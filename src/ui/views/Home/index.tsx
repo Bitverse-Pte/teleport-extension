@@ -61,6 +61,7 @@ const Home = () => {
   const [walletManagePopupVisible, setWalletManagePopupVisible] =
     useState(false);
   const [createAccountLoading, setCreateAccountLoading] = useState(false);
+  const [tokenListLoading, setTokenListLoading] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
   const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
     useState(false);
@@ -75,7 +76,9 @@ const Home = () => {
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
       console.error(e);
+      setTokenListLoading(false);
     });
+    setTokenListLoading(false);
     if (balances && balances.length) setTokens(balances);
   };
 
@@ -120,7 +123,10 @@ const Home = () => {
   };
 
   useAsyncEffect(updateAccount, []);
-  useAsyncEffect(getTokenBalancesAsync, []);
+  useAsyncEffect(async () => {
+    setTokenListLoading(true);
+    getTokenBalancesAsync();
+  }, []);
   useAsyncEffect(getTokenBalancesSync, []);
   useAsyncEffect(queryTokenPrices, []);
 
@@ -180,6 +186,7 @@ const Home = () => {
     await wallet.changeAccount(account);
     setPopupVisible(false);
     updateAccount();
+    setTokenListLoading(true);
     getTokenBalancesAsync();
     getTokenBalancesSync();
     sensors.track('teleport_home_account_click', {
@@ -454,74 +461,79 @@ const Home = () => {
             </div>
           ) : null}
           {tabType === Tabs.FIRST && (
-            <div className="token-list flexCol">
-              {displayTokenList.length > 0 ? (
-                displayTokenList.map((t: Token, i) => {
-                  let ibcChainInfoStr = '';
-                  if (t.chainName && (t.trace?.trace as any).length > 0) {
-                    const trace = (t as any).trace.trace[
-                      (t as any).trace.trace.length - 1
-                    ];
-                    if (trace) {
-                      ibcChainInfoStr = `(${t.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`;
+            <Spin spinning={tokenListLoading}>
+              <div className="token-list flexCol">
+                {displayTokenList.length > 0 ? (
+                  displayTokenList.map((t: Token, i) => {
+                    let ibcChainInfoStr = '';
+                    if (t.chainName && (t.trace?.trace as any).length > 0) {
+                      const trace = (t as any).trace.trace[
+                        (t as any).trace.trace.length - 1
+                      ];
+                      if (trace) {
+                        ibcChainInfoStr = `(${t.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`;
+                      }
                     }
-                  }
-                  return (
-                    <div
-                      className="token-item flexR cursor"
-                      key={i}
-                      onClick={() => handleTokenClick(t)}
-                    >
-                      <div className="left flexR">
-                        <TokenIcon token={t} radius={32} />
-                        <div className="balance-container flexCol">
-                          <span
-                            className="balance ellipsis"
-                            title={denom2SymbolRatio(t.amount || 0, t.decimal)}
-                          >
-                            {addEllipsisToEachWordsInTheEnd(
-                              denom2SymbolRatio(t.amount || 0, t.decimal),
-                              16
-                            )}{' '}
-                            {t.symbol?.toUpperCase()}
-                            {ibcChainInfoStr ? ibcChainInfoStr : null}
-                          </span>
-                          <span className="estimate">
-                            ≈
-                            {getTotalPricesByAmountAndPrice(
-                              t?.amount || 0,
-                              t?.decimal || 0,
-                              t?.price || 0
-                            )}{' '}
-                            USD
-                          </span>
-                        </div>
-                      </div>
-                      <IconComponent name="chevron-right" cls="right-icon" />
-                    </div>
-                  );
-                })
-              ) : (
-                <NoContent
-                  title="Assets"
-                  ext={
-                    currentChain.ecosystem === Ecosystem.EVM ? (
-                      <CustomButton
-                        cls="add-assets-button"
-                        type="primary"
-                        style={{
-                          width: '200px',
-                          marginTop: '16px',
-                        }}
-                        onClick={handleAddTokenBtnClick}
+                    return (
+                      <div
+                        className="token-item flexR cursor"
+                        key={i}
+                        onClick={() => handleTokenClick(t)}
                       >
-                        + Add Assets
-                      </CustomButton>
-                    ) : null
-                  }
-                />
-              )}
-            </div>
+                        <div className="left flexR">
+                          <TokenIcon token={t} radius={32} />
+                          <div className="balance-container flexCol">
+                            <span
+                              className="balance ellipsis"
+                              title={denom2SymbolRatio(
+                                t.amount || 0,
+                                t.decimal
+                              )}
+                            >
+                              {addEllipsisToEachWordsInTheEnd(
+                                denom2SymbolRatio(t.amount || 0, t.decimal),
+                                16
+                              )}{' '}
+                              {t.symbol?.toUpperCase()}
+                              {ibcChainInfoStr ? ibcChainInfoStr : null}
+                            </span>
+                            <span className="estimate">
+                              ≈
+                              {getTotalPricesByAmountAndPrice(
+                                t?.amount || 0,
+                                t?.decimal || 0,
+                                t?.price || 0
+                              )}{' '}
+                              USD
+                            </span>
+                          </div>
+                        </div>
+                        <IconComponent name="chevron-right" cls="right-icon" />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <NoContent
+                    title="Assets"
+                    ext={
+                      currentChain.ecosystem === Ecosystem.EVM ? (
+                        <CustomButton
+                          cls="add-assets-button"
+                          type="primary"
+                          style={{
+                            width: '200px',
+                            marginTop: '16px',
+                          }}
+                          onClick={handleAddTokenBtnClick}
+                        >
+                          + Add Assets
+                        </CustomButton>
+                      ) : null
+                    }
+                  />
+                )}
+              </div>
+            </Spin>
           )}
           {tabType === Tabs.SECOND && (
             <div className="transaction-list">
