@@ -37,6 +37,7 @@ const { sensors } = skynet;
 
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
+import WalletSwitch from 'ui/components/WalletSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import ConnectedSites from '../ConnectedSites';
 import { Ecosystem, Provider, VmEnums } from 'types/network';
@@ -57,6 +58,8 @@ const Home = () => {
     useState<BaseAccount>();
   //const [accountList, setAccountList] = useState<DisplayWalletManage>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
+  const [walletManagePopupVisible, setWalletManagePopupVisible] =
+    useState(false);
   const [createAccountLoading, setCreateAccountLoading] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
   const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
@@ -184,6 +187,11 @@ const Home = () => {
     });
   };
 
+  const handleWalletClick = () => {
+    updateAccount();
+    setWalletManagePopupVisible(false);
+  };
+
   const handleSiteClick = async (account: BaseAccount) => {
     setAccount2ConnectedSite(account);
     setConnectedSitePopupVisible(true);
@@ -295,6 +303,10 @@ const Home = () => {
     localStorage.setItem('guide_read', 'true');
   };
 
+  const handleWalletNameClick = () => {
+    setWalletManagePopupVisible(true);
+  };
+
   return (
     <div className="home flexCol">
       <Spin spinning={createAccountLoading}>
@@ -324,7 +336,10 @@ const Home = () => {
         />
         <div className="home-bg"></div>
         <div className="home-content">
-          <div className="home-content-name-wrap content-wrap-padding flexR">
+          <div
+            className="home-content-name-wrap content-wrap-padding flexR cursor"
+            onClick={handleWalletNameClick}
+          >
             <img src={ArrowRight} className="home-content-name-arrow-right" />
             <WalletName width={200} cls="home-wallet-name">
               {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
@@ -615,6 +630,61 @@ const Home = () => {
             </div>
           </Drawer>
         </Drawer>
+
+        <Drawer
+          placement="top"
+          closable={false}
+          onClose={() => {
+            setWalletManagePopupVisible(false);
+          }}
+          height="76vh"
+          bodyStyle={{
+            padding: 0,
+          }}
+          contentWrapperStyle={{
+            borderRadius: '0 0 23px 23px',
+            overflow: 'hidden',
+          }}
+          visible={walletManagePopupVisible}
+          key="wallet-switch"
+        >
+          <div
+            style={{ width: '100%', height: '100%' }}
+            className="account-switch-drawer flexCol"
+          >
+            <div className="account-switch-header flexR content-wrap-padding">
+              <IconComponent
+                name="close"
+                cls="icon icon-close"
+                onClick={() => {
+                  setWalletManagePopupVisible(false);
+                }}
+              />
+            </div>
+            <div className="account-switch-accounts flexR content-wrap-padding">
+              <span className="account-switch-accounts-title">Wallets</span>
+              <span
+                className="account-switch-accounts-manage-wallet-container cursor flexR"
+                onClick={() => {
+                  sensors.track('teleport_home_wallet_manage', {
+                    page: location.pathname,
+                  });
+                  history.push({
+                    pathname: '/wallet-manage',
+                  });
+                }}
+              >
+                Manage Wallet
+                <IconComponent name="chevron-right" cls="icon chevron-right" />
+              </span>
+            </div>
+            <WalletSwitch
+              visible={walletManagePopupVisible}
+              handleWalletClick={handleWalletClick}
+            />
+          </div>
+        </Drawer>
+
         <Drawer
           placement="top"
           closable={false}
