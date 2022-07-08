@@ -37,7 +37,9 @@ export function useAdd10PctTxParams(
     if (!gasFeeEstimates) return '--';
 
     try {
-      const ms = BigNumber.from(add10PercentTxParams.maxFeePerGas?.split('.')[0]).gt(
+      const ms = BigNumber.from(
+        add10PercentTxParams.maxFeePerGas?.split('.')[0]
+      ).gt(
         utils.parseUnits(gasFeeEstimates?.high.suggestedMaxFeePerGas, 'gwei')
       )
         ? gasFeeEstimates?.high.minWaitTimeEstimate
