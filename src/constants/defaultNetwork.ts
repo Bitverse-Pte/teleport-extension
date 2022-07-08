@@ -37,7 +37,7 @@ export const defaultNetworks: {
   [CHAINS.BSC]: {
     id: PresetNetworkId.BSC,
     type: CHAINS.BSC,
-    rpcUrl: 'https://bsc-dataseed.binance.org/',
+    rpcUrl: 'https://bsc-dataseed1.ninicoin.io/',
     chainId: '0x38',
     ticker: 'BNB',
     nickname: 'BNB Smart Chain',
@@ -54,7 +54,7 @@ export const defaultNetworks: {
     ticker: 'ETH',
     nickname: 'Arbitrum One',
     rpcPrefs: {
-      blockExplorerUrl: 'https://arbiscan.io/',
+      blockExplorerUrl: 'https://arbiscan.io',
     },
     ...EVMProviderSharedProperties,
   },
@@ -90,7 +90,7 @@ export const defaultNetworks: {
     ticker: 'AVAX',
     nickname: 'Avalanche Network',
     rpcPrefs: {
-      blockExplorerUrl: 'https://snowtrace.io',
+      blockExplorerUrl: 'https://explorer.avax.network',
     },
     ...EVMProviderSharedProperties,
   },
@@ -102,7 +102,7 @@ export const defaultNetworks: {
     ticker: 'ETH',
     nickname: 'Optimistic Ethereum',
     rpcPrefs: {
-      blockExplorerUrl: 'https://optimistic.ethereum.io',
+      blockExplorerUrl: 'https://optimistic.etherscan.io',
     },
     ...EVMProviderSharedProperties,
   },

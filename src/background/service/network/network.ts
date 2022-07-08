@@ -218,17 +218,25 @@ class NetworkPreferenceService extends EventEmitter {
       console.debug('No more migration');
     }
 
-    /**
-     * Fix `chainId` issues with
-     * - uncessary padding 0
-     * - pure decimal number
-     */
     const { networks } = this.customNetworksStore.getState();
+    const migratedNetworks = networks.map((n) => {
+      const updatedObj = { ...n };
+      /**
+       * Fix `chainId` issues with
+       * - uncessary padding 0
+       * - pure decimal number
+       */
+      updatedObj.chainId = toHexString(n.chainId);
+      if (!updatedObj.ecosystem) {
+        /**
+         * issue due to type changes, fix `undefined` to avoid future errors
+         */
+        updatedObj.ecosystem = Ecosystem.EVM;
+      }
+      return updatedObj;
+    });
     this.customNetworksStore.updateState({
-      networks: networks.map((n) => ({
-        ...n,
-        chainId: toHexString(n.chainId),
-      })),
+      networks: migratedNetworks,
     });
 
     /**
@@ -264,7 +272,7 @@ class NetworkPreferenceService extends EventEmitter {
     }
   }
 
-  addCustomNetwork(
+  addCustomEthereumProvider(
     nickname: string,
     rpcUrl: string,
     chainId: string,
@@ -323,7 +331,7 @@ class NetworkPreferenceService extends EventEmitter {
     });
   }
 
-  editCustomNetwork(
+  editCustomEthereumProvider(
     providerId: string,
     newNickname: string,
     rpcUrl: string,

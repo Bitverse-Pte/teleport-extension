@@ -1,6 +1,9 @@
 import { message } from 'antd';
 import { ArgsProps } from 'antd/lib/message';
 import { nanoid } from 'nanoid';
+import React from 'react';
+import { IconComponent } from '../IconComponents';
+import './style.less';
 
 function isArgsProps(jc: React.ReactNode | ArgsProps): jc is ArgsProps {
   return typeof jc === 'object' && Boolean((jc as any).content);
@@ -15,6 +18,8 @@ const createCTCMessage =
     if (!isArgsProps(params[0])) {
       content = {
         content: params[0],
+        duration: params[1],
+        onClose: params[2],
       } as ArgsProps;
     }
 
@@ -36,8 +41,21 @@ const createCTCMessage =
          */
         _poorOldOnClick(e);
       }
+
       message.destroy(msgKey);
     };
+    content.content = (
+      <div className="flex items-center">
+        <span className="message">{content.content}</span>
+        <div className="flex cursor-pointer justify-center items-center ml-auto toast-close-button">
+          <IconComponent
+            name="close"
+            cls="closeIcon base-text-color"
+            style={{ width: 8, height: 8 }}
+          />
+        </div>
+      </div>
+    );
     params[0] = content;
     message[name](...params);
   };
