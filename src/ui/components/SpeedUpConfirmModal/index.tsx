@@ -138,7 +138,9 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
           <div className="summary w-full text-right">
             {baseFee && (
               <h4 className="summary-amount bold">
-                {utils.formatEther(baseFee.mul(gasDetail.gasLimit!))}{' '}
+                {Number(
+                  utils.formatEther(baseFee.mul(gasDetail.gasLimit!))
+                ).toFixed(7)}{' '}
                 {nativeToken?.symbol}
               </h4>
             )}
@@ -148,7 +150,9 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
             <div className="summary-max-fee fs12">
               Max Fee:
               <span className="max-fee-amount">
-                {utils.formatEther(gasPrice.mul(gasDetail.gasLimit!))}{' '}
+                {Number(
+                  utils.formatEther(gasPrice.mul(gasDetail.gasLimit!))
+                ).toFixed(7)}{' '}
                 {nativeToken?.symbol}
               </span>
             </div>
