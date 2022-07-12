@@ -32,6 +32,8 @@ export function CosmosTransactionItem({
     recipientAddress,
     displayedStatusKey,
     senderAddress,
+
+    fromDapp,
   } = useCosmosTxDisplayData(transaction);
   const { t } = useTranslation();
   // const isSignatureReq =
@@ -65,7 +67,7 @@ export function CosmosTransactionItem({
    */
   const displayPrimaryCurrency = useMemo(() => {
     // split by space
-    if (!primaryCurrency) return '--.--';
+    if (!primaryCurrency) return undefined;
     return `${primaryCurrency.amount} ${primaryCurrency?.denom}`;
   }, [primaryCurrency]);
   /**
@@ -94,10 +96,12 @@ export function CosmosTransactionItem({
         id={`tx-${idx}`}
       >
         <p className="tx-title capitalize">{title}</p>
-        <p className="tx-value ml-auto" title={displayPrimaryCurrency}>
-          {displayPrimaryCurrency}
-        </p>
-        {/* hide if recipientAddress not exist e.g contract deploy */}
+        {displayPrimaryCurrency && (
+          <p className="tx-value ml-auto" title={displayPrimaryCurrency}>
+            {displayPrimaryCurrency}
+          </p>
+        )}
+        {/* hide if recipientAddress not exist e.g cosmos sign request */}
         {recipientAddress && (
           <div className="grey-02 from-and-to flex items-center mr-auto mb-8">
             <span className="from cursor-default">
@@ -113,9 +117,20 @@ export function CosmosTransactionItem({
             </span>
           </div>
         )}
-        <span className={clsx('status capitalize', colorByStatus)}>
-          {t(displayedStatusKey || '')}
-        </span>
+        {fromDapp && (
+          <div className="grey-02 from-and-to flex items-center mr-auto mb-8 w-full">
+            <span className="from cursor-default">
+              <Tooltip placement="top" title={senderAddress}>
+                {t('from')}: {fromDapp}
+              </Tooltip>
+            </span>
+          </div>
+        )}
+        {title === 'send' && (
+          <span className={clsx('status capitalize', colorByStatus)}>
+            {t(displayedStatusKey || '')}
+          </span>
+        )}
         <span className="date">
           {dayjs(transaction.timestamp).format('YYYY-MM-DD HH:mm:ss')}
         </span>

@@ -62,6 +62,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     token,
     ibcChannel,
     ibcChainName,
+    fromDapp,
   } = useCosmosTxDisplayData(transaction);
   // transaction
   console.debug('primaryCurrency', primaryCurrency);
@@ -149,11 +150,19 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
                 value={`${formattedFee.amount} ${formattedFee.denom}`}
               />
             )}
+            {fromDapp && <TransactionItemDetail name="From" value={fromDapp} />}
             <TransactionItemDetail name="Gas" value={transaction.fee?.gas} />
             <TransactionItemDetail
               name="Sequence"
               value={transaction.account.sequence}
             />
+            {/* { messageData && 
+            <><TransactionItemDetail name={t('Message')} value="" />
+             <div className="sign-data">
+                <div>
+                  <pre>{JSON.stringify(messageData, null, 2)}</pre>
+                </div>
+            </div></>} */}
             <TransactionItemDetail name="Memo" value={transaction.memo} />
             {ibcChannel && (
               <TransactionItemDetail
