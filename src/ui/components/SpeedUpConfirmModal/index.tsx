@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { priorityLevelToI18nKey } from '../TransactionCancelAndSpeedUp/component/FeeTier/constant';
 import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import clsx from 'clsx';
+import useGasTiming from '../GasTiming/useGasTiming.hook';
 
 const toFixedDigits =
   (digits = 7) =>
@@ -81,8 +82,8 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
       newTxParams = {
         ...newTxParams,
         estimateUsed: selectedGasTier,
-        maxFeePerGas: decGWEIToHexWEI(suggestedMaxFeePerGas),
-        maxPriorityFeePerGas: decGWEIToHexWEI(suggestedMaxPriorityFeePerGas),
+        maxFeePerGas: addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas)),
+        maxPriorityFeePerGas: addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas)),
       };
     } else if (PRIORITY_LEVELS.CUSTOM === selectedGasTier) {
       /**
@@ -96,6 +97,8 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
 
     return newTxParams;
   }, [selectedGasTier]);
+
+  const gasTiming = useGasTiming(gasDetail);
 
   const isLegacyTransaction = isLegacyTransactionParams(gasDetail);
 
@@ -161,6 +164,18 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
             </div>
           </div>
         )}
+        {gasDetail.gasPrice && (
+          <div
+            className={clsx('gas-detail-item', {
+              flex: isGasDetailExpanded,
+            })}
+          >
+            <div className="name">Gas Price</div>
+            <div className="value">
+              {utils.formatUnits(addHexPrefix(gasDetail.gasPrice), 'gwei')} gwei
+            </div>
+          </div>
+        )}
         {gasDetail.maxPriorityFeePerGas && (
           <div
             className={clsx('gas-detail-item', {
@@ -196,9 +211,23 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
                 {nativeToken?.symbol}
               </h4>
             )}
-            <div className="summary-estimated-time bold fs12 green-02">
-              Likely in 30 Seconds
-            </div>
+            {gasDetail.gasPrice && (
+              <h4 className="summary-amount bold">
+                {toFixed7Digits(
+                  utils.formatEther(
+                    BigNumber.from(addHexPrefix(gasDetail.gasPrice)).mul(
+                      gasDetail.gasLimit!
+                    )
+                  )
+                )}{' '}
+                {nativeToken?.symbol}
+              </h4>
+            )}
+            {gasTiming && (
+              <div className="summary-estimated-time bold fs12 green-02">
+                {gasTiming.text}
+              </div>
+            )}
             {!isLegacyTransaction && (
               <div className="summary-max-fee fs12">
                 Max Fee:
