@@ -96,7 +96,7 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
     }
 
     return newTxParams;
-  }, [selectedGasTier]);
+  }, [selectedGasTier, customGasPrice]);
 
   const gasTiming = useGasTiming(gasDetail);
 
