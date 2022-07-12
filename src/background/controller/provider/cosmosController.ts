@@ -10,6 +10,8 @@ import { nanoid as createId } from 'nanoid';
 import { CosChainInfo } from 'background/service/transactions/cosmos/types';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
+import cosmosController from 'background/service/transactions/cosmos';
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 
 class CosmosProviderController {
   @Reflect.metadata('SAFE', true)
@@ -94,6 +96,36 @@ class CosmosProviderController {
       serializeSignDoc(signDoc),
       pk
     );
+    // process activities
+    const {
+      rpcUrl,
+      ecoSystemParams,
+      prefix: bech32Config,
+      coinType,
+    } = networkPreferenceService.getProviderConfig();
+    const cosChainInfo = {
+      rpc: rpcUrl,
+      chainId,
+      rest: ecoSystemParams?.rest,
+      bech32Config,
+      coinType,
+    } as CosChainInfo;
+    const { account } = await cosmosTxController.cosmosAccount.getAccounts(
+      cosChainInfo.rest,
+      k.bech32Address
+    );
+    const txId = createId();
+    cosmosTxController.cosmosAccount.addTransactionToList({
+      id: txId,
+      type: 'sign',
+      status: CosmosTxStatus.SIGNED,
+      chainInfo: cosChainInfo,
+      timestamp: new Date().getTime(),
+      aminoMsgs: approvalRes?.msgs,
+      memo: approvalRes?.memo,
+      fee: approvalRes?.fee,
+      account,
+    });
     return {
       signed: JSONUint8Array.wrap(signDoc),
       signature: encodeSecp256k1Signature(k.pubKey, signature),
