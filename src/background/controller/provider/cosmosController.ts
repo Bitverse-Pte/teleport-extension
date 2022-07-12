@@ -81,11 +81,12 @@ class CosmosProviderController {
       args: [chainId, from, messages],
     },
     session: { origin },
+    approvalRes,
   }) => {
-    console.log('==[chainId, from, messages]==', chainId, from, messages);
+    console.log('==[chainId, from, approvalRes]==', chainId, from, approvalRes);
     const k = keyringService.getKeplrCompatibleKey(chainId);
     if (!k) throw Error('no key found');
-    const signDoc = JSONUint8Array.unwrap(messages);
+    const signDoc = JSONUint8Array.unwrap(approvalRes);
     const pk = keyringService.getPrivateKeyByAddress(k.bech32Address);
     if (!pk) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
     const cosmosKey = new CosmosKey();

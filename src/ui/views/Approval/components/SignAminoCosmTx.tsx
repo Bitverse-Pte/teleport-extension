@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -8,7 +8,7 @@ import {
   UserPreferencedCurrencyDisplay,
 } from 'ui/components';
 import { HeaderWithFlex } from 'ui/components/Header';
-import { CustomButton, TokenIcon } from 'ui/components/Widgets';
+import { CustomButton, CustomTab, TokenIcon } from 'ui/components/Widgets';
 import {
   getTotalPricesByAmountAndPrice,
   useApproval,
@@ -30,7 +30,9 @@ import { Token } from 'types/token';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import BigNumber from 'bignumber.js';
 import { IconComponent } from 'ui/components/IconComponents';
-import { Divider } from 'antd';
+import { Divider, Input } from 'antd';
+import { Tabs } from 'constants/wallet';
+import { useMethodData } from 'ui/hooks/wallet/useMethodData';
 
 interface SignCosmosTxProps {
   data: [string, string, any];
@@ -61,17 +63,19 @@ const SignAminoCosmTx = ({
   const [getApproval, resolveApproval, rejectApproval] = useApproval();
   const dispatch = useDispatch();
   const wallet = useWallet();
-  const [signDoc, setSignDoc] = useState<any>();
+  const [signDoc, setSignDoc] = useState<any>(params.data[2]);
+  const [memo, setMemo] = useState<string>(params.data[2].memo);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [prices, setPrices] = useState();
   const [visible, setVisible] = useState(false);
+  const [tabType, setTabType] = useState<Tabs>(Tabs.FIRST);
 
   const initState = async () => {
     dispatch(showLoadingIndicator());
     const chainId = params.data[0];
     const from = params.data[1];
     const signDoc = params.data[2];
-    setSignDoc(signDoc);
+    //setSignDoc(signDoc);
     const tokens = await wallet.getTokenBalancesAsync(chainId, from);
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
@@ -88,14 +92,6 @@ const SignAminoCosmTx = ({
   const from = useMemo(() => {
     return params.data[1];
   }, []);
-
-  // const txBodyMemo = useMemo(() => {
-  //   return signDoc?.txBody;
-  // }, [signDoc]);
-
-  // const authInfoMemo = useMemo(() => {
-  //   return signDoc?.authInfo;
-  // }, [signDoc]);
 
   const nativeToken = useMemo(() => {
     const nativeToken = tokens.find((t: Token) => t.isNative);
@@ -118,21 +114,13 @@ const SignAminoCosmTx = ({
     return fee;
   }, [signDoc, nativeToken]);
 
-  const amountMemo = useMemo(() => {
-    const multiplier = new BigNumber(10).pow(Number(txToken?.decimal || 0));
-    const rate = new BigNumber(1.0).div(multiplier);
-    const amount = new BigNumber(
-      signDoc?.msgs[0].value.amount[0].amount || 0
-    ).times(rate);
-    return amount;
-  }, [signDoc, txToken]);
+  const handleMemoChange = (val) => {
+    setMemo(val);
+    signDoc.memo = val;
+    setSignDoc(signDoc);
+  };
 
   const renderContent = () => {
-    const renderTotalMaxAmount = () => {
-      const total = amountMemo.add(totalFeeMemo);
-      return `${total.toString(10)} ${txToken?.symbol || ''}`;
-    };
-
     const renderTotalGasFeeAmount = () => {
       return `${totalFeeMemo.toString(10)} ${txToken?.symbol || ''}`;
     };
@@ -146,55 +134,73 @@ const SignAminoCosmTx = ({
       return `$ ${totalDec}`;
     };
 
-    const renderTotalMaxFiat = () => {
-      const total = amountMemo.add(totalFeeMemo);
-      const totalDec = getTotalPricesByAmountAndPrice(
-        total.toNumber(),
-        nativeToken?.decimal || 0,
-        nativeToken?.price || 0
-      );
-      return `$ ${totalDec}`;
-    };
-
     return (
-      <div className="tx-details-tab-container flex">
-        <div className="transaction-detail">
-          <div
-            className="gas-edit-button hidden flex ml-auto"
-            onClick={() => {
-              setVisible(true);
-              // sensors.track('teleport_sign_tx_edit_gas', {
-              //   page: location.pathname,
-              // });
-            }}
-          >
-            <IconComponent name="edit" cls="edit-icon" />
-            <div>{t('Edit')}</div>
+      <div className="tx-details-tab-container">
+        <CustomTab
+          tab1="Details"
+          tab2="Data"
+          currentTab={tabType}
+          handleTabClick={setTabType}
+        />
+        {tabType === Tabs.FIRST && (
+          <div className="transaction-detail">
+            <div className="transaction-detail-messages">
+              <div className="transaction-detail-messages-title">
+                <div className="transaction-detail-title">Messages:</div>
+              </div>
+              <div className="transaction-detail-messages-value">
+                <pre>{JSON.stringify(signDoc?.msgs, null, 2)}</pre>
+              </div>
+            </div>
+            <Divider style={{ margin: '16px 0' }} />
+            <div className="transaction-detail-memo">
+              <div className="transaction-detail-memo-title">
+                <div className="transaction-detail-title">Memo:</div>
+              </div>
+              <Input
+                className="customInputStyle"
+                value={signDoc?.memo}
+                //defaultValue={memo}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => handleMemoChange(e.target.value)}
+              />
+            </div>
+            <Divider style={{ margin: '16px 0' }} />
+            <div
+              className="gas-edit-button flex ml-auto"
+              onClick={() => {
+                setVisible(true);
+              }}
+            >
+              <IconComponent name="edit" cls="edit-icon" />
+              <div>{t('Edit')}</div>
+            </div>
+            <div className="transaction-detail-item">
+              <div className="transaction-detail-item-key">
+                <div className="transaction-detail-title">
+                  {t('Estimated gas fee')}
+                </div>
+                <div className="transaction-detail-subtitle"></div>
+              </div>
+              <div className="transaction-detail-item-values">
+                <div className="transaction-detail-detailText">
+                  {renderTotalGasFeeAmount()}
+                </div>
+                <div className="transaction-detail-detailSubText">
+                  {renderTotalGasFeeFiat()}
+                </div>
+                <div className="transaction-detail-detailMax">{`Max fee: ${renderTotalGasFeeAmount()}`}</div>
+              </div>
+            </div>
           </div>
-          <TransactionDetailItem
-            key="gas-item"
-            detailTitle={t('Estimated gas fee')}
-            subTitle={undefined}
-            detailText={`${renderTotalGasFeeAmount()}`}
-            detailSubText={renderTotalGasFeeFiat()}
-            detailMax={`Max fee: ${renderTotalGasFeeAmount()}`}
-          />
-          <Divider style={{ margin: '16px 0' }} />
-          <TransactionDetailItem
-            key="total-item"
-            detailTitle={t('Sum')}
-            subTitle={t('Amount + gas fee')}
-            detailText={renderTotalMaxAmount()}
-            detailSubText={renderTotalMaxFiat()}
-            detailMax={`Max amount: ${renderTotalMaxAmount()}`}
-          />
-        </div>
+        )}
+        {tabType === Tabs.SECOND && <TxDataComponent signDoc={signDoc} />}
       </div>
     );
   };
 
   const handleAllow = async () => {
-    resolveApproval({});
+    resolveApproval({ ...signDoc });
   };
 
   const handleCancel = () => {
@@ -202,24 +208,13 @@ const SignAminoCosmTx = ({
   };
 
   return (
-    <div className="approval-tx flexCol">
+    <div className="approval-tx-sign-amino flexCol">
       <div className="top-part-container flexCol flex-wrap items-center">
         <HeaderWithFlex
           title={<NetworkDisplay networkName={chainId} />}
           handleBackClick={handleCancel}
         />
-        <SenderToRecipient
-          senderAddress={signDoc?.msgs[0].value.from_address}
-          senderName={''}
-          recipientName={''}
-          recipientAddress={signDoc?.msgs[0].value.to_address}
-        />
-        <TxSummaryComponent
-          action={params.method}
-          value={signDoc?.msgs[0].value.amount[0].amount}
-          token={txToken}
-          origin={origin}
-        />
+        <TxSummaryComponent origin={origin} />
       </div>
       {renderContent()}
       <div className="tx-button-container flexCol">
@@ -244,47 +239,75 @@ const SignAminoCosmTx = ({
   );
 };
 
-const TxSummaryComponent = ({ action, value, token, origin }) => {
-  const multiplier = new BigNumber(10).pow(token?.decimal || 0);
-  const rate = new BigNumber(1.0).div(multiplier);
-  const amount = new BigNumber(value || 0).times(rate);
+const TxSummaryComponent = ({ origin }) => {
   return (
     <div className="tx-summary">
       <div className="tx-summary-origin">
         {origin === 'https://teleport.network' ? null : <div>{origin}</div>}
       </div>
-      <div className="tx-summary-currency">
-        {token && (
-          <div className="flexR items-end">
-            <TokenIcon token={token} radius={30} />
-            <span className="dec" title={value}>
-              {addEllipsisToEachWordsInTheEnd(amount.toString(10), 8)}{' '}
-            </span>
-            <span className="symbol">{token?.symbol} </span>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
 
-const TransactionDetailItem = ({
+const TransactionDetailComponent = ({
+  signDoc,
   detailTitle = '',
   subTitle,
   detailText,
   detailSubText,
   detailMax,
+  handleMemoChange,
 }) => {
+  const len = 1;
   return (
-    <div className="transaction-detail-item">
-      <div className="transaction-detail-item-key">
-        <div className="transaction-detail-title">{detailTitle}</div>
-        <div className="transaction-detail-subtitle">{subTitle}</div>
+    <div className="transaction-detail">
+      <div className="transaction-detail-messages">
+        <div className="transaction-detail-messages-title">
+          <div className="transaction-detail-title">Messages:</div>
+        </div>
+        <div className="transaction-detail-messages-value">
+          <pre>{JSON.stringify(signDoc?.msgs, null, 2)}</pre>
+        </div>
       </div>
-      <div className="transaction-detail-item-values">
-        <div className="transaction-detail-detailText">{detailText}</div>
-        <div className="transaction-detail-detailSubText">{detailSubText}</div>
-        <div className="transaction-detail-detailMax">{detailMax}</div>
+      <Divider style={{ margin: '16px 0' }} />
+      <div className="transaction-detail-memo">
+        <div className="transaction-detail-memo-title">
+          <div className="transaction-detail-title">Memo:</div>
+        </div>
+        <Input
+          className="customInputStyle"
+          value={signDoc?.memo}
+          //onClick={(e) => e.stopPropagation()}
+          onChange={(e) => handleMemoChange(e.target.value)}
+        />
+      </div>
+      <Divider style={{ margin: '16px 0' }} />
+      <div className="transaction-detail-item">
+        <div className="transaction-detail-item-key">
+          <div className="transaction-detail-title">{detailTitle}</div>
+          <div className="transaction-detail-subtitle">{subTitle}</div>
+        </div>
+        <div className="transaction-detail-item-values">
+          <div className="transaction-detail-detailText">{detailText}</div>
+          <div className="transaction-detail-detailSubText">
+            {detailSubText}
+          </div>
+          <div className="transaction-detail-detailMax">{detailMax}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TxDataComponent = ({ signDoc }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="transaction-data flexCol">
+      <div className="transaction-data-params">
+        <div>{`${t('parameters')}:`}</div>
+        <div>
+          <pre>{JSON.stringify(signDoc, null, 2)}</pre>
+        </div>
       </div>
     </div>
   );

@@ -8,12 +8,6 @@ import { PromiseFlow, underline2Camelcase } from 'background/utils';
 import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
 import cosmosController from './cosmosController';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isSignApproval = (type: string) => {
-  const SIGN_APPROVALS = ['SignCosmosTx', 'SignTx'];
-  return SIGN_APPROVALS.includes(type);
-};
-
 const flow = new PromiseFlow();
 const flowContext = flow
   //check method
@@ -99,7 +93,6 @@ const flowContext = flow
         return 'existed';
       }
       ctx.request.requestedApproval = true;
-      console.log('====[args]===', args);
       ctx.approvalRes = await notificationService.requestApproval({
         approvalComponent: approvalType,
         params: {
@@ -122,6 +115,7 @@ const flowContext = flow
     const {
       session: { origin },
     } = request;
+    console.log('===[ctx.approvalRes]==', ctx.approvalRes);
     const requestDefer = Promise.resolve(
       cosmosController[mapMethod]({
         ...request,
