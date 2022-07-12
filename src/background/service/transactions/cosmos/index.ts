@@ -20,6 +20,7 @@ class cosmosController {
     });
     this.cosmwasmAccount = cosmwasmAccount;
   }
+
   sendToken(
     amount: string,
     currency,

@@ -182,6 +182,7 @@ export interface CosmosTx {
   currency?: AppCurrency;
   tx_hash?: string;
   error?: any;
+  type?: string; //this attribute design for displayed in activities. type=undefined for send; type='sign' for sign
 }
 interface TransactionState {
   transactions: Record<string, CosmosTx>;
