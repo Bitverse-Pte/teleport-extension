@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Drawer } from 'antd';
 import { CustomButton } from 'ui/components/Widgets';
 import { decGWEIToHexWEI } from 'ui/utils/conversion';
@@ -13,6 +13,15 @@ import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 import { addHexPrefix } from 'ethereumjs-util';
 import { useTranslation } from 'react-i18next';
 import { priorityLevelToI18nKey } from '../TransactionCancelAndSpeedUp/component/FeeTier/constant';
+import { isLegacyTransactionParams } from 'utils/transaction.utils';
+import clsx from 'clsx';
+
+const toFixedDigits =
+  (digits = 7) =>
+  (numberToBeFixed: any) =>
+    Number(numberToBeFixed).toFixed(digits);
+
+const toFixed7Digits = toFixedDigits(7);
 
 interface DrawerHeaderProps {
   title: string;
@@ -88,6 +97,10 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
     return newTxParams;
   }, [selectedGasTier]);
 
+  const isLegacyTransaction = isLegacyTransactionParams(gasDetail);
+
+  const [isGasDetailExpanded, setGDExpand] = useState(false);
+
   const gasPrice = BigNumber.from(
     addHexPrefix(gasDetail.maxFeePerGas || gasDetail.gasPrice!)
   );
@@ -102,7 +115,7 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
       visible={props.visible}
       placement="bottom"
       closable={false}
-      height="286px"
+      height={isGasDetailExpanded ? '360px' : '286px'}
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0 24px 24px 24px',
@@ -123,7 +136,10 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
             }
           }}
         />
-        <div className="flex gas-tier-n-breakdown cursor-pointer">
+        <div
+          className="flex gas-tier-n-breakdown cursor-pointer"
+          onClick={() => setGDExpand((prev) => !prev)}
+        >
           {t(priorityLevelToI18nKey[selectedGasTier])}
           <IconComponent
             name="chevron-right"
@@ -133,29 +149,67 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
             }}
           />
         </div>
+        {baseFee && (
+          <div
+            className={clsx('gas-detail-item', {
+              flex: isGasDetailExpanded,
+            })}
+          >
+            <div className="name">Base Fee</div>
+            <div className="value">
+              {utils.formatUnits(baseFee, 'gwei')} gwei
+            </div>
+          </div>
+        )}
+        {gasDetail.maxPriorityFeePerGas && (
+          <div
+            className={clsx('gas-detail-item', {
+              flex: isGasDetailExpanded,
+            })}
+          >
+            <div className="name">Priority Fee</div>
+            <div className="value">
+              {utils.formatUnits(
+                addHexPrefix(gasDetail.maxPriorityFeePerGas),
+                'gwei'
+              )}{' '}
+              gwei
+            </div>
+          </div>
+        )}
+        <div
+          className={clsx('gas-detail-item', {
+            flex: isGasDetailExpanded,
+          })}
+        >
+          <div className="name">Gas Limit</div>
+          <div className="value">{Number(gasDetail.gas)}</div>
+        </div>
         <div className="flex gas-summary">
           <h4>Gas</h4>
           <div className="summary w-full text-right">
             {baseFee && (
               <h4 className="summary-amount bold">
-                {Number(
+                {toFixed7Digits(
                   utils.formatEther(baseFee.mul(gasDetail.gasLimit!))
-                ).toFixed(7)}{' '}
+                )}{' '}
                 {nativeToken?.symbol}
               </h4>
             )}
             <div className="summary-estimated-time bold fs12 green-02">
               Likely in 30 Seconds
             </div>
-            <div className="summary-max-fee fs12">
-              Max Fee:
-              <span className="max-fee-amount">
-                {Number(
-                  utils.formatEther(gasPrice.mul(gasDetail.gasLimit!))
-                ).toFixed(7)}{' '}
-                {nativeToken?.symbol}
-              </span>
-            </div>
+            {!isLegacyTransaction && (
+              <div className="summary-max-fee fs12">
+                Max Fee:
+                <span className="max-fee-amount">
+                  {toFixed7Digits(
+                    utils.formatEther(gasPrice.mul(gasDetail.gasLimit!))
+                  )}{' '}
+                  {nativeToken?.symbol}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <CustomButton
