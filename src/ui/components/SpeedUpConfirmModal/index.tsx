@@ -83,7 +83,9 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
         ...newTxParams,
         estimateUsed: selectedGasTier,
         maxFeePerGas: addHexPrefix(decGWEIToHexWEI(suggestedMaxFeePerGas)),
-        maxPriorityFeePerGas: addHexPrefix(decGWEIToHexWEI(suggestedMaxPriorityFeePerGas)),
+        maxPriorityFeePerGas: addHexPrefix(
+          decGWEIToHexWEI(suggestedMaxPriorityFeePerGas)
+        ),
       };
     } else if (PRIORITY_LEVELS.CUSTOM === selectedGasTier) {
       /**
