@@ -31,11 +31,13 @@ import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
 import ArrowRight from '../../../assets/arrowRight.svg';
+import Guide from '../../../assets/guide.png';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
+import WalletSwitch from 'ui/components/WalletSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import ConnectedSites from '../ConnectedSites';
 import { Ecosystem, Provider, VmEnums } from 'types/network';
@@ -56,7 +58,10 @@ const Home = () => {
     useState<BaseAccount>();
   //const [accountList, setAccountList] = useState<DisplayWalletManage>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
+  const [walletManagePopupVisible, setWalletManagePopupVisible] =
+    useState(false);
   const [createAccountLoading, setCreateAccountLoading] = useState(false);
+  const [tokenListLoading, setTokenListLoading] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
   const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
     useState(false);
@@ -66,11 +71,14 @@ const Home = () => {
   const [prices, setPrices] = useState();
   const currentChain: Provider = useSelector(getProvider);
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+  const [guideVisible, setGuideVisisble] = useState(false);
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
       console.error(e);
+      setTokenListLoading(false);
     });
+    setTokenListLoading(false);
     if (balances && balances.length) setTokens(balances);
   };
 
@@ -84,6 +92,13 @@ const Home = () => {
     setBalanceQueryInterval();
     return () => clearInterval(intervalRef.current);
   }, [currentChain]);
+
+  useEffect(() => {
+    const read = localStorage.getItem('guide_read');
+    if (!read || read === 'false') {
+      setGuideVisisble(true);
+    }
+  });
 
   const queryTokenPrices = async () => {
     const prices = await wallet.queryTokenPrices().catch((e) => {
@@ -108,7 +123,10 @@ const Home = () => {
   };
 
   useAsyncEffect(updateAccount, []);
-  useAsyncEffect(getTokenBalancesAsync, []);
+  useAsyncEffect(async () => {
+    setTokenListLoading(true);
+    getTokenBalancesAsync();
+  }, []);
   useAsyncEffect(getTokenBalancesSync, []);
   useAsyncEffect(queryTokenPrices, []);
 
@@ -168,11 +186,17 @@ const Home = () => {
     await wallet.changeAccount(account);
     setPopupVisible(false);
     updateAccount();
+    setTokenListLoading(true);
     getTokenBalancesAsync();
     getTokenBalancesSync();
     sensors.track('teleport_home_account_click', {
       page: location.pathname,
     });
+  };
+
+  const handleWalletClick = () => {
+    updateAccount();
+    setWalletManagePopupVisible(false);
   };
 
   const handleSiteClick = async (account: BaseAccount) => {
@@ -281,9 +305,30 @@ const Home = () => {
     });
   }, [tokenList]);
 
+  const handleGuideReadClick = () => {
+    setGuideVisisble(false);
+    localStorage.setItem('guide_read', 'true');
+  };
+
+  const handleWalletNameClick = () => {
+    setWalletManagePopupVisible(true);
+  };
+
   return (
     <div className="home flexCol">
       <Spin spinning={createAccountLoading}>
+        <div
+          className="guide_container"
+          style={guideVisible ? {} : { display: 'none' }}
+        >
+          <img src={Guide} className="home-guide" />
+          <span
+            className="home-guide-close cursor"
+            onClick={handleGuideReadClick}
+          >
+            Understand
+          </span>
+        </div>
         <HomeHeader
           menuOnClick={() => {
             sensors.track('teleport_home_menus', { page: location.pathname });
@@ -298,7 +343,10 @@ const Home = () => {
         />
         <div className="home-bg"></div>
         <div className="home-content">
-          <div className="home-content-name-wrap content-wrap-padding flexR">
+          <div
+            className="home-content-name-wrap content-wrap-padding flexR cursor"
+            onClick={handleWalletNameClick}
+          >
             <img src={ArrowRight} className="home-content-name-arrow-right" />
             <WalletName width={200} cls="home-wallet-name">
               {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
@@ -413,74 +461,79 @@ const Home = () => {
             </div>
           ) : null}
           {tabType === Tabs.FIRST && (
-            <div className="token-list flexCol">
-              {displayTokenList.length > 0 ? (
-                displayTokenList.map((t: Token, i) => {
-                  let ibcChainInfoStr = '';
-                  if (t.chainName && (t.trace?.trace as any).length > 0) {
-                    const trace = (t as any).trace.trace[
-                      (t as any).trace.trace.length - 1
-                    ];
-                    if (trace) {
-                      ibcChainInfoStr = `(${t.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`;
+            <Spin spinning={tokenListLoading}>
+              <div className="token-list flexCol">
+                {displayTokenList.length > 0 ? (
+                  displayTokenList.map((t: Token, i) => {
+                    let ibcChainInfoStr = '';
+                    if (t.chainName && (t.trace?.trace as any).length > 0) {
+                      const trace = (t as any).trace.trace[
+                        (t as any).trace.trace.length - 1
+                      ];
+                      if (trace) {
+                        ibcChainInfoStr = `(${t.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`;
+                      }
                     }
-                  }
-                  return (
-                    <div
-                      className="token-item flexR cursor"
-                      key={i}
-                      onClick={() => handleTokenClick(t)}
-                    >
-                      <div className="left flexR">
-                        <TokenIcon token={t} radius={32} />
-                        <div className="balance-container flexCol">
-                          <span
-                            className="balance ellipsis"
-                            title={denom2SymbolRatio(t.amount || 0, t.decimal)}
-                          >
-                            {addEllipsisToEachWordsInTheEnd(
-                              denom2SymbolRatio(t.amount || 0, t.decimal),
-                              16
-                            )}{' '}
-                            {t.symbol?.toUpperCase()}
-                            {ibcChainInfoStr ? ibcChainInfoStr : null}
-                          </span>
-                          <span className="estimate">
-                            ≈
-                            {getTotalPricesByAmountAndPrice(
-                              t?.amount || 0,
-                              t?.decimal || 0,
-                              t?.price || 0
-                            )}{' '}
-                            USD
-                          </span>
-                        </div>
-                      </div>
-                      <IconComponent name="chevron-right" cls="right-icon" />
-                    </div>
-                  );
-                })
-              ) : (
-                <NoContent
-                  title="Assets"
-                  ext={
-                    currentChain.ecosystem === Ecosystem.EVM ? (
-                      <CustomButton
-                        cls="add-assets-button"
-                        type="primary"
-                        style={{
-                          width: '200px',
-                          marginTop: '16px',
-                        }}
-                        onClick={handleAddTokenBtnClick}
+                    return (
+                      <div
+                        className="token-item flexR cursor"
+                        key={i}
+                        onClick={() => handleTokenClick(t)}
                       >
-                        + Add Assets
-                      </CustomButton>
-                    ) : null
-                  }
-                />
-              )}
-            </div>
+                        <div className="left flexR">
+                          <TokenIcon token={t} radius={32} />
+                          <div className="balance-container flexCol">
+                            <span
+                              className="balance ellipsis"
+                              title={denom2SymbolRatio(
+                                t.amount || 0,
+                                t.decimal
+                              )}
+                            >
+                              {addEllipsisToEachWordsInTheEnd(
+                                denom2SymbolRatio(t.amount || 0, t.decimal),
+                                16
+                              )}{' '}
+                              {t.symbol?.toUpperCase()}
+                              {ibcChainInfoStr ? ibcChainInfoStr : null}
+                            </span>
+                            <span className="estimate">
+                              ≈
+                              {getTotalPricesByAmountAndPrice(
+                                t?.amount || 0,
+                                t?.decimal || 0,
+                                t?.price || 0
+                              )}{' '}
+                              USD
+                            </span>
+                          </div>
+                        </div>
+                        <IconComponent name="chevron-right" cls="right-icon" />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <NoContent
+                    title="Assets"
+                    ext={
+                      currentChain.ecosystem === Ecosystem.EVM ? (
+                        <CustomButton
+                          cls="add-assets-button"
+                          type="primary"
+                          style={{
+                            width: '200px',
+                            marginTop: '16px',
+                          }}
+                          onClick={handleAddTokenBtnClick}
+                        >
+                          + Add Assets
+                        </CustomButton>
+                      ) : null
+                    }
+                  />
+                )}
+              </div>
+            </Spin>
           )}
           {tabType === Tabs.SECOND && (
             <div className="transaction-list">
@@ -589,6 +642,61 @@ const Home = () => {
             </div>
           </Drawer>
         </Drawer>
+
+        <Drawer
+          placement="top"
+          closable={false}
+          onClose={() => {
+            setWalletManagePopupVisible(false);
+          }}
+          height="76vh"
+          bodyStyle={{
+            padding: 0,
+          }}
+          contentWrapperStyle={{
+            borderRadius: '0 0 23px 23px',
+            overflow: 'hidden',
+          }}
+          visible={walletManagePopupVisible}
+          key="wallet-switch"
+        >
+          <div
+            style={{ width: '100%', height: '100%' }}
+            className="account-switch-drawer flexCol"
+          >
+            <div className="account-switch-header flexR content-wrap-padding">
+              <IconComponent
+                name="close"
+                cls="icon icon-close"
+                onClick={() => {
+                  setWalletManagePopupVisible(false);
+                }}
+              />
+            </div>
+            <div className="account-switch-accounts flexR content-wrap-padding">
+              <span className="account-switch-accounts-title">Wallets</span>
+              <span
+                className="account-switch-accounts-manage-wallet-container cursor flexR"
+                onClick={() => {
+                  sensors.track('teleport_home_wallet_manage', {
+                    page: location.pathname,
+                  });
+                  history.push({
+                    pathname: '/wallet-manage',
+                  });
+                }}
+              >
+                Manage Wallet
+                <IconComponent name="chevron-right" cls="icon chevron-right" />
+              </span>
+            </div>
+            <WalletSwitch
+              visible={walletManagePopupVisible}
+              handleWalletClick={handleWalletClick}
+            />
+          </div>
+        </Drawer>
+
         <Drawer
           placement="top"
           closable={false}

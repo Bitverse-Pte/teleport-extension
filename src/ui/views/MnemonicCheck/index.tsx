@@ -29,10 +29,19 @@ const BackupCheck = () => {
 
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
-      checksumPsd();
+      setUnlocked(true);
+      switch (state.accountType) {
+        case Tabs.FIRST:
+          getMnemonic();
+          break;
+        case Tabs.SECOND:
+          getPrivateKey();
+          break;
+      }
       sensors.track('teleport_mnemonic_backup_next', { page: pathname });
     },
     onError(err) {
+      console.error(err.code);
       ClickToCloseMessage.error({
         content: 'Wrong password',
         key: 'Wrong password',
@@ -72,7 +81,7 @@ const BackupCheck = () => {
     }
   };
 
-  const checksumPsd = async () => {
+  /* const checksumPsd = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
       ClickToCloseMessage.error({
         content: 'Wrong password',
@@ -81,17 +90,9 @@ const BackupCheck = () => {
       console.error(e.code);
     });
     if (checksumPassed) {
-      setUnlocked(true);
-      switch (state.accountType) {
-        case Tabs.FIRST:
-          getMnemonic();
-          break;
-        case Tabs.SECOND:
-          getPrivateKey();
-          break;
-      }
+      
     }
-  };
+  }; */
   const arr = mnemonic?.split(' ');
   const style = {
     display: unlocked && state.accountType === Tabs.FIRST ? 'flex' : 'none',
