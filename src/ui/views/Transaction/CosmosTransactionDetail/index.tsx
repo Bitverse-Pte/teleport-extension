@@ -111,18 +111,22 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
           </div>
         </div>
         <div className="txdetail-values flex flex-wrap justify-center">
-          <div className="txdetail-value-display">
-            <p className="txdetail-value items-baseline flex-wrap">
-              {displayPrimaryCurrency.amount}
-              <span className="unit">{displayPrimaryCurrency.unit}</span>
-            </p>
-          </div>
-          <div className="details">
-            <div className="row from-and-to justify-center">
-              <AddressCard title="From" address={senderAddress} />
-              <IconComponent name="arrow-right" cls="to-icon" />
-              <AddressCard title="To" address={recipientAddress} />
+          {transaction.type !== 'sign' && (
+            <div className="txdetail-value-display">
+              <p className="txdetail-value items-baseline flex-wrap">
+                {displayPrimaryCurrency.amount}
+                <span className="unit">{displayPrimaryCurrency.unit}</span>
+              </p>
             </div>
+          )}
+          <div className="details">
+            {recipientAddress && (
+              <div className="row from-and-to justify-center">
+                <AddressCard title="From" address={senderAddress} />
+                <IconComponent name="arrow-right" cls="to-icon" />
+                <AddressCard title="To" address={recipientAddress} />
+              </div>
+            )}
             {transaction.tx_hash && (
               <div className="row">
                 <div className="field-name">Transaction ID</div>
