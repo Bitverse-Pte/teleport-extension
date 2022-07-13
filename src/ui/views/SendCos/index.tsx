@@ -279,7 +279,7 @@ const Send = () => {
 
   return (
     <div
-      className="send flexCol"
+      className="send-cos flexCol"
       onClick={() => {
         if (showToList) {
           /**
