@@ -98,6 +98,10 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     window.open(`${rpcPrefs.blockExplorerUrl}/${type}/${hash}`);
   };
 
+  const messageData = transaction.aminoMsgs
+    ? transaction.aminoMsgs[0]
+    : undefined;
+
   const matchedNativeToken = useSelector(getCurrentProviderNativeToken);
 
   return (
@@ -160,13 +164,14 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
               name="Sequence"
               value={transaction.account.sequence}
             />
-            {/* { messageData && 
-            <><TransactionItemDetail name={t('Message')} value="" />
-             <div className="sign-data">
-                <div>
+            {messageData && (
+              <>
+                <TransactionItemDetail name={t('Message')} value="" />
+                <div className="sign-data row">
                   <pre>{JSON.stringify(messageData, null, 2)}</pre>
                 </div>
-            </div></>} */}
+              </>
+            )}
             <TransactionItemDetail name="Memo" value={transaction.memo} />
             {ibcChannel && (
               <TransactionItemDetail
