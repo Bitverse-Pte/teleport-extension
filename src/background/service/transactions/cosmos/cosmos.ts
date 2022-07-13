@@ -820,7 +820,7 @@ export class CosmosAccountImpl {
             ...currentCosmosTx,
             status: CosmosTxStatus.FAILED,
             tx_hash: txResponse.txhash,
-            error: tx
+            error: tx,
           });
         } else {
           platform._showNotification('Tx Success', tx.log);

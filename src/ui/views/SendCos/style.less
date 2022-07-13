@@ -184,31 +184,47 @@
     }
 }
 
-.assets-option {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    .assets-option-symbol {
-        margin-left: 10px;
-        color: #364361;
-        font-family: MontserratBold;
-        font-weight: bolder;
+.assets-option-cos-wrapper {
+    align-items: flex-start;
+    img.token-icon, span.token-icon {
+        margin-top: 3px;
+        margin-right: 10px
     }
-    .assets-option-symbol-name {
-        margin-left: 10px;
-        color: #A3B4CC;
+    .flex-wrap {
+        flex-wrap: wrap;
     }
-    .assets-option-left {
+    .assets-option {
+        margin-right: 10px;
+    }
+    .assets-option {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        line-height: 38px;
-    }
-    .assets-option-right {
-       float: right;
+        .assets-option-symbol {
+            // margin-left: 10px;
+            color: #364361;
+            font-family: MontserratBold;
+            font-weight: bolder;
+        }
+        .assets-option-symbol-name {
+            margin-left: 10px;
+            color: #A3B4CC;
+        }
+        .assets-option-left {
+            align-items: center;
+            line-height: 38px;
+        }
+        .assets-option-right {
+        float: right;
+        }
     }
 }
 
 
+.left-10 {
+    margin-left: 10px!important;
+}
 
 .card-title {
     font-size:12px;
