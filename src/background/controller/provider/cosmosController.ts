@@ -110,10 +110,15 @@ class CosmosProviderController {
       bech32Config,
       coinType,
     } as CosChainInfo;
-    const { account } = await cosmosTxController.cosmosAccount.getAccounts(
+    let { account } = await cosmosTxController.cosmosAccount.getAccounts(
       cosChainInfo.rest,
       k.bech32Address
     );
+    if (!account) {
+      account = {
+        address: k.bech32Address,
+      };
+    }
     const txId = createId();
     cosmosTxController.cosmosAccount.addTransactionToList({
       id: txId,
