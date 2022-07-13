@@ -130,6 +130,7 @@ class CosmosProviderController {
       memo: approvalRes?.memo,
       fee: approvalRes?.fee,
       account,
+      fromDapp: origin,
     });
     return {
       signed: JSONUint8Array.wrap(signDoc),
