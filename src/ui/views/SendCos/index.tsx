@@ -253,22 +253,24 @@ const Send = () => {
     }
     return {
       label: (
-        <div className="assets-option flexR">
-          <div className="assets-option-left flexR">
-            <TokenIcon token={t} scale={0.8} />
-            <span className="assets-option-symbol">{t.symbol}</span>
-            {ibcChainInfoStr ? ibcChainInfoStr : null}
+        <div className="flexR assets-option-cos-wrapper">
+          <TokenIcon token={t} scale={0.8} />
+          <div className="assets-option flexR flex-wrap">
+            <div className="assets-option-left flexR">
+              <span className="assets-option-symbol">{t.symbol}</span>
+              {ibcChainInfoStr ? ibcChainInfoStr : null}
+            </div>
+            <span className="assets-option-right">
+              {`${denom2SymbolRatio(t?.amount || 0, t?.decimal || 0)}  `}
+            </span>
           </div>
-          <span className="assets-option-right">
-            {`${denom2SymbolRatio(t?.amount || 0, t?.decimal || 0)}  `}
-          </span>
         </div>
       ),
       selected: (
         <div className="assets-option flexR">
           <div className="assets-option-left flexR">
             <TokenIcon token={t} scale={0.8} />
-            <span className="assets-option-symbol">{t.symbol}</span>
+            <span className="assets-option-symbol left-10">{t.symbol}</span>
             {ibcChainInfoStr ? ibcChainInfoStr : null}
           </div>
         </div>
