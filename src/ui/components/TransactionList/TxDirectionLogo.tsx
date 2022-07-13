@@ -60,9 +60,12 @@ export function TxDirectionLogo({ status, type, size = 48 }: TxLogoParams) {
   }, [status]);
   const theIcon = useMemo(() => {
     switch (type) {
-      case 'send': return <IconSent style={iconStyle} width={12} height={12} />;
-      case 'sign': return <IconSign style={iconStyle} width={12} height={12} />;
-      default: return <IconReceive style={iconStyle} width={12} height={12} />
+      case 'send':
+        return <IconSent style={iconStyle} width={12} height={12} />;
+      case 'sign':
+        return <IconSign style={iconStyle} width={12} height={12} />;
+      default:
+        return <IconReceive style={iconStyle} width={12} height={12} />;
     }
   }, [type]);
   return (

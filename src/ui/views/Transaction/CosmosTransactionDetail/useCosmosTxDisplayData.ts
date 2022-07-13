@@ -20,7 +20,10 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     ? formatDateWithWeekContext(transaction?.timestamp)
     : undefined;
 
-  const displayedStatusKey = transaction?.type === 'send' ? transaction?.status || CosmosTxStatus.CREATED : CosmosTxStatus.SUCCESS;
+  const displayedStatusKey =
+    transaction?.type === 'send'
+      ? transaction?.status || CosmosTxStatus.CREATED
+      : CosmosTxStatus.SUCCESS;
 
   const balances = useSelector(getTokenBalancesOfCurrentAccount);
   /**
