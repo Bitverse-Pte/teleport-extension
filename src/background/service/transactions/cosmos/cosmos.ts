@@ -392,7 +392,10 @@ export class CosmosAccountImpl {
     if (!k) throw Error('no key found');
     const { bech32Address, pubKey } = k;
 
-    const { account } = await this.getAccounts(ecoSystemParams?.rest, bech32Address);
+    const { account } = await this.getAccounts(
+      ecoSystemParams?.rest,
+      bech32Address
+    );
     const actualAmount = (_amount) => {
       let dec = new Dec(_amount);
       dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
