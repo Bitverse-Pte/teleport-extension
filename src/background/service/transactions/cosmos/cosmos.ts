@@ -392,10 +392,10 @@ export class CosmosAccountImpl {
     if (!k) throw Error('no key found');
     const { bech32Address, pubKey } = k;
 
-    const {
-      account: { account_number, sequence },
-    } = await this.getAccounts(ecoSystemParams?.rest, bech32Address);
-
+    const { account } = await this.getAccounts(
+      ecoSystemParams?.rest,
+      bech32Address
+    );
     const actualAmount = (_amount) => {
       let dec = new Dec(_amount);
       dec = dec.mul(DecUtils.getPrecisionDec(currency.coinDecimals));
@@ -403,8 +403,8 @@ export class CosmosAccountImpl {
     };
     return {
       chain_id: chainId,
-      account_number: account_number,
-      sequence: sequence,
+      account_number: account?.account_number || null,
+      sequence: account?.sequence || null,
       fee: stdFee,
       from_address: bech32Address,
       to_address: recipient,
@@ -582,7 +582,7 @@ export class CosmosAccountImpl {
     this.addTransactionToList({
       ...currentCosmosTx,
       status: CosmosTxStatus.SIGNED,
-      account,
+      account: account ? account : { address: bech32Address },
       aminoMsgs,
       mode,
     });
@@ -803,7 +803,7 @@ export class CosmosAccountImpl {
           status: CosmosTxStatus.FAILED,
           error: txResponse,
         });
-        platform._showNotification('Tx Failed', txResponse);
+        platform._showNotification('Tx Failed', txResponse['raw_log']);
         return txResponse;
       }
 
