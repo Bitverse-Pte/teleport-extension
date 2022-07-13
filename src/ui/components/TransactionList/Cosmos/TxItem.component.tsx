@@ -87,7 +87,7 @@ export function CosmosTransactionItem({
       <TxDirectionLogo
         status={displayedStatusKey}
         type={
-          category === TransactionGroupCategories.RECEIVE ? 'receive' : 'send'
+          title === 'sign' ? 'sign' : 'send'
         }
         size={30}
       />

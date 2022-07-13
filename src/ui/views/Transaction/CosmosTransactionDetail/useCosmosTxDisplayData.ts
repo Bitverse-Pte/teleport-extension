@@ -20,7 +20,7 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     ? formatDateWithWeekContext(transaction?.timestamp)
     : undefined;
 
-  const displayedStatusKey = transaction?.status || CosmosTxStatus.CREATED;
+  const displayedStatusKey = transaction?.type === 'send' ? transaction?.status || CosmosTxStatus.CREATED : CosmosTxStatus.SUCCESS;
 
   const balances = useSelector(getTokenBalancesOfCurrentAccount);
   /**
@@ -42,12 +42,11 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
   const ibcChainName = token?.chainName;
 
   /**
-   * @TODO
    * These are props for Sign type
    * furthermore need to play with albert for sign tx's data stroage and its type
    */
-  const title: CosmosTxType = TransactionGroupCategories.SEND;
-  const fromDapp: string | undefined = undefined;
+  const title = (transaction?.type as CosmosTxType) || 'send';
+  const fromDapp: string | undefined = transaction?.fromDapp;
 
   return {
     title: title as CosmosTxType,
