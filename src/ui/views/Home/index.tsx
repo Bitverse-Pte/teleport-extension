@@ -554,6 +554,7 @@ const Home = () => {
           height="76vh"
           bodyStyle={{
             padding: 0,
+            overflowX: 'hidden',
           }}
           contentWrapperStyle={{
             borderRadius: '0 0 23px 23px',
