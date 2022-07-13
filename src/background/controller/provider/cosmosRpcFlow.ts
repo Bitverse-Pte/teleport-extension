@@ -97,7 +97,7 @@ const flowContext = flow
         approvalComponent: approvalType,
         params: {
           method,
-          data: args,
+          data: JSONUint8Array.wrap(args),
           existed: existed,
           session: { origin, name, icon },
         },
@@ -130,7 +130,7 @@ const flowContext = flow
   .callback();
 
 export default (request) => {
-  //request = JSONUint8Array.unwrap(request);
+  request = JSONUint8Array.unwrap(request);
   const ctx: any = { request: { ...request, requestedApproval: false } };
   return flowContext(ctx).finally(() => {
     if (ctx.request.rejectApproval) {
