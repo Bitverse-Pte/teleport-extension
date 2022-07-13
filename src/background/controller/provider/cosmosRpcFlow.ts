@@ -115,7 +115,6 @@ const flowContext = flow
     const {
       session: { origin },
     } = request;
-    console.log('===[ctx.approvalRes]==', ctx.approvalRes);
     const requestDefer = Promise.resolve(
       cosmosController[mapMethod]({
         ...request,
