@@ -699,7 +699,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
   },
   {
     symbol: 'EVMOS',
-    decimal: 6,
+    decimal: 18,
     name: 'EVMOS',
     denom: 'aevmos',
     icon: '',
@@ -738,7 +738,7 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
   },
   {
     symbol: 'CRO',
-    decimal: 6,
+    decimal: 8,
     name: 'CRO',
     denom: 'basecro',
     icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/cronos/info/logo.png',
