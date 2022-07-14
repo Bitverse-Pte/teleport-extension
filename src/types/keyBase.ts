@@ -20,7 +20,7 @@ export abstract class KeyBase<T> {
   public abstract generateSignature(
     msg: T,
     privateKey: string | Buffer
-  ): Buffer;
+  ): Buffer | Promise<Buffer>;
 
   public abstract signTx(stdTx: T, privateKey: string | Buffer): any;
 }

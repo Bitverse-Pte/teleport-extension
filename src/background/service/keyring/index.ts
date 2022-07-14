@@ -41,6 +41,7 @@ import secp256k1_1 from 'ethereum-cryptography/secp256k1';
 import { Bech32Config } from 'types/cosmos';
 import { PresetNetworkId } from 'constants/defaultNetwork';
 import { Bech32Address } from 'utils/cosmos/bech32';
+import { transformHexAddress2Bech32 } from 'background/utils/hexstring-utils';
 
 export interface IStorageState {
   booted: string;
@@ -279,10 +280,21 @@ class KeyringService extends EventEmitter {
           ecosystem = Ecosystem.EVM;
           break;
         case Ecosystem.COSMOS:
-          keyPair = await this._createCosmosKeypairByImportPrivateKey(
-            opts.privateKey,
-            (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
-          );
+          if (chain.coinType === CoinType.ETH) {
+            keyPair = await this._createEthKeypairByImportPrivateKey(
+              opts.privateKey
+            );
+            keyPair.address = transformHexAddress2Bech32(
+              keyPair.address,
+              (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+            );
+          } else {
+            keyPair = await this._createCosmosKeypairByImportPrivateKey(
+              opts.privateKey,
+              (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+            );
+          }
+
           if (
             this._checkDuplicateAccount(
               keyPair.address,
@@ -485,11 +497,20 @@ class KeyringService extends EventEmitter {
           }
           break;
         case Ecosystem.COSMOS:
-          keyPair = this._createCosmosKeypairByMnemonic(
-            opts.mnemonic,
-            hdPath,
-            (p.prefix as Bech32Config).bech32PrefixAccAddr
-          );
+          if (p.coinType === CoinType.ETH) {
+            keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
+            keyPair.address = transformHexAddress2Bech32(
+              keyPair.address,
+              (p.prefix as Bech32Config)?.bech32PrefixAccAddr
+            );
+          } else {
+            keyPair = this._createCosmosKeypairByMnemonic(
+              opts.mnemonic,
+              hdPath,
+              (p.prefix as Bech32Config).bech32PrefixAccAddr
+            );
+          }
+
           if (
             this._checkDuplicateAccount(
               keyPair.address,
@@ -601,11 +622,19 @@ class KeyringService extends EventEmitter {
         }
         break;
       case Ecosystem.COSMOS:
-        keyPair = this._createCosmosKeypairByMnemonic(
-          mnemonic,
-          hdPath,
-          (prefix as Bech32Config).bech32PrefixAccAddr
-        );
+        if (coinType === CoinType.ETH) {
+          keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
+          keyPair.address = transformHexAddress2Bech32(
+            keyPair.address,
+            (prefix as Bech32Config)?.bech32PrefixAccAddr
+          );
+        } else {
+          keyPair = this._createCosmosKeypairByMnemonic(
+            mnemonic,
+            hdPath,
+            (prefix as Bech32Config).bech32PrefixAccAddr
+          );
+        }
         if (
           this._checkDuplicateAccount(
             keyPair.address,
@@ -1469,11 +1498,22 @@ class KeyringService extends EventEmitter {
                 }
                 break;
               case Ecosystem.COSMOS:
-                keyPair = this._createCosmosKeypairByMnemonic(
-                  wallet.mnemonic as string,
-                  hdPath,
-                  (chain.prefix as Bech32Config).bech32PrefixAccAddr
-                );
+                if (chain.coinType === CoinType.ETH) {
+                  keyPair = this._createEthKeypairByMnemonic(
+                    wallet.mnemonic as string,
+                    hdPath
+                  );
+                  keyPair.address = transformHexAddress2Bech32(
+                    keyPair.address,
+                    (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+                  );
+                } else {
+                  keyPair = this._createCosmosKeypairByMnemonic(
+                    wallet.mnemonic as string,
+                    hdPath,
+                    (chain.prefix as Bech32Config).bech32PrefixAccAddr
+                  );
+                }
                 if (
                   this._checkDuplicateAccount(
                     keyPair.address,
@@ -1544,10 +1584,20 @@ class KeyringService extends EventEmitter {
               }
               break;
             case Ecosystem.COSMOS:
-              keyPair = await this._createCosmosKeypairByImportPrivateKey(
-                (wallet as any).privateKey,
-                (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
-              );
+              if (chain.coinType === CoinType.ETH) {
+                keyPair = await this._createEthKeypairByImportPrivateKey(
+                  (wallet as any).privateKey
+                );
+                keyPair.address = transformHexAddress2Bech32(
+                  keyPair.address,
+                  (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+                );
+              } else {
+                keyPair = await this._createCosmosKeypairByImportPrivateKey(
+                  (wallet as any).privateKey,
+                  (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+                );
+              }
               if (
                 this._checkDuplicateAccount(
                   keyPair.address,
