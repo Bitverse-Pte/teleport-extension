@@ -74,9 +74,8 @@ const SignDirectCosmTx = ({
     const protoSignDoc = new ProtoSignDocDecoder(msg);
     const signDoc = protoSignDoc.toJSON();
     setSignDoc(signDoc);
-    const tokens = await wallet.getTokenBalancesAsync(chainId, from);
+    const tokens = await wallet.getTokenBalancesSync(chainId, from);
     const prices = await wallet.queryTokenPrices();
-    console.log('====[ tokens, prices]====', tokens, prices);
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
     dispatch(hideLoadingIndicator());
