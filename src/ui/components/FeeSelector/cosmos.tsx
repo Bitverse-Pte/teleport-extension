@@ -76,7 +76,7 @@ function FeeSelector(props) {
   const location = useLocation();
   const gasState: any = useSelector((state) => state.gas);
   const dispatch = useDispatch();
-  const { visible, onClose, currency } = props;
+  const { visible, onClose, currency, customGas: customStdGas } = props;
   const wallet = useWallet();
   const [selectFee, setSelectFee] = useState('medium');
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -90,11 +90,38 @@ function FeeSelector(props) {
     setSelectFee(type);
   };
   const fetchStdFee = async () => {
-    const stdFee = await wallet.getCosmosStdFee('low', currency);
-    setCustomGas(stdFee.gas);
+    let gas = '0';
+    if (customStdGas) {
+      gas = customStdGas.gas;
+    } else {
+      const stdFee = await wallet.getCosmosStdFee('low', currency);
+      gas = stdFee.gas;
+    }
+    setCustomGas(gas);
+  };
+  const fetchSelectFee = async () => {
+    if (customStdGas) {
+      const c = customStdGas.gas;
+      const amount = customStdGas?.amount[0]?.amount;
+      const l = await wallet.getCosmosFeeTypePrimitive('low', currency, c);
+      const a = await wallet.getCosmosFeeTypePrimitive('average', currency, c);
+      const h = await wallet.getCosmosFeeTypePrimitive('high', currency, c);
+      switch (amount) {
+        case l.amount:
+          setSelectFee('low');
+          break;
+        case a.amount:
+          setSelectFee('medium');
+          break;
+        case h.amount:
+          setSelectFee('high');
+          break;
+      }
+    }
   };
   useEffect(() => {
     fetchStdFee();
+    fetchSelectFee();
   }, []);
   const fetchGasFeeEstimates = async () => {
     const cGas = Number(customGas);

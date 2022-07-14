@@ -3,6 +3,7 @@ import EIP1559 from './EIP1559';
 import Legacy from './legacy';
 import CosmosFee from './cosmos';
 import { Currency } from '@keplr-wallet/types';
+import { StdFee } from '@cosmjs/launchpad';
 interface FeeSelectorProps {
   visible: boolean;
   onClose: (...args: any[]) => void;
@@ -13,6 +14,7 @@ interface FeeSelectorProps {
   supportsEIP1559?: boolean;
   isCosmos?: boolean;
   currency?: Currency;
+  customGas?: Partial<StdFee>;
 }
 
 function FeeSelector(props: FeeSelectorProps) {

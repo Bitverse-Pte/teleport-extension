@@ -47,6 +47,7 @@ import { CosmosKey } from 'background/service/keyManager/cosmos/CosmosKey';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { nanoid as createId } from 'nanoid';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
+import { EthKey } from 'background/service/keyManager/eth/EthKey';
 
 export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
@@ -183,6 +184,7 @@ export interface CosmosTx {
   tx_hash?: string;
   error?: any;
   type?: string; //this attribute design for displayed in activities. type=undefined for send; type='sign' for sign
+  fromDapp?: string; // this attribute design for displayed in activities.
 }
 interface TransactionState {
   transactions: Record<string, CosmosTx>;
@@ -816,16 +818,21 @@ export class CosmosAccountImpl {
         // platform.showTransactionNotification(tx, {});
         if (tx.code && !tx.data) {
           platform._showNotification('Tx Failed', tx.log);
+          this.addTransactionToList({
+            ...currentCosmosTx,
+            status: CosmosTxStatus.FAILED,
+            tx_hash: txResponse.txhash,
+            error: tx,
+          });
         } else {
           platform._showNotification('Tx Success', tx.log);
+          this.addTransactionToList({
+            ...currentCosmosTx,
+            status: CosmosTxStatus.SUCCESS,
+            tx_hash: txResponse.txhash,
+          });
         }
         txTracer.close();
-      });
-      console.log('--currentCosmosTx2222--', currentCosmosTx);
-      this.addTransactionToList({
-        ...currentCosmosTx,
-        status: CosmosTxStatus.SUCCESS,
-        tx_hash: txResponse.txhash,
       });
 
       return txHash;
@@ -939,10 +946,20 @@ export class CosmosAccountImpl {
     try {
       const privateKey = keyringService.getPrivateKeyByAddress(k.bech32Address);
       if (!privateKey) throw Error('no private key found');
-      const signature = new CosmosKey().generateSignature(
-        serializeSignDoc(signDoc),
-        privateKey
-      );
+      const coinType = networkPreferenceService.getChainCoinType(chainId);
+      let signature;
+      if (coinType === CoinType.ETH) {
+        const ethKey = new EthKey();
+        signature = ethKey.generateSignature(
+          serializeSignDoc(signDoc),
+          privateKey
+        );
+      } else {
+        signature = new CosmosKey().generateSignature(
+          serializeSignDoc(signDoc),
+          privateKey
+        );
+      }
 
       return {
         signed: signDoc,

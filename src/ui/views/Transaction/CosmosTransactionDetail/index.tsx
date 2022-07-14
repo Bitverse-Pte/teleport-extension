@@ -65,7 +65,6 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     fromDapp,
   } = useCosmosTxDisplayData(transaction);
   // transaction
-  console.debug('primaryCurrency', primaryCurrency);
   const { t } = useTranslation();
 
   const {
@@ -98,32 +97,40 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     window.open(`${rpcPrefs.blockExplorerUrl}/${type}/${hash}`);
   };
 
-  const matchedNativeToken = useSelector(getCurrentProviderNativeToken);
+  const messageData = transaction.aminoMsgs
+    ? transaction.aminoMsgs[0]
+    : undefined;
 
   return (
     <Fragment>
       <div className={'activity-detail ' + statusBackground}>
         <Header title={t(title)} />
-        <div className="txdetail-direction-logo flex justify-center">
-          {/* workaround as hook treat native token as undefined */}
-          <div>
-            <TokenIcon token={token || matchedNativeToken} radius={48} />
-          </div>
-        </div>
-        <div className="txdetail-values flex flex-wrap justify-center">
-          <div className="txdetail-value-display">
-            <p className="txdetail-value items-baseline flex-wrap">
-              {displayPrimaryCurrency.amount}
-              <span className="unit">{displayPrimaryCurrency.unit}</span>
-            </p>
-          </div>
-          <div className="details">
-            <div className="row from-and-to justify-center">
-              <AddressCard title="From" address={senderAddress} />
-              <IconComponent name="arrow-right" cls="to-icon" />
-              <AddressCard title="To" address={recipientAddress} />
+        {/* hooks will return token even it's native token, so undefined usually means sign  */}
+        {token && (
+          <div className="txdetail-direction-logo flex justify-center">
+            <div>
+              <TokenIcon token={token} radius={48} />
             </div>
-            {transaction.tx_hash && (
+          </div>
+        )}
+        <div className="txdetail-values flex flex-wrap justify-center">
+          {transaction.type !== 'sign' && (
+            <div className="txdetail-value-display">
+              <p className="txdetail-value items-baseline flex-wrap">
+                {displayPrimaryCurrency.amount}
+                <span className="unit">{displayPrimaryCurrency.unit}</span>
+              </p>
+            </div>
+          )}
+          <div className="details">
+            {recipientAddress && (
+              <div className="row from-and-to justify-center">
+                <AddressCard title="From" address={senderAddress} />
+                <IconComponent name="arrow-right" cls="to-icon" />
+                <AddressCard title="To" address={recipientAddress} />
+              </div>
+            )}
+            {transaction.tx_hash ? (
               <div className="row">
                 <div className="field-name">Transaction ID</div>
                 <div className="field-value">
@@ -138,6 +145,18 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
                   />
                 </div>
               </div>
+            ) : (
+              <TransactionItemDetail
+                name={t('Chain ID')}
+                value={transaction.chainInfo.chainId}
+              />
+            )}
+            {fromDapp && (
+              <TransactionItemDetail
+                name="From Dapp"
+                hoverValueText={date}
+                value={fromDapp}
+              />
             )}
             <TransactionItemDetail
               name="Time"
@@ -156,13 +175,14 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
               name="Sequence"
               value={transaction.account.sequence}
             />
-            {/* { messageData && 
-            <><TransactionItemDetail name={t('Message')} value="" />
-             <div className="sign-data">
-                <div>
+            {messageData && (
+              <>
+                <TransactionItemDetail name={t('Message')} value="" />
+                <div className="sign-data row">
                   <pre>{JSON.stringify(messageData, null, 2)}</pre>
                 </div>
-            </div></>} */}
+              </>
+            )}
             <TransactionItemDetail name="Memo" value={transaction.memo} />
             {ibcChannel && (
               <TransactionItemDetail
