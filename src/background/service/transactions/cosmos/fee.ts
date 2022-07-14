@@ -191,11 +191,21 @@ export const DefaultGasPriceStep: {
 };
 
 class FeeConfig {
-  toStdFee(feeType: FeeType, sendCurrency: Currency, customGas?: number) {
-    const amount = this.getFeeTypePrimitive(feeType, sendCurrency, customGas);
+  toStdFee(
+    feeType: FeeType,
+    sendCurrency: Currency,
+    customGas?: number,
+    chainId?: string
+  ) {
+    const amount = this.getFeeTypePrimitive(
+      feeType,
+      sendCurrency,
+      customGas,
+      chainId
+    );
     const gas = customGas
       ? customGas.toString()
-      : this.gas(sendCurrency).toString();
+      : this.gas(sendCurrency, chainId).toString();
     if (!amount) {
       return {
         gas,
@@ -209,13 +219,17 @@ class FeeConfig {
     };
   }
 
-  get feeCurrency(): Currency | undefined {
-    const { ecoSystemParams } = networkPreferenceService.getProviderConfig();
+  feeCurrency(chainId?: string): Currency | undefined {
+    const { ecoSystemParams } = chainId
+      ? networkPreferenceService.getCosmosChainInfo(chainId)
+      : networkPreferenceService.getProviderConfig();
     return ecoSystemParams?.feeCurrencies[0];
   }
 
-  get gasPriceStep(): GasPriceStep {
-    const { ecoSystemParams } = networkPreferenceService.getProviderConfig();
+  gasPriceStep(chainId?: string): GasPriceStep {
+    const { ecoSystemParams } = chainId
+      ? networkPreferenceService.getCosmosChainInfo(chainId)
+      : networkPreferenceService.getProviderConfig();
     return ecoSystemParams?.gasPriceStep
       ? ecoSystemParams.gasPriceStep
       : DefaultGasPriceStep;
@@ -224,18 +238,20 @@ class FeeConfig {
   getFeeTypePrimitive(
     feeType: FeeType,
     sendCurrency: Currency,
-    customGas?: number
+    customGas?: number,
+    chainId?: string
   ) {
-    if (!this.feeCurrency) {
+    const feeCurrency = this.feeCurrency(chainId);
+    if (!feeCurrency) {
       throw new Error('Fee currency not set');
     }
 
-    const gasPrice = new Dec(this.gasPriceStep[feeType].toString());
-    const gas = customGas ? customGas : this.gas(sendCurrency);
+    const gasPrice = new Dec(this.gasPriceStep(chainId)[feeType].toString());
+    const gas = customGas ? customGas : this.gas(sendCurrency, chainId);
     const feeAmount = gasPrice.mul(new Dec(gas));
 
     return {
-      denom: this.feeCurrency.coinMinimalDenom,
+      denom: feeCurrency.coinMinimalDenom,
       amount: feeAmount.roundUp().toString(),
     };
   }
@@ -243,19 +259,20 @@ class FeeConfig {
   getFeeTypePretty(
     feeType: FeeType,
     sendCurrency: Currency,
-    customGas?: number
+    customGas?: number,
+    chainId?: string
   ) {
-    if (!this.feeCurrency) {
+    const feeCurrency = this.feeCurrency(chainId);
+    if (!feeCurrency) {
       throw new Error('Fee currency not set');
     }
 
     const feeTypePrimitive = this.getFeeTypePrimitive(
       feeType,
       sendCurrency,
-      customGas
+      customGas,
+      chainId
     );
-    const feeCurrency = this.feeCurrency;
-    console.log('feeTypePrimitive:', feeTypePrimitive, feeCurrency);
 
     return new CoinPretty(feeCurrency, new Int(feeTypePrimitive.amount))
       .maxDecimals(feeCurrency.coinDecimals)
@@ -263,8 +280,10 @@ class FeeConfig {
       .toString();
   }
 
-  gas(sendCurrency: Currency): number {
-    const { chainId } = networkPreferenceService.getProviderConfig();
+  gas(sendCurrency: Currency, _chainId?: string): number {
+    const chainId = _chainId
+      ? _chainId
+      : networkPreferenceService.getProviderConfig().chainId;
     const denomHelper = new DenomHelper(sendCurrency.coinMinimalDenom);
 
     switch (denomHelper.type) {

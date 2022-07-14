@@ -15,6 +15,7 @@ interface FeeSelectorProps {
   isCosmos?: boolean;
   currency?: Currency;
   customGas?: Partial<StdFee>;
+  chainId?: string;
 }
 
 function FeeSelector(props: FeeSelectorProps) {
