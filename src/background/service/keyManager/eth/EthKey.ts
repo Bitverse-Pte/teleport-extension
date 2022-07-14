@@ -5,7 +5,10 @@ import * as sigUtil from 'eth-sig-util';
 import * as bip39 from 'bip39';
 import { hdkey } from 'ethereumjs-wallet';
 import Wallet from 'ethereumjs-wallet';
+import { Wallet as EthWallet } from '@ethersproject/wallet';
+import { keccak256 } from '@ethersproject/keccak256';
 import { CoinType } from 'types/network';
+import * as BytesUtils from '@ethersproject/bytes';
 
 export class EthKey extends Base.KeyBase<Tx.Transaction> {
   public generateWalletFromMnemonic(
@@ -44,8 +47,23 @@ export class EthKey extends Base.KeyBase<Tx.Transaction> {
     return keyPair;
   }
 
-  public generateSignature(stdTx: any, privateKey: string | Buffer): Buffer {
-    throw new Error('Method not implemented.');
+  public async generateSignature(
+    stdTx: any,
+    privateKey: string | Buffer
+  ): Promise<any> {
+    let privKey = privateKey;
+    if (typeof privKey === 'string') {
+      const stripped = ethUtil.stripHexPrefix(privateKey as string);
+      privKey = Buffer.from(stripped, 'hex');
+    }
+    const ethWallet = new EthWallet(privKey);
+    const signature = await ethWallet
+      ._signingKey()
+      .signDigest(keccak256(stdTx));
+    const splitSignature = BytesUtils.splitSignature(signature);
+    return BytesUtils.arrayify(
+      BytesUtils.concat([splitSignature.r, splitSignature.s])
+    );
   }
 
   public signTx(stdTx: Tx.Transaction, privateKey: string): any {
