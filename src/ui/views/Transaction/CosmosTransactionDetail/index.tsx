@@ -131,7 +131,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
                 <AddressCard title="To" address={recipientAddress} />
               </div>
             )}
-            {transaction.tx_hash && (
+            {transaction.tx_hash ? (
               <div className="row">
                 <div className="field-name">Transaction ID</div>
                 <div className="field-value">
@@ -146,6 +146,18 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
                   />
                 </div>
               </div>
+            ) : (
+              <TransactionItemDetail
+                name={t('Chain ID')}
+                value={transaction.chainInfo.chainId}
+              />
+            )}
+            {fromDapp && (
+              <TransactionItemDetail
+                name="From Dapp"
+                hoverValueText={date}
+                value={fromDapp}
+              />
             )}
             <TransactionItemDetail
               name="Time"
