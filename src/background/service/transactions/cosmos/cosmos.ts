@@ -817,16 +817,21 @@ export class CosmosAccountImpl {
         // platform.showTransactionNotification(tx, {});
         if (tx.code && !tx.data) {
           platform._showNotification('Tx Failed', tx.log);
+          this.addTransactionToList({
+            ...currentCosmosTx,
+            status: CosmosTxStatus.FAILED,
+            tx_hash: txResponse.txhash,
+            error: tx,
+          });
         } else {
           platform._showNotification('Tx Success', tx.log);
+          this.addTransactionToList({
+            ...currentCosmosTx,
+            status: CosmosTxStatus.SUCCESS,
+            tx_hash: txResponse.txhash,
+          });
         }
         txTracer.close();
-      });
-      console.log('--currentCosmosTx2222--', currentCosmosTx);
-      this.addTransactionToList({
-        ...currentCosmosTx,
-        status: CosmosTxStatus.SUCCESS,
-        tx_hash: txResponse.txhash,
       });
 
       return txHash;
