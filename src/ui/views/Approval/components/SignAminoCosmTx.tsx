@@ -104,16 +104,12 @@ const SignAminoCosmTx = ({
   }, [tokens]);
 
   const fetchStdFee = async () => {
+    if (!nativeToken) {
+      return;
+    }
     dispatch(showLoadingIndicator());
     const feeType = fixedFeeType(gasState.gasType);
     let _stdFee = signDoc.fee;
-    console.log(
-      '====fetchStdFee:[gasState, _stdFee, currency, chainId]=====',
-      gasState,
-      _stdFee,
-      currency,
-      chainId
-    );
     if (gasState.customType) {
       _stdFee = await wallet.getCosmosStdFee(
         feeType,
@@ -121,15 +117,7 @@ const SignAminoCosmTx = ({
         Number(gasState.cosmosCustomsGas),
         chainId
       );
-    } else {
-      _stdFee = await wallet.getCosmosStdFee(
-        feeType,
-        currency,
-        undefined,
-        chainId
-      );
     }
-    console.log('=====_stdFee=====', _stdFee);
     setStdFee(_stdFee);
     signDoc.fee = _stdFee;
     setSignDoc(signDoc);
@@ -276,6 +264,7 @@ const SignAminoCosmTx = ({
         onClose={() => setVisible(false)}
         currency={currency}
         customGas={signDoc.fee}
+        chainId={chainId}
       />
       <div className="tx-button-container flexCol">
         <CustomButton
