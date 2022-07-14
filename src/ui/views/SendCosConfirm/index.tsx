@@ -182,8 +182,7 @@ const ConfirmTx = () => {
       _stdFee = await wallet.getCosmosStdFee(
         feeType,
         currency,
-        Number(gasState.cosmosCustomsGas),
-        'osmosis'
+        Number(gasState.cosmosCustomsGas)
       );
     } else {
       _stdFee = await wallet.getCosmosStdFee(feeType, currency);
