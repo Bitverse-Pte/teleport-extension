@@ -171,6 +171,13 @@ class CosmosProviderController {
       coinType,
     } as CosChainInfo;
     const txId = createId();
+    console.log(
+      '==={cosChainInfo, tx, mode, txId}===',
+      cosChainInfo,
+      tx,
+      mode,
+      txId
+    );
     const txHash = await cosmosTxController.sendTx(
       cosChainInfo,
       tx,
