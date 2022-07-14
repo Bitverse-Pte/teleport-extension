@@ -182,7 +182,8 @@ const ConfirmTx = () => {
       _stdFee = await wallet.getCosmosStdFee(
         feeType,
         currency,
-        Number(gasState.cosmosCustomsGas)
+        Number(gasState.cosmosCustomsGas),
+        'osmosis'
       );
     } else {
       _stdFee = await wallet.getCosmosStdFee(feeType, currency);
@@ -278,6 +279,7 @@ const ConfirmTx = () => {
           visible={visible}
           onClose={() => setVisible(false)}
           currency={currency}
+          chainId="cosmoshub-4"
         />
         <div className="tx-button-container flexCol">
           <CustomButton
