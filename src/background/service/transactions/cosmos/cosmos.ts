@@ -184,6 +184,7 @@ export interface CosmosTx {
   tx_hash?: string;
   error?: any;
   type?: string; //this attribute design for displayed in activities. type=undefined for send; type='sign' for sign
+  fromDapp?: string; // this attribute design for displayed in activities.
 }
 interface TransactionState {
   transactions: Record<string, CosmosTx>;
