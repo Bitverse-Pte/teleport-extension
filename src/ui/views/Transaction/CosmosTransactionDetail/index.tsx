@@ -65,7 +65,6 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     fromDapp,
   } = useCosmosTxDisplayData(transaction);
   // transaction
-  console.debug('primaryCurrency', primaryCurrency);
   const { t } = useTranslation();
 
   const {
@@ -102,18 +101,18 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     ? transaction.aminoMsgs[0]
     : undefined;
 
-  const matchedNativeToken = useSelector(getCurrentProviderNativeToken);
-
   return (
     <Fragment>
       <div className={'activity-detail ' + statusBackground}>
         <Header title={t(title)} />
-        <div className="txdetail-direction-logo flex justify-center">
-          {/* workaround as hook treat native token as undefined */}
-          <div>
-            <TokenIcon token={token || matchedNativeToken} radius={48} />
+        {/* hooks will return token even it's native token, so undefined usually means sign  */}
+        {token && (
+          <div className="txdetail-direction-logo flex justify-center">
+            <div>
+              <TokenIcon token={token} radius={48} />
+            </div>
           </div>
-        </div>
+        )}
         <div className="txdetail-values flex flex-wrap justify-center">
           {transaction.type !== 'sign' && (
             <div className="txdetail-value-display">
