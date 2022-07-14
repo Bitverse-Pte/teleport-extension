@@ -277,15 +277,18 @@ class TokenService {
     chainName: string;
     name: string;
     symbol: string;
+    decimal: number;
   } {
     const extra: {
       chainName: string;
       name: string;
       symbol: string;
+      decimal: number;
     } = {
       chainName: '',
       name: '',
       symbol: '',
+      decimal: 6,
     };
     const currentToken = EmbedChainInfos.find((e: AppChainInfo) => {
       return (
@@ -298,11 +301,13 @@ class TokenService {
       if (currentToken.stakeCurrency.coinMinimalDenom === denom) {
         extra.symbol = currentToken.stakeCurrency.coinDenom.toUpperCase();
         extra.name = currentToken.stakeCurrency.coinDenom.toUpperCase();
+        extra.decimal = currentToken.stakeCurrency.coinDecimals;
       } else {
         currentToken.currencies.forEach((c) => {
           if (c.coinMinimalDenom === denom) {
             extra.symbol = c.coinDenom.toUpperCase();
             extra.name = c.coinDenom.toUpperCase();
+            extra.decimal = c.coinDecimals;
           }
         });
       }
@@ -388,6 +393,7 @@ class TokenService {
                 t.symbol = tokenInfo.symbol;
                 t.name = tokenInfo.name;
                 t.trace = denomTrace;
+                t.decimal = tokenInfo.decimal;
               }
               currentAccountTokens.push(t);
             }
