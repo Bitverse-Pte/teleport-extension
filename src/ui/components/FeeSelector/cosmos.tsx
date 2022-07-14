@@ -76,7 +76,13 @@ function FeeSelector(props) {
   const location = useLocation();
   const gasState: any = useSelector((state) => state.gas);
   const dispatch = useDispatch();
-  const { visible, onClose, currency, customGas: customStdGas } = props;
+  const {
+    visible,
+    onClose,
+    currency,
+    customGas: customStdGas,
+    chainId,
+  } = props;
   const wallet = useWallet();
   const [selectFee, setSelectFee] = useState('medium');
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -103,9 +109,24 @@ function FeeSelector(props) {
     if (customStdGas) {
       const c = customStdGas.gas;
       const amount = customStdGas?.amount[0]?.amount;
-      const l = await wallet.getCosmosFeeTypePrimitive('low', currency, c);
-      const a = await wallet.getCosmosFeeTypePrimitive('average', currency, c);
-      const h = await wallet.getCosmosFeeTypePrimitive('high', currency, c);
+      const l = await wallet.getCosmosFeeTypePrimitive(
+        'low',
+        currency,
+        c,
+        chainId
+      );
+      const a = await wallet.getCosmosFeeTypePrimitive(
+        'average',
+        currency,
+        c,
+        chainId
+      );
+      const h = await wallet.getCosmosFeeTypePrimitive(
+        'high',
+        currency,
+        c,
+        chainId
+      );
       switch (amount) {
         case l.amount:
           setSelectFee('low');
@@ -129,13 +150,43 @@ function FeeSelector(props) {
     let aveFee = '0';
     let highFee = '0';
     if (cGas > 0) {
-      lowFee = await wallet.getCosmosFeeTypePretty('low', currency, cGas);
-      aveFee = await wallet.getCosmosFeeTypePretty('average', currency, cGas);
-      highFee = await wallet.getCosmosFeeTypePretty('high', currency, cGas);
+      lowFee = await wallet.getCosmosFeeTypePretty(
+        'low',
+        currency,
+        cGas,
+        chainId
+      );
+      aveFee = await wallet.getCosmosFeeTypePretty(
+        'average',
+        currency,
+        cGas,
+        chainId
+      );
+      highFee = await wallet.getCosmosFeeTypePretty(
+        'high',
+        currency,
+        cGas,
+        chainId
+      );
     } else {
-      lowFee = await wallet.getCosmosFeeTypePretty('low', currency);
-      aveFee = await wallet.getCosmosFeeTypePretty('average', currency);
-      highFee = await wallet.getCosmosFeeTypePretty('high', currency);
+      lowFee = await wallet.getCosmosFeeTypePretty(
+        'low',
+        currency,
+        undefined,
+        chainId
+      );
+      aveFee = await wallet.getCosmosFeeTypePretty(
+        'average',
+        currency,
+        undefined,
+        chainId
+      );
+      highFee = await wallet.getCosmosFeeTypePretty(
+        'high',
+        currency,
+        undefined,
+        chainId
+      );
     }
     setFeeList([
       { type: 'high', gas: highFee },
