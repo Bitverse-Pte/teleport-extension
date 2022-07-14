@@ -279,7 +279,6 @@ const ConfirmTx = () => {
           visible={visible}
           onClose={() => setVisible(false)}
           currency={currency}
-          chainId="cosmoshub-4"
         />
         <div className="tx-button-container flexCol">
           <CustomButton
