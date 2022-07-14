@@ -344,6 +344,24 @@ class KeyringService extends EventEmitter {
       currentAccount = tempAccounts.find(
         (c: BaseAccount) => c.chainCustomId === currentChain.id
       );
+      if (!currentAccount) {
+        let destChainCustomId;
+        const ethChainCustomId: PresetNetworkId | string =
+            PresetNetworkId.ETHEREUM,
+          cosmosChainId: PresetNetworkId | string = PresetNetworkId.COSMOS_HUB;
+        if (tempAccounts[0].ecosystem === Ecosystem.COSMOS) {
+          destChainCustomId = cosmosChainId;
+        } else if (tempAccounts[0].ecosystem === Ecosystem.EVM) {
+          destChainCustomId = ethChainCustomId;
+        }
+        currentAccount = tempAccounts.find(
+          (c: BaseAccount) => c.chainCustomId === destChainCustomId
+        );
+        const provider =
+          networkPreferenceService.getProvider(destChainCustomId);
+        if (provider)
+          networkPreferenceService.setProviderConfig(provider, false);
+      }
     }
     this.accounts = [...this.accounts, ...tempAccounts];
     this.secrets = [...this.secrets, ...tempSecrets];
