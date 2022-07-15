@@ -169,7 +169,6 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
                 value={`${formattedFee.amount} ${formattedFee.denom}`}
               />
             )}
-            {fromDapp && <TransactionItemDetail name="From" value={fromDapp} />}
             <TransactionItemDetail name="Gas" value={transaction.fee?.gas} />
             <TransactionItemDetail
               name="Sequence"
