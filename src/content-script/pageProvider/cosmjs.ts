@@ -9,7 +9,7 @@ import { OfflineDirectSigner } from '@cosmjs/proto-signing';
 import { DirectSignResponse } from '@cosmjs/proto-signing/build/signer';
 import { SignDoc } from '@cosmjs/proto-signing/build/codec/cosmos/tx/v1beta1/tx';
 
-export class CosmJSOfflineSigner implements OfflineSigner, OfflineDirectSigner {
+export class CosmJSOfflineSignerOnlyAmino implements OfflineSigner {
   private _chainId: string;
   private _keplr: Keplr;
   constructor(
@@ -49,21 +49,32 @@ export class CosmJSOfflineSigner implements OfflineSigner, OfflineDirectSigner {
 
     return await this._keplr.signAmino(this._chainId, signerAddress, signDoc);
   }
+}
+export class CosmJSOfflineSigner
+  extends CosmJSOfflineSignerOnlyAmino
+  implements OfflineSigner, OfflineDirectSigner
+{
+  constructor(
+    protected readonly chainId: string,
+    protected readonly keplr: Keplr
+  ) {
+    super(chainId, keplr);
+  }
 
   async signDirect(
     signerAddress: string,
     signDoc: SignDoc
   ): Promise<DirectSignResponse> {
-    if (this._chainId !== signDoc.chainId) {
+    if (this.chainId !== signDoc.chainId) {
       throw new Error('Unmatched chain id with the offline signer');
     }
 
-    const key = await this._keplr.getKey(signDoc.chainId);
+    const key = await this.keplr.getKey(signDoc.chainId);
 
     if (key.bech32Address !== signerAddress) {
       throw new Error('Unknown signer address');
     }
 
-    return await this._keplr.signDirect(this._chainId, signerAddress, signDoc);
+    return await this.keplr.signDirect(this.chainId, signerAddress, signDoc);
   }
 }
