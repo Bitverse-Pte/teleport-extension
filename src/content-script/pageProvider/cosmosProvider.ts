@@ -13,7 +13,7 @@ import {
   Key,
 } from 'types/cosmos';
 import { JSONUint8Array } from 'utils/cosmos/json-uint8-array';
-import { CosmJSOfflineSigner } from './cosmjs';
+import { CosmJSOfflineSigner, CosmJSOfflineSignerOnlyAmino } from './cosmjs';
 import {
   AminoSignResponse,
   BroadcastMode,
@@ -221,6 +221,20 @@ export class CosmosProvider extends EventEmitter implements Keplr {
     return await this.requestMethod('sendTx', [chainId, tx, mode]);
   }
 
+  getOfflineSignerOnlyAmino(chainId: string): OfflineSigner {
+    return new CosmJSOfflineSignerOnlyAmino(chainId, this);
+  }
+
+  async getOfflineSignerAuto(
+    chainId: string
+  ): Promise<OfflineSigner | OfflineDirectSigner> {
+    const key = await this.getKey(chainId);
+    if (key.isNanoLedger) {
+      return new CosmJSOfflineSignerOnlyAmino(chainId, this);
+    }
+    return new CosmJSOfflineSigner(chainId, this);
+  }
+
   signArbitrary(
     chainId: string,
     signer: string,
@@ -236,14 +250,7 @@ export class CosmosProvider extends EventEmitter implements Keplr {
   ): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
-  getOfflineSignerOnlyAmino(chainId: string): OfflineSigner {
-    throw new Error('Method not implemented.');
-  }
-  getOfflineSignerAuto(
-    chainId: string
-  ): Promise<OfflineSigner | OfflineDirectSigner> {
-    throw new Error('Method not implemented.');
-  }
+
   suggestToken(
     chainId: string,
     contractAddress: string,
