@@ -3,6 +3,7 @@ import { Switch, Route } from 'react-router-dom';
 import { LazyPrivateRoute } from 'ui/components';
 import Welcome from 'ui/views/Welcome/Welcome';
 import { AddChain } from './Approval/components';
+import { DarkModeTest } from './_DarkModeTest';
 
 const AccountCreate = lazy(() => import('ui/views/AccountCreate'));
 const MnemonicBackup = lazy(() => import('ui/views/MnemonicBackup'));
@@ -119,6 +120,9 @@ const Main = () => {
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/cosmos/activity/:activityId">
           <CosmosActivityDetail />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/dev/darkmode">
+          <DarkModeTest />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/mock/addNetworkPrompt">
           <AddChain

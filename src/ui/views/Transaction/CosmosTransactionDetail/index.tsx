@@ -7,8 +7,9 @@ import { AddressCard } from 'ui/components/universal/AddressCard';
 import { IconComponent } from 'ui/components/IconComponents';
 import { TokenIcon } from 'ui/components/Widgets';
 import { useTranslation } from 'react-i18next';
-import skynet from 'utils/skynet';
-import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
+// import skynet from 'utils/skynet';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { TransactionItemDetail } from '../components/TransactionItemDetail.component';
 import { useCosmosTxDisplayData } from './useCosmosTxDisplayData';
 import { Tooltip } from 'antd';
@@ -17,7 +18,7 @@ import { useParams } from 'react-router-dom';
 import { getCosmosTransactionById } from 'ui/selectors/cosmos-transaction.selector';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
 import CopyOrOpenInScan from 'ui/components/universal/copyOrOpenInScan';
-const { sensors } = skynet;
+// const { sensors } = skynet;
 
 export default function ActivityDetail() {
   /**
@@ -97,13 +98,21 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
     window.open(`${rpcPrefs.blockExplorerUrl}/${type}/${hash}`);
   };
 
+  const { isDarkMode } = useDarkmode();
+
   const messageData = transaction.aminoMsgs
     ? transaction.aminoMsgs[0]
     : undefined;
 
   return (
     <Fragment>
-      <div className={'activity-detail ' + statusBackground}>
+      <div
+        className={clsx(
+          'activity-detail',
+          { dark: isDarkMode },
+          statusBackground
+        )}
+      >
         <Header title={t(title)} />
         {/* hooks will return token even it's native token, so undefined usually means sign  */}
         {token && (
