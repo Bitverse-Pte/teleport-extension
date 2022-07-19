@@ -280,26 +280,14 @@ function FeeSelector(props) {
           ))}
         </ul>
         {!props.disableCustomGasFee && (
-          // <div
-          //   className="custom-box"
-          //   onClick={() => {
-          //     setCustomVisible(true);
-          //     sensors.track('teleport_gas_edit_customize', {
-          //       page: location.pathname,
-          //     });
-          //   }}
-          // >
-          //   <span>Custom Gas Fee</span>
-          //   <IconComponent name="chevron-right" cls="base-text-color" />
-          // </div>
           <div className="tel-collapse-box">
             <Collapse className="tel-collapse">
               <Collapse.Panel
-                header="Custom Gas Fee"
+                header="Customize Gas Fee"
                 key={1}
                 className="tel-collapse-panel"
               >
-                <div className="custom-fee">
+                <div className="cosmos-custom-fee">
                   <Form
                     layout="vertical"
                     onFinish={() => {
@@ -359,7 +347,7 @@ function FeeSelector(props) {
         key="top2"
       >
         <DrawerHeader
-          title="Custom Gas Fee"
+          title="Customize Gas Fee"
           type={2}
           handleCloseIconClick={() => setCustomVisible(false)}
         />
