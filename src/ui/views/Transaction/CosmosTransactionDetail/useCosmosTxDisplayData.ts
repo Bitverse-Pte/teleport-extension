@@ -21,7 +21,7 @@ export function useCosmosTxDisplayData(transaction?: CosmosTx) {
     : undefined;
 
   const displayedStatusKey =
-    transaction?.type === 'send'
+    transaction?.type !== 'sign'
       ? transaction?.status || CosmosTxStatus.CREATED
       : CosmosTxStatus.SUCCESS;
 
