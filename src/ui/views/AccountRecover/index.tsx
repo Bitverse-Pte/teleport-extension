@@ -173,14 +173,14 @@ const AccountRecover = () => {
     },
     policyShow
       ? [
-        name,
-        agreed,
-        mnemonic,
-        privateKey,
-        psd,
-        confirmPsd,
-        passwordCheckPassed,
-      ]
+          name,
+          agreed,
+          mnemonic,
+          privateKey,
+          psd,
+          confirmPsd,
+          passwordCheckPassed,
+        ]
       : [name, mnemonic, privateKey]
   );
 
