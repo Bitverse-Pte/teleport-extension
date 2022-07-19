@@ -580,7 +580,6 @@ export class CosmosAccountImpl {
     );
 
     const currentCosmosTx: CosmosTx = this.getTransaction(txId);
-    console.log('--currentCosmosTx--', currentCosmosTx);
     this.addTransactionToList({
       ...currentCosmosTx,
       status: CosmosTxStatus.SIGNED,
@@ -589,17 +588,7 @@ export class CosmosAccountImpl {
       mode,
     });
 
-    // const account = await BaseAccount.fetchFromRest(
-    //   this.instance(cosChainInfo),
-    //   bech32Address,
-    //   true
-    // );
-
     const coinType = cosChainInfo.coinType;
-
-    // TODO: need remove keplr
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    // const keplr = (await this.base.getKeplr())!;
 
     const signDoc = makeSignDoc(
       aminoMsgs,
@@ -610,7 +599,6 @@ export class CosmosAccountImpl {
       account.sequence
     );
 
-    // TODO: need remove keplr
     const signResponse = await this.requestSignAmino(
       cosChainInfo.chainId,
       bech32Address,
@@ -668,7 +656,6 @@ export class CosmosAccountImpl {
     }).finish();
 
     return {
-      // TODO: need remove keplr
       txHash: await this.sendTx(
         cosChainInfo,
         signedTx,
@@ -858,13 +845,6 @@ export class CosmosAccountImpl {
       isADR36WithString?: boolean;
     }
   ): Promise<AminoSignResponse> {
-    //const coinType = this.cosChainInfo.coinType;
-
-    // TODO: use keyRing
-    //const key = await this.keyRing.getKey(chainId, coinType);
-    //const bech32Prefix = this.cosChainInfo.bech32Config.bech32PrefixAccAddr;
-    //const bech32Address = new Bech32Address(key.address).toBech32(bech32Prefix);
-
     const chains: Provider[] = networkPreferenceService.getSupportProviders();
     const chain: Provider | undefined = chains.find(
       (c: Provider) => c.chainId === chainId
@@ -970,12 +950,20 @@ export class CosmosAccountImpl {
     }
   }
   async getAccounts(baseURL, address) {
-    return await fetch(`${baseURL}/cosmos/auth/v1beta1/accounts/${address}`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-    }).then((res) => res.json());
+    const { account } = await fetch(
+      `${baseURL}/cosmos/auth/v1beta1/accounts/${address}`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+      }
+    ).then((res) => res.json());
+    if (account && account.base_account) {
+      return { account: account.base_account };
+    } else {
+      return { account };
+    }
   }
 }
