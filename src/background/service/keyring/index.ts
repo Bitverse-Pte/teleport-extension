@@ -360,7 +360,7 @@ class KeyringService extends EventEmitter {
         const provider =
           networkPreferenceService.getProvider(destChainCustomId);
         if (provider)
-          networkPreferenceService.setProviderConfig(provider, false);
+          networkPreferenceService.setProviderConfig(provider, false, false);
       }
     }
     this.accounts = [...this.accounts, ...tempAccounts];
