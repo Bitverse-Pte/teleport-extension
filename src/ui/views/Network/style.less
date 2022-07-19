@@ -3,22 +3,21 @@
   font-size: 1.5rem;
 }
 
-.network-name {
-  // width: 100%;
-  // cursor: pointer;
-  white-space: nowrap;
-  max-width: 70%;
-  text-overflow: ellipsis;
-  // font-weight: 400;
-  // font-size: 16px;
-  // margin-left: 4px;
-  overflow: hidden;
-  // color: #9EA2A9;
-  //styleName: Title/Subtitle;
-  font-family: MontserratBold;
-  font-size: 16px;
-  text-align: left;
-  color: #364361;
+/** darkmode related override */
+.network-page-container.dark {
+  background-color: black;
+
+  .chevron-icon {
+    fill: #FFF;
+  }
+
+  .custom-network-card {
+    background-color: #02182B;
+  }
+
+  .network-list-header svg {
+    fill: #FFF;
+  }
 }
 .network-page-container {
 

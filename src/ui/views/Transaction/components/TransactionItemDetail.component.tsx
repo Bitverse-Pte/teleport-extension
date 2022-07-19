@@ -1,4 +1,6 @@
+import clsx from 'clsx';
 import React from 'react';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 interface TransactionItemDetailProps {
   name: string;
@@ -11,10 +13,16 @@ export function TransactionItemDetail({
   hoverValueText,
   value,
 }: TransactionItemDetailProps) {
+  const { isDarkMode } = useDarkmode();
   return (
     <div className="row">
       <div className="field-name">{name}</div>
-      <div className="field-value" title={hoverValueText}>
+      <div
+        className={clsx('field-value', {
+          dark: isDarkMode,
+        })}
+        title={hoverValueText}
+      >
         {value}
       </div>
     </div>

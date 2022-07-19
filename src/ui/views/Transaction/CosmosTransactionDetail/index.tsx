@@ -142,7 +142,7 @@ export function _ActivityDetail({ transaction }: { transaction: CosmosTx }) {
             {transaction.tx_hash ? (
               <div className="row">
                 <div className="field-name">Transaction ID</div>
-                <div className="field-value">
+                <div className={clsx('field-value', { dark: isDarkMode })}>
                   <Tooltip placement="topRight" title={transaction.tx_hash}>
                     {shortenedStr(transaction.tx_hash, 4)}
                   </Tooltip>

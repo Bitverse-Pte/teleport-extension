@@ -29,6 +29,7 @@ import type {
 } from 'react-beautiful-dnd';
 import { useWallet } from 'ui/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 const { sensors } = skynet;
 
 interface NetworkSelectionItemProps {
@@ -57,7 +58,7 @@ export function NetworkSelectionItem({
     () => network.id === currentProviderId,
     [network, currentProviderId]
   );
-
+  const { isDarkMode } = useDarkmode();
   const selectProvider = async () => {
     console.debug(`Selected Chain ${network.chainId}`);
     const currentProvider = await wallet.getCurrentChain();
@@ -91,6 +92,7 @@ export function NetworkSelectionItem({
       className={clsx('flex items-center network-item', {
         'network-item-active': isSelectedNetwork,
         'is-dragging': props.isDragging,
+        dark: isDarkMode,
       })}
       onClick={selectProvider}
     >

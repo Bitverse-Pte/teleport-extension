@@ -188,7 +188,7 @@ export function _ActivityDetail({
             {primaryTransaction.hash && (
               <div className="row">
                 <div className="field-name">Transaction ID</div>
-                <div className="field-value">
+                <div className={clsx('field-value', { dark: isDarkMode })}>
                   <Tooltip placement="topRight" title={primaryTransaction.hash}>
                     {shortenedStr(primaryTransaction.hash, 4)}
                   </Tooltip>
