@@ -1,8 +1,7 @@
 import React from 'react';
 import './index.less';
-import { conversionUtil, getValueFromWeiHex } from 'ui/utils/conversion';
+import { conversionUtil } from 'ui/utils/conversion';
 import { ETH } from 'constants/transaction';
-import { Token } from 'types/token';
 import { TokenIcon } from '../Widgets';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
 import { addHexPrefix } from 'ethereumjs-util';
@@ -23,13 +22,13 @@ export default function UserPreferencedCurrencyDisplay({
       invertConversionRate: true,
     });
   } else {
-    decimalValueString = (Number(value) * multiplier).toString();
+    decimalValueString = Number(value).toString();
   }
   return token ? (
     <div className="flexR items-end">
       <TokenIcon token={token} radius={30} />
       <span className="dec" title={decimalValueString}>
-        {isEVM ? addEllipsisToEachWordsInTheEnd(decimalValueString, 8) : value}{' '}
+        {addEllipsisToEachWordsInTheEnd(decimalValueString, 8)}{' '}
       </span>
       <span className="symbol">{token.symbol} </span>
     </div>
