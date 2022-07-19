@@ -1,7 +1,13 @@
 import { utils } from 'ethers';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import React, { Fragment, MouseEvent, useCallback, useMemo, useState } from 'react';
+import React, {
+  Fragment,
+  MouseEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import '../style.less';
 import { TxDirectionLogo } from '../TxDirectionLogo';
 import { useSelector } from 'react-redux';
