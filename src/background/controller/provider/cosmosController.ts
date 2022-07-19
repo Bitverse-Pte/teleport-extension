@@ -12,6 +12,8 @@ import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import cosmosController from 'background/service/transactions/cosmos';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
+import { CoinType } from 'types/network';
+import { EthKey } from 'background/service/keyManager/eth/EthKey';
 
 class CosmosProviderController {
   @Reflect.metadata('SAFE', true)
@@ -66,11 +68,16 @@ class CosmosProviderController {
     const signDoc = JSONUint8Array.unwrap(messages);
     const pk = keyringService.getPrivateKeyByAddress(k.bech32Address);
     if (!pk) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
-    const cosmosKey = new CosmosKey();
-    const signature = cosmosKey.generateSignature(
-      serializeSignDoc(signDoc),
-      pk
-    );
+    const coinType = networkPreferenceService.getChainCoinType(chainId);
+    let signature;
+    if (coinType === CoinType.ETH) {
+      const ethKey = new EthKey();
+      signature = ethKey.generateSignature(serializeSignDoc(signDoc), pk);
+    } else {
+      const cosmosKey = new CosmosKey();
+      signature = cosmosKey.generateSignature(serializeSignDoc(signDoc), pk);
+    }
+
     return {
       signed: JSONUint8Array.wrap(signDoc),
       signature: encodeSecp256k1Signature(k.pubKey, signature),
@@ -91,11 +98,15 @@ class CosmosProviderController {
     const signDoc = JSONUint8Array.unwrap(approvalRes);
     const pk = keyringService.getPrivateKeyByAddress(k.bech32Address);
     if (!pk) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
-    const cosmosKey = new CosmosKey();
-    const signature = cosmosKey.generateSignature(
-      serializeSignDoc(signDoc),
-      pk
-    );
+    const currentCoinType = networkPreferenceService.getChainCoinType(chainId);
+    let signature;
+    if (currentCoinType === CoinType.ETH) {
+      const ethKey = new EthKey();
+      signature = ethKey.generateSignature(serializeSignDoc(signDoc), pk);
+    } else {
+      const cosmosKey = new CosmosKey();
+      signature = cosmosKey.generateSignature(serializeSignDoc(signDoc), pk);
+    }
     // process activities
     const {
       rpcUrl,
@@ -160,6 +171,13 @@ class CosmosProviderController {
       coinType,
     } as CosChainInfo;
     const txId = createId();
+    console.log(
+      '==={cosChainInfo, tx, mode, txId}===',
+      cosChainInfo,
+      tx,
+      mode,
+      txId
+    );
     const txHash = await cosmosTxController.sendTx(
       cosChainInfo,
       tx,

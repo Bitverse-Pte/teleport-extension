@@ -744,7 +744,10 @@ class NetworkPreferenceService extends EventEmitter {
    * Sets the provider config and switches the network.
    */
   setProviderConfig(config: Provider, shouldSetDestinationChainAccount = true) {
-    if (!this._checkAccountExistWithChain(config))
+    if (
+      shouldSetDestinationChainAccount &&
+      !this._checkAccountExistWithChain(config)
+    )
       throw new BitError(ErrorCode.ACCOUNT_DOES_NOT_EXIST);
     if (!this._isSameEcosystemForCurrentAccount(config)) {
       throw new BitError(ErrorCode.NORMAL_WALLET_SWITCH_EVM_ONLY);

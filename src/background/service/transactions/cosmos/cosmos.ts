@@ -47,6 +47,7 @@ import { CosmosKey } from 'background/service/keyManager/cosmos/CosmosKey';
 import { ObservableStorage } from 'background/utils/obsStorage';
 import { nanoid as createId } from 'nanoid';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
+import { EthKey } from 'background/service/keyManager/eth/EthKey';
 
 export interface CosmosAccount {
   cosmos: CosmosAccountImpl;
@@ -945,10 +946,20 @@ export class CosmosAccountImpl {
     try {
       const privateKey = keyringService.getPrivateKeyByAddress(k.bech32Address);
       if (!privateKey) throw Error('no private key found');
-      const signature = new CosmosKey().generateSignature(
-        serializeSignDoc(signDoc),
-        privateKey
-      );
+      const coinType = networkPreferenceService.getChainCoinType(chainId);
+      let signature;
+      if (coinType === CoinType.ETH) {
+        const ethKey = new EthKey();
+        signature = ethKey.generateSignature(
+          serializeSignDoc(signDoc),
+          privateKey
+        );
+      } else {
+        signature = new CosmosKey().generateSignature(
+          serializeSignDoc(signDoc),
+          privateKey
+        );
+      }
 
       return {
         signed: signDoc,

@@ -639,18 +639,39 @@ export class WalletController extends BaseController {
     );
   };
 
-  getCosmosStdFee = (feeType, sendCurrency, customGas?: number) => {
-    return cosmosFeeService.toStdFee(feeType, sendCurrency, customGas);
+  getCosmosStdFee = (
+    feeType,
+    sendCurrency,
+    customGas?: number,
+    chainId?: string
+  ) => {
+    return cosmosFeeService.toStdFee(feeType, sendCurrency, customGas, chainId);
   };
-  getCosmosFeeTypePrimitive = (feeType, sendCurrency, customGas?: number) => {
+  getCosmosFeeTypePrimitive = (
+    feeType,
+    sendCurrency,
+    customGas?: number,
+    chainId?: string
+  ) => {
     return cosmosFeeService.getFeeTypePrimitive(
       feeType,
       sendCurrency,
-      customGas
+      customGas,
+      chainId
     );
   };
-  getCosmosFeeTypePretty = (feeType, sendCurrency, customGas?: number) => {
-    return cosmosFeeService.getFeeTypePretty(feeType, sendCurrency, customGas);
+  getCosmosFeeTypePretty = (
+    feeType,
+    sendCurrency,
+    customGas?: number,
+    chainId?: string
+  ) => {
+    return cosmosFeeService.getFeeTypePretty(
+      feeType,
+      sendCurrency,
+      customGas,
+      chainId
+    );
   };
 }
 

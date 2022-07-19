@@ -73,16 +73,14 @@ const SignAminoCosmTx = ({
   const [prices, setPrices] = useState();
   const [visible, setVisible] = useState(false);
   const [tabType, setTabType] = useState<Tabs>(Tabs.FIRST);
-  const [stdFee, setStdFee] = useState(defaultStdFee);
+  const [stdFee, setStdFee] = useState(signDoc.fee);
   const gasState: any = useSelector((state) => state.gas);
 
   const initState = async () => {
     dispatch(showLoadingIndicator());
     const chainId = params.data[0];
     const from = params.data[1];
-    const signDoc = params.data[2];
-    //setSignDoc(signDoc);
-    const tokens = await wallet.getTokenBalancesAsync(chainId, from);
+    const tokens = await wallet.getTokenBalancesSync(chainId, from);
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
@@ -90,43 +88,6 @@ const SignAminoCosmTx = ({
   };
 
   useAsyncEffect(initState, []);
-
-  const fetchStdFee = async () => {
-    dispatch(showLoadingIndicator());
-    const feeType = fixedFeeType(gasState.gasType);
-    let _stdFee = defaultStdFee;
-    if (gasState.customType) {
-      _stdFee = await wallet.getCosmosStdFee(
-        feeType,
-        currency,
-        Number(gasState.cosmosCustomsGas)
-      );
-    } else {
-      _stdFee = await wallet.getCosmosStdFee(feeType, currency);
-    }
-    setStdFee(_stdFee);
-    signDoc.fee = _stdFee;
-    setSignDoc(signDoc);
-    dispatch(hideLoadingIndicator());
-  };
-
-  const fixedFeeType = (feeType) => {
-    // export type FeeType = "high" | "average" | "low";
-    if (feeType === 'medium') {
-      return 'average';
-    }
-    return feeType;
-  };
-
-  useAsyncEffect(fetchStdFee, [gasState]);
-
-  const chainId = useMemo(() => {
-    return params.data[0];
-  }, []);
-
-  const from = useMemo(() => {
-    return params.data[1];
-  }, []);
 
   const nativeToken: any = useMemo(() => {
     const nativeToken = tokens.find((t: Token) => t.isNative);
@@ -142,10 +103,49 @@ const SignAminoCosmTx = ({
     return nativeToken;
   }, [tokens]);
 
+  const fetchStdFee = async () => {
+    if (!nativeToken) {
+      return;
+    }
+    dispatch(showLoadingIndicator());
+    const feeType = fixedFeeType(gasState.gasType);
+    let _stdFee = signDoc.fee;
+    if (gasState.customType) {
+      _stdFee = await wallet.getCosmosStdFee(
+        feeType,
+        currency,
+        Number(gasState.cosmosCustomsGas),
+        chainId
+      );
+    }
+    setStdFee(_stdFee);
+    signDoc.fee = _stdFee;
+    setSignDoc(signDoc);
+    dispatch(hideLoadingIndicator());
+  };
+
+  const fixedFeeType = (feeType) => {
+    // export type FeeType = "high" | "average" | "low";
+    if (feeType === 'medium') {
+      return 'average';
+    }
+    return feeType;
+  };
+
+  useAsyncEffect(fetchStdFee, [gasState, nativeToken]);
+
+  const chainId = useMemo(() => {
+    return params.data[0];
+  }, []);
+
+  const from = useMemo(() => {
+    return params.data[1];
+  }, []);
+
   const currency = {
-    coinDenom: nativeToken?.symbol || 'ATOM',
-    coinMinimalDenom: nativeToken?.denom || 'uatom',
-    coinDecimals: nativeToken?.decimal || 6,
+    coinDenom: nativeToken?.symbol,
+    coinMinimalDenom: nativeToken?.denom,
+    coinDecimals: nativeToken?.decimal,
   };
 
   const totalFeeMemo = useMemo(() => {
@@ -263,6 +263,8 @@ const SignAminoCosmTx = ({
         visible={visible}
         onClose={() => setVisible(false)}
         currency={currency}
+        customGas={signDoc.fee}
+        chainId={chainId}
       />
       <div className="tx-button-container flexCol">
         <CustomButton
