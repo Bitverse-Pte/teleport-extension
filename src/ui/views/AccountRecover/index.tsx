@@ -120,7 +120,7 @@ const AccountRecover = () => {
         break;
       case ErrorCode.INVALID_PRIVATE_KEY:
         ClickToCloseMessage.error({
-          content: 'IInvalid private key',
+          content: 'Invalid private key',
           key: 'Invalid private key',
         });
         break;
@@ -131,17 +131,11 @@ const AccountRecover = () => {
         });
         break;
       default:
-        if (importType === Tabs.FIRST) {
-          ClickToCloseMessage.error({
-            content: 'Invalid mnemonic',
-            key: 'Invalid mnemonic',
-          });
-        } else {
-          ClickToCloseMessage.error({
-            content: 'Invalid private key',
-            key: 'Invalid private key',
-          });
-        }
+        //It will misled developer if using the same error msg
+        ClickToCloseMessage.error({
+          content: 'unexcept error',
+          key: 'unexcept error',
+        });
     }
   };
 
@@ -179,14 +173,14 @@ const AccountRecover = () => {
     },
     policyShow
       ? [
-          name,
-          agreed,
-          mnemonic,
-          privateKey,
-          psd,
-          confirmPsd,
-          passwordCheckPassed,
-        ]
+        name,
+        agreed,
+        mnemonic,
+        privateKey,
+        psd,
+        confirmPsd,
+        passwordCheckPassed,
+      ]
       : [name, mnemonic, privateKey]
   );
 
