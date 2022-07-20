@@ -72,7 +72,7 @@ class CosmosProviderController {
     let signature;
     if (coinType === CoinType.ETH) {
       const ethKey = new EthKey();
-      signature = ethKey.generateSignature(serializeSignDoc(signDoc), pk);
+      signature = await ethKey.generateSignature(serializeSignDoc(signDoc), pk);
     } else {
       const cosmosKey = new CosmosKey();
       signature = cosmosKey.generateSignature(serializeSignDoc(signDoc), pk);
@@ -102,7 +102,7 @@ class CosmosProviderController {
     let signature;
     if (currentCoinType === CoinType.ETH) {
       const ethKey = new EthKey();
-      signature = ethKey.generateSignature(serializeSignDoc(signDoc), pk);
+      signature = await ethKey.generateSignature(serializeSignDoc(signDoc), pk);
     } else {
       const cosmosKey = new CosmosKey();
       signature = cosmosKey.generateSignature(serializeSignDoc(signDoc), pk);

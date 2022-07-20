@@ -197,6 +197,8 @@ const Home = () => {
   const handleWalletClick = () => {
     updateAccount();
     setWalletManagePopupVisible(false);
+    //setTokenListLoading(true);
+    getTokenBalancesAsync();
   };
 
   const handleSiteClick = async (account: BaseAccount) => {

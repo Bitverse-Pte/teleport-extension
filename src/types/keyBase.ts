@@ -28,6 +28,7 @@ export abstract class KeyBase<T> {
 export interface KeyPair {
   privateKey: string;
   publicKey: string;
+  publicKeyCompressed?: string;
   address: string;
   mnemonic?: string;
 }
