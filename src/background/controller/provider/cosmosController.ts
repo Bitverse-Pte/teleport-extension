@@ -14,6 +14,12 @@ import cosmosController from 'background/service/transactions/cosmos';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
 import { CoinType } from 'types/network';
 import { EthKey } from 'background/service/keyManager/eth/EthKey';
+import {
+  AuthInfo,
+  SignDoc,
+  TxBody,
+} from '@keplr-wallet/proto-types/cosmos/tx/v1beta1/tx';
+import { ProtoSignDocDecoder } from '@keplr-wallet/cosmos';
 
 class CosmosProviderController {
   @Reflect.metadata('SAFE', true)
@@ -61,11 +67,30 @@ class CosmosProviderController {
       args: [chainId, from, messages],
     },
     session: { origin },
+    approvalRes,
   }) => {
-    console.log('==[chainId, from, messages]==', chainId, from, messages);
+    const _protoSignDoc = new ProtoSignDocDecoder(messages);
+    const newSignDoc: SignDoc = {
+      bodyBytes: TxBody.encode({
+        ..._protoSignDoc.txBody,
+        ...{
+          memo: approvalRes?.txBody?.memo,
+        },
+      }).finish(),
+      authInfoBytes: AuthInfo.encode({
+        ..._protoSignDoc.authInfo,
+        ...{
+          fee: approvalRes?.authInfo?.fee,
+        },
+      }).finish(),
+      chainId: approvalRes.chainId,
+      accountNumber: approvalRes.accountNumber,
+    };
+    console.log('====[messages, newSignDoc]====', messages, newSignDoc);
+
     const k = keyringService.getKeplrCompatibleKey(chainId);
     if (!k) throw Error('no key found');
-    const signDoc = JSONUint8Array.unwrap(messages);
+    const signDoc = JSONUint8Array.unwrap(newSignDoc);
     const pk = keyringService.getPrivateKeyByAddress(k.bech32Address);
     if (!pk) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
     const coinType = networkPreferenceService.getChainCoinType(chainId);

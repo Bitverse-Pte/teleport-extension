@@ -45,16 +45,6 @@ interface SignCosmosTxProps {
   };
 }
 
-const defaultStdFee = {
-  amount: [
-    {
-      denom: 'uatom',
-      amount: '2500',
-    },
-  ],
-  gas: '200000',
-};
-
 const SignAminoCosmTx = ({
   params,
   origin,
@@ -151,7 +141,7 @@ const SignAminoCosmTx = ({
   const totalFeeMemo = useMemo(() => {
     const multiplier = new BigNumber(10).pow(Number(nativeToken?.decimal || 0));
     const rate = new BigNumber(1.0).div(multiplier);
-    const fee = new BigNumber(stdFee?.amount[0].amount || 0).times(rate);
+    const fee = new BigNumber(stdFee?.amount[0]?.amount || 0).times(rate);
     return fee;
   }, [signDoc, nativeToken, stdFee]);
 
@@ -189,9 +179,9 @@ const SignAminoCosmTx = ({
               <div className="transaction-detail-messages-title">
                 <div className="transaction-detail-title">Messages:</div>
               </div>
-              <div className="transaction-detail-messages-value">
-                <pre>{JSON.stringify(signDoc?.msgs, null, 2)}</pre>
-              </div>
+              <pre className="transaction-detail-messages-value">
+                {JSON.stringify(signDoc?.msgs, null, 2)}
+              </pre>
             </div>
             <Divider style={{ margin: '16px 0' }} />
             <div className="transaction-detail-memo">
@@ -293,56 +283,6 @@ const TxSummaryComponent = ({ origin }) => {
     <div className="tx-summary">
       <div className="tx-summary-origin">
         {origin === 'https://teleport.network' ? null : <div>{origin}</div>}
-      </div>
-    </div>
-  );
-};
-
-const TransactionDetailComponent = ({
-  signDoc,
-  detailTitle = '',
-  subTitle,
-  detailText,
-  detailSubText,
-  detailMax,
-  handleMemoChange,
-}) => {
-  const len = 1;
-  return (
-    <div className="transaction-detail">
-      <div className="transaction-detail-messages">
-        <div className="transaction-detail-messages-title">
-          <div className="transaction-detail-title">Messages:</div>
-        </div>
-        <div className="transaction-detail-messages-value">
-          <pre>{JSON.stringify(signDoc?.msgs, null, 2)}</pre>
-        </div>
-      </div>
-      <Divider style={{ margin: '16px 0' }} />
-      <div className="transaction-detail-memo">
-        <div className="transaction-detail-memo-title">
-          <div className="transaction-detail-title">Memo:</div>
-        </div>
-        <Input
-          className="customInputStyle"
-          value={signDoc?.memo}
-          //onClick={(e) => e.stopPropagation()}
-          onChange={(e) => handleMemoChange(e.target.value)}
-        />
-      </div>
-      <Divider style={{ margin: '16px 0' }} />
-      <div className="transaction-detail-item">
-        <div className="transaction-detail-item-key">
-          <div className="transaction-detail-title">{detailTitle}</div>
-          <div className="transaction-detail-subtitle">{subTitle}</div>
-        </div>
-        <div className="transaction-detail-item-values">
-          <div className="transaction-detail-detailText">{detailText}</div>
-          <div className="transaction-detail-detailSubText">
-            {detailSubText}
-          </div>
-          <div className="transaction-detail-detailMax">{detailMax}</div>
-        </div>
       </div>
     </div>
   );
