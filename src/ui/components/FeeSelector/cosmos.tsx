@@ -98,7 +98,7 @@ function FeeSelector(props) {
   const fetchStdFee = async () => {
     let gas = '0';
     if (customStdGas) {
-      gas = customStdGas.gas;
+      gas = customStdGas.gas || customStdGas.gasLimit;
     } else {
       const stdFee = await wallet.getCosmosStdFee('low', currency);
       gas = stdFee.gas;
@@ -107,7 +107,7 @@ function FeeSelector(props) {
   };
   const fetchSelectFee = async () => {
     if (customStdGas) {
-      const c = customStdGas.gas;
+      const c = customStdGas.gas || customStdGas.gasLimit;
       const amount = customStdGas?.amount[0]?.amount;
       const l = await wallet.getCosmosFeeTypePrimitive(
         'low',
