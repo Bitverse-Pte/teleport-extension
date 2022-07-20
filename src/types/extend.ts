@@ -16,6 +16,7 @@ export interface BaseAccount {
   address: string;
   coinType: CoinType;
   publicKey: string;
+  publicKeyCompressed?: string;
   hdPathCoinType: number;
   hdPathAccount: number;
   hdPathChange: number;

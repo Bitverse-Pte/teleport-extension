@@ -261,7 +261,7 @@ class KeyringService extends EventEmitter {
       if (this._checkDuplicateHdWalletName(opts.name)) {
         return Promise.reject(new BitError(ErrorCode.WALLET_NAME_REPEAT));
       }
-      let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
+      let keyPair: KeyPair;
       let signatureAlgorithm: SignatureAlgorithm, ecosystem: Ecosystem;
       switch (chain.ecosystem) {
         case Ecosystem.EVM:
@@ -500,7 +500,7 @@ class KeyringService extends EventEmitter {
     const accountList: BaseAccount[] = [];
     const secretList: Secret[] = [];
     for (const p of supportProviders) {
-      let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
+      let keyPair: KeyPair;
       hdPath.coinType = p.coinType;
       switch (p.ecosystem) {
         case Ecosystem.EVM:
@@ -553,6 +553,7 @@ class KeyringService extends EventEmitter {
         address: keyPair.address,
         coinType: p.coinType,
         publicKey: keyPair.publicKey,
+        publicKeyCompressed: keyPair.publicKeyCompressed,
         hdPathCoinType: p.coinType,
         hdPathAccount: 0,
         hdPathChange: 0,
@@ -626,7 +627,7 @@ class KeyringService extends EventEmitter {
       ecosystem,
     };
 
-    let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
+    let keyPair: KeyPair;
     switch (ecosystem) {
       case Ecosystem.EVM:
         keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
@@ -675,6 +676,7 @@ class KeyringService extends EventEmitter {
     }
     createdAccount.address = keyPair.address;
     createdAccount.publicKey = keyPair.publicKey;
+    createdAccount.publicKeyCompressed = keyPair.publicKeyCompressed;
     const secret: Secret = {
       privateKey: keyPair.privateKey,
       mnemonic: mnemonic,
@@ -1397,9 +1399,24 @@ class KeyringService extends EventEmitter {
   }
 
   private _getKey(account: BaseAccount): KeplrGetKeyResponseInterface {
-    const { address, publicKey, hdWalletName, signatureAlgorithm } = account;
+    const {
+      address,
+      publicKey,
+      hdWalletName,
+      signatureAlgorithm,
+      publicKeyCompressed,
+      ecosystem,
+      coinType,
+    } = account;
     const addressBuf = Bech32Address.fromBech32(address).address,
-      publicKeyBuf = Buffer.from(publicKey, 'hex');
+      publicKeyBuf = Buffer.from(
+        ethUtil.stripHexPrefix(
+          (ecosystem === Ecosystem.COSMOS && coinType === CoinType.ETH
+            ? publicKeyCompressed
+            : publicKey) as string
+        ),
+        'hex'
+      );
     return {
       name: hdWalletName,
       algo:
@@ -1499,7 +1516,7 @@ class KeyringService extends EventEmitter {
               ecosystem: chain.ecosystem,
             };
 
-            let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
+            let keyPair: KeyPair;
             switch (chain.ecosystem) {
               case Ecosystem.EVM:
                 keyPair = this._createEthKeypairByMnemonic(
@@ -1558,6 +1575,7 @@ class KeyringService extends EventEmitter {
             }
             createdAccount.address = keyPair.address;
             createdAccount.publicKey = keyPair.publicKey;
+            createdAccount.publicKeyCompressed = keyPair.publicKeyCompressed;
             const secret: Secret = {
               privateKey: keyPair.privateKey,
               mnemonic: wallet.mnemonic as string,
@@ -1586,7 +1604,7 @@ class KeyringService extends EventEmitter {
             ecosystem: chain.ecosystem,
           };
 
-          let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
+          let keyPair: KeyPair;
           switch (chain.ecosystem) {
             case Ecosystem.EVM:
               keyPair = await this._createEthKeypairByImportPrivateKey(

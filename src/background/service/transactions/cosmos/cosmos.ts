@@ -930,7 +930,7 @@ export class CosmosAccountImpl {
       let signature;
       if (coinType === CoinType.ETH) {
         const ethKey = new EthKey();
-        signature = ethKey.generateSignature(
+        signature = await ethKey.generateSignature(
           serializeSignDoc(signDoc),
           privateKey
         );

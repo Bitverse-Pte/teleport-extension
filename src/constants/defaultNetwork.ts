@@ -346,7 +346,7 @@ export const defaultNetworks: {
     id: PresetNetworkId.EVMOS,
     type: CHAINS.EVMOS,
     rpcUrl: 'https://tendermint.bd.evmos.org:26657',
-    chainId: 'evmos_9001-1',
+    chainId: 'evmos_9001-2',
     chainName: 'Evmos (Beta)',
     ticker: 'EVMOS',
     nickname: 'EVMOS',
