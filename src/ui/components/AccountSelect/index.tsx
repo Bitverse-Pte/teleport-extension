@@ -87,7 +87,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
           HdAccountStruct,
           { selected?: boolean }
         > = accounts.hdAccount[0];
-        firstSelect.selected = true;
+        if (firstSelect) firstSelect.selected = true;
       }
       setDisplayAccount(accounts);
     }
