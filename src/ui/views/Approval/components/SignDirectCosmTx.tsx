@@ -2,11 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import {
-  NetworkDisplay,
-  SenderToRecipient,
-  UserPreferencedCurrencyDisplay,
-} from 'ui/components';
+import { NetworkDisplay } from 'ui/components';
 import { HeaderWithFlex } from 'ui/components/Header';
 import { CustomButton, CustomTab, TokenIcon } from 'ui/components/Widgets';
 import {
@@ -70,6 +66,7 @@ const SignDirectCosmTx = ({
   const msg = JSONUint8Array.unwrap(params.data[2]);
   const protoSignDoc = new ProtoSignDocDecoder(msg);
   const paramSignDoc = protoSignDoc.toJSON();
+  console.log('=====[paramSignDoc]====', paramSignDoc);
   const [signDoc, setSignDoc] = useState<any>(paramSignDoc);
   const [stdFee, setStdFee] = useState(paramSignDoc.fee);
   const [memo, setMemo] = useState<string>(paramSignDoc.memo);
@@ -79,7 +76,7 @@ const SignDirectCosmTx = ({
     dispatch(showLoadingIndicator());
     const chainId = params.data[0];
     const from = params.data[1];
-    const tokens = await wallet.getTokenBalancesSync(chainId, from);
+    const tokens = await wallet.getTokenBalancesAsync(chainId, from);
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
@@ -122,6 +119,13 @@ const SignDirectCosmTx = ({
         feeType,
         currency,
         Number(gasState.cosmosCustomsGas),
+        chainId
+      );
+    } else {
+      _stdFee = await wallet.getCosmosStdFee(
+        feeType,
+        currency,
+        undefined,
         chainId
       );
     }
