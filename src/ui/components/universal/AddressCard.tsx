@@ -7,6 +7,7 @@ import { Tooltip } from 'antd';
 import skynet from 'utils/skynet';
 import { useTranslation } from 'react-i18next';
 import { Ecosystem } from 'types/network';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 const { sensors } = skynet;
 interface AddressCardParameters extends HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -27,6 +28,7 @@ export function AddressCard({
   ...others
 }: AddressCardParameters) {
   const { t } = useTranslation();
+  const { isDarkMode } = useDarkmode();
   const {
     provider: { rpcPrefs, ecosystem },
   } = useSelector((state) => state.network);
@@ -43,7 +45,9 @@ export function AddressCard({
 
   return (
     <div
-      className={clsx(className, 'flex items-center address-card flex-wrap')}
+      className={clsx(className, 'flex items-center address-card flex-wrap', {
+        dark: isDarkMode,
+      })}
       {...others}
     >
       <h4 className="title">{title}</h4>
