@@ -7,7 +7,7 @@ import EthQuery from 'ethjs-query';
 import { ethErrors } from 'eth-rpc-errors';
 import abi from 'utils/human-standard-token-abi-extended';
 import Common from '@ethereumjs/common';
-import { TransactionFactory } from '@ethereumjs/tx';
+import { TransactionFactory } from 'utils/ethjs-tx';
 import { BigNumber, ethers } from 'ethers';
 import NonceTracker from 'nonce-tracker';
 import Eth from 'ethjs';
