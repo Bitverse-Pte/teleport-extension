@@ -20,6 +20,8 @@ import {
   TxBody,
 } from '@keplr-wallet/proto-types/cosmos/tx/v1beta1/tx';
 import { ProtoSignDocDecoder } from '@keplr-wallet/cosmos';
+import { makeSignBytes } from '@cosmjs/proto-signing';
+import Long from 'long';
 
 class CosmosProviderController {
   @Reflect.metadata('SAFE', true)
@@ -100,7 +102,13 @@ class CosmosProviderController {
       signature = await ethKey.generateSignature(serializeSignDoc(signDoc), pk);
     } else {
       const cosmosKey = new CosmosKey();
-      signature = cosmosKey.generateSignature(serializeSignDoc(signDoc), pk);
+      const { accountNumber: newSignDocAccountNumber, ...newSignDocRest } =
+        newSignDoc;
+      const cosmJSSignDoc = {
+        ...newSignDocRest,
+        accountNumber: Long.fromString(newSignDocAccountNumber),
+      };
+      signature = cosmosKey.generateSignature(makeSignBytes(cosmJSSignDoc), pk);
     }
 
     return {

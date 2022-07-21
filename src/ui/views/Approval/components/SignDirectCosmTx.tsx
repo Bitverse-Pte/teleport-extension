@@ -79,7 +79,7 @@ const SignDirectCosmTx = ({
     dispatch(showLoadingIndicator());
     const chainId = params.data[0];
     const from = params.data[1];
-    const tokens = await wallet.getTokenBalancesSync(chainId, from);
+    const tokens = await wallet.getTokenBalancesAsync(chainId, from);
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
