@@ -13,6 +13,7 @@ import * as ethUtil from 'ethereumjs-util';
 
 import './signTypedData.less';
 import { utils } from 'ethers';
+import { isHexString } from 'ethereumjs-util';
 const itemsCenteredCls = 'flex items-center justify-center';
 
 const SignText = ({ params }) => {
@@ -37,7 +38,8 @@ const SignText = ({ params }) => {
   }, []);
 
   const parsedData = useMemo(() => {
-    return data ? utils.toUtf8String(data) : '';
+    console.info('SignText::parsedData data:', data);
+    return isHexString(data) ? utils.toUtf8String(data) : data;
   }, [data]);
 
   return (
