@@ -381,11 +381,41 @@ export class WalletController extends BaseController {
     return networkPreferenceService.getProviderConfig();
   }
 
-  getTokenBalancesAsync = (): Promise<Token[]> => {
-    const account = preferenceService.getCurrentAccount();
-    const { id, ecosystem } = this.getCurrentChain();
-    if (account) {
-      return TokenService.getBalancesAsync(account.address, id, ecosystem);
+  getTokenBalancesAsync = (
+    chainId?: PresetNetworkId | string,
+    address?: string
+  ): Promise<Token[]> => {
+    let customChainId, tempAddress, tempEcosystem;
+    if (chainId) {
+      const chains: Provider[] = networkPreferenceService.getSupportProviders();
+      const chain: Provider | undefined = chains.find(
+        (c: Provider) => c.chainId === chainId
+      );
+      if (chain) {
+        customChainId = chain.id;
+        tempEcosystem = chain.ecosystem;
+      }
+    } else {
+      const { id, ecosystem } = this.getCurrentChain();
+      customChainId = id;
+      tempEcosystem = ecosystem;
+    }
+    if (address) {
+      tempAddress = address;
+    } else {
+      const account = preferenceService.getCurrentAccount();
+      if (account) {
+        tempAddress = account.address;
+      } else {
+        return Promise.reject(new Error('no account found'));
+      }
+    }
+    if (customChainId && tempAddress && tempEcosystem) {
+      return TokenService.getBalancesAsync(
+        tempAddress,
+        customChainId,
+        tempEcosystem
+      );
     } else {
       return Promise.reject(new Error('no account found'));
     }
