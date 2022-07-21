@@ -317,6 +317,7 @@ class KeyringService extends EventEmitter {
       const account: BaseAccount = {
         address: keyPair.address,
         publicKey: keyPair.publicKey,
+        publicKeyCompressed: keyPair.publicKeyCompressed,
         coinType: chain.coinType,
         hdPathCoinType: 0,
         hdPathAccount: 0,
@@ -1653,6 +1654,7 @@ class KeyringService extends EventEmitter {
           }
           createdAccount.address = keyPair.address;
           createdAccount.publicKey = keyPair.publicKey;
+          createdAccount.publicKeyCompressed = keyPair.publicKeyCompressed;
           const secret: Secret = {
             privateKey: keyPair.privateKey,
             mnemonic: wallet.mnemonic as string,
