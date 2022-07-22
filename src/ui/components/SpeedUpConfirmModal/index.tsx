@@ -16,6 +16,10 @@ import { priorityLevelToI18nKey } from '../TransactionCancelAndSpeedUp/component
 import { isLegacyTransactionParams } from 'utils/transaction.utils';
 import clsx from 'clsx';
 import useGasTiming from '../GasTiming/useGasTiming.hook';
+import {
+  getMaximumGasTotalInHexWei,
+  getMinimumGasTotalInHexWei,
+} from 'utils/gas';
 
 const toFixedDigits =
   (digits = 7) =>
@@ -109,10 +113,15 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
   const gasPrice = BigNumber.from(
     addHexPrefix(gasDetail.maxFeePerGas || gasDetail.gasPrice!)
   );
-
+  console.debug('SpeedUpConfirmModal::gasDetail', gasDetail);
   const baseFee = gasDetail.maxPriorityFeePerGas
     ? gasPrice.sub(addHexPrefix(gasDetail.maxPriorityFeePerGas))
     : undefined;
+  const maximumCostInHexWei = getMaximumGasTotalInHexWei(gasDetail);
+  const minimumCostInHexWei = getMinimumGasTotalInHexWei({
+    ...gasDetail,
+    baseFeePerGas: baseFee?.toString(),
+  });
   const nativeToken = useSelector(getCurrentProviderNativeToken);
 
   return (
@@ -205,26 +214,10 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
         <div className="flex gas-summary">
           <h4>Gas</h4>
           <div className="summary w-full text-right">
-            {baseFee && (
-              <h4 className="summary-amount bold">
-                {toFixed7Digits(
-                  utils.formatEther(baseFee.mul(gasDetail.gasLimit!))
-                )}{' '}
-                {nativeToken?.symbol}
-              </h4>
-            )}
-            {gasDetail.gasPrice && (
-              <h4 className="summary-amount bold">
-                {toFixed7Digits(
-                  utils.formatEther(
-                    BigNumber.from(addHexPrefix(gasDetail.gasPrice)).mul(
-                      gasDetail.gasLimit!
-                    )
-                  )
-                )}{' '}
-                {nativeToken?.symbol}
-              </h4>
-            )}
+            <h4 className="summary-amount bold">
+              {toFixed7Digits(utils.formatEther(minimumCostInHexWei))}{' '}
+              {nativeToken?.symbol}
+            </h4>
             {gasTiming && (
               <div className="summary-estimated-time bold fs12 green-02">
                 {gasTiming.text}
@@ -234,9 +227,7 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
               <div className="summary-max-fee fs12">
                 Max Fee:
                 <span className="max-fee-amount">
-                  {toFixed7Digits(
-                    utils.formatEther(gasPrice.mul(gasDetail.gasLimit!))
-                  )}{' '}
+                  {toFixed7Digits(utils.formatEther(maximumCostInHexWei))}{' '}
                   {nativeToken?.symbol}
                 </span>
               </div>
