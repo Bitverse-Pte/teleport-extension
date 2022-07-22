@@ -30,10 +30,12 @@ const SortHat = () => {
       return;
     }
 
-    if (!(await wallet.isUnlocked()) && isInNotification) {
-      setTo('/unlock');
-      return;
-    }
+    // remove these logic for keplr wallet experimentalSuggestChain(chainInfo)
+    // allows notification popup when wallet is locked
+    // if (!(await wallet.isUnlocked()) && isInNotification) {
+    //   setTo('/unlock');
+    //   return;
+    // }
 
     // here route to approval page
     if (approval) {

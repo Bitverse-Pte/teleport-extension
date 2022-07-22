@@ -224,10 +224,12 @@
               justify-content: center;
               align-items: center;
               width: 72px;
-              height:56px;
-              &:hover{
+              height: 56px;
+
+              &:hover {
                 background: #F0F9FF;
               }
+
               .key-default-icon {
                 display: block;
               }
@@ -275,6 +277,10 @@
           }
         }
 
+        .wallet-switch-item {
+          padding-right: 24px;
+        }
+
         ._active {
           background: #D6EFFF !important;
         }
@@ -305,6 +311,11 @@
 
   }
 
+}
+
+.wallet-manage-wallet-switch {
+  flex: 1;
+  height: 0;
 }
 
 .adm-popover-inner-content {

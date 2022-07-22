@@ -14,6 +14,24 @@
       }
     }
 
+    .network-name {
+      // width: 100%;
+      // cursor: pointer;
+      white-space: nowrap;
+      max-width: 70%;
+      text-overflow: ellipsis;
+      // font-weight: 400;
+      // font-size: 16px;
+      // margin-left: 4px;
+      overflow: hidden;
+      // color: #9EA2A9;
+      //styleName: Title/Subtitle;
+      font-family: MontserratBold;
+      font-size: 16px;
+      text-align: left;
+      color: #364361;
+    }
+
     button.narrow-padding {
       padding: 4px 8px !important;
     }
@@ -46,6 +64,25 @@
 .network-item.network-item-active {
   background-color: #D6EFFF;
 }
+/** darkmode related override */
+.network-item.dark:hover {
+  background-color: #02182B;
+}
+.network-item.dark {
+  svg {
+    fill: #FFF;
+  }
+  .network-name {
+    color: #FFF;
+  }
+  button.ant-btn:hover {
+    background-color: #052E55;
+  }
+}
+.network-item.network-item-active.dark {
+  background-color: #052E55;
+}
+
 .network-item.is-dragging {
   border-top: 4px solid #1484F5;
   opacity: 0.3;

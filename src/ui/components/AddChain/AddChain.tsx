@@ -53,3 +53,23 @@ export function AddChainDetailCard({ showChain }: { showChain?: Network }) {
     </div>
   );
 }
+
+export function AddCosmosChainDetailCard({
+  showChain,
+}: {
+  showChain?: Network;
+}) {
+  const { t } = useTranslation();
+
+  if (!showChain) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <div className="addChain-showchain-detail-card">
+      <Item name={t('name')} value={showChain?.nickname} />
+      <Item name={t('RPC URL')} value={showChain?.rpcUrl} />
+      <Item name={t('Chain ID')} value={showChain?.chainId} />
+    </div>
+  );
+}

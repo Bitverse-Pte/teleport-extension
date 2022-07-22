@@ -3,6 +3,7 @@ import { Switch, Route } from 'react-router-dom';
 import { LazyPrivateRoute } from 'ui/components';
 import Welcome from 'ui/views/Welcome/Welcome';
 import { AddChain } from './Approval/components';
+import { DarkModeTest } from './_DarkModeTest';
 
 const AccountCreate = lazy(() => import('ui/views/AccountCreate'));
 const MnemonicBackup = lazy(() => import('ui/views/MnemonicBackup'));
@@ -23,7 +24,14 @@ const MnemonicCheck = lazy(() => import('ui/views/MnemonicCheck'));
 const ActivityDetail = lazy(
   () => import('ui/views/Transaction/TransactionDetail')
 );
+
+const CosmosActivityDetail = lazy(
+  () => import('ui/views/Transaction/CosmosTransactionDetail')
+);
+
 const Send = lazy(() => import('ui/views/Send'));
+const SendCos = lazy(() => import('ui/views/SendCos'));
+const ConfirmSendCos = lazy(() => import('ui/views/SendCosConfirm'));
 const Receive = lazy(() => import('ui/views/Receive'));
 const GasFee = lazy(() => import('ui/views/GasFee'));
 const Policy = lazy(() => import('ui/views/Policy'));
@@ -110,7 +118,12 @@ const Main = () => {
             }}
           />
         </LazyPrivateRoute>
-
+        <LazyPrivateRoute exact path="/cosmos/activity/:activityId">
+          <CosmosActivityDetail />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/dev/darkmode">
+          <DarkModeTest />
+        </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/mock/addNetworkPrompt">
           <AddChain
             params={{
@@ -137,6 +150,15 @@ const Main = () => {
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/send">
           <Send />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/send-cos">
+          <SendCos />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/send-cos/:tokenId">
+          <SendCos />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/confirm-send-cos">
+          <ConfirmSendCos />
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/send/:tokenId">
           <Send />

@@ -12,15 +12,19 @@ import {
   knownMethodService,
   contactBookService,
   latestBlockDataHub,
+  cosmosTxController,
+  cosmosFeeService,
 } from 'background/service';
 import { ContactBookItem } from '../service/contactBook';
 import BaseController from './base';
 import { INTERNAL_REQUEST_ORIGIN } from 'constants/index';
 import {
+  AccountCreateType,
   BaseAccount,
   CreateAccountOpts,
   DisplayAccountManage,
   DisplayWalletManage,
+  HdAccountStruct,
   ImportAccountOpts,
 } from 'types/extend';
 import provider from './provider';
@@ -33,6 +37,8 @@ import { KnownMethodData } from 'background/service/knownMethod';
 import { HexString } from 'constants/transaction';
 import { CustomGasSettings } from 'types/tx';
 import { BigNumberish } from 'ethers';
+import { CosmosChainInfo } from 'types/cosmos';
+import { KeplrGetKeyResponseInterface } from 'types/keyBase';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -88,17 +94,20 @@ export class WalletController extends BaseController {
     return provider;
   };
 
+  getCosmosProviderByChainId = (id: string) =>
+    networkPreferenceService.getCosmosChainInfo(id);
+
   moveNetwork = (e: Ecosystem, f: number, d: number) =>
     networkPreferenceService.moveNetwork(e, f, d);
 
-  addCustomNetwork = async (
+  addCustomEthereumProvider = async (
     nickname: string,
     rpcUrl: string,
     chainId: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => {
-    const network = networkPreferenceService.addCustomNetwork(
+    const network = networkPreferenceService.addCustomEthereumProvider(
       nickname,
       rpcUrl,
       chainId,
@@ -113,14 +122,22 @@ export class WalletController extends BaseController {
       isNative: true,
     });
 
-    networkPreferenceService.setProviderConfig({
-      ...network,
-      type: 'rpc',
-    });
+    try {
+      networkPreferenceService.setProviderConfig({
+        ...network,
+        type: 'rpc',
+      });
+    } catch (error: any) {
+      /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+      // if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+
+      // }
+      console.error('addCustomNetwork::error: ', error);
+    }
     return network;
   };
 
-  editCustomNetwork = (
+  editCustomEthereumProvider = (
     id: string,
     newNickname: string,
     rpcUrl: string,
@@ -130,7 +147,7 @@ export class WalletController extends BaseController {
     coinType = CoinType.ETH,
     chainName = 'ETH'
   ) => {
-    networkPreferenceService.editCustomNetwork(
+    networkPreferenceService.editCustomEthereumProvider(
       id,
       newNickname,
       rpcUrl,
@@ -155,9 +172,23 @@ export class WalletController extends BaseController {
 
   useCurrentSelectedNetwork = () => {
     const { provider } = networkPreferenceService.networkStore.getState();
-    console.debug('useCurrentSelectedNetwork use provider:', provider);
     // reset once again
-    networkPreferenceService.setProviderConfig(provider);
+    try {
+      networkPreferenceService.setProviderConfig(provider);
+    } catch (error: any) {
+      if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+        /** error will be ignored, as it will 100% occurred in the first time (no account)
+         *  but will be log message as warn */
+        console.warn('useCurrentSelectedNetwork::error: no account for now');
+      } else {
+        console.error(
+          `useCurrentSelectedNetwork::error #${
+            error.code || 'No Error Code'
+          }: `,
+          error
+        );
+      }
+    }
   };
 
   getCurrentCurrency = () => preferenceService.getCurrentCurrency();
@@ -167,8 +198,14 @@ export class WalletController extends BaseController {
   getConnectedSitesByAccount = (account: string) =>
     permissionService.getConnectedSitesByAccount(account);
 
+  getConnectedSitesByChainId = (chainId: string) =>
+    permissionService.getConnectedSitesByChainId(chainId);
+
   removeConnectedSite = (origin: string, account: string) =>
     permissionService.removeConnectedSite(origin, account);
+
+  removeConnectedSiteByChainId = (origin: string, chainId: string) =>
+    permissionService.removeConnectedSiteByChainId(origin, chainId);
 
   getPrivateKey = async (password: string, hdWalletId: string) => {
     await this.verifyPassword(password);
@@ -223,6 +260,28 @@ export class WalletController extends BaseController {
   changeAccount = (account: BaseAccount) =>
     preferenceService.setCurrentAccount(account);
 
+  changeAccountByWalletId = (
+    hdWalletId: string,
+    ecosystem: Ecosystem,
+    accountCreateType: AccountCreateType
+  ) => {
+    return keyringService.changeAccountByWallet(
+      hdWalletId,
+      ecosystem,
+      accountCreateType
+    );
+  };
+
+  addCurrentChainAccountByWalletId = async (hdWalletId) => {
+    const account = await keyringService.addCurrentChainAccountByWalletId(
+      hdWalletId
+    );
+    if (account) {
+      keyringService.boot();
+      return this._setCurrentAccount(account);
+    }
+  };
+
   isDefaultWallet = () => preferenceService.getIsDefaultWallet();
 
   setIsDefaultWallet = (val: boolean) =>
@@ -254,10 +313,10 @@ export class WalletController extends BaseController {
     return keyringService.getMnemonicByHdWalletId(name);
   }
 
-  public addNewDisplayAccountByExistKeyring(
+  public async addNewDisplayAccountByExistKeyring(
     hdWalletId: string,
     accountName: string
-  ): Promise<boolean> {
+  ) {
     let hdWalletName = '';
     const currentHdWalletIdAccounts = keyringService
       .getAccountAllList()
@@ -265,11 +324,12 @@ export class WalletController extends BaseController {
     if (currentHdWalletIdAccounts && currentHdWalletIdAccounts.length > 0) {
       hdWalletName = currentHdWalletIdAccounts[0].hdWalletName;
     }
-    return keyringService.addAccount({
+    const newAccount = await keyringService.addAccount({
       hdWalletId,
       hdWalletName,
       accountName,
     });
+    preferenceService.setCurrentAccount(newAccount);
   }
 
   public deleteDisplayAccountByExistKeyringAndIndex(
@@ -277,6 +337,10 @@ export class WalletController extends BaseController {
     addressIndex: number
   ): Promise<void> {
     return keyringService.deleteDisplayAccount(hdWalletId, addressIndex);
+  }
+
+  public deleteAccountsByChainCustomId(chainCustomId: string): Promise<void> {
+    return keyringService.deleteAccountsByChainCustomId(chainCustomId);
   }
 
   public renameDisplayAccount(
@@ -289,6 +353,10 @@ export class WalletController extends BaseController {
 
   getAccountList(useCurrentChain?: boolean): Promise<DisplayWalletManage> {
     return Promise.resolve(keyringService.getAccountList(useCurrentChain));
+  }
+
+  getWalletList(useCurrentEcosystem?: boolean): Promise<HdAccountStruct[]> {
+    return Promise.resolve(keyringService.getWalletList(useCurrentEcosystem));
   }
 
   getCurrentChainAccounts(): Promise<BaseAccount[]> {
@@ -312,33 +380,73 @@ export class WalletController extends BaseController {
     return networkPreferenceService.getProviderConfig();
   }
 
-  getTokenBalancesAsync = (showHideToken?: boolean): Promise<Token[]> => {
-    const account = preferenceService.getCurrentAccount();
-    let chainCustomId;
-    const currentProvider = this.getCurrentChain();
-    if (currentProvider) chainCustomId = currentProvider.id;
-    if (account) {
+  getTokenBalancesAsync = (
+    chainId?: PresetNetworkId | string,
+    address?: string
+  ): Promise<Token[]> => {
+    let customChainId, tempAddress, tempEcosystem;
+    if (chainId) {
+      const chains: Provider[] = networkPreferenceService.getSupportProviders();
+      const chain: Provider | undefined = chains.find(
+        (c: Provider) => c.chainId === chainId
+      );
+      if (chain) {
+        customChainId = chain.id;
+        tempEcosystem = chain.ecosystem;
+      }
+    } else {
+      const { id, ecosystem } = this.getCurrentChain();
+      customChainId = id;
+      tempEcosystem = ecosystem;
+    }
+    if (address) {
+      tempAddress = address;
+    } else {
+      const account = preferenceService.getCurrentAccount();
+      if (account) {
+        tempAddress = account.address;
+      } else {
+        return Promise.reject(new Error('no account found'));
+      }
+    }
+    if (customChainId && tempAddress && tempEcosystem) {
       return TokenService.getBalancesAsync(
-        account.address,
-        chainCustomId
-        //showHideToken
+        tempAddress,
+        customChainId,
+        tempEcosystem
       );
     } else {
       return Promise.reject(new Error('no account found'));
     }
   };
 
-  getTokenBalancesSync = (showHideToken?: boolean): Promise<Token[]> => {
-    const account = preferenceService.getCurrentAccount();
-    let chainCustomId;
-    const currentProvider = this.getCurrentChain();
-    if (currentProvider) chainCustomId = currentProvider.id;
-    if (account && chainCustomId) {
-      return TokenService.getBalancesSync(
-        account.address,
-        chainCustomId
-        //showHideToken
+  getTokenBalancesSync = (
+    chainId?: PresetNetworkId | string,
+    address?: string
+  ): Promise<Token[]> => {
+    let customChainId, tempAddress;
+    const { id } = this.getCurrentChain();
+    if (chainId) {
+      const chains: Provider[] = networkPreferenceService.getSupportProviders();
+      const chain: Provider | undefined = chains.find(
+        (c: Provider) => c.chainId === chainId
       );
+      if (chain) customChainId = chain.id;
+    } else {
+      customChainId = id;
+    }
+    if (address) {
+      tempAddress = address;
+    } else {
+      const account = preferenceService.getCurrentAccount();
+      if (account) {
+        tempAddress = account.address;
+      } else {
+        return Promise.reject(new Error('no account found'));
+      }
+    }
+    if (customChainId && tempAddress) {
+      return TokenService.getBalancesSync(tempAddress, customChainId);
     } else {
       return Promise.reject(new Error('no account found'));
     }
@@ -376,10 +484,14 @@ export class WalletController extends BaseController {
     }
   };
 
-  queryToken = (rpc: string, contractAddress: string) => {
+  queryToken = (chainCustomId: string, contractAddress: string) => {
     const account = preferenceService.getCurrentAccount();
     if (account) {
-      return TokenService.queryToken(account.address, rpc, contractAddress);
+      return TokenService.queryToken(
+        account.address,
+        chainCustomId,
+        contractAddress
+      );
     } else {
       return Promise.reject(new Error('no account found'));
     }
@@ -393,12 +505,21 @@ export class WalletController extends BaseController {
     return TokenService.addCustomToken(tokenParams);
   }
 
-  getChains = () => networkPreferenceService.getAllProviders();
+  queryTokenPrices = (tokenId?: string) =>
+    TokenService.queryTokenPrices('usd', tokenId);
 
-  queryTokenPrices = () => TokenService.queryTokenPrices();
+  getKey(chainId): KeplrGetKeyResponseInterface | null {
+    return keyringService.getKeplrCompatibleKey(chainId);
+  }
 
-  // TODO (Jayce) follows are test code
-  testUnlock = () => this.unlock('Q1!qqqqq');
+  generateMissedAccounts() {
+    return keyringService.generateMissedAccounts();
+  }
+
+  hasMissedAccounts() {
+    const missed = keyringService.getMissedAccountsForAllChain();
+    return missed.length > 0;
+  }
 
   providers() {
     console.log(networkPreferenceService.getProviderConfig());
@@ -500,6 +621,7 @@ export class WalletController extends BaseController {
     contactBookService.removeContact(address);
   };
   listContact = () => contactBookService.listContacts();
+  listContactsByChain = () => contactBookService.listContactsByChain();
   getContactByAddress = (address: string) =>
     contactBookService.getContactByAddress(address);
 
@@ -507,6 +629,79 @@ export class WalletController extends BaseController {
 
   setManualLocked = (locked: boolean) =>
     preferenceService.setManualLocked(locked);
+  generateCosmosMsg = async ({
+    amount,
+    currency,
+    recipient,
+    memo = '',
+    stdFee = {},
+    contractAddress,
+  }) => {
+    return await cosmosTxController.generateMsg({
+      amount,
+      currency,
+      recipient,
+      memo,
+      stdFee,
+      contractAddress,
+    });
+  };
+  sendCosmosToken = async (
+    amount: string,
+    currency,
+    recipient: string,
+    contractAddress,
+    memo = '',
+    stdFee = {},
+    signOptions,
+    onTxEvents
+  ) => {
+    await cosmosTxController.sendToken(
+      amount,
+      currency,
+      recipient,
+      contractAddress,
+      memo,
+      stdFee,
+      signOptions,
+      onTxEvents
+    );
+  };
+
+  getCosmosStdFee = (
+    feeType,
+    sendCurrency,
+    customGas?: number,
+    chainId?: string
+  ) => {
+    return cosmosFeeService.toStdFee(feeType, sendCurrency, customGas, chainId);
+  };
+  getCosmosFeeTypePrimitive = (
+    feeType,
+    sendCurrency,
+    customGas?: number,
+    chainId?: string
+  ) => {
+    return cosmosFeeService.getFeeTypePrimitive(
+      feeType,
+      sendCurrency,
+      customGas,
+      chainId
+    );
+  };
+  getCosmosFeeTypePretty = (
+    feeType,
+    sendCurrency,
+    customGas?: number,
+    chainId?: string
+  ) => {
+    return cosmosFeeService.getFeeTypePretty(
+      feeType,
+      sendCurrency,
+      customGas,
+      chainId
+    );
+  };
 }
 
 export default new WalletController();

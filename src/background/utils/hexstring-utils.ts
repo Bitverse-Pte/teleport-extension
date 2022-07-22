@@ -5,7 +5,9 @@ import {
   addHexPrefix,
   toChecksumAddress,
   zeroAddress,
+  stripHexPrefix,
 } from 'ethereumjs-util';
+import { toWords, encode } from 'bech32';
 
 export const BURN_ADDRESS = zeroAddress();
 
@@ -71,4 +73,15 @@ export function toChecksumHexAddress(address) {
     return hexPrefixed;
   }
   return toChecksumAddress(addHexPrefix(address));
+}
+
+export function transformHexAddress2Bech32(
+  hexAddress: string,
+  prefix: string
+): string {
+  if (!hexAddress || !prefix) return hexAddress;
+  return encode(
+    prefix,
+    toWords(Buffer.from(stripHexPrefix(hexAddress), 'hex'))
+  );
 }

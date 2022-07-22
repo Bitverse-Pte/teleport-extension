@@ -20,6 +20,8 @@ import {
 } from 'react-beautiful-dnd';
 import { Ecosystem } from 'types/network';
 import { useWallet } from 'ui/utils';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 const { sensors } = skynet;
 
 const NetworksSelectionContainer = () => {
@@ -79,13 +81,19 @@ const NetworksSelectionContainer = () => {
     );
   };
 
+  const { isDarkMode } = useDarkmode();
+
   if (!providerContext) {
     return <p>Loading...</p>;
   }
 
   return (
     <DragDropContext onDragEnd={onNetworkItemDragEnd}>
-      <div className="flexCol network-page-container">
+      <div
+        className={clsx('flexCol network-page-container', {
+          dark: isDarkMode,
+        })}
+      >
         <GeneralHeader
           title={
             <span className="title flex">

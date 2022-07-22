@@ -6,12 +6,14 @@ import { BaseAccount } from 'types/extend';
 import { NetworkDisplay } from 'ui/components';
 import { useApproval, useWallet, transferAddress2Display } from 'ui/utils';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { WalletName } from '../../../components/Widgets';
 import { FallbackSiteLogo } from 'ui/components';
 import * as ethUtil from 'ethereumjs-util';
 
 import './signTypedData.less';
 import { utils } from 'ethers';
+import { isHexString } from 'ethereumjs-util';
 const itemsCenteredCls = 'flex items-center justify-center';
 
 const SignText = ({ params }) => {
@@ -36,7 +38,8 @@ const SignText = ({ params }) => {
   }, []);
 
   const parsedData = useMemo(() => {
-    return data ? utils.toUtf8String(data) : '';
+    console.info('SignText::parsedData data:', data);
+    return isHexString(data) ? utils.toUtf8String(data) : data;
   }, [data]);
 
   return (
@@ -47,7 +50,7 @@ const SignText = ({ params }) => {
         <div className="from-container flexCol">
           <div className="account-info flexR">
             <Jazzicon
-              seed={Number(currentAccount?.address?.substring(0, 8) || 0)}
+              seed={getUnit10ByAddress(currentAccount?.address)}
               diameter={16}
             />
             <WalletName cls="account-name" width={100}>

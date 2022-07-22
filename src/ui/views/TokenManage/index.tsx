@@ -30,6 +30,8 @@ import tokenShow from '../../../assets/tokenShow.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { isValidAddress } from 'ethereumjs-util';
 import skynet from 'utils/skynet';
+import { getProvider } from 'ui/selectors/selectors';
+import { useSelector } from 'react-redux';
 const { sensors } = skynet;
 
 const TokenManage = () => {
@@ -39,18 +41,18 @@ const TokenManage = () => {
   const [filterCondition, setFilterCondition] = useState('');
   const [tokens, setTokens] = useState<Token[]>([]);
   const [contractAddress, setContractAddress] = useState('');
-  const [currentChain, setCurrentChain] = useState<Provider>();
   const wallet = useWallet();
+  const currentChain: Provider = useSelector(getProvider);
 
   const getTokenBalancesAsync = async () => {
-    const balances = await wallet.getTokenBalancesAsync(true).catch((e) => {
+    const balances = await wallet.getTokenBalancesAsync().catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) setTokens(balances);
   };
 
   const getTokenBalancesSync = async () => {
-    const balances = await wallet.getTokenBalancesSync(true).catch((e) => {
+    const balances = await wallet.getTokenBalancesSync().catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) setTokens(balances);
@@ -124,15 +126,15 @@ const TokenManage = () => {
   });
 
   const handleNextBtnClick = async () => {
-    if (!isValidAddress(contractAddress)) {
+    /* if (!isValidAddress(contractAddress)) {
       ClickToCloseMessage.error({
         content: 'Invalid contract address',
         key: 'Invalid contract address',
       });
       return;
-    }
+    } */
     if (!contractAddress) return;
-    queryToken(currentChain?.rpcUrl, contractAddress);
+    queryToken(currentChain?.id, contractAddress);
   };
 
   return (
@@ -202,7 +204,7 @@ const TokenManage = () => {
         }}
       >
         <div className="token-custom-top">
-          <p className="token-custom-title">Networks</p>
+          {/* <p className="token-custom-title">Networks</p>
           <ChainSelect
             handleChainSelect={(chain: Provider) => {
               sensors.track('teleport_token_manage_network_select', {
@@ -212,7 +214,7 @@ const TokenManage = () => {
               });
               setCurrentChain(chain);
             }}
-          />
+          /> */}
           <p className="token-custom-title token-custom-address">
             Token Contract Address
           </p>

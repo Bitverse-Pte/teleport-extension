@@ -5,14 +5,21 @@ import * as sigUtil from 'eth-sig-util';
 import * as bip39 from 'bip39';
 import { hdkey } from 'ethereumjs-wallet';
 import Wallet from 'ethereumjs-wallet';
+import { Wallet as EthWallet } from '@ethersproject/wallet';
+import { keccak256 } from '@ethersproject/keccak256';
 import { CoinType } from 'types/network';
+import * as BytesUtils from '@ethersproject/bytes';
+import { ec } from 'elliptic';
 
 export class EthKey extends Base.KeyBase<Tx.Transaction> {
   public generateWalletFromMnemonic(
     mnemonic: string,
     hdPath: Base.Bip44HdPath,
     password?: string
-  ): Pick<Base.KeyPair, 'privateKey' | 'publicKey' | 'address'> {
+  ): Pick<
+    Base.KeyPair,
+    'privateKey' | 'publicKey' | 'address' | 'publicKeyCompressed'
+  > {
     const seed = bip39.mnemonicToSeedSync(mnemonic, password);
     const masterKey = hdkey.fromMasterSeed(seed);
     const { account, change, addressIndex } = hdPath;
@@ -20,32 +27,65 @@ export class EthKey extends Base.KeyBase<Tx.Transaction> {
     const master = masterKey.derivePath(hdPathStr);
     const child = master.deriveChild(addressIndex);
     const wallet = child.getWallet();
-    const keyPair: Pick<Base.KeyPair, 'privateKey' | 'publicKey' | 'address'> =
-      {
-        privateKey: ethUtil.bufferToHex(wallet.getPrivateKey()),
-        publicKey: ethUtil.bufferToHex(wallet.getPublicKey()),
-        address: ethUtil.bufferToHex(wallet.getAddress()),
-      };
+    //Using compressed public key for evmos
+    const secp256k1 = new ec('secp256k1');
+    const key = secp256k1.keyFromPrivate(wallet.getPrivateKey());
+    const publicKey = Buffer.from(key.getPublic().encodeCompressed('array'));
+
+    const keyPair: Pick<
+      Base.KeyPair,
+      'privateKey' | 'publicKey' | 'address' | 'publicKeyCompressed'
+    > = {
+      privateKey: ethUtil.bufferToHex(wallet.getPrivateKey()),
+      publicKey: ethUtil.bufferToHex(wallet.getPublicKey()),
+      publicKeyCompressed: ethUtil.bufferToHex(publicKey),
+      address: ethUtil.bufferToHex(wallet.getAddress()),
+    };
     return keyPair;
   }
 
   public generateWalletFromPrivateKey(
     privateKey: string
-  ): Pick<Base.KeyPair, 'privateKey' | 'publicKey' | 'address'> {
+  ): Pick<
+    Base.KeyPair,
+    'privateKey' | 'publicKey' | 'address' | 'publicKeyCompressed'
+  > {
     const stripped = ethUtil.stripHexPrefix(privateKey);
     const buffer = Buffer.from(stripped, 'hex');
+    //Using compressed public key for evmos
+    const secp256k1 = new ec('secp256k1');
+    const key = secp256k1.keyFromPrivate(buffer);
+    const publicKey = Buffer.from(key.getPublic().encodeCompressed('array'));
     const wallet: any = Wallet.fromPrivateKey(buffer);
-    const keyPair: Pick<Base.KeyPair, 'privateKey' | 'publicKey' | 'address'> =
-      {
-        privateKey: ethUtil.bufferToHex(wallet.getPrivateKey()),
-        publicKey: ethUtil.bufferToHex(wallet.getPublicKey()),
-        address: ethUtil.bufferToHex(wallet.getAddress()),
-      };
+    const keyPair: Pick<
+      Base.KeyPair,
+      'privateKey' | 'publicKey' | 'address' | 'publicKeyCompressed'
+    > = {
+      privateKey: ethUtil.bufferToHex(wallet.getPrivateKey()),
+      publicKey: ethUtil.bufferToHex(wallet.getPublicKey()),
+      publicKeyCompressed: ethUtil.bufferToHex(publicKey),
+      address: ethUtil.bufferToHex(wallet.getAddress()),
+    };
     return keyPair;
   }
 
-  public generateSignature(stdTx: Tx.Transaction, privateKey: string): string {
-    throw new Error('Method not implemented.');
+  public async generateSignature(
+    stdTx: any,
+    privateKey: string | Buffer
+  ): Promise<any> {
+    let privKey = privateKey;
+    if (typeof privKey === 'string') {
+      const stripped = ethUtil.stripHexPrefix(privateKey as string);
+      privKey = Buffer.from(stripped, 'hex');
+    }
+    const ethWallet = new EthWallet(privKey);
+    const signature = await ethWallet
+      ._signingKey()
+      .signDigest(keccak256(stdTx));
+    const splitSignature = BytesUtils.splitSignature(signature);
+    return BytesUtils.arrayify(
+      BytesUtils.concat([splitSignature.r, splitSignature.s])
+    );
   }
 
   public signTx(stdTx: Tx.Transaction, privateKey: string): any {

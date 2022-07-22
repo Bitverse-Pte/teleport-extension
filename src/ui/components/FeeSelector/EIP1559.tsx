@@ -87,7 +87,7 @@ function FeeSelector(props) {
     ]);
   };
   const fetchNativePrice = async () => {
-    const tokens = await wallet.getTokenBalancesAsync(true);
+    const tokens = await wallet.getTokenBalancesAsync();
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
@@ -207,7 +207,7 @@ function FeeSelector(props) {
               });
             }}
           >
-            <span>Custom Gas Fee</span>
+            <span>Customize Gas Fee</span>
             <IconComponent name="chevron-right" cls="base-text-color" />
           </div>
         )}
@@ -241,7 +241,7 @@ function FeeSelector(props) {
         key="top2"
       >
         <DrawerHeader
-          title="Custom Gas Fee"
+          title="Customize Gas Fee"
           type={2}
           handleCloseIconClick={() => setCustomVisible(false)}
         />

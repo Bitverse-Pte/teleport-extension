@@ -6,6 +6,7 @@ import { Drawer } from 'antd';
 import { useAsyncEffect, useWallet, useWalletRequest } from 'ui/utils';
 import { AccountCreateType, BaseAccount } from 'types/extend';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import * as _ from 'lodash';
 import { IconComponent } from 'ui/components/IconComponents';
 import {
@@ -23,6 +24,7 @@ import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
+import { useHistory } from 'react-router-dom';
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -36,6 +38,7 @@ const AccountManage: React.FC = () => {
   const accountManageWidgetRef = useRef();
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
+  const history = useHistory();
 
   const { state, pathname } = useLocation<{
     hdWalletId: string;
@@ -56,7 +59,7 @@ const AccountManage: React.FC = () => {
           tempAccounts.push(a);
         }
       });
-      setAccounts(accountList);
+      setAccounts(tempAccounts);
     }
   };
 
@@ -64,12 +67,13 @@ const AccountManage: React.FC = () => {
     wallet.addNewDisplayAccountByExistKeyring,
     {
       onSuccess: () => {
-        setAddPopupVisible(false);
-        queryAccounts();
-        (accountManageWidgetRef.current as any).queryAccounts();
+        //setAddPopupVisible(false);
+        //queryAccounts();
+        //(accountManageWidgetRef.current as any).queryAccounts();
         sensors.track('teleport_account_manage_add_confirm', {
           page: pathname,
         });
+        history.go(-1);
       },
       onError: (e) => {
         console.error(e.code);
@@ -211,10 +215,7 @@ const AccountManage: React.FC = () => {
           {accounts.map((a, i) => (
             <div className="edit-account flexR" key={`edit_${i}`}>
               <div className="edit-left flexR">
-                <Jazzicon
-                  diameter={30}
-                  seed={Number(a.address.substr(0, 8) || 0)}
-                />
+                <Jazzicon diameter={30} seed={getUnit10ByAddress(a.address)} />
                 <WalletName cls="account" width={100}>
                   {a.accountName || a.hdWalletName}
                 </WalletName>

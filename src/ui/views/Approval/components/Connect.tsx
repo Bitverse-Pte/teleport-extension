@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'antd';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { WalletName } from '../../../components/Widgets';
 import { useTranslation } from 'react-i18next';
 import { Spin, FallbackSiteLogo } from 'ui/components';
@@ -72,7 +73,7 @@ const Connect = ({ params: { icon, origin } }: ConnectProps) => {
           <div className="account-left flex">
             <Jazzicon
               diameter={30}
-              seed={Number(currentAccount?.address?.substr(0, 8) || 0)}
+              seed={getUnit10ByAddress(currentAccount?.address)}
             />
             <div className="account-info flexCol">
               <WalletName cls="account-name" width={100}>

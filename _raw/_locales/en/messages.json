@@ -13,6 +13,15 @@
   "Swap": {
     "message": "Swap"
   },
+  "networkType": {
+    "message": "Network Type"
+  },
+  "SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST": {
+    "message": "You do not have account in that network"
+  },
+  "NORMAL_WALLET_SWITCH_EVM_ONLY": {
+    "message": "Please switch between {{ecosystem_name}} networks"
+  },
   "History": {
     "message": "History"
   },
@@ -423,6 +432,9 @@
   },
   "doYouAllowSiteToAddNetwork" : {
     "message": "Allow this site to add a chain?"
+  },
+  "existedChain": {
+    "message": "This chain already exists in wallet！"
   },
   "doYouAllowSiteToSwitchNetwork" : {
     "message": "Allow this site to switch the network?"

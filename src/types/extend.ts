@@ -1,5 +1,6 @@
+import { PresetNetworkId } from 'constants/defaultNetwork';
 import { SignatureAlgorithm } from 'types/keyBase';
-import { CoinType } from 'types/network';
+import { CoinType, Ecosystem, Provider } from 'types/network';
 
 export enum AccountCreateType {
   MNEMONIC = 'mnemonic',
@@ -15,6 +16,7 @@ export interface BaseAccount {
   address: string;
   coinType: CoinType;
   publicKey: string;
+  publicKeyCompressed?: string;
   hdPathCoinType: number;
   hdPathAccount: number;
   hdPathChange: number;
@@ -22,11 +24,13 @@ export interface BaseAccount {
   hdWalletName: string;
   hdWalletId: string;
   accountName: string;
-  isCompatibleEthereum: boolean;
-  countOfPhrase: number;
+  countOfPhrase?: number;
   signatureAlgorithm: SignatureAlgorithm;
   accountCreateType: AccountCreateType;
   deletedHdPathIndex?: number[];
+  // add field after v0.3.0
+  chainCustomId: PresetNetworkId | string;
+  ecosystem: Ecosystem;
 }
 
 export interface Secret {
@@ -45,7 +49,7 @@ export interface CreateAccountOpts {
 export interface ImportAccountOpts {
   name: string;
   privateKey: string;
-  coinType: CoinType;
+  chains: Provider[];
   password?: string;
 }
 
@@ -64,4 +68,17 @@ export interface DisplayAccountManage {
   accountName: string;
   hdPathIndex: number;
   accounts: BaseAccount[];
+}
+
+export interface CompareAccountsForCompatible {
+  hdWalletId: string;
+  hdWalletName: string;
+  mnemonic?: string;
+  privateKey?: string;
+  accountCreateType: AccountCreateType;
+  accounts?: {
+    hdPathIndex: number;
+    accountName: string;
+  }[];
+  chains: Provider[];
 }

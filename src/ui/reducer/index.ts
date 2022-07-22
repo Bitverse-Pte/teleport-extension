@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import networkSliceReducer from './network.reducer';
 import customNetworkReducer from './customNetwork.reducer';
 import transactionsReducer from './transactions.reducer';
+import cosmosTxsReducer from './cosmosTxs.reducer';
 import tokensReducer from './token.reducer';
 import knownMethodReducer from './knownMethod.reducer';
 import preferenceReducer from './preference.reducer';
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   customNetworks: customNetworkReducer,
   tokens: tokensReducer,
   transactions: transactionsReducer,
+  cosmosTxHistory: cosmosTxsReducer,
   knownMethod: knownMethodReducer,
   preference: preferenceReducer,
   appState: appStateReducer,

@@ -1,6 +1,9 @@
 import { message } from 'antd';
 import { ArgsProps } from 'antd/lib/message';
 import { nanoid } from 'nanoid';
+import React from 'react';
+import { IconComponent } from '../IconComponents';
+import './style.less';
 
 function isArgsProps(jc: React.ReactNode | ArgsProps): jc is ArgsProps {
   return typeof jc === 'object' && Boolean((jc as any).content);
@@ -15,31 +18,35 @@ const createCTCMessage =
     if (!isArgsProps(params[0])) {
       content = {
         content: params[0],
+        duration: params[1],
+        onClose: params[2],
+        key: nanoid(),
       } as ArgsProps;
     }
 
-    let msgKey: string | number;
-    if (!content.key) {
-      /**
-       * Generate a key for onClick to close
-       */
-      msgKey = nanoid();
-      content.key = msgKey;
-    } else {
-      msgKey = content.key;
-    }
-    const _poorOldOnClick = content.onClick;
-    content.onClick = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (_poorOldOnClick) {
-        /**
-         * continute if onClick existed
-         */
-        _poorOldOnClick(e);
-      }
-      message.destroy(msgKey);
+    const closeMessage = () => {
+      console.debug(
+        `ClickToCloseMessage::onClick: closing message #${content.key}`
+      );
+      message.destroy(content.key);
     };
-    params[0] = content;
-    message[name](...params);
+
+    content.content = (
+      <div className="flex items-center">
+        <span className="message">{content.content}</span>
+        <div
+          className="flex cursor-pointer justify-center items-center ml-auto toast-close-button"
+          onClick={closeMessage}
+        >
+          <IconComponent
+            name="close"
+            cls="closeIcon base-text-color"
+            style={{ width: 8, height: 8 }}
+          />
+        </div>
+      </div>
+    );
+    message[name](content);
   };
 
 export const ClickToCloseMessage = {

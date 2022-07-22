@@ -1,8 +1,12 @@
 import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
-import { CoinType, NetworkController, Provider } from 'types/network';
+import {
+  CoinType,
+  Ecosystem,
+  NetworkController,
+  Provider,
+} from 'types/network';
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useInterval } from 'react-use';
 import { useWallet } from '../utils';
 import {
   hideLoadingIndicator,
@@ -12,6 +16,7 @@ import {
   getCustomProvidersSelector,
   getEnabledProvidersSelector,
 } from 'ui/selectors/network.selector';
+import { ErrorCode } from 'constants/code';
 
 /**
  * Design was based on MetaMask
@@ -35,14 +40,14 @@ export const NetworkProviderContext = React.createContext<{
   useProviderById: (networkId: PresetNetworkId | string) => Promise<Provider>;
 
   // you can create / edit / remove custom network
-  addCustomProvider: (
+  addCustomEthereumProvider: (
     nickname: string,
     rpcUrl: string,
     chainId: string,
     ticker?: string,
     blockExplorerUrl?: string
   ) => Promise<any>;
-  editCustomProvider: (
+  editCustomEthereumProvider: (
     providerId: string,
     newNickname: string,
     rpcUrl: string,
@@ -53,6 +58,17 @@ export const NetworkProviderContext = React.createContext<{
   removeCustomProvider: (idToBeRemoved: string) => Promise<any>;
   getAllProviders: () => Promise<Provider[]>;
 } | null>(null);
+
+export function NetworkErrorCodeToMessageKey(code?: ErrorCode) {
+  switch (code) {
+    case ErrorCode.ACCOUNT_DOES_NOT_EXIST:
+      return 'SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST';
+    case ErrorCode.NORMAL_WALLET_SWITCH_EVM_ONLY:
+      return 'NORMAL_WALLET_SWITCH_EVM_ONLY';
+    default:
+      return 'UNCAUGHT_NETWORK_ERROR';
+  }
+}
 
 /**
  * NetworkStoreProvider
@@ -77,10 +93,12 @@ export function NetworkStoreProvider({
       dispatch(showLoadingIndicator());
       try {
         const provider = await wallet.useProviderById(networkId);
-        await wallet.fetchLatestBlockDataNow();
+        if (provider.ecosystem === Ecosystem.EVM)
+          await wallet.fetchLatestBlockDataNow();
         return provider;
-      } catch (error) {
+      } catch (error: any) {
         console.error('useProviderById::error', error);
+        throw error;
       } finally {
         dispatch(hideLoadingIndicator());
       }
@@ -88,7 +106,7 @@ export function NetworkStoreProvider({
     [wallet, customProviders]
   );
 
-  const editCustomProvider = useCallback(
+  const editCustomEthereumProvider = useCallback(
     async (
       networkId: string,
       newNickname: string,
@@ -98,7 +116,7 @@ export function NetworkStoreProvider({
       blockExplorerUrl?: string,
       coinType = CoinType.ETH
     ) => {
-      await wallet.editCustomNetwork(
+      await wallet.editCustomEthereumProvider(
         networkId,
         newNickname,
         rpcUrl,
@@ -115,7 +133,7 @@ export function NetworkStoreProvider({
     return wallet.getAllProviders() as Promise<Provider[]>;
   }, [wallet]);
 
-  const addCustomProvider = useCallback(
+  const addCustomEthereumProvider = useCallback(
     async (
       nickname: string,
       rpcUrl: string,
@@ -126,7 +144,7 @@ export function NetworkStoreProvider({
     ) => {
       dispatch(showLoadingIndicator());
       try {
-        await wallet.addCustomNetwork(
+        await wallet.addCustomEthereumProvider(
           nickname,
           rpcUrl,
           chainId,
@@ -136,7 +154,7 @@ export function NetworkStoreProvider({
         );
         await wallet.fetchLatestBlockDataNow();
       } catch (error) {
-        console.error('addCustomProvider::error', error);
+        console.error('addCustomEthereumProvider::error', error);
       } finally {
         dispatch(hideLoadingIndicator());
       }
@@ -159,9 +177,9 @@ export function NetworkStoreProvider({
       customProviders,
       useProviderById,
       removeCustomProvider,
-      editCustomProvider,
+      editCustomEthereumProvider,
       enabledProviders,
-      addCustomProvider,
+      addCustomEthereumProvider,
       getAllProviders,
     }),
     [
@@ -169,9 +187,9 @@ export function NetworkStoreProvider({
       customProviders,
       useProviderById,
       enabledProviders,
-      editCustomProvider,
+      editCustomEthereumProvider,
       removeCustomProvider,
-      addCustomProvider,
+      addCustomEthereumProvider,
       getAllProviders,
     ]
   );

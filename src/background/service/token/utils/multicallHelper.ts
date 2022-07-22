@@ -24,7 +24,7 @@ export class MulticallHelper {
       callData: t.isNative
         ? mcallV2Iface.encodeFunctionData('getEthBalance', [who])
         : erc20Iface.encodeFunctionData('balanceOf', [who]),
-      target: t.isNative ? mcallAddr : t.contractAddress,
+      target: t.isNative ? mcallAddr : (t as any).contractAddress,
     });
   }
 

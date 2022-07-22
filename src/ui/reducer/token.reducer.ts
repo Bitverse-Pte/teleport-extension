@@ -31,6 +31,7 @@ export const tokensListSlice = createSlice<
   initialState: {
     tokens: [],
     balances: {},
+    denomTrace: {},
   },
   reducers: {
     setTokens(state, action) {

@@ -73,7 +73,10 @@ const switchChainValidation = ({
 }) => {
   const providers = networkPreferenceService.getAllProviders();
   const matchedProvider = providers.find((p) => {
-    return BigNumber.from(p.chainId).eq(chainParams.chainId);
+    return (
+      p.ecosystem == Ecosystem.EVM &&
+      BigNumber.from(p.chainId).eq(chainParams.chainId)
+    );
   });
   if (!matchedProvider) {
     throw ethErrors.provider.custom({
@@ -82,10 +85,13 @@ const switchChainValidation = ({
     });
   }
   const connected = permissionService.getConnectedSite(session.origin);
-  const { chainId: currentChainId } =
+  const { chainId: currentChainId, ecosystem } =
     networkPreferenceService.getProviderConfig();
   if (connected) {
-    if (BigNumber.from(chainParams.chainId).eq(currentChainId)) {
+    if (
+      ecosystem == Ecosystem.EVM &&
+      BigNumber.from(chainParams.chainId).eq(currentChainId)
+    ) {
       return true;
     }
   }
@@ -114,7 +120,12 @@ class ProviderController extends BaseController {
 
   ethRequestAccounts = async ({ session: { origin } }) => {
     const _account = await this.getCurrentAccount();
-    if (!permissionService.hasPerssmion(origin, _account?.address)) {
+    if (
+      !permissionService.hasPerssmion({
+        origin: origin,
+        account: _account?.address,
+      })
+    ) {
       throw ethErrors.provider.unauthorized();
     }
 
@@ -138,7 +149,12 @@ class ProviderController extends BaseController {
   @Reflect.metadata('SAFE', true)
   ethAccounts = async ({ session: { origin } }) => {
     const account = await this.getCurrentAccount();
-    if (!permissionService.hasPerssmion(origin, account?.address)) {
+    if (
+      !permissionService.hasPerssmion({
+        origin: origin,
+        account: account?.address,
+      })
+    ) {
       return [];
     }
     return account ? [account.address] : [];
@@ -147,7 +163,12 @@ class ProviderController extends BaseController {
   @Reflect.metadata('SAFE', true)
   ethCoinbase = async ({ session: { origin } }) => {
     const account = await this.getCurrentAccount();
-    if (!permissionService.hasPerssmion(origin, account?.address)) {
+    if (
+      !permissionService.hasPerssmion({
+        origin: origin,
+        account: account?.address,
+      })
+    ) {
       return null;
     }
     return account ? [account.address] : [];
@@ -353,10 +374,13 @@ class ProviderController extends BaseController {
       session,
     }) => {
       const connected = permissionService.getConnectedSite(session.origin);
-      const { chainId: currentChainId } =
+      const { chainId: currentChainId, ecosystem } =
         networkPreferenceService.getProviderConfig();
       if (connected) {
-        if (BigNumber.from(chainParams.chainId).eq(currentChainId)) {
+        if (
+          ecosystem == Ecosystem.EVM &&
+          BigNumber.from(chainParams.chainId).eq(currentChainId)
+        ) {
           return true;
         }
       }
@@ -383,7 +407,10 @@ class ProviderController extends BaseController {
        * then they are treated as existed provider:
        * - Chain ID
        */
-      return BigNumber.from(p.chainId).eq(chainParams.chainId);
+      return (
+        p.ecosystem == Ecosystem.EVM &&
+        BigNumber.from(p.chainId).eq(chainParams.chainId)
+      );
     });
 
     if (matchedSameChainIdProvider) {
@@ -402,7 +429,7 @@ class ProviderController extends BaseController {
      * chainParams are the data from the dapp,
      * so the type of `chainParams` is `AddEthereumChainParameter`
      */
-    const network = networkPreferenceService.addCustomNetwork(
+    const network = networkPreferenceService.addCustomEthereumProvider(
       newChainName,
       chainParams.rpcUrls[0],
       chainParams.chainId,
@@ -415,10 +442,18 @@ class ProviderController extends BaseController {
       Ecosystem.EVM,
       '0x'
     );
-    networkPreferenceService.setProviderConfig({
-      ...network,
-      type: 'rpc',
-    });
+    try {
+      networkPreferenceService.setProviderConfig({
+        ...network,
+        type: 'rpc',
+      });
+    } catch (error: any) {
+      /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+      // if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+
+      // }
+      console.error('walletAddEthereumChain::error: ', error);
+    }
 
     await TokenService.addCustomToken({
       symbol: chainParams.nativeCurrency.symbol || 'ETH',
@@ -447,7 +482,10 @@ class ProviderController extends BaseController {
       console.debug('walletSwitchEthereumChain::chainParams:', chainParams);
       const providers = networkPreferenceService.getAllProviders();
       const matchedProvider = providers.find((p) => {
-        return BigNumber.from(p.chainId).eq(chainParams.chainId);
+        return (
+          p.ecosystem == Ecosystem.EVM &&
+          BigNumber.from(p.chainId).eq(chainParams.chainId)
+        );
       });
       if (!matchedProvider) {
         throw ethErrors.provider.custom({
@@ -455,7 +493,16 @@ class ProviderController extends BaseController {
           message: `Unrecognized chain ID "${chainParams.chainId}". Try adding the chain using ${MESSAGE_TYPE.ADD_ETHEREUM_CHAIN} first.`,
         });
       }
-      networkPreferenceService.setProviderConfig(matchedProvider);
+
+      try {
+        networkPreferenceService.setProviderConfig(matchedProvider);
+      } catch (error: any) {
+        /** @TODO handle potential ACCOUNT_DOES_NOT_EXIST */
+        // if (error.code == ErrorCode.ACCOUNT_DOES_NOT_EXIST) {
+
+        // }
+        console.error('walletSwitchEthereumChain::error: ', error);
+      }
 
       // return null is expected behaviour
       return null;
