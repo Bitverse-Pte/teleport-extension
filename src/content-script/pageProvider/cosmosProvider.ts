@@ -126,7 +126,6 @@ export class CosmosProvider extends EventEmitter implements Keplr {
   };
 
   async getKey(chainId: string): Promise<Key> {
-    console.log('=====CosmosProvider.getKey=====');
     return await this.requestMethod('getKey', [chainId]);
   }
 

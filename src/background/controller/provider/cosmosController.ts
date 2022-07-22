@@ -89,30 +89,31 @@ class CosmosProviderController {
       accountNumber: approvalRes.accountNumber,
     };
     console.log('====[messages, newSignDoc]====', messages, newSignDoc);
-
+    const { accountNumber: newSignDocAccountNumber, ...newSignDocRest } =
+      newSignDoc;
+    const cosmJSSignDoc = {
+      ...newSignDocRest,
+      accountNumber: Long.fromString(newSignDocAccountNumber),
+    };
     const k = keyringService.getKeplrCompatibleKey(chainId);
     if (!k) throw Error('no key found');
-    const signDoc = JSONUint8Array.unwrap(newSignDoc);
     const pk = keyringService.getPrivateKeyByAddress(k.bech32Address);
     if (!pk) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
     const coinType = networkPreferenceService.getChainCoinType(chainId);
     let signature;
     if (coinType === CoinType.ETH) {
       const ethKey = new EthKey();
-      signature = await ethKey.generateSignature(serializeSignDoc(signDoc), pk);
+      signature = await ethKey.generateSignature(
+        serializeSignDoc(JSONUint8Array.unwrap(newSignDoc)),
+        pk
+      );
     } else {
       const cosmosKey = new CosmosKey();
-      const { accountNumber: newSignDocAccountNumber, ...newSignDocRest } =
-        newSignDoc;
-      const cosmJSSignDoc = {
-        ...newSignDocRest,
-        accountNumber: Long.fromString(newSignDocAccountNumber),
-      };
       signature = cosmosKey.generateSignature(makeSignBytes(cosmJSSignDoc), pk);
     }
 
     return {
-      signed: JSONUint8Array.wrap(signDoc),
+      signed: JSONUint8Array.wrap(newSignDoc),
       signature: encodeSecp256k1Signature(k.pubKey, signature),
     };
   };
