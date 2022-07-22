@@ -38,6 +38,5 @@ export const getCosmosTransactionById = (activityId: string) =>
     const target = transactions.find((tx) => {
       return tx.id === activityId;
     });
-    console.debug('getCosmosTransactionById::transaction data:', target);
     return target;
   });

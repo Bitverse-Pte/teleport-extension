@@ -19,7 +19,6 @@ export function CosmosTransactionsList({
   const balances = useSelector(getTokenBalancesOfCurrentAccount);
   const matchedToken = balances.find((t) => t.tokenId === tokenId);
 
-  console.debug('CosmosTransactionsList::matchedToken:', matchedToken);
   const filteredTxForCurrentChainAndToken = allTxForCurrentChain.filter(
     (tx) => {
       // if no matched token, then display all
