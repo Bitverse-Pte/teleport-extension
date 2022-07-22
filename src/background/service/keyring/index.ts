@@ -13,20 +13,35 @@ import preference from '../preference';
 import {
   AccountCreateType,
   BaseAccount,
+  CompareAccountsForCompatible,
   DisplayAccountManage,
   DisplayWalletManage,
+  HdAccountStruct,
   ImportAccountOpts,
   Secret,
 } from 'types/extend';
-import { networkPreferenceService } from 'background/service';
+import {
+  networkPreferenceService,
+  preferenceService,
+} from 'background/service';
 import BitError from 'error';
 import { ErrorCode } from 'constants/code';
 import { nanoid } from 'nanoid';
 import { EthKey } from '../keyManager/eth/EthKey';
-import { Bip44HdPath, KeyPair, SignatureAlgorithm } from 'types/keyBase';
+import { CosmosKey } from '../keyManager/cosmos/CosmosKey';
+import {
+  Bip44HdPath,
+  KeplrGetKeyResponseInterface,
+  KeyPair,
+  SignatureAlgorithm,
+} from 'types/keyBase';
 import cloneDeep from 'lodash/cloneDeep';
-import { CoinType } from 'types/network';
+import { CoinType, Ecosystem, Provider } from 'types/network';
 import secp256k1_1 from 'ethereum-cryptography/secp256k1';
+import { Bech32Config } from 'types/cosmos';
+import { PresetNetworkId } from 'constants/defaultNetwork';
+import { Bech32Address } from 'utils/cosmos/bech32';
+import { transformHexAddress2Bech32 } from 'background/utils/hexstring-utils';
 
 export interface IStorageState {
   booted: string;
@@ -77,9 +92,17 @@ class KeyringService extends EventEmitter {
    */
   public loadStore(initState: IStorageState): void {
     this.store = new ObservableStore<IStorageState>(initState);
-    this.accounts = initState?.account
-      ? JSON.parse(initState.account as string)
-      : [];
+
+    let accounts = [];
+    if (initState?.account) {
+      accounts = JSON.parse(initState.account as string);
+      //v0.3
+      accounts.forEach((a: BaseAccount) => {
+        if (!a.chainCustomId) a.chainCustomId = PresetNetworkId.ETHEREUM;
+        if (!a.ecosystem) a.ecosystem = Ecosystem.EVM;
+      });
+    }
+    this.accounts = accounts;
   }
 
   /**
@@ -156,8 +179,56 @@ class KeyringService extends EventEmitter {
     return this.accounts.some((a: BaseAccount) => a.hdWalletName === name);
   }
 
-  private _checkDuplicateAccount(address: string): boolean {
-    return this.accounts.some((a: BaseAccount) => a.address === address);
+  /* private _checkDuplicatePrivateKeyWalletName(
+    name: string,
+    chainCustomId: PresetNetworkId | string
+  ): boolean {
+    return this.accounts.some((a: BaseAccount) => {
+      if (a.accountCreateType === AccountCreateType.MNEMONIC) {
+        return a.hdWalletName === name;
+      } else {
+        //there is no `chainCustomId` field on typeof BaseAccount, compatible
+        if (a.coinType === CoinType.ETH) {
+          return (
+            chainCustomId === PresetNetworkId.ETHEREUM &&
+            a.hdWalletName === name
+          );
+        } else {
+          return a.chainCustomId === chainCustomId && a.hdWalletName === name;
+        }
+      }
+    });
+  } */
+
+  /**
+   * Get Private Key
+   *
+   * Get private key by address
+   *
+   * @param {string} address - the current account address
+   *
+   * @returns {Promise<String>} the current account private key.
+   */
+  public getPrivateKeyByAddress(address) {
+    return this.secrets.find((s) => s.address === address)?.privateKey;
+  }
+
+  private _checkDuplicateAccount(
+    address: string,
+    accountCreateType: AccountCreateType,
+    customChainId?: PresetNetworkId | string
+  ): boolean {
+    const exist = this.accounts.some(
+      (a: BaseAccount) =>
+        a.address === address &&
+        accountCreateType === a.accountCreateType &&
+        (customChainId ? a.chainCustomId === customChainId : true)
+    );
+    if (exist) {
+      console.error('this address is duplicated', address);
+      console.error(this.accounts);
+    }
+    return exist;
   }
 
   private _checkDuplicateIndexName(
@@ -180,62 +251,125 @@ class KeyringService extends EventEmitter {
   async createAccountByImportPrivateKey(
     opts: ImportAccountOpts
   ): Promise<BaseAccount> {
-    if (this._checkDuplicateHdWalletName(opts.name)) {
-      return Promise.reject(new BitError(ErrorCode.WALLET_NAME_REPEAT));
-    }
-    let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
-    let signatureAlgorithm: SignatureAlgorithm,
-      countOfPhrase: number,
-      isCompatibleEthereum: boolean;
+    // account or secret must be a transaction, which should be reverted if error occur
+    let currentAccount;
+    const tempAccounts: BaseAccount[] = [],
+      tempSecrets: Secret[] = [];
     const hdWalletId: string = nanoid();
-    switch (opts.coinType) {
-      case CoinType.ETH:
-        keyPair = await this._createEthKeypairByImportPrivateKey(
-          opts.privateKey
-        );
-        if (this._checkDuplicateAccount(keyPair.address)) {
-          return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
-        }
-        signatureAlgorithm = SignatureAlgorithm.secp256k1;
-        countOfPhrase = 12;
-        isCompatibleEthereum = true;
-        break;
-      default:
-        keyPair = await this._createEthKeypairByImportPrivateKey(
-          opts.privateKey
-        );
-        signatureAlgorithm = SignatureAlgorithm.secp256k1;
-        countOfPhrase = 12;
-        isCompatibleEthereum = false;
+    for (const chain of opts.chains) {
+      // same wallet name can not exist bellow the same chain
+      if (this._checkDuplicateHdWalletName(opts.name)) {
+        return Promise.reject(new BitError(ErrorCode.WALLET_NAME_REPEAT));
+      }
+      let keyPair: KeyPair;
+      let signatureAlgorithm: SignatureAlgorithm, ecosystem: Ecosystem;
+      switch (chain.ecosystem) {
+        case Ecosystem.EVM:
+          keyPair = await this._createEthKeypairByImportPrivateKey(
+            opts.privateKey
+          );
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.PRIVATE_KEY
+            )
+          ) {
+            return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+          }
+          signatureAlgorithm = SignatureAlgorithm.secp256k1;
+          ecosystem = Ecosystem.EVM;
+          break;
+        case Ecosystem.COSMOS:
+          if (chain.coinType === CoinType.ETH) {
+            keyPair = await this._createEthKeypairByImportPrivateKey(
+              opts.privateKey
+            );
+            keyPair.address = transformHexAddress2Bech32(
+              keyPair.address,
+              (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+            );
+          } else {
+            keyPair = await this._createCosmosKeypairByImportPrivateKey(
+              opts.privateKey,
+              (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+            );
+          }
+
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.PRIVATE_KEY
+            )
+          ) {
+            return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+          }
+          signatureAlgorithm = SignatureAlgorithm.secp256k1;
+          ecosystem = Ecosystem.COSMOS;
+          break;
+
+        default:
+          keyPair = await this._createEthKeypairByImportPrivateKey(
+            opts.privateKey
+          );
+          signatureAlgorithm = SignatureAlgorithm.secp256k1;
+          ecosystem = Ecosystem.EVM;
+      }
+      const account: BaseAccount = {
+        address: keyPair.address,
+        publicKey: keyPair.publicKey,
+        publicKeyCompressed: keyPair.publicKeyCompressed,
+        coinType: chain.coinType,
+        hdPathCoinType: 0,
+        hdPathAccount: 0,
+        hdPathChange: 0,
+        hdPathIndex: 0,
+        hdWalletName: opts.name,
+        hdWalletId: hdWalletId,
+        accountName: '',
+        signatureAlgorithm,
+        accountCreateType: AccountCreateType.PRIVATE_KEY,
+        chainCustomId: chain.id,
+        ecosystem,
+      };
+      const secret: Secret = {
+        privateKey: keyPair.privateKey,
+        mnemonic: '',
+        address: keyPair.address,
+        hdWalletId: hdWalletId,
+      };
+      tempAccounts.push(account);
+      tempSecrets.push(secret);
     }
-    const account: BaseAccount = {
-      address: keyPair.address,
-      //address: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852', for test
-      coinType: opts.coinType,
-      publicKey: keyPair.publicKey,
-      hdPathCoinType: 0,
-      hdPathAccount: 0,
-      hdPathChange: 0,
-      hdPathIndex: 0,
-      hdWalletName: opts.name,
-      hdWalletId: hdWalletId,
-      accountName: '',
-      isCompatibleEthereum,
-      countOfPhrase,
-      signatureAlgorithm,
-      accountCreateType: AccountCreateType.PRIVATE_KEY,
-    };
-    const secret: Secret = {
-      privateKey: keyPair.privateKey,
-      mnemonic: '',
-      address: keyPair.address,
-      hdWalletId: hdWalletId,
-    };
-    this.accounts.push(account);
-    this.secrets.push(secret);
+    const currentChain: Provider = networkPreferenceService.getProviderConfig();
+    if (currentChain) {
+      currentAccount = tempAccounts.find(
+        (c: BaseAccount) => c.chainCustomId === currentChain.id
+      );
+      if (!currentAccount) {
+        let destChainCustomId;
+        const ethChainCustomId: PresetNetworkId | string =
+            PresetNetworkId.ETHEREUM,
+          cosmosChainId: PresetNetworkId | string = PresetNetworkId.COSMOS_HUB;
+        if (tempAccounts[0].ecosystem === Ecosystem.COSMOS) {
+          destChainCustomId = cosmosChainId;
+        } else if (tempAccounts[0].ecosystem === Ecosystem.EVM) {
+          destChainCustomId = ethChainCustomId;
+        }
+        currentAccount = tempAccounts.find(
+          (c: BaseAccount) => c.chainCustomId === destChainCustomId
+        );
+        const provider =
+          networkPreferenceService.getProvider(destChainCustomId);
+        if (provider)
+          networkPreferenceService.setProviderConfig(provider, false, true);
+      }
+    }
+    this.accounts = [...this.accounts, ...tempAccounts];
+    this.secrets = [...this.secrets, ...tempSecrets];
+
     this.setUnlocked();
     this._persistAllAccount();
-    return Promise.resolve(account);
+    return Promise.resolve(currentAccount);
   }
 
   /**
@@ -268,7 +402,7 @@ class KeyringService extends EventEmitter {
    * @param {IAddAccountOpts}
    * @returns {Promise<Boolean>}
    */
-  async addAccount(opts: IAddAccountOpts): Promise<boolean> {
+  async addAccount(opts: IAddAccountOpts): Promise<BaseAccount> {
     const currentHdWalletSecret: Secret[] = this.secrets.filter(
       (a: Secret) => a.hdWalletId === opts.hdWalletId
     );
@@ -300,11 +434,11 @@ class KeyringService extends EventEmitter {
       accountName: opts.accountName,
     };
 
-    await this._createAccountByImportMnemonic(
+    const newAccount = await this._createAccountByImportMnemonic(
       createOpts,
       opts.hdWalletId as string
     );
-    return Promise.resolve(true);
+    return Promise.resolve(newAccount);
   }
 
   /**
@@ -357,60 +491,84 @@ class KeyringService extends EventEmitter {
       hdWalletName: '',
       hdWalletId: '',
       accountName: '',
-      isCompatibleEthereum: false,
       countOfPhrase: 0,
       signatureAlgorithm: SignatureAlgorithm.secp256k1,
       accountCreateType: AccountCreateType.MNEMONIC,
+      chainCustomId: '',
+      ecosystem: Ecosystem.EVM,
     };
-    const currentCoinType =
-      networkPreferenceService.getProviderConfig().coinType;
+    const { id } = networkPreferenceService.getProviderConfig();
+    const accountList: BaseAccount[] = [];
+    const secretList: Secret[] = [];
     for (const p of supportProviders) {
-      let keyPair: Pick<KeyPair, 'privateKey' | 'publicKey' | 'address'>;
-      let signatureAlgorithm: SignatureAlgorithm,
-        countOfPhrase: number,
-        isCompatibleEthereum: boolean,
-        coinType: CoinType,
-        hdPathCoinType: number;
-      switch (p.coinType) {
-        case CoinType.ETH:
+      let keyPair: KeyPair;
+      hdPath.coinType = p.coinType;
+      switch (p.ecosystem) {
+        case Ecosystem.EVM:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
-          if (this._checkDuplicateAccount(keyPair.address)) {
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.MNEMONIC
+            )
+          ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
-          signatureAlgorithm = SignatureAlgorithm.secp256k1;
-          countOfPhrase = 12;
-          isCompatibleEthereum = true;
-          coinType = p.coinType;
-          hdPathCoinType = p.coinType;
+          break;
+        case Ecosystem.COSMOS:
+          if (p.coinType === CoinType.ETH) {
+            keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
+            keyPair.address = transformHexAddress2Bech32(
+              keyPair.address,
+              (p.prefix as Bech32Config)?.bech32PrefixAccAddr
+            );
+          } else {
+            keyPair = this._createCosmosKeypairByMnemonic(
+              opts.mnemonic,
+              hdPath,
+              (p.prefix as Bech32Config).bech32PrefixAccAddr
+            );
+          }
+
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.MNEMONIC
+            )
+          ) {
+            return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+          }
           break;
         default:
           keyPair = this._createEthKeypairByMnemonic(opts.mnemonic, hdPath);
-          if (this._checkDuplicateAccount(keyPair.address)) {
+          if (
+            this._checkDuplicateAccount(
+              keyPair.address,
+              AccountCreateType.MNEMONIC
+            )
+          ) {
             return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
           }
-          signatureAlgorithm = SignatureAlgorithm.secp256k1;
-          countOfPhrase = 12;
-          isCompatibleEthereum = true;
-          coinType = p.coinType;
-          hdPathCoinType = p.coinType;
       }
       const account: BaseAccount = {
         address: keyPair.address,
-        coinType,
+        coinType: p.coinType,
         publicKey: keyPair.publicKey,
-        hdPathCoinType,
+        publicKeyCompressed: keyPair.publicKeyCompressed,
+        hdPathCoinType: p.coinType,
         hdPathAccount: 0,
         hdPathChange: 0,
         hdPathIndex: opts.addressIndex as number,
         hdWalletName: opts.name,
         hdWalletId: hdWalletId as string,
         accountName: opts.accountName || `account ${hdPath.addressIndex + 1}`,
-        isCompatibleEthereum,
-        countOfPhrase,
-        signatureAlgorithm,
+        countOfPhrase: 12,
+        signatureAlgorithm: SignatureAlgorithm.secp256k1,
         accountCreateType: AccountCreateType.MNEMONIC,
+        chainCustomId: p.id,
+        ecosystem: p.ecosystem,
       };
-      if (coinType === currentCoinType) {
+      if (p.id === id) {
         newDisplayAccount = Object.assign(account, {});
       }
       const secret: Secret = {
@@ -420,12 +578,118 @@ class KeyringService extends EventEmitter {
         hdWalletId: hdWalletId as string,
       };
 
-      this.accounts.push(account);
-      this.secrets.push(secret);
+      accountList.push(account);
+      secretList.push(secret);
     }
+    this.accounts = [...this.accounts, ...accountList];
+    this.secrets = [...this.secrets, ...secretList];
     this.setUnlocked();
     this._persistAllAccount();
     return Promise.resolve(newDisplayAccount);
+  }
+
+  addCurrentChainAccountByWalletId(hdWalletId: string): Promise<BaseAccount> {
+    let mnemonic, baseHdWallet;
+    const hdWalletSecrets: Secret[] = this.secrets.filter(
+      (s: Secret) => s.hdWalletId === hdWalletId
+    );
+    const hdWallets: BaseAccount[] = this.accounts.filter(
+      (s: BaseAccount) => s.hdWalletId === hdWalletId
+    );
+    if (hdWalletSecrets) {
+      mnemonic = hdWalletSecrets[0].mnemonic;
+    }
+    if (hdWallets) {
+      baseHdWallet = hdWallets[0];
+    }
+
+    const { ecosystem, id, coinType, prefix } =
+      networkPreferenceService.getProviderConfig();
+    const hdPath: Bip44HdPath = {
+      account: 0,
+      change: 0,
+      addressIndex: 0,
+    };
+    const createdAccount: BaseAccount = {
+      address: '',
+      coinType,
+      publicKey: '',
+      hdPathCoinType: coinType,
+      hdPathAccount: 0,
+      hdPathChange: 0,
+      hdPathIndex: 0,
+      hdWalletName: baseHdWallet?.hdWalletName,
+      hdWalletId,
+      accountName: `account ${hdPath.addressIndex + 1}`,
+      countOfPhrase: 0,
+      signatureAlgorithm: SignatureAlgorithm.secp256k1,
+      accountCreateType: AccountCreateType.MNEMONIC,
+      chainCustomId: id,
+      ecosystem,
+    };
+
+    let keyPair: KeyPair;
+    switch (ecosystem) {
+      case Ecosystem.EVM:
+        keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
+        if (
+          this._checkDuplicateAccount(
+            keyPair.address,
+            AccountCreateType.MNEMONIC
+          )
+        ) {
+          return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+        }
+        break;
+      case Ecosystem.COSMOS:
+        if (coinType === CoinType.ETH) {
+          keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
+          keyPair.address = transformHexAddress2Bech32(
+            keyPair.address,
+            (prefix as Bech32Config)?.bech32PrefixAccAddr
+          );
+        } else {
+          keyPair = this._createCosmosKeypairByMnemonic(
+            mnemonic,
+            hdPath,
+            (prefix as Bech32Config).bech32PrefixAccAddr
+          );
+        }
+        if (
+          this._checkDuplicateAccount(
+            keyPair.address,
+            AccountCreateType.MNEMONIC
+          )
+        ) {
+          return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+        }
+        break;
+      default:
+        keyPair = this._createEthKeypairByMnemonic(mnemonic, hdPath);
+        if (
+          this._checkDuplicateAccount(
+            keyPair.address,
+            AccountCreateType.MNEMONIC
+          )
+        ) {
+          return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+        }
+    }
+    createdAccount.address = keyPair.address;
+    createdAccount.publicKey = keyPair.publicKey;
+    createdAccount.publicKeyCompressed = keyPair.publicKeyCompressed;
+    const secret: Secret = {
+      privateKey: keyPair.privateKey,
+      mnemonic: mnemonic,
+      address: keyPair.address,
+      hdWalletId: hdWalletId as string,
+    };
+
+    this.accounts.push(createdAccount);
+    this.secrets.push(secret);
+    this.setUnlocked();
+    this._persistAllAccount();
+    return Promise.resolve(createdAccount);
   }
 
   /**
@@ -437,7 +701,7 @@ class KeyringService extends EventEmitter {
    */
   private async _persistAllAccount(): Promise<boolean> {
     if (!this.password) {
-      return Promise.reject(new Error('no password found'));
+      return Promise.reject(new BitError(ErrorCode.WALLET_WAS_LOCKED));
     }
     const encryptedSecret = await encrypt.encrypt(
       this.password as string,
@@ -474,6 +738,22 @@ class KeyringService extends EventEmitter {
     }
   }
 
+  private _createCosmosKeypairByImportPrivateKey(
+    privateKey: string,
+    addressPrefix: string
+  ): Promise<KeyPair> {
+    try {
+      const buffer = toBuffer(privateKey);
+      isValidPrivate(buffer);
+      return Promise.resolve(
+        new CosmosKey().generateWalletFromPrivateKey(privateKey, addressPrefix)
+      );
+    } catch (e) {
+      console.error(e);
+      return Promise.reject(new BitError(ErrorCode.INVALID_PRIVATE_KEY));
+    }
+  }
+
   /**
    * Create Key Pair
    *
@@ -490,6 +770,19 @@ class KeyringService extends EventEmitter {
     hdPath: Bip44HdPath
   ): KeyPair {
     return new EthKey().generateWalletFromMnemonic(mnemonic, hdPath);
+  }
+
+  private _createCosmosKeypairByMnemonic(
+    mnemonic: string,
+    hdPath: Bip44HdPath,
+    prefix: string
+  ): KeyPair {
+    return new CosmosKey().generateWalletFromMnemonic(
+      mnemonic,
+      hdPath,
+      '',
+      prefix
+    );
   }
 
   /**
@@ -548,21 +841,6 @@ class KeyringService extends EventEmitter {
         return Promise.reject(new BitError(ErrorCode.WRONG_PSD));
       });
     return Promise.resolve(Boolean(checksumPassed));
-  }
-
-  /**
-   * Get Private Key
-   *
-   * Get private key by address
-   *
-   * @param {string} address - the current account address
-   *
-   * @returns {Promise<String>} the current account private key.
-   */
-  getPrivateKeyByAddress(address: string): Promise<string> {
-    const secret = this.secrets.find((s: Secret) => s.address === address);
-    if (secret) return Promise.resolve(secret.privateKey);
-    return Promise.resolve('');
   }
 
   /**
@@ -769,24 +1047,161 @@ class KeyringService extends EventEmitter {
   }
 
   async getCurrentChainAccounts(): Promise<BaseAccount[]> {
-    const currentChainCoinType: CoinType =
-      networkPreferenceService.getProviderConfig().coinType;
+    const currentChain: Provider = networkPreferenceService.getProviderConfig();
+    const { ecosystem, id } = currentChain;
     const currentAccount = preference.getCurrentAccount();
     let accounts: BaseAccount[] = [];
     if (!currentAccount) {
       return Promise.reject(new Error('no account found'));
     }
 
-    accounts = this.accounts.filter(
-      (a: BaseAccount) =>
-        a.coinType === currentChainCoinType &&
-        a.hdWalletId === currentAccount.hdWalletId
+    accounts = this.accounts.filter((a: BaseAccount) =>
+      ecosystem === Ecosystem.EVM
+        ? a.ecosystem === Ecosystem.EVM &&
+          a.hdWalletId === currentAccount.hdWalletId
+        : a.hdWalletId === currentAccount.hdWalletId && a.chainCustomId === id
     );
     return Promise.resolve(accounts);
   }
 
+  changeAccountByWallet(
+    destHdWalletId: string,
+    destEcosystem: Ecosystem,
+    destAccountCreateType: AccountCreateType
+  ) {
+    const { id, ecosystem } = networkPreferenceService.getProviderConfig();
+    const currentAccount = preference.getCurrentAccount();
+
+    const ethChainCustomId: PresetNetworkId | string = PresetNetworkId.ETHEREUM,
+      cosmosChainId: PresetNetworkId | string = PresetNetworkId.COSMOS_HUB;
+    let destChainCustomId;
+    if (destEcosystem === Ecosystem.COSMOS) {
+      destChainCustomId = cosmosChainId;
+    } else if (destEcosystem === Ecosystem.EVM) {
+      destChainCustomId = ethChainCustomId;
+    }
+
+    if (!currentAccount) throw Error('no current account found');
+    const srcEcosystem = ecosystem;
+    const srcAccountCreateType = currentAccount?.accountCreateType;
+
+    if (srcAccountCreateType === AccountCreateType.MNEMONIC) {
+      if (destAccountCreateType === AccountCreateType.MNEMONIC) {
+        const accounts = this.accounts.filter((a: BaseAccount) => {
+          return (
+            a.hdWalletId === destHdWalletId &&
+            ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
+              (srcEcosystem === Ecosystem.EVM && a.ecosystem === Ecosystem.EVM))
+          );
+        });
+        let account = accounts.find(
+          (a: BaseAccount) => a.hdPathIndex === currentAccount?.hdPathIndex
+        );
+        if (!account) account = accounts[0];
+        if (!account) throw Error('no account found');
+        preferenceService.setCurrentAccount(account);
+      } else {
+        if (srcEcosystem === destEcosystem) {
+          const account = this.accounts.find((a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
+                srcEcosystem === Ecosystem.EVM)
+            );
+          });
+          if (!account) throw Error('no account found');
+          preferenceService.setCurrentAccount(account);
+        } else {
+          const account = this.accounts.find((a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              a.chainCustomId === destChainCustomId
+            );
+          });
+          if (!account) throw Error('no account found');
+          preferenceService.setCurrentAccount(account);
+          const provider =
+            networkPreferenceService.getProvider(destChainCustomId);
+          if (provider)
+            networkPreferenceService.setProviderConfig(provider, false);
+        }
+      }
+    } else if (srcAccountCreateType === AccountCreateType.PRIVATE_KEY) {
+      if (destAccountCreateType === AccountCreateType.MNEMONIC) {
+        const accounts: BaseAccount[] = this.accounts.filter(
+          (a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
+                srcEcosystem === Ecosystem.EVM)
+            );
+          }
+        );
+        if (!accounts?.length) throw Error('no account found');
+        preferenceService.setCurrentAccount(accounts[0]);
+      } else {
+        if (srcEcosystem === destEcosystem) {
+          const account = this.accounts.find((a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              ((srcEcosystem !== Ecosystem.EVM && a.chainCustomId === id) ||
+                srcEcosystem === Ecosystem.EVM)
+            );
+          });
+          if (!account) throw Error('no account found');
+          preferenceService.setCurrentAccount(account);
+        } else {
+          const account = this.accounts.find((a: BaseAccount) => {
+            return (
+              a.hdWalletId === destHdWalletId &&
+              a.chainCustomId === destChainCustomId
+            );
+          });
+          if (!account) throw Error('no account found');
+          preferenceService.setCurrentAccount(account);
+          const provider =
+            networkPreferenceService.getProvider(destChainCustomId);
+          if (provider)
+            networkPreferenceService.setProviderConfig(provider, false);
+        }
+      }
+    }
+  }
+
+  getWalletList(useCurrentEcosystem = false): HdAccountStruct[] {
+    const { ecosystem } = networkPreferenceService.getProviderConfig();
+    const accounts: HdAccountStruct[] = [];
+    const cloned: BaseAccount[] = cloneDeep(this.accounts);
+    cloned.forEach((c: BaseAccount) => {
+      if (
+        useCurrentEcosystem &&
+        c.accountCreateType === AccountCreateType.PRIVATE_KEY
+      ) {
+        //compatible, there is no `ecosystem` filed in BaseAccount
+        if (
+          (c.ecosystem && c.ecosystem !== ecosystem) ||
+          (!c.ecosystem && ecosystem === Ecosystem.EVM)
+        )
+          return;
+      }
+      if (accounts.some((a: any) => a.hdWalletId === c.hdWalletId)) {
+        accounts
+          .find((a: any) => a.hdWalletId === c.hdWalletId)
+          ?.accounts.push(c);
+      } else {
+        accounts.push({
+          hdWalletId: c.hdWalletId,
+          hdWalletName: c.hdWalletName,
+          accounts: [c],
+        });
+      }
+    });
+
+    return accounts;
+  }
+
   getAccountList(useCurrentChain = false): DisplayWalletManage {
-    const coinType = networkPreferenceService.getProviderConfig().coinType;
+    const { coinType, id } = networkPreferenceService.getProviderConfig();
     const accounts: DisplayWalletManage = {
       hdAccount: [],
       simpleAccount: [],
@@ -795,7 +1210,7 @@ class KeyringService extends EventEmitter {
     cloned.forEach((c: BaseAccount) => {
       switch (c.accountCreateType) {
         case AccountCreateType.MNEMONIC:
-          if (useCurrentChain && coinType && coinType !== c.coinType) return;
+          //if (useCurrentChain && ((coinType && coinType !== c.coinType) || (id && id !== c.chainCustomId))) return;
           if (
             accounts.hdAccount.some((a: any) => a.hdWalletId === c.hdWalletId)
           ) {
@@ -856,8 +1271,8 @@ class KeyringService extends EventEmitter {
    *
    * @returns {Promise<Array<string>>} The array of accounts.
    */
-  async getAccounts(): Promise<string[]> {
-    return this.accounts.map((a: BaseAccount) => a.address);
+  async getAccounts(): Promise<BaseAccount[]> {
+    return cloneDeep(this.accounts) as BaseAccount[];
   }
 
   /**
@@ -950,6 +1365,16 @@ class KeyringService extends EventEmitter {
     await this._persistAllAccount();
   }
 
+  async deleteAccountsByChainCustomId(chainCustomId: string): Promise<void> {
+    if (!this.password) {
+      return Promise.reject(new BitError(ErrorCode.WALLET_WAS_LOCKED));
+    }
+    this.accounts = this.accounts.filter(
+      (a: BaseAccount) => a.chainCustomId !== chainCustomId
+    );
+    await this._persistAllAccount();
+  }
+
   /**
    * Rename display account
    *
@@ -972,6 +1397,358 @@ class KeyringService extends EventEmitter {
     });
     await this._persistAllAccount();
     return Promise.resolve(true);
+  }
+
+  private _getKey(account: BaseAccount): KeplrGetKeyResponseInterface {
+    const {
+      address,
+      publicKey,
+      hdWalletName,
+      signatureAlgorithm,
+      publicKeyCompressed,
+      ecosystem,
+      coinType,
+    } = account;
+    const addressBuf = Bech32Address.fromBech32(address).address,
+      publicKeyBuf = Buffer.from(
+        ethUtil.stripHexPrefix(
+          (ecosystem === Ecosystem.COSMOS && coinType === CoinType.ETH
+            ? publicKeyCompressed
+            : publicKey) as string
+        ),
+        'hex'
+      );
+    return {
+      name: hdWalletName,
+      algo:
+        signatureAlgorithm === SignatureAlgorithm.secp256k1 ? 'secp256k1' : '',
+      pubKey: publicKeyBuf,
+      address: addressBuf,
+      bech32Address: address,
+      isNanoLedger: false,
+    } as KeplrGetKeyResponseInterface;
+  }
+
+  public getKeplrCompatibleKey(chainId): KeplrGetKeyResponseInterface | null {
+    const chains: Provider[] = networkPreferenceService.getSupportProviders();
+    const chain: Provider | undefined = chains.find(
+      (c: Provider) => c.chainId === chainId
+    );
+    if (chain) {
+      const { id } = chain;
+      const accounts = cloneDeep(this.accounts);
+      const currentAccount: BaseAccount | null | undefined =
+        preferenceService.getCurrentAccount();
+      if (currentAccount) {
+        const { hdPathIndex, ecosystem, accountCreateType, hdWalletId } =
+          currentAccount;
+        if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
+          if (ecosystem !== Ecosystem.COSMOS) {
+            return null;
+          } else {
+            const currentChainAccounts: BaseAccount[] = accounts.filter(
+              (a: BaseAccount) =>
+                a.chainCustomId === id && a.hdWalletId === hdWalletId
+            );
+            if (currentChainAccounts?.length > 0) {
+              return this._getKey(currentChainAccounts[0]);
+            } else {
+              return null;
+            }
+          }
+        } else {
+          const currentChainAccounts: BaseAccount[] = accounts.filter(
+            (a: BaseAccount) =>
+              a.chainCustomId === id &&
+              a.hdWalletId === hdWalletId &&
+              a.hdPathIndex === hdPathIndex
+          );
+          if (currentChainAccounts?.length > 0) {
+            return this._getKey(currentChainAccounts[0]);
+          } else {
+            return null;
+          }
+        }
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  public generateMissedAccounts() {
+    if (!this.getIsUnlocked()) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
+    const wallets: CompareAccountsForCompatible[] =
+      this.getMissedAccountsForAllChain();
+    console.log('missed accounts', wallets);
+    this._generateAccounts(wallets);
+  }
+
+  private async _generateAccounts(wallets: CompareAccountsForCompatible[]) {
+    const accountList: BaseAccount[] = [];
+    const secretList: Secret[] = [];
+
+    for (const wallet of wallets) {
+      for (const chain of wallet.chains) {
+        if (wallet.accountCreateType === AccountCreateType.MNEMONIC) {
+          for (const account of (wallet as any).accounts) {
+            const hdPath: Bip44HdPath = {
+              account: 0,
+              change: 0,
+              addressIndex: account.hdPathIndex,
+              coinType: chain.coinType,
+            };
+            const createdAccount: BaseAccount = {
+              address: '',
+              coinType: chain.coinType,
+              publicKey: '',
+              hdPathCoinType: chain.coinType,
+              hdPathAccount: 0,
+              hdPathChange: 0,
+              hdPathIndex: account.hdPathIndex,
+              hdWalletName: wallet.hdWalletName,
+              hdWalletId: wallet.hdWalletId,
+              accountName: account.accountName,
+              countOfPhrase: 0,
+              signatureAlgorithm: SignatureAlgorithm.secp256k1,
+              accountCreateType: AccountCreateType.MNEMONIC,
+              chainCustomId: chain.id,
+              ecosystem: chain.ecosystem,
+            };
+
+            let keyPair: KeyPair;
+            switch (chain.ecosystem) {
+              case Ecosystem.EVM:
+                keyPair = this._createEthKeypairByMnemonic(
+                  wallet.mnemonic as string,
+                  hdPath
+                );
+                if (
+                  this._checkDuplicateAccount(
+                    keyPair.address,
+                    AccountCreateType.MNEMONIC
+                  )
+                ) {
+                  return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+                }
+                break;
+              case Ecosystem.COSMOS:
+                if (chain.coinType === CoinType.ETH) {
+                  keyPair = this._createEthKeypairByMnemonic(
+                    wallet.mnemonic as string,
+                    hdPath
+                  );
+                  keyPair.address = transformHexAddress2Bech32(
+                    keyPair.address,
+                    (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+                  );
+                } else {
+                  keyPair = this._createCosmosKeypairByMnemonic(
+                    wallet.mnemonic as string,
+                    hdPath,
+                    (chain.prefix as Bech32Config).bech32PrefixAccAddr
+                  );
+                }
+                if (
+                  this._checkDuplicateAccount(
+                    keyPair.address,
+                    AccountCreateType.MNEMONIC,
+                    chain.id
+                  )
+                ) {
+                  return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+                }
+                break;
+              default:
+                keyPair = this._createEthKeypairByMnemonic(
+                  wallet.mnemonic as string,
+                  hdPath
+                );
+                if (
+                  this._checkDuplicateAccount(
+                    keyPair.address,
+                    AccountCreateType.MNEMONIC
+                  )
+                ) {
+                  return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+                }
+            }
+            createdAccount.address = keyPair.address;
+            createdAccount.publicKey = keyPair.publicKey;
+            createdAccount.publicKeyCompressed = keyPair.publicKeyCompressed;
+            const secret: Secret = {
+              privateKey: keyPair.privateKey,
+              mnemonic: wallet.mnemonic as string,
+              address: keyPair.address,
+              hdWalletId: wallet.hdWalletId,
+            };
+            accountList.push(createdAccount);
+            secretList.push(secret);
+          }
+        } else if (wallet.accountCreateType === AccountCreateType.PRIVATE_KEY) {
+          const createdAccount: BaseAccount = {
+            address: '',
+            coinType: chain.coinType,
+            publicKey: '',
+            hdPathCoinType: chain.coinType,
+            hdPathAccount: 0,
+            hdPathChange: 0,
+            hdPathIndex: 0,
+            hdWalletName: wallet.hdWalletName,
+            hdWalletId: wallet.hdWalletId,
+            accountName: '',
+            countOfPhrase: 0,
+            signatureAlgorithm: SignatureAlgorithm.secp256k1,
+            accountCreateType: AccountCreateType.PRIVATE_KEY,
+            chainCustomId: chain.id,
+            ecosystem: chain.ecosystem,
+          };
+
+          let keyPair: KeyPair;
+          switch (chain.ecosystem) {
+            case Ecosystem.EVM:
+              keyPair = await this._createEthKeypairByImportPrivateKey(
+                (wallet as any).privateKey
+              );
+              if (
+                this._checkDuplicateAccount(
+                  keyPair.address,
+                  AccountCreateType.PRIVATE_KEY
+                )
+              ) {
+                return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+              }
+              break;
+            case Ecosystem.COSMOS:
+              if (chain.coinType === CoinType.ETH) {
+                keyPair = await this._createEthKeypairByImportPrivateKey(
+                  (wallet as any).privateKey
+                );
+                keyPair.address = transformHexAddress2Bech32(
+                  keyPair.address,
+                  (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+                );
+              } else {
+                keyPair = await this._createCosmosKeypairByImportPrivateKey(
+                  (wallet as any).privateKey,
+                  (chain.prefix as Bech32Config)?.bech32PrefixAccAddr
+                );
+              }
+              if (
+                this._checkDuplicateAccount(
+                  keyPair.address,
+                  AccountCreateType.PRIVATE_KEY,
+                  chain.id
+                )
+              ) {
+                return Promise.reject(new BitError(ErrorCode.ADDRESS_REPEAT));
+              }
+
+              break;
+
+            default:
+              keyPair = await this._createEthKeypairByImportPrivateKey(
+                (wallet as any).privateKey
+              );
+          }
+          createdAccount.address = keyPair.address;
+          createdAccount.publicKey = keyPair.publicKey;
+          createdAccount.publicKeyCompressed = keyPair.publicKeyCompressed;
+          const secret: Secret = {
+            privateKey: keyPair.privateKey,
+            mnemonic: wallet.mnemonic as string,
+            address: keyPair.address,
+            hdWalletId: wallet.hdWalletId,
+          };
+          accountList.push(createdAccount);
+          secretList.push(secret);
+        }
+      }
+    }
+    this.accounts = [...this.accounts, ...accountList];
+    this.secrets = [...this.secrets, ...secretList];
+    await this._persistAllAccount();
+  }
+
+  public getMissedAccountsForAllChain(): CompareAccountsForCompatible[] {
+    const accounts: BaseAccount[] = cloneDeep(this.accounts);
+    const secret: Secret[] = cloneDeep(this.secrets);
+    // accounts bellow evm chains are not missed;
+    const chains: Provider[] = networkPreferenceService
+      .getSupportProviders()
+      .filter((c: Provider) => c.ecosystem !== Ecosystem.EVM);
+    const difference: CompareAccountsForCompatible[] = [];
+
+    const walletIdMap: Record<string, BaseAccount[]> = {};
+    accounts.forEach((a: BaseAccount) => {
+      if (walletIdMap[a.hdWalletId]) {
+        walletIdMap[a.hdWalletId].push(a);
+      } else {
+        walletIdMap[a.hdWalletId] = [a];
+      }
+    });
+
+    for (const walletId in walletIdMap) {
+      const { accountCreateType, ecosystem, hdWalletName } =
+        walletIdMap[walletId][0];
+      let currentChains = chains,
+        mnemonic,
+        privateKey;
+      if (accountCreateType === AccountCreateType.PRIVATE_KEY) {
+        currentChains = chains.filter(
+          (c: Provider) => c.ecosystem === ecosystem
+        );
+        privateKey = secret.find(
+          (s: Secret) => s.hdWalletId === walletId
+        )?.privateKey;
+      } else if (accountCreateType === AccountCreateType.MNEMONIC) {
+        mnemonic = secret.find(
+          (s: Secret) => s.hdWalletId === walletId
+        )?.mnemonic;
+      }
+      currentChains.forEach((c: Provider) => {
+        if (
+          walletIdMap[walletId].every(
+            (a: BaseAccount) => a.chainCustomId !== c.id
+          )
+        ) {
+          const diffItem = difference.find(
+            (d: CompareAccountsForCompatible) => d.hdWalletId === walletId
+          );
+          if (diffItem) {
+            diffItem.chains.push(c);
+          } else {
+            const d: CompareAccountsForCompatible = {
+              hdWalletId: walletId,
+              hdWalletName,
+              mnemonic,
+              privateKey,
+              accountCreateType,
+              accounts: [],
+              chains: [c],
+            };
+            if (accountCreateType === AccountCreateType.MNEMONIC) {
+              walletIdMap[walletId].forEach((a: BaseAccount) => {
+                if (
+                  (d as any).accounts.every(
+                    (account: { hdPathIndex: number; accountName }) =>
+                      account.hdPathIndex !== a.hdPathIndex
+                  )
+                ) {
+                  (d as any).accounts.push({
+                    hdPathIndex: a.hdPathIndex,
+                    accountName: a.accountName,
+                  });
+                }
+              });
+            }
+            difference.push(d);
+          }
+        }
+      });
+    }
+    return difference;
   }
 }
 

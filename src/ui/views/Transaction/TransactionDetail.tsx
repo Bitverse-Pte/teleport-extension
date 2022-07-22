@@ -15,7 +15,6 @@ import { AddressCard } from 'ui/components/universal/AddressCard';
 import { IconComponent } from 'ui/components/IconComponents';
 import { TokenIcon } from 'ui/components/Widgets';
 import { Tooltip } from 'antd';
-import { cancelTxs } from 'ui/state/actions';
 import { useWallet } from 'ui/utils';
 import CancelSpeedupPopover from 'ui/components/TransactionCancelAndSpeedUp/CancelAndSpeedUp.popover';
 import { EDIT_GAS_MODES } from 'constants/gas';
@@ -26,6 +25,8 @@ import CancelButton from 'ui/components/TransactionCancelAndSpeedUp/CancelButton
 import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
 import { TransactionItemDetail } from './components/TransactionItemDetail.component';
 import { TransactionGasDetail } from './components/TxGasDetail.component';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 const { sensors } = skynet;
 
 const shortenedStr = (str: string, digits = 6, isHex = true) =>
@@ -133,13 +134,7 @@ export function _ActivityDetail({
 
   const walletController = useWallet();
 
-  const cancelTx = useCallback(() => {
-    dispatch(cancelTxs(transaction.transactions, walletController));
-    sensors.track('teleport_activity_cancelled', {
-      page: location.pathname,
-    });
-    history.goBack();
-  }, [dispatch, history]);
+  const { isDarkMode } = useDarkmode();
 
   const handleSpeedUpClick = useCallback(() => {
     setEditGasMode(EDIT_GAS_MODES.SPEED_UP);
@@ -163,7 +158,13 @@ export function _ActivityDetail({
 
   return (
     <Fragment>
-      <div className={'activity-detail ' + statusBackground}>
+      <div
+        className={clsx(
+          'activity-detail',
+          { dark: isDarkMode },
+          statusBackground
+        )}
+      >
         <Header title={t(title)} />
         <div className="txdetail-direction-logo flex justify-center">
           {/* workaround as hook treat native token as undefined */}
@@ -187,7 +188,7 @@ export function _ActivityDetail({
             {primaryTransaction.hash && (
               <div className="row">
                 <div className="field-name">Transaction ID</div>
-                <div className="field-value">
+                <div className={clsx('field-value', { dark: isDarkMode })}>
                   <Tooltip placement="topRight" title={primaryTransaction.hash}>
                     {shortenedStr(primaryTransaction.hash, 4)}
                   </Tooltip>

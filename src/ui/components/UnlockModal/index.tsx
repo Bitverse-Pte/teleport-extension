@@ -9,17 +9,20 @@ import './style.less';
 interface DrawerHeaderProps {
   title: string;
   handleCloseIconClick: () => void;
+  hideCloseIcon?: boolean;
 }
 
 const DrawerHeader = (props: DrawerHeaderProps) => {
   return (
     <div className="drawer-header-container-common flexR">
       <span className="drawer-header-title">{props.title}</span>
-      <IconComponent
-        name="close"
-        onClick={props.handleCloseIconClick}
-        cls="drawer-header-close-icon"
-      />
+      {props.hideCloseIcon ? null : (
+        <IconComponent
+          name="close"
+          onClick={props.handleCloseIconClick}
+          cls="drawer-header-close-icon"
+        />
+      )}
     </div>
   );
 };
@@ -29,6 +32,7 @@ export interface PropsInterface {
   title: string;
   setVisible?: (visible: boolean) => void;
   unlocked?: () => void;
+  hideCloseIcon?: boolean;
 }
 
 export const UnlockModal: React.FC<PropsInterface> = (
@@ -79,6 +83,7 @@ export const UnlockModal: React.FC<PropsInterface> = (
       <div className="backup-popup-container flexCol">
         <DrawerHeader
           title={props.title}
+          hideCloseIcon={props.hideCloseIcon}
           handleCloseIconClick={() => {
             if (props.setVisible) {
               props.setVisible(false);

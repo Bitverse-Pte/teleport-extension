@@ -12,6 +12,47 @@
     line-height: 1;
   }
 
+  .guide_container {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    z-index: 100;
+
+    .home-guide {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
+
+    .home-guide-close{
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 136px;
+      height: 34px;
+      border-radius: 8px;
+      background: @themeColor;
+      line-height: 34px;
+      text-align: center;
+      font-size: 14px;
+      color: #ffffff;
+      font-family: MontserratBold;
+    }
+  }
+
+  .ant-spin-nested-loading {
+    height: 200px;
+
+    .ant-spin-container {
+      position: relative;
+      height: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
   .home-bg {
     position: absolute;
     top: 0;
@@ -27,23 +68,23 @@
     box-sizing: border-box;
     padding-top: 2px;
 
-    .home-content-name-wrap{
+    .home-content-name-wrap {
       align-items: center;
-      font-size:12px;
+      font-size: 12px;
       font-family: MontserratBold;
       color: @themeColor;
-      margin-bottom: 8px;
-      height: 12px;
+      height: 28px;
+      line-height: 28px;
 
       .home-wallet-name {
         margin-left: 5px;
       }
     }
 
-    
+
 
     .home-preview-container {
-      height: 160px;
+      height: 152px;
       align-items: center;
       box-sizing: border-box;
       padding: 12px 16px 0 16px;
@@ -105,6 +146,11 @@
 
           .copy {
             fill: @themeColor;
+          }
+
+          .explorer {
+            fill: @themeColor;
+            margin-left: 8px;
           }
 
         }
@@ -268,6 +314,7 @@
           font-size: 36px;
           font-weight: 600;
           line-height: 50px;
+          max-width: 250px;
         }
 
         .token {
@@ -313,13 +360,13 @@
     justify-content: space-between;
 
     .wrap {
-      flex:1;
+      flex: 1;
     }
 
     .home-search-add-icon {
       width: 24px;
       height: 24px;
-      flex:0 0 24px;
+      flex: 0 0 24px;
       margin-left: 22px;
     }
 
@@ -356,6 +403,7 @@
             font-size: 14px;
             line-height: 20px;
             font-family: MontserratBold;
+            max-width: 240px;
           }
 
           .estimate {
@@ -391,25 +439,27 @@
     color: #9EA2A9;
   }
 }
-.account-switch-drawer{
+
+.account-switch-drawer {
   div.account-switch-header {
     justify-content: flex-end;
     align-items: center;
     height: 60px;
-    flex:0 0 60px;
+    flex: 0 0 60px;
   }
-  
+
   div.account-switch-accounts {
     height: 24px;
-    flex:0 0 24px;
+    flex: 0 0 24px;
     margin-bottom: 24px;
     justify-content: space-between;
     align-items: center;
+
     span.account-switch-accounts-title {
       font-family: MontserratBold;
       font-size: 24px;
     }
-  
+
     span.account-switch-accounts-manage-wallet-container {
       font-size: 12px;
       font-family: MontserratBold;
@@ -417,15 +467,16 @@
       margin-right: 8px;
       align-items: center;
 
-      .chevron-right{
+      .chevron-right {
         fill: @themeColor;
-      }   
+      }
     }
   }
 }
+
 .back-icon {
   cursor: pointer;
   fill: #798CAD;
-  width: 24px!important;
-  height: 24px!important;
+  width: 24px !important;
+  height: 24px !important;
 }

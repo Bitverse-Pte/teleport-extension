@@ -12,6 +12,7 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import { useTranslation } from 'react-i18next';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { ChainIdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
@@ -55,7 +56,7 @@ const SendToken = () => {
           <div className="account-box">
             <Jazzicon
               diameter={30}
-              seed={Number(fromAccount?.address?.substr(0, 8) || 0)}
+              seed={getUnit10ByAddress(fromAccount?.address)}
             />
             <span className="account-address">{fromAccount?.accountName}</span>
           </div>

@@ -12,15 +12,6 @@ export const WALLET_THEME_COLOR: string[] = [
   '#000000',
 ];
 
-export const TOKEN_THEME_COLOR: string[] = [
-  '#D6EFFF',
-  '#C9F0CB',
-  '#FFDDD6',
-  '#FFE9AD',
-  '#E5DBFF',
-  '#BEFAEC',
-];
-
 export enum TOKEN_MANAGE_TAB {
   SEARCH = 1,
   CUSTOMIZE,
@@ -38,22 +29,18 @@ export enum TipButtonEnum {
   LOCK,
 }
 
-export const CoinTypeEcosystemMapping: {
+export const ecosystemMapping: {
   [key in keyof typeof Ecosystem]: {
-    coinType: CoinType[];
     ecosystemName: string;
   };
 } = {
   [Ecosystem.EVM]: {
-    coinType: [CoinType.ETH],
     ecosystemName: 'EVM Networks',
   },
   [Ecosystem.COSMOS]: {
-    coinType: [CoinType.COSMOS],
     ecosystemName: 'Cosmos Networks',
   },
   [Ecosystem.POLKADOT]: {
-    coinType: [CoinType.POLKADOT],
     ecosystemName: 'Polkadot Networks',
   },
 };

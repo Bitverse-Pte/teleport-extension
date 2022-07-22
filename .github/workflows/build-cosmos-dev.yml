@@ -1,0 +1,29 @@
+name: Make Build for Cosmos
+on: 
+  push:
+    branches: 
+      - cosmos/feature
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    env:
+      INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+          cache: 'yarn' # enable cache for yarn
+      - run: yarn
+      - run: yarn build:pro
+      - name: Create zip
+        uses: "montudor/action-zip@v1"
+        with:
+            args: zip -qq -r "teleport-wallet-${{ github.sha }}.zip" dist
+      - uses: actions/upload-artifact@v2
+        with:
+          name: "teleport-wallet-${{ github.sha }}.zip"
+          path: "./teleport-wallet-${{ github.sha }}.zip"

@@ -1,14 +1,14 @@
 import { Grey, Orange, Red } from 'constants/colorPalette';
 import { TransactionStatuses } from 'constants/transaction';
 import React, { CSSProperties, useMemo } from 'react';
-import { ReactComponent as IconSent } from '../../../assets/send.svg';
-import { ReactComponent as IconReceive } from '../../../assets/receive.svg';
-
+import { ReactComponent as IconSent } from '../../../assets/sendOuter.svg';
+import { ReactComponent as IconReceive } from '../../../assets/receiveOuter.svg';
+import { ReactComponent as IconSign } from '../../../assets/action-icon/signOuter.svg';
 import './style.less';
-
+import { CosmosTxStatus } from 'types/cosmos/transaction';
 interface TxLogoParams {
-  status: TransactionStatuses | 'cancelled';
-  type: 'send' | 'receive';
+  status: TransactionStatuses | CosmosTxStatus | 'cancelled';
+  type: 'send' | 'receive' | 'sign';
   size?: number;
 }
 
@@ -17,16 +17,16 @@ export function TxDirectionLogo({ status, type, size = 48 }: TxLogoParams) {
     switch (status) {
       case TransactionStatuses.ON_CHAIN_FALIURE:
       case TransactionStatuses.REJECTED:
-      case TransactionStatuses.FAILED: {
+      case CosmosTxStatus.FAILED:
+      case TransactionStatuses.FAILED:
         return Red['07'];
-      }
-      case TransactionStatuses.SUBMITTED: {
+      case CosmosTxStatus.CREATED:
+      case CosmosTxStatus.SIGNED:
+      case TransactionStatuses.SUBMITTED:
         return Orange['02'];
-      }
       // success is default
-      default: {
+      default:
         return Grey['07'];
-      }
     }
   }, [status]);
   const iconStyle = useMemo(() => {
@@ -58,14 +58,20 @@ export function TxDirectionLogo({ status, type, size = 48 }: TxLogoParams) {
     }
     return style;
   }, [status]);
+  const theIcon = useMemo(() => {
+    switch (type) {
+      case 'send':
+        return <IconSent style={iconStyle} width={12} height={12} />;
+      case 'sign':
+        return <IconSign style={iconStyle} width={12} height={12} />;
+      default:
+        return <IconReceive style={iconStyle} width={12} height={12} />;
+    }
+  }, [type]);
   return (
     <div className="logo-container">
       <div className="tx-stat-logo" style={{ backgroundColor }}>
-        {type === 'send' ? (
-          <IconSent style={iconStyle} width={12} height={12} />
-        ) : (
-          <IconReceive style={iconStyle} width={12} height={12} />
-        )}
+        {theIcon}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import * as ethUtil from 'ethereumjs-util';
 export { default as createPersistStore } from './persisitStore';
 export * from 'utils';
+import bech32 from 'bech32';
 // {a:{b: string}} => {1: 'a.b'}
 // later same [source] value will override [result] key generated before
 const retrieveValuePath = (obj) => {
@@ -78,3 +79,19 @@ export const addHexPrefix = (str) => {
 
   return `0x${str}`;
 };
+
+export function getUnit10ByAddress(address: string | undefined): number {
+  if (!address) return 0;
+  if (address.startsWith('0x')) {
+    return Number(address.substr(0, 8));
+  } else {
+    const decoded = bech32.decode(address);
+    if (decoded?.words.length > 0) {
+      return Number(
+        `0x${Buffer.from(decoded.words).toString('hex').substr(0, 6)}`
+      );
+    } else {
+      return 0;
+    }
+  }
+}

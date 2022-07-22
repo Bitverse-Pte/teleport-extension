@@ -14,10 +14,13 @@ import { Token } from 'types/token';
 import Header from 'ui/components/Header';
 import teleportLogo from 'assets/teleportBg.svg';
 import { TipButton, TokenIcon, WalletName } from 'ui/components/Widgets';
-import { TransactionsList } from 'ui/components/TransactionList';
+import { TransactionListRouter } from 'ui/components/TransactionList';
 import './style.less';
 import clsx from 'clsx';
 import { TipButtonEnum } from 'constants/wallet';
+import { Ecosystem, Provider } from 'types/network';
+import { getProvider } from 'ui/selectors/selectors';
+import { useSelector } from 'react-redux';
 
 const SingleToken = () => {
   const wallet = useWallet();
@@ -31,14 +34,15 @@ const SingleToken = () => {
   const [account, setAccount] = useState<BaseAccount>();
   const [token, setToken] = useState<Token>();
   const [prices, setPrices] = useState();
+  const currentChain: Provider = useSelector(getProvider);
 
-  const getTokenBalanceAsync = async () => {
+  /* const getTokenBalanceAsync = async () => {
     const balance = await wallet.getTokenBalanceAsync(tokenId).catch((e) => {
       console.error(e);
     });
     console.log('async balance', balance);
     if (balance) setToken(balance);
-  };
+  }; */
 
   const getTokenBalanceSync = async () => {
     const balance = await wallet.getTokenBalanceSync(tokenId).catch((e) => {
@@ -53,10 +57,10 @@ const SingleToken = () => {
     if (account) setAccount(account);
   };
   useAsyncEffect(updateAccount, []);
-  useAsyncEffect(getTokenBalanceAsync, []);
+  //useAsyncEffect(getTokenBalanceAsync, []);
   useAsyncEffect(getTokenBalanceSync, []);
   const queryTokenPrices = async () => {
-    const prices = await wallet.queryTokenPrices().catch((e) => {
+    const prices = await wallet.queryTokenPrices(tokenId).catch((e) => {
       console.error(e);
     });
     console.log('prices', prices);
@@ -87,10 +91,27 @@ const SingleToken = () => {
       </span>
     </div>
   );
+
+  const ibcChainInfoStr = useMemo(() => {
+    let ibcStr;
+    if (token?.chainName && (token?.trace?.trace as any).length > 0) {
+      const trace = (token as any)?.trace.trace[
+        (token as any)?.trace.trace.length - 1
+      ];
+      if (trace) {
+        ibcStr = `(${token?.chainName.toUpperCase()}/${trace.channelId.toUpperCase()})`;
+      }
+    }
+    return ibcStr;
+  }, [token]);
+
   return (
     <div className="single-token flexCol">
       <Header title={title} />
-      <div className="summary flexCol content-wrap-padding">
+      <div
+        className="summary flexCol content-wrap-padding"
+        style={ibcChainInfoStr ? { height: '190px' } : {}}
+      >
         <div className="top">
           <TokenIcon token={updatedToken} radius={42} />
           {/* <img src={teleportLogo} className="logo" /> */}
@@ -105,12 +126,18 @@ const SingleToken = () => {
             </span>
             <span className="single-symbol">{updatedToken?.symbol}</span>
           </div>
+          <span
+            className="ibc-denomanation ellipsis"
+            style={ibcChainInfoStr ? {} : { display: 'none' }}
+          >
+            {ibcChainInfoStr}
+          </span>
           <span className="estimate">
             ≈{' '}
             {getTotalPricesByAmountAndPrice(
               updatedToken?.amount || 0,
               updatedToken?.decimal || 0,
-              updatedToken?.price || 1
+              updatedToken?.price || 0
             )}{' '}
             USD
           </span>
@@ -121,7 +148,11 @@ const SingleToken = () => {
           title="Send"
           type={TipButtonEnum.SEND}
           handleClick={() => {
-            history.push({ pathname: `/send/${tokenId}` });
+            if (currentChain.ecosystem === Ecosystem.EVM) {
+              history.push({ pathname: `/send/${tokenId}` });
+            } else {
+              history.push({ pathname: `/send-cos/${tokenId}` });
+            }
           }}
         />
         <TipButton
@@ -135,11 +166,10 @@ const SingleToken = () => {
 
       <div className="token-tx-list">
         <h2 className="title">{t('Activity')}</h2>
-        <TransactionsList
-          listContiannerHeight={240}
-          tokenAddress={token?.contractAddress}
-          // hideTokenTransactions is true = show native token transfer
-          hideTokenTransactions={token?.isNative}
+        <TransactionListRouter
+          ecosystem={currentChain.ecosystem}
+          listContiannerHeight={200}
+          tokenId={token?.tokenId}
         />
       </div>
     </div>

@@ -1,5 +1,7 @@
 import { MAINNET_CHAIN_ID } from 'constants/network';
 import TransactionController from './transactions/index';
+import CosmosTxController from './transactions/cosmos';
+import cosmosFeeService from './transactions/cosmos/fee';
 import NetworkController, { NETWORK_EVENTS } from './network/index';
 import keyringController from './keyring';
 import { GasFeeController, ControllerMessenger } from '@metamask/controllers';
@@ -11,7 +13,6 @@ import permissionService from './permission';
 import preferenceService from './preference';
 import networkPreferenceService from './network';
 import sessionService from './session';
-//import transactionWatchService from './transactionWatcher';
 import i18n from './i18n';
 import TokenService from './token/TokenService';
 import platform from './extension';
@@ -98,6 +99,8 @@ latestBlockDataHub.store.subscribe(({ isBaseFeePerGasExist }) => {
   );
 });
 
+const cosmosTxController = new CosmosTxController(networkPreferenceService);
+
 export {
   txController,
   gasFeeController,
@@ -108,12 +111,13 @@ export {
   preferenceService,
   networkPreferenceService,
   sessionService,
-  //transactionWatchService,
   i18n,
   knownMethodService,
   TokenService,
   latestBlockDataHub,
   contactBookService,
+  cosmosTxController,
+  cosmosFeeService,
 };
 
 async function newUnapprovedTransaction(txParams, req) {

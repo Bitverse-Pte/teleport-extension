@@ -60,18 +60,17 @@ function _getDefaultIcon(
       {token?.symbol?.substr(0, 1)?.toUpperCase()}
     </span>
   );
-  if (!token.isNative && !token.contractAddress) return defaultIcon;
   let contractAddress = '';
-  try {
-    contractAddress = (token as any).contractAddress
-      ? utils.getAddress((token as any).contractAddress)
-      : '';
-  } catch {
-    setLoadError(true);
+  if (!token.icon && 'contractAddress' in token) {
+    if (!token.isNative && !token.contractAddress) return defaultIcon;
+    try {
+      contractAddress = (token as any)?.contractAddress.startsWith('0x')
+        ? utils.getAddress((token as any).contractAddress)
+        : '';
+    } catch {
+      setLoadError(true);
+    }
   }
-  /* const contractAddress = (token as any).contractAddress
-    ? utils.getAddress((token as any).contractAddress)
-    : ''; */
 
   const src = useMemo(() => {
     let _src: string | undefined;

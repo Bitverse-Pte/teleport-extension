@@ -7,6 +7,7 @@ export interface ConnectedSite {
   icon: string;
   name: string;
   chain: CHAINS_ENUM;
+  chainIds: string[];
   e?: number;
   isSigned: boolean;
   isTop: boolean;
@@ -63,6 +64,7 @@ class PermissionService {
     if (!account) return;
     if (this.lruCache.has(origin)) {
       let _value = this.lruCache.get(origin);
+      // init accounts array if no accouts in record
       if (!_value?.accounts) {
         _value = {
           ...(_value as ConnectedSite),
@@ -96,6 +98,42 @@ class PermissionService {
     this.sync();
   };
 
+  addConnectedSite4CosmosNetwork = (
+    origin: string,
+    name: string,
+    icon: string,
+    chainId: string
+  ) => {
+    if (!this.lruCache) return;
+    if (!chainId) return;
+    if (this.lruCache.has(origin)) {
+      let site = this.lruCache.get(origin);
+      if (!site?.chainIds) {
+        site = {
+          ...(site as ConnectedSite),
+          chainIds: [],
+        };
+      }
+      if (!site?.chainIds.includes(chainId)) {
+        site?.chainIds.push(chainId);
+      }
+      this.lruCache.set(origin, {
+        ...site,
+        origin,
+        name,
+        icon,
+      } as ConnectedSite);
+    } else {
+      this.lruCache.set(origin, {
+        origin,
+        name,
+        icon,
+        chainIds: [chainId],
+      } as ConnectedSite);
+    }
+    this.sync();
+  };
+
   touchConnectedSite = (origin) => {
     if (!this.lruCache) return;
     if (origin === INTERNAL_REQUEST_ORIGIN) return;
@@ -122,12 +160,24 @@ class PermissionService {
   };
 
   // TODO: typo
-  hasPerssmion = (origin: string, account?: string) => {
+  hasPerssmion = ({
+    origin,
+    account,
+    chainId,
+  }: {
+    origin: string;
+    account?: string;
+    chainId?: string;
+  }) => {
     if (!this.lruCache) return;
     if (origin === INTERNAL_REQUEST_ORIGIN) return true;
     if (account) {
       const _value = this.lruCache.peek(origin);
       return _value?.accounts?.includes(account);
+    }
+    if (chainId) {
+      const _value = this.lruCache.peek(origin);
+      return _value?.chainIds?.includes(chainId);
     }
     return this.lruCache.has(origin);
   };
@@ -150,6 +200,24 @@ class PermissionService {
     this.sync();
   };
 
+  removeConnectedSiteByChainId = (origin: string, chainId: string) => {
+    if (!this.lruCache) return;
+    const site = this.lruCache.get(origin);
+    if (!site) {
+      return;
+    }
+    const i = site.chainIds.indexOf(chainId);
+    if (i > -1) {
+      site.chainIds.splice(i, 1);
+    }
+    if (!site.chainIds?.length) {
+      this.lruCache.del(origin);
+    } else {
+      this.lruCache.set(origin, site);
+    }
+    this.sync();
+  };
+
   getConnectedSite = (origin: string) => {
     return this.lruCache?.get(origin);
   };
@@ -159,54 +227,10 @@ class PermissionService {
     return values.filter((item) => item.accounts.includes(account));
   };
 
-  // getRecentConnectSites = (max = 12) => {
-  //   const values = this.lruCache?.values() || [];
-  //   const topSites: ConnectedSite[] = [];
-  //   const signedSites: ConnectedSite[] = [];
-  //   const connectedSites: ConnectedSite[] = [];
-  //   for (let i = 0; i < values.length; i++) {
-  //     const item = values[i];
-  //     if (item.isTop) {
-  //       topSites.push(item);
-  //     } else if (item.isSigned) {
-  //       signedSites.push(item);
-  //     } else {
-  //       connectedSites.push(item);
-  //     }
-  //   }
-  //   return [...topSites, ...signedSites, ...connectedSites].slice(0, max) || [];
-  // };
-
-  // getConnectedSites = () => {
-  //   return this.lruCache?.values() || [];
-  // };
-
-  // topConnectedSite = (origin: string) => {
-  //   const site = this.getConnectedSite(origin);
-  //   if (!site || !this.lruCache) return;
-  //   this.updateConnectSite(origin, {
-  //     ...site,
-  //     isTop: true,
-  //   });
-  // };
-
-  // unpinConnectedSite = (origin: string) => {
-  //   const site = this.getConnectedSite(origin);
-  //   if (!site || !this.lruCache) return;
-  //   this.updateConnectSite(origin, {
-  //     ...site,
-  //     isTop: false,
-  //   });
-  // };
-
-  // getSitesByDefaultChain = (chain: CHAINS_ENUM) => {
-  //   if (!this.lruCache) return [];
-  //   return this.lruCache.values().filter((item) => item.chain === chain);
-  // };
-
-  // isInternalOrigin = (origin: string) => {
-  //   return origin === INTERNAL_REQUEST_ORIGIN;
-  // };
+  getConnectedSitesByChainId = (chainId: string): ConnectedSite[] => {
+    const values = this.lruCache?.values() || [];
+    return values.filter((item) => item.chainIds.includes(chainId));
+  };
 }
 
 export default new PermissionService();

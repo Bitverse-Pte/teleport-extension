@@ -9,6 +9,7 @@ import { Input, InputNumber, Select, Spin } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { addHexPrefix, isValidAddress } from 'ethereumjs-util';
 
 import {
@@ -118,7 +119,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const balances = await wallet.getTokenBalancesAsync(true).catch((e) => {
+    const balances = await wallet.getTokenBalancesAsync().catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) {
@@ -131,7 +132,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const balances = await wallet.getTokenBalancesSync(true).catch((e) => {
+    const balances = await wallet.getTokenBalancesSync().catch((e) => {
       console.error(e);
     });
     if (balances && balances.length) {
@@ -144,7 +145,7 @@ const Send = () => {
   }, []);
 
   useAsyncEffect(async () => {
-    const list = await wallet.listContact();
+    const list = await wallet.listContactsByChain();
     const recentAddress = list.map((item) => {
       return item.address;
     });
@@ -326,7 +327,7 @@ const Send = () => {
         <div className="from-container flexCol">
           <div className="account-info flexR">
             <Jazzicon
-              seed={Number(fromAccount?.address?.substring(0, 8) || 0)}
+              seed={getUnit10ByAddress(fromAccount?.address)}
               diameter={16}
             />
             <WalletName cls="account-name" width={100}>

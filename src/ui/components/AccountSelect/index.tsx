@@ -12,13 +12,16 @@ import {
 import { Object } from 'ts-toolbelt';
 import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
 import Jazzicon from 'react-jazzicon';
+import { getUnit10ByAddress } from 'background/utils';
 import { Drawer } from 'antd';
 import * as _ from 'lodash';
+import { useSelector } from 'react-redux';
 import { CustomTab, WalletName } from '../Widgets';
 import { NoContent } from '../universal/NoContent';
 import { IconComponent } from '../IconComponents';
 import ChainIcons from '../ChainIcons';
-import { findIndex } from 'lodash';
+import { getProvider } from 'ui/selectors/selectors';
+import { Ecosystem, Provider } from 'types/network';
 
 interface AccountSelectProps {
   onClose: (selected?: BaseAccount) => void;
@@ -31,6 +34,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
 ) => {
   const wallet = useWallet();
   const [accountCreateType, setAccountCreateType] = useState(Tabs.FIRST);
+  const currentChain: Provider = useSelector(getProvider);
   const [displayAccounts, setDisplayAccount] = useState<any>({});
   const { t } = useTranslation();
   const isMnemonic = useMemo(() => {
@@ -83,23 +87,34 @@ const AccountSelect: React.FC<AccountSelectProps> = (
           HdAccountStruct,
           { selected?: boolean }
         > = accounts.hdAccount[0];
-        firstSelect.selected = true;
+        if (firstSelect) firstSelect.selected = true;
       }
       setDisplayAccount(accounts);
     }
   }, [props.visible]);
 
   const accountList = useMemo(() => {
+    let list = [];
     if (accountCreateType === Tabs.SECOND) {
-      return displayAccounts?.simpleAccount;
+      list = displayAccounts?.simpleAccount;
     } else {
-      return (
+      list =
         displayAccounts?.hdAccount?.find(
           (a: Object.Merge<HdAccountStruct, { selected?: boolean }>) =>
             a.selected
-        )?.accounts || []
-      );
+        )?.accounts || [];
     }
+    if (currentChain.ecosystem === Ecosystem.EVM) {
+      return list.filter((item: any) => {
+        return item?.ecosystem === Ecosystem.EVM;
+      });
+    }
+    if (currentChain.ecosystem === Ecosystem.COSMOS) {
+      return list.filter((item: any) => {
+        return item?.chainCustomId === currentChain.id;
+      });
+    }
+    return list;
   }, [displayAccounts, accountCreateType]);
 
   const handleTabClick = (type: Tabs) => {
@@ -218,7 +233,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
                         <div className="account-left flex">
                           <Jazzicon
                             diameter={30}
-                            seed={Number(a?.address?.substr(0, 8) || 0)}
+                            seed={getUnit10ByAddress(a?.address)}
                           />
                           <div className="account-info flexCol">
                             <WalletName cls="account-name" width={100}>

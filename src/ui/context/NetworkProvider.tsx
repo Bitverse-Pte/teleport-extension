@@ -1,8 +1,12 @@
 import { defaultNetworks, PresetNetworkId } from 'constants/defaultNetwork';
-import { CoinType, NetworkController, Provider } from 'types/network';
+import {
+  CoinType,
+  Ecosystem,
+  NetworkController,
+  Provider,
+} from 'types/network';
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useInterval } from 'react-use';
 import { useWallet } from '../utils';
 import {
   hideLoadingIndicator,
@@ -12,6 +16,7 @@ import {
   getCustomProvidersSelector,
   getEnabledProvidersSelector,
 } from 'ui/selectors/network.selector';
+import { ErrorCode } from 'constants/code';
 
 /**
  * Design was based on MetaMask
@@ -54,6 +59,17 @@ export const NetworkProviderContext = React.createContext<{
   getAllProviders: () => Promise<Provider[]>;
 } | null>(null);
 
+export function NetworkErrorCodeToMessageKey(code?: ErrorCode) {
+  switch (code) {
+    case ErrorCode.ACCOUNT_DOES_NOT_EXIST:
+      return 'SWITCH_PROVIDER_ACCOUNT_DOES_NOT_EXIST';
+    case ErrorCode.NORMAL_WALLET_SWITCH_EVM_ONLY:
+      return 'NORMAL_WALLET_SWITCH_EVM_ONLY';
+    default:
+      return 'UNCAUGHT_NETWORK_ERROR';
+  }
+}
+
 /**
  * NetworkStoreProvider
  * @param childrens  children elements into be injected
@@ -77,10 +93,12 @@ export function NetworkStoreProvider({
       dispatch(showLoadingIndicator());
       try {
         const provider = await wallet.useProviderById(networkId);
-        await wallet.fetchLatestBlockDataNow();
+        if (provider.ecosystem === Ecosystem.EVM)
+          await wallet.fetchLatestBlockDataNow();
         return provider;
-      } catch (error) {
+      } catch (error: any) {
         console.error('useProviderById::error', error);
+        throw error;
       } finally {
         dispatch(hideLoadingIndicator());
       }
