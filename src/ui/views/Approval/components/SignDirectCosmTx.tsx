@@ -125,7 +125,7 @@ const SignDirectCosmTx = ({
       _stdFee = await wallet.getCosmosStdFee(
         feeType,
         currency,
-        undefined,
+        Number(_stdFee.gas || _stdFee.gasLimit),
         chainId
       );
     }
