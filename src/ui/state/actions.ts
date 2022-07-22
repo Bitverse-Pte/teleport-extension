@@ -102,9 +102,7 @@ export function cancelTxs(txDataList: { id: string }[], background: any) {
     try {
       const txIds = txDataList.map(({ id }) => id);
       const cancellations = txIds.map((id) => background.cancelTransaction(id));
-      console.debug('before promise');
       await Promise.all(cancellations);
-      console.debug('after promise');
       // @todo:
       // dispatch(resetSendState());
 
@@ -211,7 +209,6 @@ export function createCancelTransaction(
   customGasSettings: any,
   newTxMetaProps: Partial<Transaction>
 ) {
-  console.debug('background.cancelTransaction');
   // let newTxId: string;
 
   return async (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {
@@ -231,7 +228,6 @@ export function createSpeedUpTransaction(
   customGasSettings: any,
   newTxMetaProps: Partial<Transaction>
 ) {
-  console.debug('background.createSpeedUpTransaction');
   // let newTx;
 
   return async (dispatch: ThunkDispatch<RootState, void, AnyAction>) => {

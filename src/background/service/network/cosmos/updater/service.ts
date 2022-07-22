@@ -74,7 +74,7 @@ export class CosmosChainUpdaterService {
       // If chain id is not fomatted as {chainID}-{version},
       // there is no way to deal with the updated chain id.
       if (!ChainIdHelper.hasChainVersion(chainInfo.chainId)) {
-        console.debug(
+        console.warn(
           'CosmosChainUpdate::tryUpdateChain: exit due to no version in chainId:',
           chainInfo.chainId
         );

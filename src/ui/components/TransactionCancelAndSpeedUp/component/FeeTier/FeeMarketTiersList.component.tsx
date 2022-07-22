@@ -22,9 +22,6 @@ export function FeeMarketTiersList({
 }: FeeMarketTiersListProps) {
   const { t } = useTranslation();
   const { gasFeeEstimates, isGasEstimatesLoading } = useGasFeeEstimates();
-  useEffect(() => {
-    console.debug('gasFeeEstimates::updated:', gasFeeEstimates);
-  }, [gasFeeEstimates]);
   console.log('isGasEstimatesLoading', isGasEstimatesLoading);
   if (!props.isEIP1559Tx || isGasEstimatesLoading) return null;
   // avoid undefined error

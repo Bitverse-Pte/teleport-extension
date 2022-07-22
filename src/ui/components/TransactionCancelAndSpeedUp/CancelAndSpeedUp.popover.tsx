@@ -282,16 +282,11 @@ const CancelSpeedupPopoverImplementation = ({
                   selected: selectedGasTier == PRIORITY_LEVELS.CUSTOM,
                 })}
                 onClick={() => {
-                  console.debug(
-                    'Custom::previousSelectedGasTier',
-                    previousSelectedGasTier
-                  );
                   const nextTier =
                     selectedGasTier !== PRIORITY_LEVELS.CUSTOM ||
                     !previousSelectedGasTier
                       ? PRIORITY_LEVELS.CUSTOM
                       : previousSelectedGasTier;
-                  console.debug('Custom::nextTier:', nextTier);
                   setGasTier(nextTier);
                 }}
               >

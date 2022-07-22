@@ -172,7 +172,6 @@ export class WalletController extends BaseController {
 
   useCurrentSelectedNetwork = () => {
     const { provider } = networkPreferenceService.networkStore.getState();
-    console.debug('useCurrentSelectedNetwork use provider:', provider);
     // reset once again
     try {
       networkPreferenceService.setProviderConfig(provider);
