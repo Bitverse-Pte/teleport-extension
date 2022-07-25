@@ -99,9 +99,9 @@ class CosmosProviderController {
     if (!k) throw Error('no key found');
     const pk = keyringService.getPrivateKeyByAddress(k.bech32Address);
     if (!pk) throw new BitError(ErrorCode.WALLET_WAS_LOCKED);
-    const coinType = networkPreferenceService.getChainCoinType(chainId);
+    const currentCoinType = networkPreferenceService.getChainCoinType(chainId);
     let signature;
-    if (coinType === CoinType.ETH) {
+    if (currentCoinType === CoinType.ETH) {
       const ethKey = new EthKey();
       signature = await ethKey.generateSignature(
         serializeSignDoc(JSONUint8Array.unwrap(newSignDoc)),
@@ -111,6 +111,46 @@ class CosmosProviderController {
       const cosmosKey = new CosmosKey();
       signature = cosmosKey.generateSignature(makeSignBytes(cosmJSSignDoc), pk);
     }
+    // process activities
+    const chain = networkPreferenceService
+      .getAllProviders()
+      .find((n) => n.chainId === chainId);
+    if (!chain) {
+      return {
+        signed: JSONUint8Array.wrap(newSignDoc),
+        signature: encodeSecp256k1Signature(k.pubKey, signature),
+      };
+    }
+    const { rpcUrl, ecoSystemParams, prefix: bech32Config, coinType } = chain;
+    const cosChainInfo = {
+      rpc: rpcUrl,
+      chainId,
+      rest: ecoSystemParams?.rest,
+      bech32Config,
+      coinType,
+    } as CosChainInfo;
+    let { account } = await cosmosTxController.cosmosAccount.getAccounts(
+      cosChainInfo.rest,
+      k.bech32Address
+    );
+    if (!account) {
+      account = {
+        address: k.bech32Address,
+      };
+    }
+    const txId = createId();
+    cosmosTxController.cosmosAccount.addTransactionToList({
+      id: txId,
+      type: 'sign',
+      status: CosmosTxStatus.SIGNED,
+      chainInfo: cosChainInfo,
+      timestamp: new Date().getTime(),
+      aminoMsgs: approvalRes?.msgs,
+      memo: approvalRes?.memo,
+      fee: approvalRes?.fee,
+      account,
+      fromDapp: origin,
+    });
 
     return {
       signed: JSONUint8Array.wrap(newSignDoc),
@@ -142,12 +182,16 @@ class CosmosProviderController {
       signature = cosmosKey.generateSignature(serializeSignDoc(signDoc), pk);
     }
     // process activities
-    const {
-      rpcUrl,
-      ecoSystemParams,
-      prefix: bech32Config,
-      coinType,
-    } = networkPreferenceService.getProviderConfig();
+    const chain = networkPreferenceService
+      .getAllProviders()
+      .find((n) => n.chainId === chainId);
+    if (!chain) {
+      return {
+        signed: JSONUint8Array.wrap(signDoc),
+        signature: encodeSecp256k1Signature(k.pubKey, signature),
+      };
+    }
+    const { rpcUrl, ecoSystemParams, prefix: bech32Config, coinType } = chain;
     const cosChainInfo = {
       rpc: rpcUrl,
       chainId,
