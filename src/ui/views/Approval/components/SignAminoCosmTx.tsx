@@ -107,6 +107,13 @@ const SignAminoCosmTx = ({
         Number(gasState.cosmosCustomsGas),
         chainId
       );
+    } else {
+      _stdFee = await wallet.getCosmosStdFee(
+        feeType,
+        currency,
+        Number(_stdFee.gas || _stdFee.gasLimit),
+        chainId
+      );
     }
     setStdFee(_stdFee);
     signDoc.fee = _stdFee;
