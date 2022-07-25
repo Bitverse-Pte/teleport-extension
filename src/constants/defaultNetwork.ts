@@ -449,7 +449,7 @@ export const defaultNetworks: {
     id: PresetNetworkId.KAVA,
     type: CHAINS.KAVA,
     rpcUrl: 'https://rpc.data.kava.io',
-    chainId: 'kava-9',
+    chainId: 'kava_2222-10',
     ticker: 'KAVA',
     nickname: 'Kava',
     rpcPrefs: {
@@ -530,10 +530,11 @@ export const defaultNetworks: {
         },
       ],
       gasPriceStep: {
-        low: 0,
-        average: 0.001,
+        low: 0.05,
+        average: 0.1,
         high: 0.25,
       },
+      beta: true,
     },
   },
   [CHAINS.CRYPTO_ORG]: {
