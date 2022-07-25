@@ -310,7 +310,9 @@ const TxDataComponent = ({ msg }) => {
         <div>{msg?.msgs[0]?.type}</div>
       </div>
       <div className="transaction-data-title">Hex Data:</div>
-      <div className="transaction-data-value">{JSON.stringify(msg)}</div>
+      <div className="transaction-data-value">
+        <pre>{JSON.stringify(msg, null, 2)}</pre>
+      </div>
     </div>
   );
 };
