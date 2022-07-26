@@ -4,6 +4,9 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.png';
 import { ReactComponent as TeleportTextSVG } from 'assets/teleportText.svg';
+import { ReactComponent as LightIcon } from 'assets/theme/light.svg';
+import { ReactComponent as MoonIcon } from 'assets/theme/moon.svg';
+import { ReactComponent as SystemIcon } from 'assets/theme/system.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
@@ -84,7 +87,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   const history = useHistory();
   const location = useLocation();
   const wallet = useWallet();
-  const { isDarkMode, setDarkmode } = useDarkmode();
+  const { isDarkMode, setDarkmode, darkmodeSetting } = useDarkmode();
   const [isDefaultWallet, setIsDefaultWallet] = useState(false);
 
   const init = async () => {
@@ -163,12 +166,29 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           onChange={handleDefaultWalletChange}
         />
       </div>
-      <div className="setting-item flexR cursor" key="theme-select">
+      <div
+        className="setting-item flexR cursor theme-selection-bar"
+        key="theme-select"
+      >
         <span className="title">Theme</span>
         <span className="tag" style={{ display: 'none' }}></span>
-        <button onClick={() => setDarkmode('light')}>Light</button>
-        <button onClick={() => setDarkmode('dark')}>Dark</button>
-        <button onClick={() => setDarkmode('system')}>System</button>
+        <div className="theme-buttons">
+          <button className={clsx({
+            selected: darkmodeSetting === 'light'
+          })} onClick={() => setDarkmode('light')}>
+            <LightIcon />
+          </button>
+          <button className={clsx({
+            selected: darkmodeSetting === 'dark'
+          })} onClick={() => setDarkmode('dark')}>
+            <MoonIcon />
+          </button>
+          <button className={clsx({
+            selected: darkmodeSetting === 'system'
+          })} onClick={() => setDarkmode('system')}>
+            <SystemIcon />
+          </button>
+        </div>
       </div>
       {SettingFeat.map((setting: ISettingFeat, i) => (
         <div
