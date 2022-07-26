@@ -55,7 +55,7 @@
     }
     
     .logo-header-left-title{
-      width: 94px;
+      // width: 94px;
       height: 14px;
       margin-right: 4px;
     }
@@ -69,5 +69,22 @@
       width: 16px;
       height: 16px;
     }
+  }
+}
+/** Style override for darkmode */
+.setting.dark {
+  background-color: #020C15;
+  color: #FFF;
+  // need to fix svg icon color before enable this
+  // .setting-button-container .tip-button-not-send-img {
+  //   background-color: #364361;
+  // }
+  .setting-item:hover{
+    background: #052E55;
+  }
+}
+.logo-header.dark {
+  .logo-header-left-title {
+    fill: #FFF;
   }
 }
