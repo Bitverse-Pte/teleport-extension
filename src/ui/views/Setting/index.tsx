@@ -84,7 +84,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   const history = useHistory();
   const location = useLocation();
   const wallet = useWallet();
-  const { isDarkMode } = useDarkmode();
+  const { isDarkMode, setDarkmode } = useDarkmode();
   const [isDefaultWallet, setIsDefaultWallet] = useState(false);
 
   const init = async () => {
@@ -162,6 +162,13 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           checked={isDefaultWallet}
           onChange={handleDefaultWalletChange}
         />
+      </div>
+      <div className="setting-item flexR cursor" key="theme-select">
+        <span className="title">Theme</span>
+        <span className="tag" style={{ display: 'none' }}></span>
+        <button onClick={() => setDarkmode('light')}>Light</button>
+        <button onClick={() => setDarkmode('dark')}>Dark</button>
+        <button onClick={() => setDarkmode('system')}>System</button>
       </div>
       {SettingFeat.map((setting: ISettingFeat, i) => (
         <div
