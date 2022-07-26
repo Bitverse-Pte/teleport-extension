@@ -1,21 +1,24 @@
+import clsx from 'clsx';
 import React from 'react';
 import Header from 'ui/components/Header';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 import './style.less';
 
 const Policy = () => {
+  const { isDarkMode } = useDarkmode();
   return (
-    <div className="policy-container flexCol">
+    <div className={clsx('policy-container flexCol', { dark: isDarkMode })}>
       <Header title="Privacy Policy" />
       <div className="policy-content content-wrap-padding">
         <h3 className="policy-title">Teleport Wallet Terms of Use</h3>
         <p className="policy-time">Last updated: 21 March 2022</p>
         <p className="policy-summary">
           These terms of use (“Terms” or “Agreement”) govern your use of the
-          website located at <b>[INSERT WEBSITE ADDRESS]</b> (“Site”), Teleport
-          wallet and any other related tools, products or services made
-          available to you on the same (“Service(s)”) which are developed and
-          owned independently by Teleport LLC, a company incorporated under the
-          laws of St. Vincent and the Grenadines (“Teleport”, “Company”, “we” or
+          website located at <b>teleport.network</b> (“Site”), Teleport wallet
+          and any other related tools, products or services made available to
+          you on the same (“Service(s)”) which are developed and owned
+          independently by Teleport LLC, a company incorporated under the laws
+          of St. Vincent and the Grenadines (“Teleport”, “Company”, “we” or
           “us”). Certain features of the Site and Service may be subject to
           additional guidelines, terms, or rules, which will be posted on the
           Site in connection with such features. All such additional terms,
