@@ -13,6 +13,7 @@ import { NetworkStoreProvider } from '../context/NetworkProvider';
 import { BackgroundDataSyncMiddleware } from '../context/BackgroundDataToStoreProvider';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { message } from 'antd';
+import { DarkmodeCxtProvider } from 'ui/hooks/useDarkMode';
 
 const Main = () => {
   /**
@@ -60,7 +61,9 @@ const ProvidersInjector = ({
     <Provider store={store}>
       <BackgroundDataSyncMiddleware />
       <WalletProvider wallet={wallet}>
-        <NetworkStoreProvider>{children}</NetworkStoreProvider>
+        <NetworkStoreProvider>
+          <DarkmodeCxtProvider>{children}</DarkmodeCxtProvider>
+        </NetworkStoreProvider>
       </WalletProvider>
     </Provider>
   );
