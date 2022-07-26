@@ -84,6 +84,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   const history = useHistory();
   const location = useLocation();
   const wallet = useWallet();
+  const { isDarkMode } = useDarkmode();
   const [isDefaultWallet, setIsDefaultWallet] = useState(false);
 
   const init = async () => {
@@ -132,7 +133,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   };
 
   return (
-    <div className="setting flexCol">
+    <div className={clsx('setting flexCol', { dark: isDarkMode })}>
       <LogoHeader handleCloseClick={props.handleCloseClick} />
       <div className="setting-button-container content-wrap-padding flexR">
         <TipButton
