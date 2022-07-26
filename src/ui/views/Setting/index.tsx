@@ -3,13 +3,14 @@ import React, { useState } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.png';
-import TeleportText from 'assets/teleportText.svg';
+import { ReactComponent as TeleportTextSVG } from 'assets/teleportText.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
-import { stat } from 'fs';
 import skynet from 'utils/skynet';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 const { sensors } = skynet;
 interface ISettingFeat {
   title: string;
@@ -56,11 +57,13 @@ export interface ILogoHeader {
 }
 
 export const LogoHeader: React.FC<ILogoHeader> = (props) => {
+  const { isDarkMode } = useDarkmode();
   return (
-    <div className="logo-header flexR">
+    <div className={clsx('logo-header flexR', { dark: isDarkMode })}>
       <div className="logo-header-left flexR">
         <img src={walletLogo} className="logo-header-left-logo" />
-        <img src={TeleportText} className="logo-header-left-title" />
+        {/* <img src={TeleportText} className="logo-header-left-title" /> */}
+        <TeleportTextSVG className="logo-header-left-title" />
       </div>
       <div
         className="logo-header-right flexR"

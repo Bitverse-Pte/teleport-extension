@@ -8,6 +8,8 @@ import './style.less';
 import { LogoHeader } from '../Setting';
 import defenseImg from '../../../assets/defense.png';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const Unlock = () => {
   const wallet = useWallet();
@@ -31,8 +33,10 @@ const Unlock = () => {
     unlock(psd);
   };
 
+  const { isDarkMode } = useDarkmode();
+
   return (
-    <div className="unlock-container">
+    <div className={clsx('unlock-container', { dark: isDarkMode })}>
       <LogoHeader hideClosIcon />
       <div className="unlock-defense flexCol content-wrap-padding">
         <img src={defenseImg} className="unlock-defense-img" />
