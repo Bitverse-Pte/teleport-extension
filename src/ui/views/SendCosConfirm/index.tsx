@@ -42,6 +42,8 @@ import {
 import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
 import skynet from 'utils/skynet';
 import { Tabs } from 'constants/wallet';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 import './style.less';
 const { sensors } = skynet;
 
@@ -81,6 +83,7 @@ const defaultStdFee = {
 
 const ConfirmTx = () => {
   const history = useHistory();
+  const { isDarkMode } = useDarkmode();
   // amount, recipient: toAddress, memo
   const { state, pathname } = useLocation<{
     amount: string;
@@ -237,7 +240,11 @@ const ConfirmTx = () => {
   const origin = 'https://teleport.network';
 
   return (
-    <div className="approval">
+    <div
+      className={clsx('approval', {
+        dark: isDarkMode,
+      })}
+    >
       <div className="approval-tx flexCol">
         <div className="top-part-container flexCol flex-wrap items-center">
           <HeaderWithFlex

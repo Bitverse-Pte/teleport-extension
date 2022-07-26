@@ -8,6 +8,8 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import './index.less';
 import { ClickToCloseMessage } from '../universal/ClickToCloseMessage';
 import { IconComponent } from '../IconComponents';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const onCopy = () => {
   ClickToCloseMessage.success('Copied');
@@ -42,6 +44,7 @@ const SenderToRecipient = ({
   recipientAddress,
   needChecksum = true,
 }) => {
+  const { isDarkMode } = useDarkmode();
   const checksummedSenderAddress = needChecksum
     ? toChecksumHexAddress(senderAddress)
     : senderAddress;
@@ -49,7 +52,7 @@ const SenderToRecipient = ({
     ? toChecksumHexAddress(recipientAddress)
     : recipientAddress;
   return (
-    <div className="sender-to-recipient flexR">
+    <div className={clsx('sender-to-recipient flexR', { dark: isDarkMode })}>
       <Address
         checksummedAddress={checksummedSenderAddress}
         name={senderName}
