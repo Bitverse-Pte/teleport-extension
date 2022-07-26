@@ -21,9 +21,9 @@ export function useDarkmode() {
    * *OR*
    * - We follow the system's setting, and it's dark right now.
    */
-  // const isDarkMode =
-  //   darkmodeSetting === 'dark' || (darkmodeSetting === 'system' && isDarkInOS);
+  const isDarkMode =
+    darkmodeSetting === 'dark' || (darkmodeSetting === 'system' && isDarkInOS);
   /** temp disable darkmode */
-  const isDarkMode = false;
+  // const isDarkMode = false;
   return { darkmodeSetting, isDarkMode, setDarkmode };
 }
