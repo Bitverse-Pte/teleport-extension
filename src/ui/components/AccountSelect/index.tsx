@@ -22,6 +22,7 @@ import { IconComponent } from '../IconComponents';
 import ChainIcons from '../ChainIcons';
 import { getProvider } from 'ui/selectors/selectors';
 import { Ecosystem, Provider } from 'types/network';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 interface AccountSelectProps {
   onClose: (selected?: BaseAccount) => void;
@@ -40,6 +41,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
   const isMnemonic = useMemo(() => {
     return accountCreateType === Tabs.FIRST;
   }, [accountCreateType]);
+  const { isDarkMode } = useDarkmode();
 
   useAsyncEffect(async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList(true);
@@ -149,6 +151,9 @@ const AccountSelect: React.FC<AccountSelectProps> = (
 
   return (
     <Drawer
+      className={clsx('account-select-drawer', {
+        dark: isDarkMode,
+      })}
       title={t('Choose Account')}
       placement="bottom"
       visible={props.visible}
@@ -165,7 +170,11 @@ const AccountSelect: React.FC<AccountSelectProps> = (
         overflow: 'hidden',
       }}
     >
-      <div className="account-select flexCol">
+      <div
+        className={clsx('account-select flexCol', {
+          dark: isDarkMode,
+        })}
+      >
         <div className="header content-wrap-padding">
           <CustomTab
             tab1="ID Wallet"

@@ -97,5 +97,57 @@
       }
     }
   }
+}
 
+.account-select-drawer {
+  .ant-drawer-header {
+    .ant-drawer-title {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: MontserratBold;
+    }
+  }
+}
+.account-select-drawer.dark {
+  .ant-drawer-header {
+    background: #020C15;
+    border-bottom: 1px solid #032440;
+    .ant-drawer-title {
+      color: #fff;
+      font-weight: 800;
+    }
+  }
+  .ant-drawer-body {
+    background: #020C15;
+  }
+}
+.account-select.dark {
+  background: #020C15;
+  color: #fff;
+  .content{
+    .side-bar{
+      background: #032440;
+    }
+    .account-container{
+      .accounts{
+        .account-item{
+          &:hover{
+            background:#032440;
+          }
+        }
+      }
+    }
+  }
+  .widgets-tab-container {
+    background: #02182B;
+    color: #798CAD;
+    .tab-item {
+      background: #02182B;
+      color: #798CAD;
+    }
+    .tab-item-active {
+      color: #FFFFFF;
+      background: #083A6A;
+    }
+  }
 }
