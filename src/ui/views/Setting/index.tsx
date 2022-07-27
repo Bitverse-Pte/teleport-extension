@@ -173,19 +173,28 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
         <span className="title">Theme</span>
         <span className="tag" style={{ display: 'none' }}></span>
         <div className="theme-buttons">
-          <button className={clsx({
-            selected: darkmodeSetting === 'light'
-          })} onClick={() => setDarkmode('light')}>
+          <button
+            className={clsx({
+              selected: darkmodeSetting === 'light',
+            })}
+            onClick={() => setDarkmode('light')}
+          >
             <LightIcon />
           </button>
-          <button className={clsx({
-            selected: darkmodeSetting === 'dark'
-          })} onClick={() => setDarkmode('dark')}>
+          <button
+            className={clsx({
+              selected: darkmodeSetting === 'dark',
+            })}
+            onClick={() => setDarkmode('dark')}
+          >
             <MoonIcon />
           </button>
-          <button className={clsx({
-            selected: darkmodeSetting === 'system'
-          })} onClick={() => setDarkmode('system')}>
+          <button
+            className={clsx({
+              selected: darkmodeSetting === 'system',
+            })}
+            onClick={() => setDarkmode('system')}
+          >
             <SystemIcon />
           </button>
         </div>
