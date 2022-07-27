@@ -26,6 +26,7 @@ import {
 import { useChainList } from 'ui/hooks/utils/useChainList';
 import { Ecosystem } from 'types/network';
 import { useNetworkTypeSelectionComponent } from './component/NetworkTypeSelection';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
@@ -325,13 +326,15 @@ const NetworkEdit = () => {
     [checkRpcUrlAndSetChainId, customNetworks, fetchedChainId, chainListData]
   );
 
+  const { isDarkMode } = useDarkmode();
+
   if (!matchedProvider && isEdit) {
     /**
      * in edit mode, need to wait for `customNetworks` loaded from service worker
      * so we can fill the form, so set a loading in the mean time
      */
     return (
-      <div className="network-edit h-full">
+      <div className={clsx('network-edit h-full', { dark: isDarkMode })}>
         <div className="box">
           <h1 className="title">{t('loading')}...</h1>
           <p>{t('network_loading_message')}</p>
@@ -341,7 +344,10 @@ const NetworkEdit = () => {
   }
 
   return (
-    <div className="network-edit" style={{ minHeight: '100%' }}>
+    <div
+      className={clsx('network-edit', { dark: isDarkMode })}
+      style={{ minHeight: '100%' }}
+    >
       <div className="flexCol network-page-container">
         <div className="edit-network-header flex justify-center">
           <h1 className="title">{t('CustomizeNetwork')}</h1>

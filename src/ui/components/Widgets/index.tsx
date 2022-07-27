@@ -9,11 +9,12 @@ import classnames from 'classnames';
 import './style.less';
 import { utils } from 'ethers';
 import { Tabs, TipButtonEnum } from 'constants/wallet';
-import SendImg from '../../../assets/send.svg';
-import ReceiveImg from '../../../assets/receive.svg';
-import LockImg from '../../../assets/lock.svg';
-import WalletManageImg from '../../../assets/walletManage.svg';
+import { ReactComponent as SendIcon } from '../../../assets/send.svg';
+import { ReactComponent as ReceiveIcon } from '../../../assets/receive.svg';
+import { ReactComponent as LockIcon } from '../../../assets/lock.svg';
+import { ReactComponent as WalletManageIcon } from '../../../assets/walletManage.svg';
 import { PresetNetworkId } from 'constants/defaultNetwork';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 export interface SearchInputProps {
   onChange: (value) => void;
@@ -454,37 +455,41 @@ export interface TipButtonProps {
   handleClick: () => void;
 }
 
-export const TipButton = (props: TipButtonProps) => {
-  const getTipImg = (type: TipButtonEnum) => {
-    switch (type) {
-      case TipButtonEnum.SEND:
-        return SendImg;
-      case TipButtonEnum.RECEIVE:
-        return ReceiveImg;
-      case TipButtonEnum.WALLET_MANAGE:
-        return WalletManageImg;
-      case TipButtonEnum.LOCK:
-        return LockImg;
-    }
-  };
+const getTipImg = (type: TipButtonEnum) => {
+  switch (type) {
+    case TipButtonEnum.SEND:
+      return SendIcon;
+    case TipButtonEnum.RECEIVE:
+      return ReceiveIcon;
+    case TipButtonEnum.WALLET_MANAGE:
+      return WalletManageIcon;
+    case TipButtonEnum.LOCK:
+    default:
+      return LockIcon;
+  }
+};
+
+export const TipButton = ({ title, handleClick, type }: TipButtonProps) => {
+  const MatchedIcon = getTipImg(type);
+  const { isDarkMode } = useDarkmode();
+  const isSendImg =
+    type === TipButtonEnum.SEND || type === TipButtonEnum.RECEIVE;
   return (
     <div
-      className="tip-button-button-item flexCol cursor"
-      onClick={() => props.handleClick()}
+      className={classnames('tip-button-button-item flexCol cursor', {
+        dark: isDarkMode,
+      })}
+      onClick={() => handleClick()}
     >
       <div
-        className={classnames('flex tip-button-img', {
-          'tip-button-send-img':
-            props.type === TipButtonEnum.SEND ||
-            props.type === TipButtonEnum.RECEIVE,
-          'tip-button-not-send-img':
-            props.type !== TipButtonEnum.SEND &&
-            props.type !== TipButtonEnum.RECEIVE,
-        })}
+        className={classnames(
+          'flex tip-button-img',
+          isSendImg ? 'tip-button-send-img' : 'tip-button-not-send-img'
+        )}
       >
-        <img src={getTipImg(props.type)} className="tip-button-send-img-item" />
+        <MatchedIcon className="tip-button-send-img-item" />
       </div>
-      <span className="tip-button-send-title">{props.title}</span>
+      <span className="tip-button-send-title">{title}</span>
     </div>
   );
 };

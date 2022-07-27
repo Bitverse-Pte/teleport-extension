@@ -6,11 +6,41 @@
   box-sizing: border-box;
   padding-bottom: 24px;
 
+  /** some animation while changing background of this */
+  transition: background-color 0.5s linear;
+
   .setting-button-container{
     height: 124px;
     justify-content: center;
     align-items: center;
     
+  }
+  .theme-selection-bar {
+    .theme-buttons {
+      justify-content: space-between;
+      width: 160px;
+      display: flex;
+      button {
+        width: 44px;
+        height: 44px;
+  
+        background-color: #364361;
+        /** some animation while changing background of this */
+        transition: background-color 1s linear;
+
+        border-radius: 12px;
+  
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+          fill: #FFF;
+        }
+      }
+      button.selected {
+        background-color: #0E5CAA;
+      }
+    }
   }
   .setting-item{
     width:100%;
@@ -81,6 +111,13 @@
   // }
   .setting-item:hover{
     background: #052E55;
+  }
+  .theme-selection-bar {
+    button {
+      svg {
+        fill: #FFF;
+      }
+    }
   }
 }
 .logo-header.dark {
