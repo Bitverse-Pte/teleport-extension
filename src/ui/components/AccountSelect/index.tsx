@@ -43,7 +43,6 @@ const AccountSelect: React.FC<AccountSelectProps> = (
 
   useAsyncEffect(async () => {
     const accounts: DisplayWalletManage = await wallet.getAccountList(true);
-    console.log('------33accounts:', accounts);
     if (accounts) {
       for (const k in accounts) {
         if (k === 'hdAccount') {
@@ -96,7 +95,6 @@ const AccountSelect: React.FC<AccountSelectProps> = (
 
   const accountList = useMemo(() => {
     let list = [];
-    console.log('-----displayAccounts2----', displayAccounts);
     if (accountCreateType === Tabs.SECOND) {
       list = displayAccounts?.simpleAccount;
     } else {
@@ -106,7 +104,6 @@ const AccountSelect: React.FC<AccountSelectProps> = (
             a.selected
         )?.accounts || [];
     }
-    console.log('-----list---1--', list);
     if (currentChain.ecosystem === Ecosystem.EVM) {
       return list.filter((item: any) => {
         return item?.ecosystem === Ecosystem.EVM;
@@ -133,7 +130,6 @@ const AccountSelect: React.FC<AccountSelectProps> = (
   const handleKeyringClick = (
     a: Object.Merge<HdAccountStruct, { selected?: boolean }>
   ) => {
-    console.log('handleKeyringClick');
     const tempDisplayAccounts = _.cloneDeep(displayAccounts);
     tempDisplayAccounts.hdAccount.forEach(
       (ha) => (ha.selected = ha.hdWalletId === a.hdWalletId)
