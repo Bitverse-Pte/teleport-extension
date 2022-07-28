@@ -40,6 +40,7 @@ import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
 import { ActivitiesListParams, TransactionItemParams } from '../typing';
 import { getTokenBalancesOfCurrentAccount } from 'ui/selectors/token.selector';
 import { Token } from 'types/token';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 dayjs.extend(relativeTime);
 
@@ -384,10 +385,12 @@ export function EvmTransactionsList({
       viewMore();
     }
   };
+  const { isDarkMode } = useDarkmode();
 
   return (
     <div
       style={{ height: listContiannerHeight, overflowY: 'scroll' }}
+      className={clsx('activity-list-container', { dark: isDarkMode })}
       onScroll={onContainnerScroll}
     >
       {transactions.map((tx, idx) => (
