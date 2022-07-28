@@ -24,7 +24,7 @@
         width: 44px;
         height: 44px;
   
-        background-color: #364361;
+        background-color: #F8FAFC;
         /** some animation while changing background of this */
         transition: background-color 1s linear;
 
@@ -34,11 +34,14 @@
         align-items: center;
         justify-content: center;
         svg {
-          fill: #FFF;
+          fill: #364361
         }
-      }
-      button.selected {
-        background-color: #0E5CAA;
+        &.selected {
+          background-color: #F0F9FF;
+          svg {
+            fill: #1484F5;
+          }
+        }
       }
     }
   }
@@ -113,9 +116,17 @@
     background: #052E55;
   }
   .theme-selection-bar {
-    button {
-      svg {
-        fill: #FFF;
+    .theme-buttons {
+      
+      button {
+        background-color: #364361;
+        /** some animation while changing background of this */
+        svg {
+          fill: #FFF;
+        }
+        &.selected {
+          background-color: #0E5CAA;
+        }
       }
     }
   }
