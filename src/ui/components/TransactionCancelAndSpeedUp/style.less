@@ -58,16 +58,16 @@
                     text-align: right;
                 }
             }
-        }
-        .tier.selected {
-            background-color: #D6EFFF;
-        }
-        .tier.disabled {
-            color: #808080b5;
-            cursor: not-allowed;
-        }
-        .tier:hover {
-            background-color: #E1E8F0;
+            &.selected {
+                background-color: #D6EFFF;
+            }
+            &.disabled {
+                color: #808080b5;
+                cursor: not-allowed;
+            }
+            &:hover {
+                background-color: #E1E8F0;
+            }
         }
     }
 
@@ -132,4 +132,39 @@
 
 .drawer-header-network {
     height: 72px !important;
+}
+
+/** style override for darkmode **/
+.speedUp-popover.dark .ant-drawer-body {
+    background: #020C15;
+    color: #EEE;
+
+    .drawer-header-container-common h6 {
+        color: #798CAD;
+    }
+
+    .tier-select {
+        .tier {
+            &.selected { background: #052E55; }
+            &.disabled {
+                color: #808080b5;
+                cursor: not-allowed;
+            }
+            &:hover { background: #02182B; }
+        }
+    }
+
+    .custom-gas {
+        background: #02182B;
+        .field {
+            .form-title {
+                color: #EEE;
+            }
+            .ant-input-number {
+                background: transparent;
+                input { color: #DDD; }
+            }
+        }
+        
+    }
 }
