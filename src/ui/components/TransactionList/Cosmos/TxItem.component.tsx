@@ -87,7 +87,6 @@ export function CosmosTransactionItem({
       <TxDirectionLogo
         status={displayedStatusKey}
         type={title === 'sign' ? 'sign' : 'send'}
-        size={30}
       />
       <div
         className="value-n-status-display flex justify-start items-center cursor-pointer flex-wrap"
