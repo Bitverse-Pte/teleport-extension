@@ -1,78 +1,49 @@
-import { Grey, Orange, Red } from 'constants/colorPalette';
 import { TransactionStatuses } from 'constants/transaction';
-import React, { CSSProperties, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { ReactComponent as IconSent } from '../../../assets/sendOuter.svg';
 import { ReactComponent as IconReceive } from '../../../assets/receiveOuter.svg';
 import { ReactComponent as IconSign } from '../../../assets/action-icon/signOuter.svg';
 import './style.less';
 import { CosmosTxStatus } from 'types/cosmos/transaction';
+import clsx from 'clsx';
 interface TxLogoParams {
   status: TransactionStatuses | CosmosTxStatus | 'cancelled';
   type: 'send' | 'receive' | 'sign';
-  size?: number;
 }
 
-export function TxDirectionLogo({ status, type, size = 48 }: TxLogoParams) {
-  const backgroundColor = useMemo(() => {
+export function TxDirectionLogo({ status, type }: TxLogoParams) {
+  const getIconClassname = useMemo(() => {
     switch (status) {
       case TransactionStatuses.ON_CHAIN_FALIURE:
       case TransactionStatuses.REJECTED:
       case CosmosTxStatus.FAILED:
-      case TransactionStatuses.FAILED:
-        return Red['07'];
+      case TransactionStatuses.FAILED: {
+        return 'fail';
+      }
       case CosmosTxStatus.CREATED:
       case CosmosTxStatus.SIGNED:
-      case TransactionStatuses.SUBMITTED:
-        return Orange['02'];
-      // success is default
-      default:
-        return Grey['07'];
-    }
-  }, [status]);
-  const iconStyle = useMemo(() => {
-    const style: CSSProperties = {
-      // width: size,
-      // padding: `${Math.floor(size * 0.2647)}px`,
-      // borderRadius: '100%',
-      // height: size,
-    };
-    switch (status) {
-      case TransactionStatuses.ON_CHAIN_FALIURE:
-      case TransactionStatuses.REJECTED:
-      case TransactionStatuses.FAILED: {
-        // style.backgroundColor = Red['07'];
-        style.fill = Red['02'];
-        break;
-      }
       case TransactionStatuses.SUBMITTED: {
-        // style.backgroundColor = Orange['02'];
-        style.fill = '#FFFFFF';
-        break;
+        return 'pending';
       }
       // success is default
       default: {
-        // style.backgroundColor = Grey['07'];
-        style.fill = Grey['02'];
-        break;
+        return 'success';
       }
     }
-    return style;
   }, [status]);
   const theIcon = useMemo(() => {
     switch (type) {
       case 'send':
-        return <IconSent style={iconStyle} width={12} height={12} />;
+        return <IconSent width={12} height={12} />;
       case 'sign':
-        return <IconSign style={iconStyle} width={12} height={12} />;
+        return <IconSign width={12} height={12} />;
       default:
-        return <IconReceive style={iconStyle} width={12} height={12} />;
+        return <IconReceive width={12} height={12} />;
     }
   }, [type]);
   return (
     <div className="logo-container">
-      <div className="tx-stat-logo" style={{ backgroundColor }}>
-        {theIcon}
-      </div>
+      <div className={clsx('tx-stat-logo', getIconClassname)}>{theIcon}</div>
     </div>
   );
 }

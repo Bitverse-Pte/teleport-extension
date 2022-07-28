@@ -27,6 +27,7 @@ import { TierItem } from './component/FeeTier/TierItem.component';
 import { priorityLevelToI18nKey } from './component/FeeTier/constant';
 import { useAdd10PctTxParams } from './hooks/useAdd10PctTx';
 import { SpeedUpConfirmModal } from '../SpeedUpConfirmModal';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -205,6 +206,8 @@ const CancelSpeedupPopoverImplementation = ({
     }
   }, [gasLimit, currentBlockMaxGasLimit]);
 
+  const { isDarkMode } = useDarkmode();
+
   return (
     <>
       <Drawer
@@ -217,6 +220,7 @@ const CancelSpeedupPopoverImplementation = ({
         }}
         placement="bottom"
         closable={false}
+        className={clsx('speedUp-popover', { dark: isDarkMode })}
         bodyStyle={{
           boxSizing: 'border-box',
           padding: '0',
