@@ -45,12 +45,15 @@ import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
 import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const onCopy = () => {
   sensors.track('teleport_home_copy_account', { page: location.pathname });
   ClickToCloseMessage.success('Copied');
 };
 const Home = () => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
@@ -317,7 +320,11 @@ const Home = () => {
   };
 
   return (
-    <div className="home flexCol">
+    <div
+      className={clsx('home flexCol', {
+        dark: isDarkMode,
+      })}
+    >
       <Spin spinning={createAccountLoading}>
         <div
           className="guide_container"

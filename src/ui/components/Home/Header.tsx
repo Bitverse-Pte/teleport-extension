@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import SettingIcon from 'assets/settingIcon.svg';
 import { useSelector } from 'react-redux';
 import { getProvider } from 'ui/selectors/selectors';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 export function HomeHeader({
   menuOnClick,
   networkOnClick,
@@ -15,9 +16,14 @@ export function HomeHeader({
   menuOnClick: React.MouseEventHandler;
   networkOnClick: React.MouseEventHandler;
 }) {
+  const { isDarkMode } = useDarkmode();
   const currentProvider = useSelector(getProvider);
   return (
-    <div className="flex headerOfMenu justify-between items-center">
+    <div
+      className={clsx('flex headerOfMenu justify-between items-center', {
+        dark: isDarkMode,
+      })}
+    >
       <div className="logo-container">
         <img src={walletLogo} />
       </div>
