@@ -224,12 +224,12 @@ class PermissionService {
 
   getConnectedSitesByAccount = (account: string): ConnectedSite[] => {
     const values = this.lruCache?.values() || [];
-    return values.filter((item) => item.accounts.includes(account));
+    return values.filter((item) => item?.accounts?.includes(account));
   };
 
   getConnectedSitesByChainId = (chainId: string): ConnectedSite[] => {
     const values = this.lruCache?.values() || [];
-    return values.filter((item) => item.chainIds.includes(chainId));
+    return values.filter((item) => item?.chainIds?.includes(chainId));
   };
 }
 
