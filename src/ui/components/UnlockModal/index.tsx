@@ -78,6 +78,7 @@ export const UnlockModal: React.FC<PropsInterface> = (
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0 24px 24px 24px',
+        //background: '#020C15',
       }}
       contentWrapperStyle={{
         borderRadius: '16px 16px 0 0',

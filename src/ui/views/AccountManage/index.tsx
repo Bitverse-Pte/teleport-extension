@@ -25,6 +25,8 @@ import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 import { useHistory } from 'react-router-dom';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -39,6 +41,7 @@ const AccountManage: React.FC = () => {
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
   const history = useHistory();
+  const { isDarkMode } = useDarkmode();
 
   const { state, pathname } = useLocation<{
     hdWalletId: string;
@@ -155,7 +158,7 @@ const AccountManage: React.FC = () => {
   };
 
   return (
-    <div className="account-manage flexCol">
+    <div className={clsx('account-manage flexCol', { dark: isDarkMode })}>
       <UnlockModal
         title="Unlock Wallet"
         visible={unlockPopupVisible}
@@ -301,6 +304,7 @@ export interface IAddProps {
 
 export const Add: React.FC<IAddProps> = (props: IAddProps) => {
   const [value, setValue] = useState('');
+  const { isDarkMode } = useDarkmode();
 
   const handleConfirmBtnClick = () => {
     if (value.trim().length > 20) {
@@ -320,6 +324,7 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
     <Drawer
       visible={props.visible}
       placement="bottom"
+      className={clsx('ant-modal-container flexCol', { dark: isDarkMode })}
       closable={false}
       height="208px"
       bodyStyle={{
@@ -377,8 +382,13 @@ interface DrawerHeaderProps {
 }
 
 const DrawerHeader = (props: DrawerHeaderProps) => {
+  const { isDarkMode } = useDarkmode();
   return (
-    <div className="drawer-header-container-common flexR">
+    <div
+      className={clsx('drawer-header-container-common flexR', {
+        dark: isDarkMode,
+      })}
+    >
       <span className="drawer-header-title">{props.title}</span>
       <IconComponent
         name="close"
@@ -391,6 +401,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
 
 export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
   const [value, setValue] = useState(props.defaultValue);
+  const { isDarkMode } = useDarkmode();
 
   const resetState = () => {
     setValue(props.defaultValue);
@@ -428,6 +439,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
       visible={props.visible}
       placement="bottom"
       closable={false}
+      className={clsx('ant-modal-container flexCol', { dark: isDarkMode })}
       height="208px"
       bodyStyle={{
         boxSizing: 'border-box',
@@ -477,6 +489,7 @@ export interface IDeleteProps {
 export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
   const [psd, setPsd] = useState('');
   const wallet = useWallet();
+  const { isDarkMode } = useDarkmode();
 
   const resetState = () => {
     setPsd('');
@@ -506,6 +519,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
     <Drawer
       visible={props.visible}
       placement="bottom"
+      className={clsx('ant-modal-container flexCol', { dark: isDarkMode })}
       closable={false}
       height="284px"
       bodyStyle={{

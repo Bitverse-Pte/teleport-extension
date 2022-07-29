@@ -26,6 +26,9 @@ import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 import BitError from 'error';
 const { sensors } = skynet;
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
+
 export interface WalletHeaderProps {
   title: string;
   handleDoneClick: () => void;
@@ -62,6 +65,7 @@ const WalletManage: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [unlockType, setUnlockType] = useState('edit');
+  const { isDarkMode } = useDarkmode();
 
   const queryWallets = async () => {
     const accounts: HdAccountStruct[] = await wallet.getWalletList();
@@ -228,7 +232,7 @@ const WalletManage: React.FC = () => {
   };
 
   return (
-    <div className="wallet-manage flexCol">
+    <div className={clsx('wallet-manage flexCol', { dark: isDarkMode })}>
       <UnlockModal
         title="Unlock Wallet"
         visible={unlockPopupVisible}

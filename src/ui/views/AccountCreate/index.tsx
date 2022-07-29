@@ -1,10 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useHistory, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MIN_PASSWORD_LENGTH } from 'constants/index';
-import { Checkbox, message } from 'antd';
+import { Checkbox } from 'antd';
 import { useWallet, useWalletRequest, usePolicyAgreed } from 'ui/utils';
-import Header from '../../components/Header';
 import './style.less';
 import { CreateAccountOpts } from 'types/extend';
 import {
@@ -18,6 +16,8 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import skynet from 'utils/skynet';
 import { ErrorCode } from 'constants/code';
 const { sensors } = skynet;
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 const AccountCreate = () => {
   const { t } = useTranslation();
@@ -30,6 +30,7 @@ const AccountCreate = () => {
   const [passwordCheckPassed, setPasswordCheckPassed] = useState(false);
   const [policyShow, updateStoragePolicyAgreed] = usePolicyAgreed();
   const wallet = useWallet();
+  const { isDarkMode } = useDarkmode();
 
   const [run, loading] = useWalletRequest(wallet.createHdWallet, {
     onSuccess(mnemonic) {
@@ -102,7 +103,7 @@ const AccountCreate = () => {
   };
 
   return (
-    <div className="account-create flexCol">
+    <div className={clsx('account-create flexCol', { dark: isDarkMode })}>
       <AccountHeader title="Create Wallet" />
       <div className="content content-wrap-padding">
         <p className="account-create-title">Wallet name</p>

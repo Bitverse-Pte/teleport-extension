@@ -39,8 +39,8 @@
   }
 
   .popup-add-btn {
-    background: @themeColor !important;
-    border-color: @themeColor !important;
+    background: @themeColor  !important;
+    border-color: @themeColor  !important;
   }
 
 }
@@ -60,23 +60,70 @@
     fill: #798CAD;
   }
 }
+
+.backup-popup-container.dark {
+  background: @darkBg;
+  color: #ffffff;
+  fill: #ffffff;
+}
+
+.ant-modal-container.dark {
+
+  .ant-drawer-mask {
+    background: rgba(54, 67, 97, .3);
+  }
+
+  .ant-drawer-body {
+    background: @darkBg;
+
+    input,
+    .custom-input,
+    .password-input {
+      background: #02182B !important;
+      border-color: #02182B !important;
+      color: #ffffff;
+
+      svg {
+        fill: #ffffff;
+      }
+    }
+
+    input::placeholder {
+      color: #5E6C8A !important;
+    }
+  }
+
+  .drawer-header-container-common {
+    color: #ffffff;
+    fill: #ffffff;
+  }
+
+  .popup-item-title {
+    color: #ffffff
+  }
+}
+
 .backup-popup-container.dark {
   background: #020C15;
   color: #fff;
 }
+
 .unlock-drawer.dark {
   .ant-drawer-body {
     background: #020C15;
+
     .ant-input-password {
-      background-color: #02182B!important;
+      background-color: #02182B !important;
       color: #fff;
-      border: none!important;
+      border: none !important;
+
       input {
-        background: #02182B!important;
+        background: #02182B !important;
       }
-      .ant-input-suffix {
+
+      /* .ant-input-suffix {
         background-color: #fff;
-      }
+      } */
     }
   }
 }

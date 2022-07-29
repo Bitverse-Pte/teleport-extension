@@ -4,11 +4,13 @@
     width: 100%;
     height: 100%;
     box-sizing: border-box;
+
     //padding: 0 @pagePaddingLeft;
-    p{
+    p {
         margin-bottom: 0;
         line-height: 1;
     }
+
     .content {
         flex: 1;
         box-sizing: border-box;
@@ -20,7 +22,7 @@
             margin-bottom: 12px;
         }
 
-        .account-create-name-input{
+        .account-create-name-input {
             margin-bottom: 24px;
         }
 
@@ -31,7 +33,8 @@
                 color: #798CAD;
                 margin-bottom: 12px;
             }
-            .custom-password-input{
+
+            .custom-password-input {
                 margin-bottom: 12px;
             }
         }
@@ -56,8 +59,36 @@
 
     .policy-link {
         color: @themeColor;
-        &:hover{
+
+        &:hover {
             text-decoration: underline;
         }
     }
+}
+
+.account-create.dark {
+    background: @darkBg;
+    color: #ffffff;
+
+    .content {
+        svg {
+            fill: #ffffff;
+        }
+
+        input,
+        .custom-input {
+            background: #02182B !important;
+            border-color: #02182B !important;
+            color: #ffffff;
+        }
+
+        input::placeholder {
+            color: #5E6C8A !important;
+        }
+
+        input::-webkit-input-placeholder {
+            color: #5E6C8A !important;
+        }
+    }
+
 }
