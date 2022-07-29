@@ -21,8 +21,10 @@ import { TipButtonEnum } from 'constants/wallet';
 import { Ecosystem, Provider } from 'types/network';
 import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const SingleToken = () => {
+  const { isDarkMode } = useDarkmode();
   const wallet = useWallet();
   const { t } = useTranslation();
   const history = useHistory();
@@ -106,7 +108,7 @@ const SingleToken = () => {
   }, [token]);
 
   return (
-    <div className="single-token flexCol">
+    <div className={clsx('single-token flexCol', { dark: isDarkMode })}>
       <Header title={title} />
       <div
         className="summary flexCol content-wrap-padding"

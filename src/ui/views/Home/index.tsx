@@ -574,7 +574,9 @@ const Home = () => {
         >
           <div
             style={{ width: '100%', height: '100%' }}
-            className="account-switch-drawer flexCol"
+            className={clsx('account-switch-drawer flexCol', {
+              dark: isDarkMode,
+            })}
           >
             <div className="account-switch-header flexR content-wrap-padding">
               <IconComponent
@@ -622,6 +624,9 @@ const Home = () => {
             />
           </div>
           <Drawer
+            className={clsx('connected-sites-drawer', {
+              dark: isDarkMode,
+            })}
             placement="top"
             closable={true}
             closeIcon={<IconComponent name="back" cls="icon back-icon" />}
@@ -672,7 +677,9 @@ const Home = () => {
         >
           <div
             style={{ width: '100%', height: '100%' }}
-            className="account-switch-drawer flexCol"
+            className={clsx('account-switch-drawer flexCol', {
+              dark: isDarkMode,
+            })}
           >
             <div className="account-switch-header flexR content-wrap-padding">
               <IconComponent
