@@ -1,63 +1,64 @@
-//@import '../../style/mixin';
-  
 .sender-to-recipient {
-        align-items: center;
-        .sender {
-          align-items: center;
-          background: #FFFFFF;
-          border-radius: 8px;
-          border: 2px;
-          padding: 12px 16px;
+  align-items: center;
+  .sender {
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 8px;
+    border: 2px;
+    padding: 12px 16px;
 
-          width: 148px;
-          display: flex;
-          flex-wrap: wrap;
-          
-          .sender-icon-and-name {
-            margin-bottom: 8px;
-          }
-
-          .address {
-            cursor: pointer;
-            font-style: normal;
-            font-weight: normal;
-            font-size: 13px;
-            line-height: 17px;
-            /* identical to box height */
-            display: flex;
-            align-items: flex-end;
-            color: #9EA2A9;
-          }
-        }
-        
-        .to-icon {
-          height: 24px;
-          width: 24px;
-          fill: white;
-          background: #1484F5;
-          display: block;
-          border-radius: 12px;
-          padding: 6px;
-          margin: auto -4px;
-          // on top of other elements
-          z-index: 999;
-          cursor: default;
-        }
-  
-        .name {
-          padding-left: 6px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          font-family: MontserratBold;
-          font-size: 14px;
-          line-height: 14px;
-          max-width: 99px;
-        }
-}
-  
-   
-  
+    width: 148px;
+    display: flex;
+    flex-wrap: wrap;
     
+    .sender-icon-and-name {
+      margin-bottom: 8px;
+    }
 
+    .address {
+      cursor: pointer;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 13px;
+      line-height: 17px;
+      /* identical to box height */
+      display: flex;
+      align-items: flex-end;
+      color: #9EA2A9;
+    }
+  }
   
+  .to-icon {
+    height: 24px;
+    width: 24px;
+    fill: white;
+    background: #1484F5;
+    display: block;
+    border-radius: 12px;
+    padding: 6px;
+    margin: auto -4px;
+    // on top of other elements
+    z-index: 999;
+    cursor: default;
+  }
+
+  .name {
+    padding-left: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: MontserratBold;
+    font-size: 14px;
+    line-height: 14px;
+    max-width: 99px;
+  }
+}
+.sender-to-recipient.dark {
+  .sender {
+    background: #052E55;
+    color: #fff;
+    .address {
+      color: #798CAD;
+    }
+  }
+}

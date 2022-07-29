@@ -15,9 +15,13 @@ import Jazzicon from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
 import { ChainIdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 import skynet from 'utils/skynet';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+
 const { sensors } = skynet;
 
 const SendToken = () => {
+  const { isDarkMode } = useDarkmode();
   const location = useLocation();
   const wallet = useWallet();
   const history = useHistory();
@@ -37,7 +41,7 @@ const SendToken = () => {
   return (
     <div>
       <GeneralHeader title="Receive" hideLogo extCls="receive-header" />
-      <div className="receive">
+      <div className={clsx('receive', { dark: isDarkMode })}>
         <div className="chain-box">
           <img
             src={ChainIdToChainLogoSVG(

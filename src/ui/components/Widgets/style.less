@@ -218,8 +218,9 @@ div.tip-button-button-item {
         background: @themeColor;
 
         .tip-button-send-img-item {
+            overflow: visible;
             width: 15px;
-            height: 17px;
+            max-height: 17px;
         }
     }
 
@@ -230,6 +231,16 @@ div.tip-button-button-item {
     span.tip-button-send-title {
         font-size: 12px;
         font-family: MontserratBold;
+    }
+}
+
+/** darkmode style override */
+.tip-button-button-item.dark {
+    .tip-button-not-send-img {
+        background: #364361;
+        svg {
+            fill: #FFF;
+        }
     }
 }
 

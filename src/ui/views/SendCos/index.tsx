@@ -2,16 +2,9 @@ import React, { useState, createContext } from 'react';
 import { Input, InputNumber, Select, Spin } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
-// import { addHexPrefix } from 'ethereumjs-util';
-
-// import {
-//   EthDenomination,
-//   getWeiHexFromDecimalValue,
-//   multiplyCurrencies,
-// } from 'ui/utils/conversion';
-// import Header from 'ui/components/Header';
 import {
   useWallet,
   useAsyncEffect,
@@ -21,12 +14,6 @@ import {
 import { transferAddress2Display } from 'ui/utils';
 import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
 import AccountSelect from 'ui/components/AccountSelect';
-// import {
-//   ETH,
-//   HexString,
-//   Transaction,
-//   TransactionEnvelopeTypes,
-// } from 'constants/transaction';
 import { BaseAccount } from 'types/extend';
 import { Token } from 'types/token';
 // import { generateTokenTransferData } from 'ui/context/send.utils';
@@ -37,19 +24,12 @@ import BigNumber from 'bignumber.js';
 import { utils } from 'ethers';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentChainId } from 'ui/selectors/selectors';
-// import {
-//   initializeSendState,
-//   resetSendState,
-//   updateRecipient,
-//   updateSendAsset,
-//   updateSendAmount,
-// } from 'ui/reducer/send.reducer';
-// import { shortenAddress } from 'ui/utils/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 import { Bech32Address } from '@keplr-wallet/cosmos';
 import { getProvider } from 'ui/selectors/selectors';
 import { Provider } from 'types/network';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const { sensors } = skynet;
 
@@ -61,6 +41,7 @@ export const AccountSelectContext = createContext<{
 const { Option } = Select;
 
 const Send = () => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -253,7 +234,11 @@ const Send = () => {
     }
     return {
       label: (
-        <div className="flexR assets-option-cos-wrapper">
+        <div
+          className={clsx('flexR assets-option-cos-wrapper', {
+            dark: isDarkMode,
+          })}
+        >
           <TokenIcon token={t} scale={0.8} />
           <div className="assets-option flexR flex-wrap">
             <div className="assets-option-left flexR">
@@ -281,7 +266,9 @@ const Send = () => {
 
   return (
     <div
-      className="send-cos flexCol"
+      className={clsx('send-cos flexCol', {
+        dark: isDarkMode,
+      })}
       onClick={() => {
         if (showToList) {
           /**
@@ -321,7 +308,7 @@ const Send = () => {
         <Select
           dropdownMatchSelectWidth
           style={{ width: '100%' }}
-          //dropdownClassName="assets-option assets-option-symbol assets-option-right"
+          dropdownClassName={clsx('send-dropdown', { dark: isDarkMode })}
           value={selectedToken?.symbol}
           onChange={handleTokenSelect}
           optionLabelProp="selected"

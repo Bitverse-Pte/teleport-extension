@@ -4,16 +4,19 @@ import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ACCOUNT_CREATE_TYPE } from '../../../constants/index';
 import walletLogo from 'assets/walletLogo.png';
-import TeleportText from 'assets/teleportText.svg';
+import { ReactComponent as TlpTextLogo } from 'assets/teleportText.svg';
 
 import './style.less';
 import { CustomButton } from 'ui/components/Widgets';
 import skynet from 'utils/skynet';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 const { sensors } = skynet;
 
 const Welcome = () => {
   const { t } = useTranslation();
   const history = useHistory();
+  const { isDarkMode } = useDarkmode();
 
   const handleBtnClick: (type: ACCOUNT_CREATE_TYPE) => void = (
     type: ACCOUNT_CREATE_TYPE
@@ -26,10 +29,11 @@ const Welcome = () => {
     });
   };
   return (
-    <div className="welcome-container">
+    <div className={clsx('welcome-container', { dark: isDarkMode })}>
       <div className="logo-container">
         <img src={walletLogo} className="logo" />
-        <img src={TeleportText} className="logo-header-left-title" />
+        {/* <img src={TeleportText} className="logo-header-left-title" /> */}
+        <TlpTextLogo className="logo-header-left-title" viewBox="0 0 102 13" />
         <p className="welcome-to">Welcome to Teleport Wallet</p>
       </div>
 
@@ -48,7 +52,7 @@ const Welcome = () => {
           size="large"
           block
           type="default"
-          cls="custom-button-default"
+          cls="custom-button-default import-wallet-btn"
           onClick={() => handleBtnClick(ACCOUNT_CREATE_TYPE.IMPORT)}
         >
           Import Wallet

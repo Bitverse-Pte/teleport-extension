@@ -4,9 +4,9 @@ import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { useWallet, useWalletRequest } from 'ui/utils';
-import './style.less';
-import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import './style.less';
 
 interface DrawerHeaderProps {
   title: string;
@@ -68,10 +68,12 @@ export const UnlockModal: React.FC<PropsInterface> = (
 
   return (
     <Drawer
+      className={clsx('unlock-drawer', {
+        dark: isDarkMode,
+      })}
       visible={props.visible}
       placement="bottom"
       closable={false}
-      className={clsx('ant-modal-container flexCol', { dark: isDarkMode })}
       height="236px"
       bodyStyle={{
         boxSizing: 'border-box',
@@ -86,7 +88,9 @@ export const UnlockModal: React.FC<PropsInterface> = (
       key="top"
     >
       <div
-        className={clsx('backup-popup-container flexCol', { dark: isDarkMode })}
+        className={clsx('backup-popup-container flexCol', {
+          dark: isDarkMode,
+        })}
       >
         <DrawerHeader
           title={props.title}
