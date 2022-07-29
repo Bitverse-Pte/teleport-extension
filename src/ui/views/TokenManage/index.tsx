@@ -33,6 +33,8 @@ import skynet from 'utils/skynet';
 import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
 const { sensors } = skynet;
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const TokenManage = () => {
   const history = useHistory();
@@ -43,6 +45,7 @@ const TokenManage = () => {
   const [contractAddress, setContractAddress] = useState('');
   const wallet = useWallet();
   const currentChain: Provider = useSelector(getProvider);
+  const { isDarkMode } = useDarkmode();
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -138,7 +141,7 @@ const TokenManage = () => {
   };
 
   return (
-    <div className="token-manage flexCol">
+    <div className={clsx('token-manage flexCol', { dark: isDarkMode })}>
       <Header title="Add Asset" />
       <div className="tab-container content-wrap-padding">
         <CustomTab

@@ -3,6 +3,8 @@ import { CoinType, Ecosystem, Provider } from 'types/network';
 import { IdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 import { IconComponent } from '../IconComponents';
 import { useAsyncEffect, useWallet } from 'ui/utils';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 import './style.less';
 import { PresetNetworkId } from 'constants/defaultNetwork';
@@ -27,6 +29,7 @@ export default (props: EcosystemSelectProps) => {
   const [maskVisible, setMaskVisible] = useState(false);
   const [chains, setChains] = useState<Provider[]>([]);
   const [ecosystems, setEcosystems] = useState<EcosystemChains[]>([]);
+  const { isDarkMode } = useDarkmode();
 
   const getCurrentChain = async () => {
     const chain = await wallet.getCurrentChain().catch((e) => {
@@ -104,7 +107,7 @@ export default (props: EcosystemSelectProps) => {
   return (
     <>
       <div
-        className="select-container flexR"
+        className={clsx('select-container flexR', { dark: isDarkMode })}
         onClick={() => setMaskVisible(true)}
         style={props.style ? props.style : {}}
       >

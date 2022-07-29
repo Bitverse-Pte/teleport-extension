@@ -53,6 +53,7 @@ export function FeeMarketTiersList({
               parsedMFPG(level)
             )}
             onClick={() => setGasTier(level)}
+            fast={level === PRIORITY_LEVELS.HIGH}
           />
         )
       )}

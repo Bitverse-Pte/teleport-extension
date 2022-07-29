@@ -13,6 +13,8 @@ import classnames from 'classnames';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 const MnemonicBackup = () => {
   const { t } = useTranslation();
@@ -24,6 +26,8 @@ const MnemonicBackup = () => {
   const { state, pathname } = useLocation<{
     mnemonic: string;
   }>();
+
+  const { isDarkMode } = useDarkmode();
 
   useEffect(() => {
     countDownTimer.current = setInterval(() => {
@@ -75,7 +79,7 @@ const MnemonicBackup = () => {
   };
 
   return (
-    <div className="backup flexCol">
+    <div className={clsx('backup flexCol', { dark: isDarkMode })}>
       <AccountHeader title="Backup Mnemonic" hideClose />
       <div className="content">
         <ul

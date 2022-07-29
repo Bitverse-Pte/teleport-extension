@@ -35,7 +35,8 @@
             }
 
             .search {
-                fill: #A3B4CC;;
+                fill: #A3B4CC;
+                ;
             }
 
             .input {
@@ -75,14 +76,16 @@
                     .token-info {
                         justify-content: center;
                         margin-bottom: 4px;
-                        .balance{
+
+                        .balance {
                             font-size: 16px;
                             font-family: MontserratBold;
                             line-height: 1;
                             margin-bottom: 4px;
                         }
-                        .address{
-                            color:#A3B4CC;
+
+                        .address {
+                            color: #A3B4CC;
                             font-size: 12px;
                             line-height: 1;
                         }
@@ -113,13 +116,37 @@
                 font-family: MontserratBold;
 
             }
-            .token-custom-address{
+
+            .token-custom-address {
                 margin-top: 24px;
             }
         }
-        .token-manage-button{
+
+        .token-manage-button {
             margin-bottom: 24px;
         }
     }
 
+}
+
+.token-manage.dark {
+    background: @darkBg;
+    color: #ffffff;
+
+    .custom-search-input,
+    .custom-input {
+        background: #02182B !important;
+        border-color: #02182B !important;
+        color: #ffffff;
+    }
+
+    input::placeholder {
+        color: #5E6C8A !important;
+    }
+
+    .token-item {
+        &:hover {
+            background: #02182B !important;
+        }
+    }
 }

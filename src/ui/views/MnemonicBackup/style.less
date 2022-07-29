@@ -55,7 +55,7 @@
         top: 0;
         left: 0;
         position: absolute;
-        background:url(../../../assets/Mask.png) no-repeat 0 0;
+        background: url(../../../assets/Mask.png) no-repeat 0 0;
         z-index: 1;
         color: #fff;
         .flexCol;
@@ -90,8 +90,9 @@
         .mnemonic-check-button-disabled {
           opacity: 0.5;
           color: #A3B4CC !important;
-          
+
         }
+
         .mnemonic-check-button {
           color: @themeColor;
           background: #FFFFFF;
@@ -159,4 +160,23 @@
     }
   }
 
+}
+
+.backup.dark {
+  background: @darkBg;
+  color: #ffffff;
+
+  .mnemonic-backup-attention {
+    color: #C5D1E0 !important;
+  }
+  .mnemonic-container{
+    background: #02182B;
+    .phrase{
+      background: #020C15 !important;
+      color: #ffffff !important;
+    }
+  }
+  .custom-button-default{
+    background: @darkBg;
+  }
 }
