@@ -23,6 +23,7 @@ import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage
 import { ecosystemMapping } from 'constants/wallet';
 import classnames from 'classnames';
 import { getUnit10ByAddress } from 'background/utils';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -52,6 +53,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
 
   const wallet = useWallet();
   const { hdWalletId } = props;
+  const { isDarkMode } = useDarkmode();
 
   const queryAccounts = async () => {
     const accounts: ICustomChain[] = await wallet.getAccountListByHdWalletId(
@@ -180,7 +182,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
   );
 
   return (
-    <div className="account-manage-widget flexR">
+    <div className={clsx('account-manage-widget flexR', { dark: isDarkMode })}>
       <div className="side-bar flexCol">
         {tempAccounts?.concat([{}])?.map((account: any, i) => {
           return (

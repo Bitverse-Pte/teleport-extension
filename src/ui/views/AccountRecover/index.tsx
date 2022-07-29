@@ -1,12 +1,11 @@
 import React, { useMemo, useState, useContext } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { Checkbox, Input } from 'antd';
 import { usePolicyAgreed, useWallet, useWalletRequest } from 'ui/utils';
 import './style.less';
 import { CreateAccountOpts, ImportAccountOpts } from 'types/extend';
-import { CoinType, Provider } from 'types/network';
+import { Provider } from 'types/network';
 import {
   CustomButton,
   CustomInput,
@@ -19,12 +18,10 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { Tabs } from 'constants/wallet';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
-import { PresetNetworkId } from 'constants/defaultNetwork';
 import EcosystemSelect from 'ui/components/EcosystemSelect';
-import { NetworkProviderContext } from 'ui/context/NetworkProvider';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const { sensors } = skynet;
-
 const { TextArea } = Input;
 
 export interface AccountHeaderProps {
@@ -78,12 +75,13 @@ const AccountRecover = () => {
   const [policyShow, updateStoragePolicyAgreed] = usePolicyAgreed();
   const [passwordCheckPassed, setPasswordCheckPassed] = useState(false);
   const [privateKeyChains, setPrivateKeyChains] = useState<Provider[]>([]);
-  const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
+  const { isDarkMode } = useDarkmode();
+  /* const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
     PresetNetworkId | string
-  >();
+  >(); */
 
-  const providerContext = useContext(NetworkProviderContext);
-  const { t } = useTranslation();
+  //const providerContext = useContext(NetworkProviderContext);
+  //const { t } = useTranslation();
 
   const handleSuccessCallback = async () => {
     updateStoragePolicyAgreed();
@@ -231,7 +229,7 @@ const AccountRecover = () => {
   };
 
   return (
-    <div className="recover flexCol">
+    <div className={clsx('recover flexCol', { dark: isDarkMode })}>
       <AccountHeader title="Import Wallet" />
       <div className="account-recover-content content-wrap-padding">
         <CustomTab
@@ -282,7 +280,7 @@ const AccountRecover = () => {
           style={importType === Tabs.FIRST ? { display: 'none' } : {}}
           handleEcosystemSelect={(chains: Provider[], originChainId) => {
             setPrivateKeyChains(chains);
-            setPrivateKeyMasterChain(originChainId);
+            //setPrivateKeyMasterChain(originChainId);
           }}
         />
         <p className="account-recover-title">Wallet name</p>

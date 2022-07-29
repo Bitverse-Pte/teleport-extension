@@ -14,6 +14,8 @@ import ReceiveImg from '../../../assets/receive.svg';
 import LockImg from '../../../assets/lock.svg';
 import WalletManageImg from '../../../assets/walletManage.svg';
 import { PresetNetworkId } from 'constants/defaultNetwork';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 export interface SearchInputProps {
   onChange: (value) => void;
@@ -401,9 +403,10 @@ export interface TabInterface {
 export const CustomTab = (props: TabInterface) => {
   const [tooltip, setTooltip] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
+  const { isDarkMode } = useDarkmode();
 
   return (
-    <div className="widgets-tab-container flexR">
+    <div className={clsx('widgets-tab-container flexR', { dark: isDarkMode })}>
       <span
         className={classnames('tab-item', 'cursor', {
           'tab-item-active': props.currentTab === Tabs.FIRST,
