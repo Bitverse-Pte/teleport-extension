@@ -260,6 +260,7 @@ declare global {
       currentProvider: EthereumProvider;
     };
     teleport: EthereumProvider;
+    teleportC?: Keplr;
     keplr?: Keplr;
     getOfflineSigner?: (chainId: string) => OfflineSigner & OfflineDirectSigner;
     getOfflineSignerOnlyAmino?: (chainId: string) => OfflineSigner;
@@ -279,6 +280,7 @@ window.addEventListener('message', function (event) {
     const channelName = event.data.channelName;
     const bcm = new BroadcastChannelMessage(channelName);
     const provider = new EthereumProvider({ bcm });
+    const cosmosProvider = new CosmosProvider({ bcm });
     provider
       .request({
         method: 'isDefaultWallet',
@@ -309,10 +311,10 @@ window.addEventListener('message', function (event) {
     window.teleport = new Proxy(provider, {
       deleteProperty: () => true,
     });
-
     window.dispatchEvent(new Event('ethereum#initialized'));
-    const cosmosProvider = new CosmosProvider({ bcm });
+
     init(
+      provider,
       cosmosProvider,
       (chainId: string) => cosmosProvider.getOfflineSigner(chainId),
       (chainId: string) => cosmosProvider.getOfflineSignerOnlyAmino(chainId),
@@ -324,6 +326,7 @@ window.addEventListener('message', function (event) {
 });
 
 function init(
+  provider: EthereumProvider,
   keplr: Keplr,
   getOfflineSigner: (chainId: string) => OfflineSigner & OfflineDirectSigner,
   getOfflineSignerOnlyAmino: (chainId: string) => OfflineSigner,
@@ -332,8 +335,27 @@ function init(
   ) => Promise<OfflineSigner | OfflineDirectSigner>,
   getEnigmaUtils: (chainId: string) => SecretUtils
 ) {
+  provider
+    .request({
+      method: 'isDefaultWallet',
+      params: [],
+    })
+    .then((isDefaultWallet: any) => {
+      if (isDefaultWallet) {
+        window.keplr = keplr;
+        window.getOfflineSigner = getOfflineSigner;
+        window.getOfflineSignerOnlyAmino = getOfflineSignerOnlyAmino;
+        window.getOfflineSignerAuto = getOfflineSignerAuto;
+        window.getEnigmaUtils = getEnigmaUtils;
+      }
+    });
+
   if (!window.keplr) {
     window.keplr = keplr;
+  }
+
+  if (!window.teleportC) {
+    window.teleportC = keplr;
   }
 
   if (!window.getOfflineSigner) {
