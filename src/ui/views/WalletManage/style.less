@@ -350,9 +350,40 @@
   }
 }
 
-.wallet-manage.dark {
+.wallet-manage.dark, .account-manage.dark {
   background: @darkBg;
   color: #ffffff;
+
+  svg{
+    fill: #ffffff !important;
+  }
+
+  .wallet-manage-button-container {
+    justify-content: space-between;
+    align-items: flex-start;
+  
+    ._edit {
+      .wallet-manage-button-wrap {
+        background: rgba(248, 250, 252, 0.1);
+      }
+  
+    }
+  
+    ._import {
+      .wallet-manage-button-wrap {
+        background: rgba(248, 250, 252, 0.1);
+      }
+    }
+  
+    ._add {
+      .wallet-manage-button-wrap {
+        background: rgba(240, 255, 254, 0.1);
+      }
+      
+    }
+  
+    
+  }
 
   .account-container {
 

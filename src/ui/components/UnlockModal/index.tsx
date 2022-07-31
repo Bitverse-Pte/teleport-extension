@@ -68,7 +68,7 @@ export const UnlockModal: React.FC<PropsInterface> = (
 
   return (
     <Drawer
-      className={clsx('unlock-drawer', {
+      className={clsx('ant-modal-container unlock-drawer', {
         dark: isDarkMode,
       })}
       visible={props.visible}
