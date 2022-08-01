@@ -11,6 +11,7 @@ import {
 } from 'ui/utils';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import './addToken.less';
+import { WalletName } from 'ui/components/Widgets';
 
 /**
  * @dev according to the spec on MetaMask
@@ -111,13 +112,13 @@ const AddToken = ({ params }) => {
                 ) : (
                   defaultIcon
                 )}
-                <div className="sym-num-container">
-                  <span className="token-num">
+                <div className="sym-num-container flexR">
+                  <WalletName width={250} cls="token-num">
                     {denom2SymbolRatio(
                       token?.balanceOf || 0,
                       token?.decimals || 0
                     )}
-                  </span>
+                  </WalletName>
                   <span className="token-symbol">{data.options.symbol}</span>
                 </div>
                 <p className="cur-network">{networkLabel}</p>
