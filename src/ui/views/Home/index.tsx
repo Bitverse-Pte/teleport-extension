@@ -31,7 +31,7 @@ import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
 import AddTokenImg from '../../../assets/addToken.svg';
 import ArrowRight from '../../../assets/arrowRight.svg';
-import Guide from '../../../assets/guide.png';
+import Guide from '../../../assets/guide.svg';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
@@ -56,7 +56,6 @@ const Home = () => {
   const [account, setAccount] = useState<BaseAccount>();
   const [account2ConnectedSite, setAccount2ConnectedSite] =
     useState<BaseAccount>();
-  //const [accountList, setAccountList] = useState<DisplayWalletManage>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
   const [walletManagePopupVisible, setWalletManagePopupVisible] =
     useState(false);
@@ -396,12 +395,12 @@ const Home = () => {
               </div>
             </div>
             <div className="home-preview-balance flexR">
-              <span className="home-preview-balance-amount">
+              <WalletName width={250} cls="home-preview-balance-amount">
                 {denom2SymbolRatio(
                   nativeToken?.amount || 0,
                   nativeToken?.decimal || 0
                 )}
-              </span>
+              </WalletName>
               <span className="home-preview-balance-symbol">
                 {nativeToken?.symbol?.toUpperCase()}
               </span>
@@ -485,13 +484,7 @@ const Home = () => {
                         <div className="left flexR">
                           <TokenIcon token={t} radius={32} />
                           <div className="balance-container flexCol">
-                            <span
-                              className="balance ellipsis"
-                              title={denom2SymbolRatio(
-                                t.amount || 0,
-                                t.decimal
-                              )}
-                            >
+                            <span className="balance ellipsis">
                               {addEllipsisToEachWordsInTheEnd(
                                 denom2SymbolRatio(t.amount || 0, t.decimal),
                                 16
