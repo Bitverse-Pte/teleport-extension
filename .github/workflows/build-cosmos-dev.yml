@@ -2,7 +2,7 @@ name: Make Build for Cosmos
 on: 
   push:
     branches: 
-      - cosmos/feature
+      - v0.3.1-hotfix
 
 jobs:
   build:
