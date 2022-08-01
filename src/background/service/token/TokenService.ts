@@ -415,7 +415,6 @@ class TokenService {
                 const tokenInfo = this._getPresetTokenCfgByDenom(
                   denomTrace.denom
                 );
-                console.error('---', tokenInfo);
                 t.chainName = tokenInfo.chainName;
                 t.symbol = tokenInfo.symbol;
                 t.name = tokenInfo.name;
