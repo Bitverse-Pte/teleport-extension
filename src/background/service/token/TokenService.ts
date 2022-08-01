@@ -290,12 +290,24 @@ class TokenService {
       symbol: '',
       decimal: 6,
     };
-    const currentToken = EmbedChainInfos.find((e: AppChainInfo) => {
-      return (
-        e.stakeCurrency.coinMinimalDenom === denom ||
-        e.currencies.some((c) => c.coinMinimalDenom === denom)
-      );
+    let chainCfgs: any = [];
+    const chains = networkPreferenceService
+      .getAllProviders()
+      .filter((c: Provider) => c.ecosystem === Ecosystem.COSMOS);
+    chainCfgs = chains.map((c: Provider) => {
+      return {
+        ...c.ecoSystemParams,
+        chainName: c.chainName,
+      };
     });
+    const currentToken = [...EmbedChainInfos, ...chainCfgs].find(
+      (e: AppChainInfo) => {
+        return (
+          e.stakeCurrency.coinMinimalDenom === denom ||
+          e.currencies.some((c) => c.coinMinimalDenom === denom)
+        );
+      }
+    );
     if (currentToken) {
       extra.chainName = currentToken.chainName;
       if (currentToken.stakeCurrency.coinMinimalDenom === denom) {
@@ -370,6 +382,20 @@ class TokenService {
             );
             if (token) {
               token.amount = b.amount;
+              if (!token.symbol && token.denom) {
+                const denomTrace: any = await this._cacheDenomTrace(hash);
+                if (denomTrace) {
+                  const tokenInfo = this._getPresetTokenCfgByDenom(
+                    denomTrace.denom
+                  );
+                  if (tokenInfo) {
+                    token.chainName = tokenInfo.chainName;
+                    token.symbol = tokenInfo.symbol;
+                    token.name = tokenInfo.name;
+                    token.decimal = tokenInfo.decimal;
+                  }
+                }
+              }
             } else {
               const t: Token = {
                 symbol: '',
