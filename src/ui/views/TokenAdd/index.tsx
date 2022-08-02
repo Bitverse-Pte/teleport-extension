@@ -8,7 +8,7 @@ import {
   denom2SymbolRatio,
 } from 'ui/utils';
 import { AddTokenOpts } from 'types/token';
-import { CustomButton, TokenIcon } from 'ui/components/Widgets';
+import { CustomButton, TokenIcon, WalletName } from 'ui/components/Widgets';
 import { ErrorCode } from 'constants/code';
 import Header from 'ui/components/Header';
 
@@ -88,10 +88,10 @@ const TokenAdd = () => {
               chainCustomId: state.chainCustomId,
             }}
           />
-          <div className="token-add-balance-container">
-            <span className="token-add-balance-amount">
+          <div className="token-add-balance-container flexR">
+            <WalletName width={250} cls="token-add-balance-amount">
               {denom2SymbolRatio(state.balance || 0, state.decimal || 0)}
-            </span>
+            </WalletName>
             <span className="token-add-balance-symbol">{state.symbol}</span>
           </div>
           <p className="token-add-chain">{state.chain}</p>

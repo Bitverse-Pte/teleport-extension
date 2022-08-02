@@ -120,12 +120,12 @@ const SingleToken = () => {
         </div>
         <div className="bottom flexCol">
           <div className="balance-container flexR">
-            <span className="balance">
+            <WalletName width={250} cls="balance">
               {denom2SymbolRatio(
                 updatedToken?.amount || 0,
                 updatedToken?.decimal || 0
               )}
-            </span>
+            </WalletName>
             <span className="single-symbol">{updatedToken?.symbol}</span>
           </div>
           <span
