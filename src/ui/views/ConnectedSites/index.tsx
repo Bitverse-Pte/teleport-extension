@@ -10,6 +10,8 @@ import { TipButton, WalletName } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
 import { stat } from 'fs';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 import disconnectDefaultIcon from 'assets/disconnectDefault.svg';
 import disconnectActiveIcon from 'assets/disconnectActive.svg';
@@ -29,6 +31,7 @@ interface IConnectedSitesProps {
 const ConnectedSites: React.FC<IConnectedSitesProps> = (
   props: IConnectedSitesProps
 ) => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const location = useLocation();
   const wallet = useWallet();
@@ -96,7 +99,9 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
   };
 
   return (
-    <div className="current-connected-sites flexCol">
+    <div
+      className={clsx('current-connected-sites flexCol', { dark: isDarkMode })}
+    >
       <div className="page-header">Connected Sites</div>
       {props.isEvm && (
         <div className="account-item flexR" key={account?.address}>

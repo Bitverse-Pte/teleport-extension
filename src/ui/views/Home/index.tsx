@@ -45,12 +45,15 @@ import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
 import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const onCopy = () => {
   sensors.track('teleport_home_copy_account', { page: location.pathname });
   ClickToCloseMessage.success('Copied');
 };
 const Home = () => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
@@ -316,7 +319,11 @@ const Home = () => {
   };
 
   return (
-    <div className="home flexCol">
+    <div
+      className={clsx('home flexCol', {
+        dark: isDarkMode,
+      })}
+    >
       <Spin spinning={createAccountLoading}>
         <div
           className="guide_container"
@@ -560,7 +567,9 @@ const Home = () => {
         >
           <div
             style={{ width: '100%', height: '100%' }}
-            className="account-switch-drawer flexCol"
+            className={clsx('account-switch-drawer flexCol', {
+              dark: isDarkMode,
+            })}
           >
             <div className="account-switch-header flexR content-wrap-padding">
               <IconComponent
@@ -608,6 +617,9 @@ const Home = () => {
             />
           </div>
           <Drawer
+            className={clsx('connected-sites-drawer', {
+              dark: isDarkMode,
+            })}
             placement="top"
             closable={true}
             closeIcon={<IconComponent name="back" cls="icon back-icon" />}
@@ -658,7 +670,9 @@ const Home = () => {
         >
           <div
             style={{ width: '100%', height: '100%' }}
-            className="account-switch-drawer flexCol"
+            className={clsx('account-switch-drawer flexCol', {
+              dark: isDarkMode,
+            })}
           >
             <div className="account-switch-header flexR content-wrap-padding">
               <IconComponent

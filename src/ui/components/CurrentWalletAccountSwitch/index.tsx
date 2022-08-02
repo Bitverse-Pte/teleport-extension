@@ -15,6 +15,8 @@ import classnames from 'classnames';
 import skynet from 'utils/skynet';
 import { getUnit10ByAddress } from 'background/utils';
 import { Divider } from 'antd';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const { sensors } = skynet;
 
@@ -29,6 +31,7 @@ interface AccountSwitchProps {
 const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
   props: AccountSwitchProps
 ) => {
+  const { isDarkMode } = useDarkmode();
   const wallet = useWallet();
   const history = useHistory();
   const location = useLocation();
@@ -55,7 +58,11 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
   }, [props.visible]);
 
   return (
-    <div className="current-wallet-account-switch flexCol">
+    <div
+      className={clsx('current-wallet-account-switch flexCol', {
+        dark: isDarkMode,
+      })}
+    >
       <p
         className=" content-wrap-padding"
         style={walletName ? {} : { display: 'none' }}

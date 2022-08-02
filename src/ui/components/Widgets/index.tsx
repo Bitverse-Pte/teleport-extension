@@ -22,8 +22,9 @@ export interface SearchInputProps {
 }
 
 export const SearchInput = (props) => {
+  const { isDarkMode } = useDarkmode();
   return (
-    <div className="custom-input-container">
+    <div className={clsx('custom-input-container', { dark: isDarkMode })}>
       <IconComponent name="search" cls="search-icon" />
       <input {...props} className={'custom-search-input'} />
     </div>
