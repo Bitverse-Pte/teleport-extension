@@ -4,8 +4,11 @@ import { useHistory } from 'react-router-dom';
 import { useWallet, useApproval } from 'ui/utils';
 import * as ApprovalComponent from './components';
 import './style.less';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 const Approval = () => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const wallet = useWallet();
   const [getApproval, , rejectApproval] = useApproval();
@@ -42,7 +45,7 @@ const Approval = () => {
   const CurrentApprovalComponent = ApprovalComponent[approvalComponent];
 
   return (
-    <div className="approval">
+    <div className={clsx('approval', { dark: isDarkMode })}>
       {approval && (
         <CurrentApprovalComponent
           params={params}
