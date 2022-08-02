@@ -6,9 +6,11 @@ import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
 import SettingIcon from 'assets/settingIcon.svg';
+import { ReactComponent as SettingLogo } from 'assets/settingIcon.svg';
 import { useSelector } from 'react-redux';
 import { getProvider } from 'ui/selectors/selectors';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+
 export function HomeHeader({
   menuOnClick,
   networkOnClick,
@@ -43,12 +45,15 @@ export function HomeHeader({
         </span>
         <IconComponent name="chevron-down" cls="expand-list base-text-color" />
       </button>
-      <img
+      {/* <img
         src={SettingIcon}
         style={{ transform: 'scale(1.5)' }}
         className="expand-menu-btn cursor"
         onClick={menuOnClick}
-      />
+      /> */}
+      <button className="expand-menu-btn cursor" onClick={menuOnClick}>
+        <SettingLogo />
+      </button>
       {/* <Button type="text" className="expand-menu-btn" >
         <IconComponent
           name="menu"

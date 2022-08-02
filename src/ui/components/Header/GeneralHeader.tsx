@@ -6,6 +6,7 @@ import { useHistory } from 'react-router';
 import { Space } from 'antd';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 /**
  *
@@ -23,11 +24,17 @@ const GeneralHeader = ({
   title?: React.ReactNode;
   extCls?: string;
 }) => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const defaultAction = () => history.goBack();
 
   return (
-    <div className={clsx('flex headerOfMenu justify-end items-center', extCls)}>
+    <div
+      className={clsx('flex headerOfMenu justify-end items-center', {
+        extCls,
+        dark: isDarkMode,
+      })}
+    >
       {!hideLogo && <img src={walletLogo} className="header-logo" />}
       {typeof title === 'string' ? (
         <span className={hideLogo ? 'nologo-title' : 'title'}>{title}</span>
