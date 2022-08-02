@@ -88,8 +88,8 @@ const TokenAdd = () => {
               chainCustomId: state.chainCustomId,
             }}
           />
-          <div className="token-add-balance-container">
-            <WalletName width={250} cls="token-add-balance-amount flexR">
+          <div className="token-add-balance-container flexR">
+            <WalletName width={250} cls="token-add-balance-amount">
               {denom2SymbolRatio(state.balance || 0, state.decimal || 0)}
             </WalletName>
             <span className="token-add-balance-symbol">{state.symbol}</span>

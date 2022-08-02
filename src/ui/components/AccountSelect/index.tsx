@@ -58,7 +58,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
                   if (subAccount.address === props.currentToAddress) {
                     subAccount.selected = true;
                     a.selected = true;
-                    setDisplayAccount(AccountCreateType.MNEMONIC);
+                    // setDisplayAccount(accounts[AccountCreateType.MNEMONIC]);
                   } else {
                     subAccount.selected = false;
                   }
