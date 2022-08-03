@@ -51,7 +51,7 @@
         background: #F8FAFC;
         box-sizing: border-box;
         .connected-sites-action-icon {
-          height: 14px;
+          // height: 14px;
         }
       }
     }
@@ -113,26 +113,28 @@
           box-sizing: border-box;
 
           .account-item-action-icon {
-            height: 14px;
+            // height: 14px;
           }
 
           .key-default-icon {
-            display: block;
-          }
-
-          .key-active-icon {
-            display: none;
+            transform: scale(1.5);
           }
 
           &:hover {
             background: #F0F9FF;
-
             .key-default-icon {
-              display: none;
+              fill: #1484F5;
+              rect {
+                fill: #1484F5;
+              }
+              path {
+                fill: #1484F5;
+              }
             }
-
-            .key-active-icon {
-              display: block;
+            .site-default-icon {
+              path {
+                stroke: #1484F5;
+              }
             }
           }
 
@@ -148,7 +150,7 @@
 
         .account-right {
           .account-item-action {
-            border: 0.5px solid #E1E8F0;
+            // border: 0.5px solid #E1E8F0;
 
             &:hover {
               background: #F0F9FF;
@@ -167,6 +169,24 @@
 
 }
 .current-wallet-account-switch.dark {
+  .connected-sites {
+    .connected-sites-left {
+      color: #fff;
+    }
+  }
+  .connected-sites-right {
+    .connected-sites-action {
+      background: #364361;
+      &:hover {
+        background: #0E5CAA;
+      }
+      .site-default-icon {
+        path {
+          stroke: #fff;
+        }
+      }
+    }
+  }
   .accounts {
     .account-item {
       &:hover {
@@ -175,6 +195,20 @@
       .account-right {
         .account-item-action {
           background: #364361;
+          .key-default-icon {
+            fill: #fff;
+            rect {
+              fill: #fff;
+            }
+            path {
+              fill: #fff;
+            }
+          }
+          .site-default-icon {
+            path {
+              stroke: #fff;
+            }
+          }
           &:hover {
             background: #0E5CAA;
           }

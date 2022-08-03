@@ -13,9 +13,9 @@ import { stat } from 'fs';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
 
-import disconnectDefaultIcon from 'assets/disconnectDefault.svg';
-import disconnectActiveIcon from 'assets/disconnectActive.svg';
-import accountSwitch from 'assets/accountSwitch.svg';
+import { ReactComponent as DisconnectIcon } from 'assets/disconnectDefault.svg';
+import { ReactComponent as AccountSwitchIcon } from 'assets/accountSwitch.svg';
+
 import { useTranslation } from 'react-i18next';
 import { ConnectedSite } from 'background/service/permission';
 import { NoContent } from 'ui/components/universal/NoContent';
@@ -133,10 +133,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
                 }
               }}
             >
-              <img
-                src={accountSwitch}
-                className="account-item-action-icon key-default-icon"
-              />
+              <AccountSwitchIcon className="account-item-action-icon account-switch-icon" />
             </div>
           </div>
         </div>
@@ -169,14 +166,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
                   handleRemoveSiteClick(a);
                 }}
               >
-                <img
-                  src={disconnectDefaultIcon}
-                  className="site-item-action-icon key-default-icon"
-                />
-                <img
-                  src={disconnectActiveIcon}
-                  className="site-item-action-icon key-active-icon"
-                />
+                <DisconnectIcon className="site-item-action-icon disconnect-icon" />
               </div>
             </div>
           ))

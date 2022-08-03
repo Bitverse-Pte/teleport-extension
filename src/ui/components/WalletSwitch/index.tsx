@@ -10,6 +10,8 @@ import noWallets from 'assets/noAssets.svg';
 import { ecosystemToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import skynet from 'utils/skynet';
 import BitError from 'error';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 const { sensors } = skynet;
 
 interface Props {
@@ -18,6 +20,7 @@ interface Props {
 }
 
 const WalletSwitch: React.FC<Props> = (props: Props) => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const location = useLocation();
   const wallet = useWallet();
@@ -83,7 +86,11 @@ const WalletSwitch: React.FC<Props> = (props: Props) => {
   };
 
   return (
-    <div className="wallet-manage flexCol wallet-manage-wallet-switch">
+    <div
+      className={clsx('wallet-manage flexCol wallet-manage-wallet-switch', {
+        dark: isDarkMode,
+      })}
+    >
       <div className="tab-container flexR content-wrap-padding">
         <CustomTab
           tab1="ID Wallet"

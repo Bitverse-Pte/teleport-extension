@@ -91,7 +91,9 @@
     }
     .expand-menu-btn {
       svg {
-        fill: #fff;
+        path:not(:first-child) {
+          stroke: #fff;
+        }
       }
     }
   }
