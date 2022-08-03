@@ -11,6 +11,8 @@ import { IconComponent } from 'ui/components/IconComponents';
 import { useLocation } from 'react-router-dom';
 import skynet from 'utils/skynet';
 import { hexWEIToDecGWEI } from '../../../utils/conversion';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 const { sensors } = skynet;
 
@@ -35,7 +37,8 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
 };
 
 function FeeSelectorLegacy(props) {
-  const location = useLocation();
+  const { isDarkMode } = useDarkmode();
+
   const dispatch = useDispatch();
   const { visible, onClose, gasLimit = 21000, gasPrice: _gasPrice } = props;
   const wallet = useWallet();
@@ -82,7 +85,9 @@ function FeeSelectorLegacy(props) {
       size="large"
       visible={visible}
       closable={false}
-      className="fee"
+      className={clsx('fee', {
+        dark: isDarkMode,
+      })}
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0',
@@ -99,7 +104,11 @@ function FeeSelectorLegacy(props) {
         handleCloseIconClick={() => onClose()}
       />
 
-      <div className="custom-fee">
+      <div
+        className={clsx('custom-fee', {
+          dark: isDarkMode,
+        })}
+      >
         <Form
           form={form}
           layout="vertical"
