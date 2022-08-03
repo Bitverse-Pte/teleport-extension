@@ -132,24 +132,15 @@
                 align-items: center;
                 background: #F8FAFC;
                 box-sizing: border-box;
-                .site-item-action-icon {
-                  height: 14px;
-                }
-                .key-default-icon {
-                  display: block;
-                }
-                .key-active-icon {
-                  display: none;
-                }
                 &:hover {
                   background: #F0F9FF;
-      
-                  .key-default-icon {
-                    display: none;
-                  }
-      
-                  .key-active-icon {
-                    display: block;
+                  .disconnect-icon {
+                    path:first-child {
+                      stroke: #E05651;
+                    }
+                    path:last-child {
+                      fill: #E05651;
+                    }
                   }
                 }
                 &:last-child {
@@ -161,7 +152,7 @@
               background: #F8FAFC;
       
               .site-item-right {
-                border: 0.5px solid #E1E8F0;
+                // border: 0.5px solid #E1E8F0;
                 &:hover {
                   background: #FFF3F0;;
                   border: none;
@@ -246,15 +237,28 @@
       }
       .site-item-right {
         background: #364361;
+        .disconnect-icon {
+          path:first-child {
+            stroke: #fff;
+          }
+          path:last-child {
+            fill: #fff;
+          }
+        }
         &:hover {
           background: #FFF3F0;
+          .disconnect-icon {
+            path:first-child {
+              stroke: #E05651;
+            }
+            path:last-child {
+              fill: #E05651;
+            }
+          }
         }
       }
       &:hover {
         background: #052E55;
-        .site-item-right {
-          background: #FFF3F0;
-        }
       }
     }
   }
