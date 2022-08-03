@@ -30,8 +30,7 @@ const GeneralHeader = ({
 
   return (
     <div
-      className={clsx('flex headerOfMenu justify-end items-center', {
-        extCls,
+      className={clsx('flex headerOfMenu justify-end items-center', extCls, {
         dark: isDarkMode,
       })}
     >
