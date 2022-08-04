@@ -42,7 +42,6 @@ export const AccountHeader = (props: AccountHeaderProps) => {
     }
     history.go(-1);
   };
-  const ClickToCloseMessage = useStyledMessage();
 
   return (
     <div className="account-header-container flexR">
