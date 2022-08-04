@@ -67,7 +67,7 @@ const SendToken = () => {
           </div>
           <QrCodeView
             data={fromAccount?.address || ''}
-            color="#364361"
+            color="#02182B"
             margin={0}
             cellSize={5}
           />

@@ -5,7 +5,9 @@
     height: 100%;
     flex: 1;
     box-sizing: border-box;
-    padding: 28px 24px;
+    .current-connected-sites-top {
+      padding: 28px 24px 0;
+    }
     .page-header {
         font-family: 'MontserratBold';
         font-style: normal;
@@ -99,7 +101,7 @@
             flex: 0 0 64px;
             // cursor: pointer;
             box-sizing: border-box;
-            
+            padding: 0 24px;
             .site-item-left {
                 align-items: center;
                 .site-icon {
@@ -260,6 +262,11 @@
       &:hover {
         background: #052E55;
       }
+    }
+  }
+  .account-switch-icon {
+    path:last-child {
+      stroke: #fff;
     }
   }
 }
