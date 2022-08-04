@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { BigNumber, utils } from 'ethers';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 import { getCurrentProviderNativeToken } from 'ui/selectors/selectors';
 
 interface TierItemProps {
@@ -26,6 +26,7 @@ export const TierItem = ({
   ...props
 }: TierItemProps) => {
   const nativeToken = useSelector(getCurrentProviderNativeToken);
+  const ClickToCloseMessage = useStyledMessage();
 
   return (
     <div
@@ -37,7 +38,7 @@ export const TierItem = ({
         !props.disabled
           ? onClick
           : () =>
-              ClickToCloseMessage.error(
+              ClickToCloseMessage('error')(
                 'Not enough to replace the old transaction'
               )
       }

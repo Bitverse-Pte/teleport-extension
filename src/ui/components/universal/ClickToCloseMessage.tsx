@@ -1,7 +1,9 @@
 import { message } from 'antd';
 import { ArgsProps } from 'antd/lib/message';
+import clsx from 'clsx';
 import { nanoid } from 'nanoid';
 import React from 'react';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { IconComponent } from '../IconComponents';
 import './style.less';
 
@@ -11,8 +13,11 @@ function isArgsProps(jc: React.ReactNode | ArgsProps): jc is ArgsProps {
 
 type MessageParams = Parameters<typeof message['info']>;
 
-const createCTCMessage =
-  (name: 'info' | 'success' | 'error' | 'warning' | 'loading') =>
+export const createCTCMessage =
+  (
+    name: 'info' | 'success' | 'error' | 'warning' | 'loading',
+    isDarkMode?: boolean
+  ) =>
   (...params: MessageParams) => {
     let content = params[0] as ArgsProps;
     if (!isArgsProps(params[0])) {
@@ -23,6 +28,9 @@ const createCTCMessage =
         key: nanoid(),
       } as ArgsProps;
     }
+    content.className = clsx(content.className, 'ctc-msg', {
+      dark: isDarkMode,
+    });
 
     const closeMessage = () => {
       console.debug(
@@ -49,20 +57,20 @@ const createCTCMessage =
     message[name](content);
   };
 
-export const ClickToCloseMessage = {
-  info: (...params: Parameters<typeof message['info']>) => {
-    return createCTCMessage('info')(...params);
-  },
-  success: (...params: MessageParams) => {
-    return createCTCMessage('success')(...params);
-  },
-  error: (...params: MessageParams) => {
-    return createCTCMessage('error')(...params);
-  },
-  warning: (...params: MessageParams) => {
-    return createCTCMessage('warning')(...params);
-  },
-  loading: (...params: MessageParams) => {
-    return createCTCMessage('loading')(...params);
-  },
-};
+// export const ClickToCloseMessage = {
+//   info: (...params: Parameters<typeof message['info']>) => {
+//     return createCTCMessage('info')(...params);
+//   },
+//   success: (...params: MessageParams) => {
+//     return createCTCMessage('success')(...params);
+//   },
+//   error: (...params: MessageParams) => {
+//     return createCTCMessage('error')(...params);
+//   },
+//   warning: (...params: MessageParams) => {
+//     return createCTCMessage('warning')(...params);
+//   },
+//   loading: (...params: MessageParams) => {
+//     return createCTCMessage('loading')(...params);
+//   },
+// };

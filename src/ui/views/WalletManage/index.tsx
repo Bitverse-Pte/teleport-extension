@@ -20,7 +20,6 @@ import editImg from 'assets/editImg.svg';
 import importImg from 'assets/importImg.svg';
 import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { ecosystemToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
@@ -28,6 +27,7 @@ import BitError from 'error';
 const { sensors } = skynet;
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 export interface WalletHeaderProps {
   title: string;
@@ -66,6 +66,7 @@ const WalletManage: React.FC = () => {
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [unlockType, setUnlockType] = useState('edit');
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const queryWallets = async () => {
     const accounts: HdAccountStruct[] = await wallet.getWalletList();
@@ -159,7 +160,7 @@ const WalletManage: React.FC = () => {
       page: location.pathname,
     });
     if (walletName.length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -170,12 +171,12 @@ const WalletManage: React.FC = () => {
       .catch((e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error({
+          ClickToCloseMessage('error')({
             content: 'Name already exists',
             key: 'Name already exists',
           });
         } else {
-          ClickToCloseMessage.error({
+          ClickToCloseMessage('error')({
             content: 'Unknown error, please try again later',
             key: 'Unknown error, please try again later',
           });
@@ -191,7 +192,7 @@ const WalletManage: React.FC = () => {
   const handleDeleteBtnClick = (e, hdWalletId) => {
     sensors.track('teleport_wallet_manage_delete', { page: location.pathname });
     if (hdWalletAccounts.length + simpleWalletAccounts.length === 1) {
-      ClickToCloseMessage.warning('Please keep alive at least one account');
+      ClickToCloseMessage('warning')('Please keep alive at least one account');
       return;
     }
     e.stopPropagation();

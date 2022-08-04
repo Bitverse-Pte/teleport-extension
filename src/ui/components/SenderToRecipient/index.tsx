@@ -6,17 +6,17 @@ import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import './index.less';
-import { ClickToCloseMessage } from '../universal/ClickToCloseMessage';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
-
-const onCopy = () => {
-  ClickToCloseMessage.success('Copied');
-};
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 function Address({ checksummedAddress, name }) {
   const { t } = useTranslation();
+  const ClickToCloseMessage = useStyledMessage();
+  const onCopy = () => {
+    ClickToCloseMessage('success')('Copied');
+  };
   return (
     <div
       className="sender"

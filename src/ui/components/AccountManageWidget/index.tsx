@@ -19,11 +19,11 @@ import {
   ecosystemToIconSVG,
   IdToChainLogoSVG,
 } from 'ui/utils/networkCategoryToIcon';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { ecosystemMapping } from 'constants/wallet';
 import classnames from 'classnames';
 import { getUnit10ByAddress } from 'background/utils';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 interface ICustomChain extends BaseAccount {
   chainList?: {
@@ -181,6 +181,8 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
     [tempAccounts]
   );
 
+  const ClickToCloseMessage = useStyledMessage();
+
   return (
     <div className={clsx('account-manage-widget flexR', { dark: isDarkMode })}>
       <div className="side-bar flexCol">
@@ -288,7 +290,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
                               <CopyToClipboard
                                 text={item.address}
                                 onCopy={() =>
-                                  ClickToCloseMessage.success('Copied')
+                                  ClickToCloseMessage('success')('Copied')
                                 }
                               >
                                 <IconComponent

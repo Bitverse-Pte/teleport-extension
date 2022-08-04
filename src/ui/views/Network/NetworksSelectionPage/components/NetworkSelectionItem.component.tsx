@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Ecosystem, Provider } from 'types/network';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import {
   NetworkErrorCodeToMessageKey,
   NetworkProviderContext,
@@ -30,6 +29,7 @@ import type {
 import { useWallet } from 'ui/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 const { sensors } = skynet;
 
 interface NetworkSelectionItemProps {
@@ -53,6 +53,7 @@ export function NetworkSelectionItem({
   const wallet = useWallet();
   const history = useHistory();
   const location = useLocation();
+  const ClickToCloseMessage = useStyledMessage();
   const currentProviderId = useSelector((s) => s.network.provider.id);
   const isSelectedNetwork = useMemo(
     () => network.id === currentProviderId,
@@ -67,7 +68,7 @@ export function NetworkSelectionItem({
       await providerContext?.useProviderById(network.id);
     } catch (error: any) {
       if (error?.code) {
-        ClickToCloseMessage.info(
+        ClickToCloseMessage('info')(
           t(NetworkErrorCodeToMessageKey(error.code), {
             replace: {
               ecosystem_name: currentEcosystem,
@@ -123,10 +124,11 @@ const NetworkActions = ({ network }: { network: Provider }) => {
   const isSelectedNetwork = useMemo(() => {
     return network.id === currentProviderId;
   }, [network, currentProviderId]);
+  const ClickToCloseMessage = useStyledMessage();
 
   const removeProvider = async () => {
     await providerContext?.removeCustomProvider(network.id);
-    ClickToCloseMessage.success(t('remove_custom_provider_success'));
+    ClickToCloseMessage('success')(t('remove_custom_provider_success'));
   };
 
   const handleRemove = useCallback(
@@ -146,7 +148,7 @@ const NetworkActions = ({ network }: { network: Provider }) => {
         content: t('Delete_Provider_Ask_Content'),
         onOk: removeProvider,
         onCancel: () => {
-          ClickToCloseMessage.info(t('remove_custom_provider_cancel'));
+          ClickToCloseMessage('info')(t('remove_custom_provider_cancel'));
         },
       });
     },

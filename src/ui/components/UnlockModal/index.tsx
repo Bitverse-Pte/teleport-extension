@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Drawer } from 'antd';
 import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { useWallet, useWalletRequest } from 'ui/utils';
 import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import './style.less';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 interface DrawerHeaderProps {
   title: string;
@@ -43,6 +43,7 @@ export const UnlockModal: React.FC<PropsInterface> = (
   const [value, setValue] = useState('');
   const wallet = useWallet();
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
@@ -55,7 +56,7 @@ export const UnlockModal: React.FC<PropsInterface> = (
       }
     },
     onError(err) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
       });
