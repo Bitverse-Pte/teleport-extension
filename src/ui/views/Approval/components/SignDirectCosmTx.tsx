@@ -200,6 +200,7 @@ const SignDirectCosmTx = ({
                 className="customInputStyle"
                 value={signDoc?.txBody?.memo}
                 //defaultValue={memo}
+                placeholder="please enter memo"
                 onClick={(e) => e.stopPropagation()}
                 onChange={(e) => handleMemoChange(e.target.value)}
               />

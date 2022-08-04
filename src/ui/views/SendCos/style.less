@@ -115,11 +115,12 @@
             z-index: 2;
             position: relative;
             background-color: #fff;
+            padding-top: 10px;
+            margin-top: 2px;
             .recent-title {
                 align-items: flex-start;
                 padding: 4px 4px 4px 16px;
                 background: #F8FAFC;
-                margin: 10px 0px;
                 font-family: 'Montserrat';
                 font-style: normal;
                 font-weight: 400;
@@ -242,6 +243,9 @@
     font-size: 14px;
     line-height: 100%;
     color: #798CAD;
+    span {
+        margin-left: 10px;
+    }
     .max-icon {
         margin-left: 10px;
         background-color: #1484F5;
@@ -249,6 +253,7 @@
         padding: 2px 4px;
         border-radius: 4px;
         text-transform: uppercase;
+        font-weight: 800;
     } 
 }
 .addonSymbol {
@@ -279,6 +284,12 @@
         .customInputStyle {
             background-color: #02182B !important;
             color: #fff;
+            border: 1px solid #02182B!important;
+            &:focus {
+                border: 1px solid #1484F5!important;
+                box-shadow: none;
+                outline: 0;
+            }
         }
         .recent {
             background-color: #020C15;
@@ -361,6 +372,7 @@
 }
 .send-dropdown.dark {
     background-color: #020C15;
+    box-shadow: 0px 4px 8px rgb(94 139 255 / 20%);
     .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
         background-color: #020C15;
     }
