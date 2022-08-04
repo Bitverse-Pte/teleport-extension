@@ -106,9 +106,7 @@ export function NetworkSelectionItem({
       >
         <DragHandleIcon />
       </div>
-      <Tooltip title={network.nickname}>
-        <span className="network-name">{network.nickname}</span>
-      </Tooltip>
+      <span className="network-name">{network.nickname}</span>
       <NetworkActions network={network} />
     </div>
   );
