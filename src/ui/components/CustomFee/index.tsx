@@ -4,9 +4,11 @@ import { SET_CUSTOM_DATA, SET_CUSTOM_TYPE } from 'ui/reducer/gas.reducer';
 import './customFee.less';
 import { Form, Button } from 'antd';
 import { hexWEIToDecGWEI } from '../../../utils/conversion';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 function CustomFee(props) {
-  // const gasReducer = useSelector((state) => state.gas);
+  const { isDarkMode } = useDarkmode();
   const {
     onSubmit,
     selectFee: { suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas },
@@ -45,7 +47,7 @@ function CustomFee(props) {
     }
   }, [gasLimit, suggestedMaxFeePerGas, suggestedMaxPriorityFeePerGas]);
   return (
-    <div className="custom-fee">
+    <div className={clsx('custom-fee', { dark: isDarkMode })}>
       <Form
         form={form}
         layout="vertical"
