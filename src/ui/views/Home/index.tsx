@@ -35,7 +35,6 @@ import Guide from '../../../assets/guide.svg';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import WalletSwitch from 'ui/components/WalletSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
@@ -47,11 +46,8 @@ import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
-const onCopy = () => {
-  sensors.track('teleport_home_copy_account', { page: location.pathname });
-  ClickToCloseMessage.success('Copied');
-};
 const Home = () => {
   const { isDarkMode } = useDarkmode();
   const history = useHistory();
@@ -74,6 +70,12 @@ const Home = () => {
   const currentChain: Provider = useSelector(getProvider);
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [guideVisible, setGuideVisisble] = useState(false);
+  const ClickToCloseMessage = useStyledMessage();
+
+  const onCopy = () => {
+    sensors.track('teleport_home_copy_account', { page: location.pathname });
+    ClickToCloseMessage('success')('Copied');
+  };
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -257,7 +259,7 @@ const Home = () => {
   const handleExplorerLinkClick = () => {
     console.log(currentChain);
     if (!currentChain?.rpcPrefs?.blockExplorerUrl) {
-      ClickToCloseMessage.success('Please set your block explorer');
+      ClickToCloseMessage('success')('Please set your block explorer');
       return;
     }
     switch (currentChain.ecosystem) {

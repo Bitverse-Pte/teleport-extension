@@ -16,10 +16,10 @@ import {
 import { ErrorCode } from 'constants/code';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Tabs } from 'constants/wallet';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
 import EcosystemSelect from 'ui/components/EcosystemSelect';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const { sensors } = skynet;
 const { TextArea } = Input;
@@ -42,6 +42,7 @@ export const AccountHeader = (props: AccountHeaderProps) => {
     }
     history.go(-1);
   };
+  const ClickToCloseMessage = useStyledMessage();
 
   return (
     <div className="account-header-container flexR">
@@ -76,6 +77,8 @@ const AccountRecover = () => {
   const [passwordCheckPassed, setPasswordCheckPassed] = useState(false);
   const [privateKeyChains, setPrivateKeyChains] = useState<Provider[]>([]);
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
+
   /* const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
     PresetNetworkId | string
   >(); */
@@ -105,32 +108,32 @@ const AccountRecover = () => {
 
     switch (e?.code) {
       case ErrorCode.ADDRESS_REPEAT:
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Account already exists',
           key: 'Account already exists',
         });
         break;
       case ErrorCode.INVALID_MNEMONIC:
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Invalid mnemonic',
           key: 'Invalid mnemonic',
         });
         break;
       case ErrorCode.INVALID_PRIVATE_KEY:
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Invalid private key',
           key: 'Invalid private key',
         });
         break;
       case ErrorCode.WALLET_NAME_REPEAT:
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Name already exists',
           key: 'Name already exists',
         });
         break;
       default:
         //It will misled developer if using the same error msg
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'unexcept error',
           key: 'unexcept error',
         });
@@ -184,7 +187,7 @@ const AccountRecover = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -192,7 +195,7 @@ const AccountRecover = () => {
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: "Password don't match",
           key: "Password don't match",
         });
@@ -294,7 +297,7 @@ const AccountRecover = () => {
           }}
           onBlur={() => {
             if (name.trim().length > 20) {
-              ClickToCloseMessage.error({
+              ClickToCloseMessage('error')({
                 content: 'Name length should be 1-20 characters',
                 key: 'Name length should be 1-20 characters',
               });
@@ -333,7 +336,7 @@ const AccountRecover = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error({
+                ClickToCloseMessage('error')({
                   content: "Password don't match",
                   key: "Password don't match",
                 });

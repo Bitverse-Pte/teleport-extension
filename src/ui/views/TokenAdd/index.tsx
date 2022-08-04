@@ -13,7 +13,6 @@ import { ErrorCode } from 'constants/code';
 import Header from 'ui/components/Header';
 
 import './style.less';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 import { getProvider } from 'ui/selectors/selectors';
@@ -21,6 +20,7 @@ import { useSelector } from 'react-redux';
 import { Ecosystem, Provider } from 'types/network';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const TokenAdd = () => {
   const { state, pathname } = useLocation<{
@@ -37,6 +37,7 @@ const TokenAdd = () => {
   const wallet = useWallet();
   const { ecosystem }: Provider = useSelector(getProvider);
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const [addToken, addTokenLoading] = useWalletRequest(wallet.addCustomToken, {
     onSuccess() {
@@ -50,7 +51,7 @@ const TokenAdd = () => {
         err.code &&
         err.code === ErrorCode.CUSTOM_ERC20_TOKEN_DUPLICATED
       ) {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Token already added',
           key: 'Token already added',
         });

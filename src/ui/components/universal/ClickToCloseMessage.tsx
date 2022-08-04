@@ -14,7 +14,10 @@ function isArgsProps(jc: React.ReactNode | ArgsProps): jc is ArgsProps {
 type MessageParams = Parameters<typeof message['info']>;
 
 export const createCTCMessage =
-  (name: 'info' | 'success' | 'error' | 'warning' | 'loading', isDarkMode?: boolean) =>
+  (
+    name: 'info' | 'success' | 'error' | 'warning' | 'loading',
+    isDarkMode?: boolean
+  ) =>
   (...params: MessageParams) => {
     let content = params[0] as ArgsProps;
     if (!isArgsProps(params[0])) {
@@ -25,7 +28,9 @@ export const createCTCMessage =
         key: nanoid(),
       } as ArgsProps;
     }
-    content.className = clsx(content.className, 'ctc-msg', { dark: isDarkMode });
+    content.className = clsx(content.className, 'ctc-msg', {
+      dark: isDarkMode,
+    });
     /** @DEV remove when push */
     content.duration = 0;
 

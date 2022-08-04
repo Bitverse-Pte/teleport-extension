@@ -16,7 +16,6 @@ import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber, utils } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { useDispatch, useSelector } from 'react-redux';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import clsx from 'clsx';
 import skynet from 'utils/skynet';
 import {
@@ -27,6 +26,7 @@ import { useChainList } from 'ui/hooks/utils/useChainList';
 import { Ecosystem } from 'types/network';
 import { useNetworkTypeSelectionComponent } from './component/NetworkTypeSelection';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
@@ -42,6 +42,7 @@ const NetworkEdit = () => {
   const history = useHistory();
   const location = useLocation();
   const { id } = useParams<{ id: string | undefined }>();
+  const ClickToCloseMessage = useStyledMessage();
 
   const isEdit = !!id;
 
@@ -197,7 +198,7 @@ const NetworkEdit = () => {
       }
       dispatch(hideLoadingIndicator());
       setSubmitting(false);
-      ClickToCloseMessage.success({
+      ClickToCloseMessage('success')({
         content: t('Custom Provider Saved!'),
       });
       history.push('/home');
