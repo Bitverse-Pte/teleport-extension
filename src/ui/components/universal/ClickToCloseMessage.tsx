@@ -31,8 +31,6 @@ export const createCTCMessage =
     content.className = clsx(content.className, 'ctc-msg', {
       dark: isDarkMode,
     });
-    /** @DEV remove when push */
-    content.duration = 0;
 
     const closeMessage = () => {
       console.debug(
