@@ -46,6 +46,8 @@ export function CosmosTransactionsList({
     // simple pagination like MetaMask
     .slice(0, limit);
 
+  const { isDarkMode } = useDarkmode();
+
   if (transactions.length === 0) {
     return <NoContent title="activity" />;
   }
@@ -62,7 +64,6 @@ export function CosmosTransactionsList({
       viewMore();
     }
   };
-  const { isDarkMode } = useDarkmode();
 
   return (
     <div
