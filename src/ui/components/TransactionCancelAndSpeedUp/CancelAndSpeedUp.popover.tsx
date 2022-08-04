@@ -78,22 +78,23 @@ const DrawerHeader = (props: {
   const { t } = useTranslation();
   return (
     <div className="drawer-header-container-common drawer-header-network flexR with-padding-x-24 flex-wrap">
-      <span className="drawer-header-title">{props.title}</span>
+      <div className="title-and-subtitle">
+        <span className="drawer-header-title">{props.title}</span>
+        <h6
+          className="flex items-center flex-wrap w-full subtitle"
+        >
+          {t('cancelSpeedUpLabel', {
+            replace: {
+              $1: 'replace',
+            },
+          })}
+        </h6>
+      </div>
       <IconComponent
         name="close"
         onClick={props.handleCloseIconClick}
         cls="drawer-header-close-icon"
       />
-      <h6
-        className="flex items-center flex-wrap w-full"
-        style={{ fontSize: 12 }}
-      >
-        {t('cancelSpeedUpLabel', {
-          replace: {
-            $1: 'replace',
-          },
-        })}
-      </h6>
     </div>
   );
 };
@@ -211,7 +212,7 @@ const CancelSpeedupPopoverImplementation = ({
   return (
     <>
       <Drawer
-        height={shouldDrawerExpanded ? 536 : 422}
+        height={shouldDrawerExpanded ? 536 : 402}
         visible={showPopOver}
         onClose={(e) => {
           e.stopPropagation();
@@ -321,9 +322,6 @@ const CancelSpeedupPopoverImplementation = ({
         </div>
         <div
           className="with-padding-x-24"
-          style={{
-            marginTop: 24,
-          }}
         >
           <Button
             type="primary"
