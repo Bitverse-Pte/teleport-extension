@@ -313,6 +313,8 @@ function FeeSelector(props) {
                       <div className="numeric-input">
                         <input
                           type="number"
+                          min="0"
+                          step="1e-18"
                           defaultValue={customGas}
                           onChange={(e) => {
                             onSaveCustom(e);

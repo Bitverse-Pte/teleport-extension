@@ -176,7 +176,13 @@ interface CustomElementProps extends Omit<any, DeletedProps> {
   cls?: string;
 }
 export const CustomButton = ({ cls, ...props }: CustomElementProps) => {
-  return <Button {...props} className={`custom-button ${cls ? cls : ''}`} />;
+  const { isDarkMode } = useDarkmode();
+  return (
+    <Button
+      {...props}
+      className={clsx(`custom-button ${cls ? cls : ''}`, { dark: isDarkMode })}
+    />
+  );
 };
 
 interface CustomInputProps extends CustomElementProps {

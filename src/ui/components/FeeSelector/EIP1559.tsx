@@ -237,7 +237,9 @@ function FeeSelector(props) {
         size="large"
         visible={customVisible}
         closable={false}
-        className="fee"
+        className={clsx('custom-fee-box', {
+          dark: isDarkMode,
+        })}
         bodyStyle={{
           boxSizing: 'border-box',
           padding: '0 20px 20px',
