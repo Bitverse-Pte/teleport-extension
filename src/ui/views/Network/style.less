@@ -106,6 +106,15 @@ h2.category-name {
         outline: solid #1484f5;
       }
     }
+    .form-action-btn-group {
+      button#submitBtn {
+        background-color: #1484f5;
+        &:disabled {
+          background-color: rgba(20, 132, 245, 0.5);
+        }
+      }
+      
+    }
   }
 }
 /** network edit page **/
@@ -134,6 +143,18 @@ h2.category-name {
     padding: 40px 106px;
 
     margin-bottom: 48px;
+    .form-action-btn-group {
+      display: flex;
+      button { 
+        width: 250px;
+      }
+      button#cancelBtn {
+        color: #1484f5;
+        margin-right: 24px;
+        border: 2px solid #1484F5;
+        background: transparent;
+      }
+    }
   }
 
   .input-error {
@@ -155,10 +176,6 @@ h2.category-name {
         font-family: Montserrat;
         color: #A3B4CC;
       }
-  }
-  .disabled_button {
-    // override disabled button font color to avoid full blank
-    color: black !important;
   }
 
   // .ant-form-item-control-input {

@@ -2,7 +2,6 @@ import { BaseAccount } from 'types/extend';
 import './style.less';
 import React, { useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Modal } from 'antd';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import Jazzicon from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
@@ -20,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { ConnectedSite } from 'background/service/permission';
 import { NoContent } from 'ui/components/universal/NoContent';
 import skynet from 'utils/skynet';
+import { useStyledModal } from 'ui/hooks/style/useStyledModal';
 const { sensors } = skynet;
 interface IConnectedSitesProps {
   isEvm?: boolean;
@@ -38,6 +38,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
   const { t } = useTranslation();
   const [account, setAccount] = useState<BaseAccount>();
   const [siteList, setSiteList] = useState<ConnectedSite[]>();
+  const Modal = useStyledModal();
 
   const init = async () => {
     if (props.isEvm) {
@@ -55,7 +56,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
   useAsyncEffect(init, [props.visible]);
 
   const handleRemoveSiteClick = async (site: ConnectedSite) => {
-    Modal.confirm({
+    Modal('confirm')({
       title: <div className="delete-confoirm-title">Confirm</div>,
       content: (
         <div className="delete-confoirm-content">
