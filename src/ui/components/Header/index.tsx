@@ -13,7 +13,6 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
-  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const { isDarkMode } = useDarkmode();
 
@@ -47,7 +46,6 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
 };
 
 export const HeaderWithFlex: React.FC<HeaderProps> = (props: HeaderProps) => {
-  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const { isDarkMode } = useDarkmode();
 
