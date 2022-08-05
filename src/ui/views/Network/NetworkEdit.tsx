@@ -360,7 +360,9 @@ const NetworkEdit = () => {
           onSubmit={editNetwork}
         >
           {({ isSubmitting, ...formik }) => {
-            const isFormNotFinished = Object.keys(formik.errors).length > 0 && !(formik.isValid && formik.dirty);
+            const isFormNotFinished =
+              Object.keys(formik.errors).length > 0 &&
+              !(formik.isValid && formik.dirty);
             return (
               <Form className="form-deco">
                 <div className="form-body">
