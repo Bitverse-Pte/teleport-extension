@@ -80,9 +80,7 @@ const DrawerHeader = (props: {
     <div className="drawer-header-container-common drawer-header-network flexR with-padding-x-24 flex-wrap">
       <div className="title-and-subtitle">
         <span className="drawer-header-title">{props.title}</span>
-        <h6
-          className="flex items-center flex-wrap w-full subtitle"
-        >
+        <h6 className="flex items-center flex-wrap w-full subtitle">
           {t('cancelSpeedUpLabel', {
             replace: {
               $1: 'replace',
@@ -320,9 +318,7 @@ const CancelSpeedupPopoverImplementation = ({
             </div>
           </div>
         </div>
-        <div
-          className="with-padding-x-24"
-        >
+        <div className="with-padding-x-24">
           <Button
             type="primary"
             onClick={() => setConfirmPopupVisible(true)}
