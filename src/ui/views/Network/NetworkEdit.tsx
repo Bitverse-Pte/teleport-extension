@@ -292,13 +292,13 @@ const NetworkEdit = () => {
           });
         }
       } catch (error) {
-        console.error('validate_chainId::error:', error);
+        console.debug('validate_chainId::error:', error);
         errors.chainId = t('bad_chain_id');
       }
       /**
        * validating symbol
        */
-      if (!chainListData.loading && chainListData.value) {
+      if (!chainListData.loading && chainListData.value && values.chainId) {
         const matchedChain = chainListData.value.find((c) =>
           BigNumber.from(values.chainId).eq(c.chainId)
         );
@@ -319,6 +319,7 @@ const NetworkEdit = () => {
           setSymbolWarningMessage(undefined);
         }
       }
+      console.debug('validate::errors:', errors);
       Object.keys(errors).forEach((field) => {
         if (!errors[field]) delete errors[field];
       });
@@ -358,8 +359,8 @@ const NetworkEdit = () => {
           validate={validateFields}
           onSubmit={editNetwork}
         >
-          {({ isSubmitting, ...formilk }) => {
-            const isFormNotFinished = Object.keys(formilk.errors).length > 0;
+          {({ isSubmitting, ...formik }) => {
+            const isFormNotFinished = Object.keys(formik.errors).length > 0 && !(formik.isValid && formik.dirty);
             return (
               <Form className="form-deco">
                 <div className="form-body">
@@ -408,14 +409,14 @@ const NetworkEdit = () => {
                     className="input-error"
                   />
                 </div>
-                <div className="flex justify-center">
+                <div className="form-action-btn-group justify-center">
+                  <Button id="cancelBtn" onClick={() => window.close()}>
+                    Cancel
+                  </Button>
                   <Button
                     type="primary"
+                    id="submitBtn"
                     htmlType="submit"
-                    className={clsx({
-                      disabled_button: isFormNotFinished,
-                    })}
-                    style={{ width: '250px' }}
                     disabled={isFormNotFinished}
                   >
                     {t('Confirm')}
