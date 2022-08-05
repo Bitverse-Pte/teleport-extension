@@ -51,4 +51,26 @@
   .unlock-defense-notice {
     color: #C5D1E0;
   }
+
+  .password-input {
+    background-color: #02182B !important;
+    border-color: transparent !important;
+    &:hover,&:active,&:focus,&:focus-within {
+      border-color: #1484F5 !important;
+    }
+    input {
+      background-color: #02182B !important;
+      color: #FFF;
+    }
+    input::placeholder {
+      color: rgb(94, 108, 138) !important;
+    }
+    input:focus-visible {
+      outline: none;
+    }
+
+    .ant-input-suffix {
+      svg.ant-input-password-icon { fill: #FFF }
+    }
+  }
 }

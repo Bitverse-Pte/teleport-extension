@@ -208,7 +208,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           <span className="title">{setting.title}</span>
           <span
             className="tag"
-            style={{ display: setting?.opts?.tag ? 'block' : 'none' }}
+            style={{ display: setting?.opts?.tag ? 'contents' : 'none' }}
           >
             {setting?.opts?.tag}
           </span>

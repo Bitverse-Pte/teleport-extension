@@ -91,12 +91,19 @@ h2.category-name {
     color: #FFFFFF;
   }
   .form-deco {
+    border-color: rgb(94, 108, 138);
     background: #020C15;
     .form-body {
       h1 { color: #FFF; }
       input {
         background-color: #02182B;
         color: #FFF;
+      }
+      input::placeholder {
+        color: rgb(94, 108, 138) !important;
+      }
+      input:focus-visible {
+        outline: solid #1484f5;
       }
     }
   }
@@ -166,9 +173,6 @@ h2.category-name {
       padding: 11px 16px;
     }
     input::placeholder {
-      color: #A3B4CC !important;
-    }
-    input::-webkit-input-placeholder {
       color: #A3B4CC !important;
     }
     input:last-child {

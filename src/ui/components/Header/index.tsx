@@ -15,6 +15,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const { isDarkMode } = useDarkmode();
   const history = useHistory();
+  const { isDarkMode } = useDarkmode();
 
   const handleBackClick = () => {
     if (props.handleBackClick) {
@@ -48,6 +49,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
 export const HeaderWithFlex: React.FC<HeaderProps> = (props: HeaderProps) => {
   const { isDarkMode } = useDarkmode();
   const history = useHistory();
+  const { isDarkMode } = useDarkmode();
 
   const handleBackClick = () => {
     if (props.handleBackClick) {
@@ -56,6 +58,7 @@ export const HeaderWithFlex: React.FC<HeaderProps> = (props: HeaderProps) => {
       history.go(-1);
     }
   };
+
   return (
     <div className={clsx('header-flex', { dark: isDarkMode })}>
       <IconComponent
