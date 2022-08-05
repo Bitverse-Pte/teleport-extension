@@ -1,4 +1,4 @@
-import { Button, Modal, Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
 import clsx from 'clsx';
 import React, {
   Fragment,
@@ -30,6 +30,7 @@ import { useWallet } from 'ui/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
+import { useStyledModal } from 'ui/hooks/style/useStyledModal';
 const { sensors } = skynet;
 
 interface NetworkSelectionItemProps {
@@ -123,7 +124,7 @@ const NetworkActions = ({ network }: { network: Provider }) => {
     return network.id === currentProviderId;
   }, [network, currentProviderId]);
   const ClickToCloseMessage = useStyledMessage();
-
+  const Modal = useStyledModal();
   const removeProvider = async () => {
     await providerContext?.removeCustomProvider(network.id);
     ClickToCloseMessage('success')(t('remove_custom_provider_success'));
@@ -141,7 +142,7 @@ const NetworkActions = ({ network }: { network: Provider }) => {
         setUnlockPopupVisible(true);
         return;
       }
-      Modal.confirm({
+      Modal('confirm')({
         title: t('Delete_Provider_Ask_Title'),
         content: t('Delete_Provider_Ask_Content'),
         onOk: removeProvider,
