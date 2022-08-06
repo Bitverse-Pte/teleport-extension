@@ -23,7 +23,6 @@ import importImg from 'assets/importImg.svg';
 import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
 import keyActiveIconDark from 'assets/keyActiveDark.png';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { ecosystemToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';

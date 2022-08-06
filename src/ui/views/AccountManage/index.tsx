@@ -19,7 +19,6 @@ import { WalletHeader } from '../WalletManage';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import editImgDark from 'assets/editImgDark.svg';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import AccountManageWidget from 'ui/components/AccountManageWidget';
 import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
