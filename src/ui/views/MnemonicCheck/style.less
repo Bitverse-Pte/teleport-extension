@@ -5,17 +5,20 @@
   height: 100%;
   box-sizing: border-box;
   position: relative;
-  
-  span, p{
+
+  span,
+  p {
     line-height: 1;
   }
-  .mnemonic-check-content{
+
+  .mnemonic-check-content {
     flex: 1;
+
     .sub-notice {
       font-size: 12px;
       margin-bottom: 32px;
     }
-    
+
 
     .password-container {
 
@@ -40,6 +43,7 @@
       box-sizing: border-box;
       overflow-y: auto;
       padding: 12px 0;
+
       .mnemonic-wrap {
         display: grid;
         grid-template-columns: repeat(3, 90px);
@@ -92,4 +96,47 @@
   }
 
 
+}
+
+.mnemonic-check-container.dark {
+  background: @darkBg;
+  color: #ffffff;
+
+  .private-key {
+    background: #02182B !important;
+    color: #553e3e !important;
+  }
+
+  .phrase-container {
+    background: #02182B;
+
+    .phrase {
+      background: @darkBg;
+      color: #ffffff !important;
+    }
+
+  }
+
+  input,
+  .password-input {
+    background: #02182B !important;
+    border-color: #02182B !important;
+    color: #ffffff;
+
+    svg {
+      fill: #ffffff;
+    }
+  }
+
+  input::placeholder {
+    color: #5E6C8A !important;
+  }
+
+  input::-webkit-input-placeholder {
+    color: #5E6C8A !important;
+  }
+
+  .custom-button-default {
+    background: @darkBg;
+  }
 }

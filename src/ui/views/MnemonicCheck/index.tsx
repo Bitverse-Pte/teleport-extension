@@ -6,12 +6,13 @@ import { useHistory, useLocation } from 'react-router-dom';
 import * as _ from 'lodash';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
-import { IconComponent } from 'ui/components/IconComponents';
 import { AccountHeader } from '../AccountRecover';
 import { Tabs } from 'constants/wallet';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 const BackupCheck = () => {
   const { state, pathname } = useLocation<{
@@ -26,6 +27,7 @@ const BackupCheck = () => {
   const [privateKey, setPrivateKey] = useState('');
   const wallet = useWallet();
   const history = useHistory();
+  const { isDarkMode } = useDarkmode();
 
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
@@ -102,7 +104,9 @@ const BackupCheck = () => {
   }
 
   return (
-    <div className="mnemonic-check-container flexCol">
+    <div
+      className={clsx('mnemonic-check-container flexCol', { dark: isDarkMode })}
+    >
       <AccountHeader
         title={`Backup ${
           state.accountType === Tabs.FIRST ? 'Mnemonic' : 'Private Key'

@@ -18,6 +18,7 @@ import {
 import { WalletHeader } from '../WalletManage';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
+import editImgDark from 'assets/editImgDark.svg';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import AccountManageWidget from 'ui/components/AccountManageWidget';
 import { ErrorCode } from 'constants/code';
@@ -191,7 +192,11 @@ const AccountManage: React.FC = () => {
           onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={editImg} alt="" className="wallet-manage-img" />
+            <img
+              src={isDarkMode ? editImgDark : editImg}
+              alt=""
+              className="wallet-manage-img"
+            />
           </div>
           <span className="wallet-manage-button-item-title">Edit</span>
         </div>

@@ -147,6 +147,7 @@ const AccountCreate = () => {
           />
           <p className="account-create-title">Confirm password</p>
           <CustomPasswordInput
+            cls="custom-password-input"
             onChange={(e) => {
               setConfirmPsd(e.target.value);
             }}

@@ -2,6 +2,8 @@ import './style.less';
 import React, { ReactNode, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { IconComponent } from '../IconComponents';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 interface HeaderProps {
   handleBackClick?: () => void;
@@ -12,6 +14,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const history = useHistory();
+  const { isDarkMode } = useDarkmode();
 
   const handleBackClick = () => {
     if (props.handleBackClick) {
@@ -21,7 +24,11 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
     }
   };
   return (
-    <div className="header flexR content-wrap-padding">
+    <div
+      className={clsx('header flexR content-wrap-padding', {
+        dark: isDarkMode,
+      })}
+    >
       <IconComponent
         name="back"
         cls="icon back-icon"

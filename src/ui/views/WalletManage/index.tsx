@@ -13,13 +13,16 @@ import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
 import { CustomTab, WalletName } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
 import noAssets from 'assets/noAssets.svg';
+import noAssetsDark from 'assets/noAssetDark.svg';
 import { Delete, Rename } from '../AccountManage';
 import { ErrorCode } from 'constants/code';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
+import editImgDark from 'assets/editImgDark.svg';
 import importImg from 'assets/importImg.svg';
 import keyDefaultIcon from 'assets/keyDefault.svg';
 import keyActiveIcon from 'assets/keyActive.svg';
+import keyActiveIconDark from 'assets/keyActiveDark.png';
 import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { ecosystemToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
@@ -260,7 +263,11 @@ const WalletManage: React.FC = () => {
           onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={editImg} alt="" className="wallet-manage-img" />
+            <img
+              src={isDarkMode ? editImgDark : editImg}
+              alt=""
+              className="wallet-manage-img"
+            />
           </div>
           <span className="wallet-manage-button-item-title">Edit</span>
         </div>
@@ -357,14 +364,25 @@ const WalletManage: React.FC = () => {
                         display: isEdit ? 'none' : 'flex',
                       }}
                     >
-                      <img
+                      <IconComponent
+                        name="key"
+                        cls={clsx('key-default-icon')}
+                        style={
+                          isDarkMode
+                            ? {
+                                fill: '#ffffff',
+                              }
+                            : {}
+                        }
+                      />
+                      {/* <img
                         src={keyDefaultIcon}
                         className="home-no-assets key-default-icon"
                       />
                       <img
-                        src={keyActiveIcon}
+                        src={isDarkMode ? keyActiveIconDark : keyActiveIcon}
                         className="home-no-assets key-active-icon"
-                      />
+                      /> */}
                     </div>
 
                     <div
@@ -404,7 +422,10 @@ const WalletManage: React.FC = () => {
             </div>
           ) : (
             <div className="no-data flexCol">
-              <img src={noAssets} className="home-no-assets" />
+              <img
+                src={isDarkMode ? noAssetsDark : noAssets}
+                className="home-no-assets"
+              />
               <span className="no-assets-title">No Wallet</span>
             </div>
           )}
