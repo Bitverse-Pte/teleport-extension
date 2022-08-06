@@ -12,12 +12,12 @@ import {
   PasswordCheckPassed,
 } from 'ui/components/Widgets';
 import { AccountHeader } from '../AccountRecover';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
 import { ErrorCode } from 'constants/code';
 const { sensors } = skynet;
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const AccountCreate = () => {
   const { t } = useTranslation();
@@ -31,6 +31,7 @@ const AccountCreate = () => {
   const [policyShow, updateStoragePolicyAgreed] = usePolicyAgreed();
   const wallet = useWallet();
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const [run, loading] = useWalletRequest(wallet.createHdWallet, {
     onSuccess(mnemonic) {
@@ -48,12 +49,12 @@ const AccountCreate = () => {
     onError(err) {
       console.error(err);
       if (err?.code === ErrorCode.WALLET_NAME_REPEAT) {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Name already exists',
           key: 'Name already exists',
         });
       } else {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Unknown error, please try again later',
           key: 'Unknown error, please try again later',
         });
@@ -78,7 +79,7 @@ const AccountCreate = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -86,7 +87,7 @@ const AccountCreate = () => {
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: "Passwords don't match",
           key: "Passwords don't match",
         });
@@ -115,7 +116,7 @@ const AccountCreate = () => {
           }}
           onBlur={() => {
             if (name.trim().length > 20) {
-              ClickToCloseMessage.error({
+              ClickToCloseMessage('error')({
                 content: 'Name length should be 1-20 characters',
                 key: 'Name length should be 1-20 characters',
               });
@@ -157,7 +158,7 @@ const AccountCreate = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error({
+                ClickToCloseMessage('error')({
                   content: "Passwords don't match",
                   key: "Passwords don't match",
                 });

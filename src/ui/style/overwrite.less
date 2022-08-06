@@ -10,3 +10,24 @@
   color: @themeColor;
   border: 1px solid @themeColor;
 }
+
+.ant-modal.dark .ant-modal-content {
+  background: #020C15;
+
+  .ant-modal-confirm-body {
+    span.ant-modal-confirm-title,
+    div.ant-modal-confirm-content,
+    .delete-confoirm-title,
+    .delete-confoirm-content { 
+      color: #FFF !important;
+    }
+  }
+
+  .ant-modal-confirm-btns {
+    button.ant-btn:not(.ant-btn-primary) {
+      background: transparent !important;
+      color: #1484F5 !important;
+      border-color: #1484F5 !important;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Store } from 'redux';
 import { Provider, useSelector } from 'react-redux';
 import { HashRouter as Router, Route } from 'react-router-dom';
@@ -19,6 +19,7 @@ const Main = () => {
   /**
    * We limit the maximum of `message` that pops at one page.
    */
+  const [api, contextHolder] = message.useMessage();
   message.config({
     maxCount: 2,
   });
@@ -28,6 +29,7 @@ const Main = () => {
       {appState.isLoading ? (
         <LoadingScreen loadingMessage={'Waiting...'} />
       ) : null}
+      {contextHolder}
       <Router>
         <Route exact path="/">
           <SortHat />

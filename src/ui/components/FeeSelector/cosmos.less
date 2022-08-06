@@ -87,8 +87,20 @@
     }
     .gas-form {
       color: #fff;
-      .numeric-input input {
-        background-color: #020C15;
+      label {
+        color: #A3B4CC;
+      }
+      .numeric-input {
+        input {
+          background-color: #020C15;
+          color: #fff;
+          border: 1px solid #ccc;
+          &:focus-visible {
+            border: 1px solid #1484F5;
+            box-shadow: none;
+            outline: none;
+          }
+        }
       }
     }
   }

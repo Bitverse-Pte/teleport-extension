@@ -16,7 +16,6 @@ import { checkIsLegitURL, checkIsTrimmed } from './field-check-rules';
 import { BigNumber, utils } from 'ethers';
 import { defaultNetworks } from 'constants/defaultNetwork';
 import { useDispatch, useSelector } from 'react-redux';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import clsx from 'clsx';
 import skynet from 'utils/skynet';
 import {
@@ -27,6 +26,7 @@ import { useChainList } from 'ui/hooks/utils/useChainList';
 import { Ecosystem } from 'types/network';
 import { useNetworkTypeSelectionComponent } from './component/NetworkTypeSelection';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 const { sensors } = skynet;
 
 // const Icon = (src: string) => <img className="category-icon" src={src} />;
@@ -42,6 +42,7 @@ const NetworkEdit = () => {
   const history = useHistory();
   const location = useLocation();
   const { id } = useParams<{ id: string | undefined }>();
+  const ClickToCloseMessage = useStyledMessage();
 
   const isEdit = !!id;
 
@@ -197,7 +198,7 @@ const NetworkEdit = () => {
       }
       dispatch(hideLoadingIndicator());
       setSubmitting(false);
-      ClickToCloseMessage.success({
+      ClickToCloseMessage('success')({
         content: t('Custom Provider Saved!'),
       });
       history.push('/home');
@@ -291,13 +292,13 @@ const NetworkEdit = () => {
           });
         }
       } catch (error) {
-        console.error('validate_chainId::error:', error);
+        console.debug('validate_chainId::error:', error);
         errors.chainId = t('bad_chain_id');
       }
       /**
        * validating symbol
        */
-      if (!chainListData.loading && chainListData.value) {
+      if (!chainListData.loading && chainListData.value && values.chainId) {
         const matchedChain = chainListData.value.find((c) =>
           BigNumber.from(values.chainId).eq(c.chainId)
         );
@@ -318,6 +319,7 @@ const NetworkEdit = () => {
           setSymbolWarningMessage(undefined);
         }
       }
+      console.debug('validate::errors:', errors);
       Object.keys(errors).forEach((field) => {
         if (!errors[field]) delete errors[field];
       });
@@ -357,8 +359,10 @@ const NetworkEdit = () => {
           validate={validateFields}
           onSubmit={editNetwork}
         >
-          {({ isSubmitting, ...formilk }) => {
-            const isFormNotFinished = Object.keys(formilk.errors).length > 0;
+          {({ isSubmitting, ...formik }) => {
+            const isFormNotFinished =
+              Object.keys(formik.errors).length > 0 &&
+              !(formik.isValid && formik.dirty);
             return (
               <Form className="form-deco">
                 <div className="form-body">
@@ -407,14 +411,14 @@ const NetworkEdit = () => {
                     className="input-error"
                   />
                 </div>
-                <div className="flex justify-center">
+                <div className="form-action-btn-group justify-center">
+                  <Button id="cancelBtn" onClick={() => window.close()}>
+                    Cancel
+                  </Button>
                   <Button
                     type="primary"
+                    id="submitBtn"
                     htmlType="submit"
-                    className={clsx({
-                      disabled_button: isFormNotFinished,
-                    })}
-                    style={{ width: '250px' }}
                     disabled={isFormNotFinished}
                   >
                     {t('Confirm')}

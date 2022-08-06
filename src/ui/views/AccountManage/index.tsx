@@ -28,6 +28,7 @@ const { sensors } = skynet;
 import { useHistory } from 'react-router-dom';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -49,6 +50,8 @@ const AccountManage: React.FC = () => {
     hdWalletName: string;
     accountCreateType: AccountCreateType;
   }>();
+  const ClickToCloseMessage = useStyledMessage();
+
   const { hdWalletId, hdWalletName, accountCreateType } = state;
 
   const queryAccounts = async () => {
@@ -82,12 +85,12 @@ const AccountManage: React.FC = () => {
       onError: (e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error({
+          ClickToCloseMessage('error')({
             content: 'Name already exists',
             key: 'Name already exists',
           });
         } else {
-          ClickToCloseMessage.error({
+          ClickToCloseMessage('error')({
             content: 'Unknown error, please try again later',
             key: 'Unknown error, please try again later',
           });
@@ -101,7 +104,7 @@ const AccountManage: React.FC = () => {
   const onRenameConfirm = async (accountName) => {
     sensors.track('teleport_account_manage_rename_confirm', { page: pathname });
     if (accountName.length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -110,7 +113,7 @@ const AccountManage: React.FC = () => {
     const renamed = await wallet
       .renameDisplayAccount(hdWalletId, accountName, currentAccountIndex)
       .catch((e) => {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Name already exist',
           key: 'Name already exist',
         });
@@ -244,7 +247,7 @@ const AccountManage: React.FC = () => {
                   cls="base-text-color right"
                   onClick={(e) => {
                     if (accounts?.length === 1) {
-                      ClickToCloseMessage.warning(
+                      ClickToCloseMessage('warning')(
                         'Please keep alive at least one account'
                       );
                       return;
@@ -310,10 +313,11 @@ export interface IAddProps {
 export const Add: React.FC<IAddProps> = (props: IAddProps) => {
   const [value, setValue] = useState('');
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const handleConfirmBtnClick = () => {
     if (value.trim().length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -407,6 +411,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
 export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
   const [value, setValue] = useState(props.defaultValue);
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const resetState = () => {
     setValue(props.defaultValue);
@@ -428,7 +433,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
       return;
     }
     if (value.trim().length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -495,6 +500,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
   const [psd, setPsd] = useState('');
   const wallet = useWallet();
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const resetState = () => {
     setPsd('');
@@ -508,7 +514,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
 
   const handleConfirmBtnClick = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
       });

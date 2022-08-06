@@ -198,6 +198,7 @@ const SignAminoCosmTx = ({
               <Input
                 className="customInputStyle"
                 value={signDoc?.memo}
+                placeholder="please enter memo"
                 //defaultValue={memo}
                 onClick={(e) => e.stopPropagation()}
                 onChange={(e) => handleMemoChange(e.target.value)}

@@ -73,6 +73,10 @@
         fill: #1484F5;
         color:  #1484F5;
         margin: 8px 0;
+        font-size: 12px;
+        .edit-icon {
+          margin-right: 4px;
+        }
       }
       .transaction-detail-item {
         white-space: pre-line;
@@ -141,9 +145,6 @@
         color: #202226;
       }
       .transaction-data-params {
-        margin-left: 10px;
-        margin-right: 10px;
-        margin-top: 10px;
         margin-bottom: 10px;
         padding: 10px 14px;
         //word-break: break-all;
@@ -155,6 +156,7 @@
         font-size: 12px;
         line-height: 17px;
         color: #9EA2A9;
+        border-radius: 8px;
       }
       .transaction-data-value {
         margin-left: 10px;
@@ -172,6 +174,7 @@
         line-height: 17px;
         color: #9EA2A9;
         overflow-y: auto;
+        border-radius: 8px;
       }
     }
 
@@ -224,6 +227,15 @@ footer {
     }
     .transaction-detail-detailText {
       color: #fff!important;
+    }
+    .transaction-data {
+      .transaction-data-title {
+        color: #fff;
+      }
+      .transaction-data-params, .transaction-data-value {
+        background: #02182B;
+        color: #798CAD;
+      }
     }
   }
   .dec {

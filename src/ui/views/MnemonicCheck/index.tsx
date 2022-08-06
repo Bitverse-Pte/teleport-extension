@@ -8,8 +8,8 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
 import { AccountHeader } from '../AccountRecover';
 import { Tabs } from 'constants/wallet';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 const { sensors } = skynet;
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
@@ -28,6 +28,7 @@ const BackupCheck = () => {
   const wallet = useWallet();
   const history = useHistory();
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
@@ -44,7 +45,7 @@ const BackupCheck = () => {
     },
     onError(err) {
       console.error(err.code);
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
       });
@@ -85,7 +86,7 @@ const BackupCheck = () => {
 
   /* const checksumPsd = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
       });
@@ -183,7 +184,7 @@ const BackupCheck = () => {
         <CopyToClipboard
           text={state.accountType === Tabs.FIRST ? mnemonic : privateKey}
           onCopy={() => {
-            ClickToCloseMessage.success('Copied');
+            ClickToCloseMessage('success')('Copied');
             sensors.track('teleport_mnemonic_backup_copy', { page: pathname });
           }}
         >

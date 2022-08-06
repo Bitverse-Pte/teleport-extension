@@ -367,6 +367,7 @@ export function EvmTransactionsList({
         .slice(0, limit)
     );
   }, [rawTransactionsGroup, txgFilter, limit]);
+  const { isDarkMode } = useDarkmode();
 
   if (transactions.length === 0) {
     return <NoContent title="activity" />;
@@ -384,7 +385,6 @@ export function EvmTransactionsList({
       viewMore();
     }
   };
-  const { isDarkMode } = useDarkmode();
 
   return (
     <div

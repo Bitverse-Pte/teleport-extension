@@ -8,7 +8,6 @@ import QrCodeView from 'ui/components/QrCode';
 import { useWallet, useAsyncEffect } from 'ui/utils';
 import { BaseAccount } from 'types/extend';
 import './style.less';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import GeneralHeader from 'ui/components/Header/GeneralHeader';
 import { useTranslation } from 'react-i18next';
 import Jazzicon from 'react-jazzicon';
@@ -17,6 +16,7 @@ import { ChainIdToChainLogoSVG } from 'ui/utils/networkCategoryToIcon';
 import skynet from 'utils/skynet';
 import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const { sensors } = skynet;
 
@@ -32,6 +32,7 @@ const SendToken = () => {
   const { t } = useTranslation();
   const [fromAccount, setFromAccount] = useState<BaseAccount>();
   const currentNetworkController = useSelector((state) => state.network);
+  const ClickToCloseMessage = useStyledMessage();
 
   useAsyncEffect(async () => {
     const current: BaseAccount = await wallet.getCurrentAccount();
@@ -66,7 +67,7 @@ const SendToken = () => {
           </div>
           <QrCodeView
             data={fromAccount?.address || ''}
-            color="#364361"
+            color="#02182B"
             margin={0}
             cellSize={5}
           />
@@ -77,7 +78,7 @@ const SendToken = () => {
           <CopyToClipboard
             text={fromAccount?.address}
             onCopy={() => {
-              ClickToCloseMessage.success('Copied');
+              ClickToCloseMessage('success')('Copied');
               sensors.track('teleport_receive_copy', {
                 page: location.pathname,
               });

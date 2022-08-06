@@ -2,7 +2,6 @@ import { BaseAccount } from 'types/extend';
 import './style.less';
 import React, { useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Modal } from 'antd';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import Jazzicon from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
@@ -20,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { ConnectedSite } from 'background/service/permission';
 import { NoContent } from 'ui/components/universal/NoContent';
 import skynet from 'utils/skynet';
+import { useStyledModal } from 'ui/hooks/style/useStyledModal';
 const { sensors } = skynet;
 interface IConnectedSitesProps {
   isEvm?: boolean;
@@ -38,6 +38,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
   const { t } = useTranslation();
   const [account, setAccount] = useState<BaseAccount>();
   const [siteList, setSiteList] = useState<ConnectedSite[]>();
+  const Modal = useStyledModal();
 
   const init = async () => {
     if (props.isEvm) {
@@ -55,7 +56,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
   useAsyncEffect(init, [props.visible]);
 
   const handleRemoveSiteClick = async (site: ConnectedSite) => {
-    Modal.confirm({
+    Modal('confirm')({
       title: <div className="delete-confoirm-title">Confirm</div>,
       content: (
         <div className="delete-confoirm-content">
@@ -102,51 +103,53 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
     <div
       className={clsx('current-connected-sites flexCol', { dark: isDarkMode })}
     >
-      <div className="page-header">Connected Sites</div>
-      {props.isEvm && (
-        <div className="account-item flexR" key={account?.address}>
-          <div className="account-left flexR">
-            <Jazzicon
-              diameter={30}
-              seed={getUnit10ByAddress(account?.address)}
-            />
-            <div className="account-info flexCol">
-              <WalletName cls="account-name" width={100}>
-                {account?.accountName || account?.hdWalletName}
-              </WalletName>
-              <span className="account-address">
-                {transferAddress2Display(account?.address)}
-              </span>
+      <div className="current-connected-sites-top">
+        <div className="page-header">Connected Sites</div>
+        {props.isEvm && (
+          <div className="account-item flexR" key={account?.address}>
+            <div className="account-left flexR">
+              <Jazzicon
+                diameter={30}
+                seed={getUnit10ByAddress(account?.address)}
+              />
+              <div className="account-info flexCol">
+                <WalletName cls="account-name" width={100}>
+                  {account?.accountName || account?.hdWalletName}
+                </WalletName>
+                <span className="account-address">
+                  {transferAddress2Display(account?.address)}
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div className="account-right flexR">
-            <div
-              className="account-item-action cursor flexR"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (props.handleOnClose) {
-                  sensors.track('teleport_connected_sites_switch', {
-                    page: location.pathname,
-                  });
-                  props.handleOnClose();
-                }
-              }}
-            >
-              <AccountSwitchIcon className="account-item-action-icon account-switch-icon" />
+            <div className="account-right flexR">
+              <div
+                className="account-item-action cursor flexR"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (props.handleOnClose) {
+                    sensors.track('teleport_connected_sites_switch', {
+                      page: location.pathname,
+                    });
+                    props.handleOnClose();
+                  }
+                }}
+              >
+                <AccountSwitchIcon className="account-item-action-icon account-switch-icon" />
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      {props.isEvm && (
-        <div className="content-desc">
-          {t(
-            `${transferAddress2Display(
-              account?.address
-            )} is connected to sites below, which can view your account address.`
-          )}
-        </div>
-      )}
+        )}
+        {props.isEvm && (
+          <div className="content-desc">
+            {t(
+              `${transferAddress2Display(
+                account?.address
+              )} is connected to sites below, which can view your account address.`
+            )}
+          </div>
+        )}
+      </div>
       <div className="connected-site-list flexCol">
         {siteList && siteList.length > 0 ? (
           siteList.map((a) => (

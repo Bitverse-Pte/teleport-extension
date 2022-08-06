@@ -27,7 +27,6 @@ import './style.less';
 import { NoContent } from 'ui/components/universal/NoContent';
 import tokenHide from '../../../assets/tokenHide.svg';
 import tokenShow from '../../../assets/tokenShow.svg';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { isValidAddress } from 'ethereumjs-util';
 import skynet from 'utils/skynet';
 import { getProvider } from 'ui/selectors/selectors';
@@ -35,6 +34,7 @@ import { useSelector } from 'react-redux';
 const { sensors } = skynet;
 import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const TokenManage = () => {
   const history = useHistory();
@@ -46,6 +46,7 @@ const TokenManage = () => {
   const wallet = useWallet();
   const currentChain: Provider = useSelector(getProvider);
   const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -115,12 +116,12 @@ const TokenManage = () => {
     onError(err) {
       console.error(err);
       if (err?.code === ErrorCode.INVALID_CONTRACT_ADDRESS) {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Invalid contract address',
           key: 'Invalid contract address',
         });
       } else {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Token not found',
           key: 'Token not found',
         });
@@ -130,7 +131,7 @@ const TokenManage = () => {
 
   const handleNextBtnClick = async () => {
     /* if (!isValidAddress(contractAddress)) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Invalid contract address',
         key: 'Invalid contract address',
       });

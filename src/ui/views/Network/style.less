@@ -13,6 +13,9 @@
 
   .custom-network-card {
     background-color: #02182B;
+    button svg {
+      fill: #FFF;
+    }
   }
 
   .network-list-header svg {
@@ -88,6 +91,7 @@ h2.category-name {
     color: #FFFFFF;
   }
   .form-deco {
+    border-color: rgb(94, 108, 138);
     background: #020C15;
     .form-body {
       h1 { color: #FFF; }
@@ -95,6 +99,21 @@ h2.category-name {
         background-color: #02182B;
         color: #FFF;
       }
+      input::placeholder {
+        color: rgb(94, 108, 138) !important;
+      }
+      input:focus-visible {
+        outline: solid #1484f5;
+      }
+    }
+    .form-action-btn-group {
+      button#submitBtn {
+        background-color: #1484f5;
+        &:disabled {
+          background-color: rgba(20, 132, 245, 0.5);
+        }
+      }
+      
     }
   }
 }
@@ -124,6 +143,18 @@ h2.category-name {
     padding: 40px 106px;
 
     margin-bottom: 48px;
+    .form-action-btn-group {
+      display: flex;
+      button { 
+        width: 250px;
+      }
+      button#cancelBtn {
+        color: #1484f5;
+        margin-right: 24px;
+        border: 2px solid #1484F5;
+        background: transparent;
+      }
+    }
   }
 
   .input-error {
@@ -146,10 +177,6 @@ h2.category-name {
         color: #A3B4CC;
       }
   }
-  .disabled_button {
-    // override disabled button font color to avoid full blank
-    color: black !important;
-  }
 
   // .ant-form-item-control-input {
     input {
@@ -163,9 +190,6 @@ h2.category-name {
       padding: 11px 16px;
     }
     input::placeholder {
-      color: #A3B4CC !important;
-    }
-    input::-webkit-input-placeholder {
       color: #A3B4CC !important;
     }
     input:last-child {
