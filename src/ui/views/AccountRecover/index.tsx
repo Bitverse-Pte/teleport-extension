@@ -31,6 +31,7 @@ export interface AccountHeaderProps {
 }
 
 export const AccountHeader = (props: AccountHeaderProps) => {
+  const { isDarkMode } = useDarkmode();
   const handleBackClick = () => {
     sensors.track('teleport_account_manage_closed', {
       page: location.pathname,
@@ -44,7 +45,9 @@ export const AccountHeader = (props: AccountHeaderProps) => {
   };
 
   return (
-    <div className="account-header-container flexR">
+    <div
+      className={clsx('account-header-container flexR', { dark: isDarkMode })}
+    >
       <span className="account-header-title">{props.title}</span>
       <IconComponent
         name="close"
@@ -272,7 +275,7 @@ const AccountRecover = () => {
               setPrivateKey(e.target.value.trim());
             }}
             placeholder="Enter private key"
-            cls="private-key-input"
+            cls="private-key-input custom-password-input"
           />
         </div>
         {importType === Tabs.SECOND ? (
@@ -313,6 +316,7 @@ const AccountRecover = () => {
             Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
+            cls="custom-password-input"
             onChange={(e) => {
               setPsd(e.target.value);
             }}
@@ -326,6 +330,7 @@ const AccountRecover = () => {
           />
           <p className="account-recover-title">Confirm password</p>
           <CustomPasswordInput
+            cls="custom-password-input"
             onChange={(e) => {
               setConfirmPsd(e.target.value);
             }}
