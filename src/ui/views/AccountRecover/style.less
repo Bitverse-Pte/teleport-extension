@@ -118,6 +118,11 @@
     .button {
         padding-top: 24px;
         margin-bottom: 40px;
+        width: 100%;
+        margin-left: 0;
+        padding-left: 24px;
+        padding-right: 24px;
+        box-shadow: 0px -4px 16px rgba(94, 139, 255, 0.1);
     }
 
     .secret-error-detail {
@@ -150,19 +155,28 @@
     justify-content: space-between;
     width: 100%;
     padding: 0 @pagePaddingLeft;
-    height: 64px;
-    flex: 0 0 64px;
+    height: 88px;
+    flex: 0 0 88px;
     align-items: center;
     margin-bottom: 16px;
+    transition: all .14s linear;
 
     .account-header-title {
         font-size: 24px;
+        transition: all .14s linear;
         font-family: MontserratBold;
     }
 
     .account-header-close-icon {
         fill: #A3B4CC;
         width: 10px;
+    }
+}
+.isScroll {
+    height: 64px;
+    flex: 0 0 64px;
+    .account-header-title{
+        font-size: 18px;
     }
 }
 

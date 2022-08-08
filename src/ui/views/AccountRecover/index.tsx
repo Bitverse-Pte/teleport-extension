@@ -27,6 +27,7 @@ const { TextArea } = Input;
 export interface AccountHeaderProps {
   title: string;
   hideClose?: boolean;
+  isScroll?: boolean;
   handleCloseIconClick?: () => void;
 }
 
@@ -46,7 +47,10 @@ export const AccountHeader = (props: AccountHeaderProps) => {
 
   return (
     <div
-      className={clsx('account-header-container flexR', { dark: isDarkMode })}
+      className={clsx('account-header-container flexR', {
+        dark: isDarkMode,
+        isScroll: props.isScroll,
+      })}
     >
       <span className="account-header-title">{props.title}</span>
       <IconComponent
@@ -67,6 +71,7 @@ const AccountRecover = () => {
   const [textareaActive, setTextareaActive] = useState(false);
   const [mnemonic, setMnemonic] = useState('');
   const [privateKey, setPrivateKey] = useState('');
+  const [isScroll, setIsScroll] = useState(false);
 
   // const mnemonicError = useSeedPhraseValidation(mnemonic);
   // const privateKeyError = usePrivateKeyValidation(privateKey);
@@ -233,10 +238,22 @@ const AccountRecover = () => {
     }
   };
 
+  const onBodyScroll = (e) => {
+    console.log();
+    if (e.target.scrollTop > 0) {
+      setIsScroll(true);
+    } else {
+      setIsScroll(false);
+    }
+  };
+
   return (
     <div className={clsx('recover flexCol', { dark: isDarkMode })}>
-      <AccountHeader title="Import Wallet" />
-      <div className="account-recover-content content-wrap-padding">
+      <AccountHeader title="Import Wallet" isScroll={isScroll} />
+      <div
+        className="account-recover-content content-wrap-padding"
+        onScroll={onBodyScroll}
+      >
         <CustomTab
           tab1="Mnemonic"
           tab2="Private Key"
