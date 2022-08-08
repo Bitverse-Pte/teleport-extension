@@ -153,6 +153,9 @@
         width: 32px;
         height: 32px;
         margin-right: 12px;
+        box-sizing: border-box;
+        border-radius: 50%;
+        border: 1px solid rgba(248, 250, 252, 1)
       }
     }
 
@@ -172,6 +175,9 @@
             width: 16px;
             height: 16px;
             margin-right: 8px;
+            box-sizing: border-box;
+            border-radius: 50%;
+            border: 1px solid rgba(248, 250, 252, 1)
           }
         }
 
@@ -208,7 +214,7 @@
   color: #ffffff;
   fill: #ffffff;
 
-  
+
   .side-bar {
     background: #032440;
 
@@ -238,44 +244,40 @@
   }
 
   .ant-collapse {
-  
+
     .ant-collapse-item {
-  
-      .ant-collapse-header {
-        
-      }
-  
+
+      .ant-collapse-header {}
+
       .account-item {
-        
-  
+
+
         .account-address {
           color: #ffffff;
         }
-  
+
         .account-item-ecosystem-icon {
-        
+          border-color: rgba(54, 67, 97, 1);
         }
       }
-  
+
       .address-container {
-  
+
         .address-item {
-  
+
           .address-chain-container {
-            
-  
             .chain-icon {
-             
+              border-color: rgba(54, 67, 97, 1);
             }
           }
-  
+
           .address-chain-address-container {
             background: #02182B;
 
             .address-chain-address {
               color: #ffffff;
             }
-  
+
             .copy-icon {
               fill: @themeColor;
             }
