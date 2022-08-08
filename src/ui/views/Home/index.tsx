@@ -366,43 +366,48 @@ const Home = () => {
           </div>
 
           <div className="home-preview-container flexCol content-wrap-padding">
-            <div
-              className="home-preview-top-container flexR"
-              onClick={() => {
-                sensors.track('teleport_home_accounts', {
-                  page: location.pathname,
-                });
-                setPopupVisible(true);
-              }}
-            >
-              <div className="home-preview-top-left flexR cursor">
+            <div className="home-preview-container-top-wrap flexR">
+              <div className="home-preview-top-top-left">
                 <Jazzicon
-                  diameter={16}
+                  diameter={30}
                   seed={getUnit10ByAddress(account?.address)}
                 />
-                <span className="home-preview-top-account-name">
-                  {account?.accountCreateType === AccountCreateType.MNEMONIC
-                    ? account?.accountName
-                    : account?.hdWalletName}
-                </span>
               </div>
-              <IconComponent name="chevron-down" cls="chevron-down" />
-            </div>
-            <div className="home-preview-address-container flexR">
-              <span className="home-preview-address">
-                ({transferAddress2Display(account?.address)})
-              </span>
-              <div className="home-preview-icon-container flexR">
-                <CopyToClipboard text={account?.address} onCopy={onCopy}>
-                  <IconComponent name="copy" cls="copy" />
-                </CopyToClipboard>
-                <IconComponent
-                  name="external-link"
-                  cls="explorer"
-                  onClick={handleExplorerLinkClick}
-                />
+              <div className="home-preview-top-right">
+                <div
+                  className="home-preview-top-container flexR cursor"
+                  onClick={() => {
+                    sensors.track('teleport_home_accounts', {
+                      page: location.pathname,
+                    });
+                    setPopupVisible(true);
+                  }}
+                >
+                  <WalletName width={200} cls="home-preview-top-account-name">
+                    {account?.accountCreateType === AccountCreateType.MNEMONIC
+                      ? account?.accountName
+                      : account?.hdWalletName}
+                  </WalletName>
+                  <IconComponent name="chevron-down" cls="chevron-down" />
+                </div>
+                <div className="home-preview-address-container flexR">
+                  <span className="home-preview-address">
+                    ({transferAddress2Display(account?.address)})
+                  </span>
+                  <div className="home-preview-icon-container flexR">
+                    <CopyToClipboard text={account?.address} onCopy={onCopy}>
+                      <IconComponent name="copy" cls="copy" />
+                    </CopyToClipboard>
+                    <IconComponent
+                      name="external-link"
+                      cls="explorer"
+                      onClick={handleExplorerLinkClick}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+
             <div className="home-preview-balance flexR">
               <WalletName width={250} cls="home-preview-balance-amount">
                 {denom2SymbolRatio(

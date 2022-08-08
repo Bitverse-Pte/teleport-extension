@@ -24,7 +24,7 @@
       position: absolute;
     }
 
-    .home-guide-close{
+    .home-guide-close {
       position: absolute;
       bottom: 120px;
       left: 50%;
@@ -93,67 +93,70 @@
       border-radius: 16px 16px 0px 0px;
       margin-bottom: 68px;
 
-      .home-preview-top-container {
-        justify-content: space-between;
-        width: 100%;
+      .home-preview-container-top-wrap {
         align-items: center;
-        margin-bottom: 8px;
-
-        .home-preview-top-left {
-          align-items: center;
-
-          .home-preview-top-account-name {
-            font-family: MontserratBold;
-            font-size: 14px;
-            margin-left: 4px;
-
-            max-width: 224px;
-            height: 14px;
-            text-overflow: ellipsis;
-            display: block;
-            overflow: hidden;
-            white-space: nowrap;
-          }
-        }
-
-        .chevron-down {
-          fill: @baseTextColor;
-          width: 8px;
-        }
-
-
-      }
-
-      .home-preview-address-container {
         width: 100%;
-        height: 22px;
-        flex: 0 0 22px;
-        background: #FFFFFF;
-        border-radius: 14px;
-        padding: 0 12px;
-        box-sizing: border-box;
-        justify-content: space-between;
-        align-items: center;
         margin-bottom: 16px;
 
-        .home-preview-address {
-          font-size: 12px;
-          color: #5E6C8A;
+        .home-preview-top-top-left {
+          width: 30px;
+          flex: 0 0 30px;
+          height: 30px;
+          margin-right: 5px;
         }
 
-        .home-preview-icon-container {
-          align-items: center;
-          justify-content: flex-end;
+        .home-preview-top-right {
+          flex: 1;
 
-          .copy {
-            fill: @themeColor;
+          .home-preview-top-container {
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 4px;
+
+            .home-preview-top-account-name {
+              margin-left: 4px;
+              font-family: MontserratBold;
+            }
+
+            .chevron-down {
+              fill: @baseTextColor;
+              height: 14px;
+              width: 8px;
+            }
+
+
           }
 
-          .explorer {
-            fill: @themeColor;
-            margin-left: 8px;
-          }
+          .home-preview-address-container {
+            width: 100%;
+            box-sizing: border-box;
+            align-items: center;
 
+
+            .home-preview-address {
+              font-size: 12px;
+              color: #5E6C8A;
+              margin-right: 9px;
+            }
+
+            .home-preview-icon-container {
+              align-items: center;
+              justify-content: flex-end;
+
+              .copy {
+                fill: @themeColor;
+                height: 12px;
+              }
+
+              .explorer {
+                fill: @themeColor;
+                height: 12px;
+                margin-left: 8px;
+              }
+
+            }
+          }
         }
       }
 
@@ -448,7 +451,8 @@
     align-items: center;
     height: 60px;
     flex: 0 0 60px;
-    .icon-close{
+
+    .icon-close {
       width: 10px;
     }
   }
@@ -479,6 +483,7 @@
     }
   }
 }
+
 .account-switch-drawer.dark {
   background: #020C15;
   color: #fff;
@@ -492,46 +497,56 @@
 
 .home.dark {
   background: #010C15;
+
   .headerOfMenu {
     z-index: 2;
     background: #052E55;
   }
+
   .home-bg {
     background: #052E55;
     border-radius: 0px 0px 16px 16px;
     z-index: 1;
   }
+
   .home-content {
     z-index: 2;
+
     .home-preview-container {
       background: #042340;
       box-shadow: 0px 4px 16px rgba(94, 139, 255, 0.1);
       color: #fff;
+
       .home-preview-top-container {
         .chevron-down {
-          fill: #fff;
+          fill: #fff !important;
         }
       }
+
       .home-preview-address-container {
         background-color: #042340;
+
         .home-preview-address {
           color: #E1E8F0;
         }
       }
+
       div.home-preview-dollar {
         color: #E1E8F0;
       }
     }
-    .home-content-name-wrap {
 
-    }
+    .home-content-name-wrap {}
   }
+
   .assets-container {
     .token-list .token-item {
       color: #fff;
+
       &:hover {
         background: #042340;
       }
+
       .right-icon {
         color: #fff;
         fill: #fff;
@@ -544,6 +559,7 @@
 .connected-sites-drawer.dark {
   .ant-drawer-header {
     background: #020C15;
+
     .back-icon {
       fill: #798CAD;
     }
