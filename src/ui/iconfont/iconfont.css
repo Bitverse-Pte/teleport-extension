@@ -1,8 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3343369 */
-  src: url('iconfont.woff2?t=1659691801105') format('woff2'),
-       url('iconfont.woff?t=1659691801105') format('woff'),
-       url('iconfont.ttf?t=1659691801105') format('truetype');
+  src: url('iconfont.woff2?t=1659950183764') format('woff2'),
+       url('iconfont.woff?t=1659950183764') format('woff'),
+       url('iconfont.ttf?t=1659950183764') format('truetype'),
+       url('iconfont.svg?t=1659950183764#iconfont') format('svg');
 }
 
 .iconfont {
@@ -11,6 +12,74 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-signature:before {
+  content: "\e659";
+}
+
+.icon-eye:before {
+  content: "\e65a";
+}
+
+.icon-select:before {
+  content: "\e65b";
+}
+
+.icon-send1:before {
+  content: "\e65d";
+}
+
+.icon-select-off:before {
+  content: "\e65f";
+}
+
+.icon-trash:before {
+  content: "\e660";
+}
+
+.icon-eye-off:before {
+  content: "\e661";
+}
+
+.icon-search-01:before {
+  content: "\e65c";
+}
+
+.icon-set:before {
+  content: "\e65e";
+}
+
+.icon-fi_trello:before {
+  content: "\e658";
+}
+
+.icon-filter:before {
+  content: "\e64e";
+}
+
+.icon-arrow-right:before {
+  content: "\e64d";
+}
+
+.icon-receive1:before {
+  content: "\e648";
+}
+
+.icon-menu:before {
+  content: "\e64c";
+}
+
+.icon-copy:before {
+  content: "\e656";
+}
+
+.icon-external-link:before {
+  content: "\e657";
+}
+
+.icon-edit1:before {
+  content: "\e655";
 }
 
 .icon-chevron-down8_8:before {
@@ -45,48 +114,8 @@
   content: "\e647";
 }
 
-.icon-receive1:before {
-  content: "\e648";
-}
-
-.icon-send1:before {
-  content: "\e649";
-}
-
-.icon-search:before {
-  content: "\e64a";
-}
-
 .icon-a-Arrowswitch:before {
   content: "\e64b";
-}
-
-.icon-fi_external-link:before {
-  content: "\e64c";
-}
-
-.icon-fi_edit:before {
-  content: "\e64d";
-}
-
-.icon-fi_copy:before {
-  content: "\e64e";
-}
-
-.icon-fi_check:before {
-  content: "\e635";
-}
-
-.icon-cancel:before {
-  content: "\e636";
-}
-
-.icon-edit:before {
-  content: "\e637";
-}
-
-.icon-fi_menu:before {
-  content: "\e639";
 }
 
 .icon-key:before {
@@ -103,10 +132,6 @@
 
 .icon-plus:before {
   content: "\e63d";
-}
-
-.icon-receive:before {
-  content: "\e63e";
 }
 
 .icon-link:before {
