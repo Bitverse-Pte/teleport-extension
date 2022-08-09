@@ -304,7 +304,7 @@ const CancelSpeedupPopoverImplementation = ({
                     name={`chevron-${
                       selectedGasTier == PRIORITY_LEVELS.CUSTOM ? 'up' : 'down'
                     }`}
-                    cls="base-text-color"
+                    cls="base-text-color gas-custom-panel-toggle"
                   />
                 </div>
               </div>
