@@ -27,10 +27,10 @@ export default function UserPreferencedCurrencyDisplay({
   return token ? (
     <div className="flexR items-end">
       <TokenIcon token={token} radius={30} />
-      <span className="dec" title={decimalValueString}>
-        {addEllipsisToEachWordsInTheEnd(decimalValueString, 8)}{' '}
-      </span>
-      <span className="symbol">{token.symbol} </span>
+      <div className="dec-symbol-container">
+        <span className="dec">{decimalValueString}</span>
+        <span className="symbol">{token.symbol}</span>
+      </div>
     </div>
   ) : (
     <div className="flexR">
