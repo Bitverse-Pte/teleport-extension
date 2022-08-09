@@ -465,21 +465,36 @@ export interface TipButtonProps {
 }
 
 const getTipImg = (type: TipButtonEnum) => {
+  const { isDarkMode } = useDarkmode();
+  let iconStr;
+
   switch (type) {
     case TipButtonEnum.SEND:
-      return SendIcon;
+      iconStr = 'send';
+      break;
     case TipButtonEnum.RECEIVE:
-      return ReceiveIcon;
+      iconStr = 'receive';
+      break;
     case TipButtonEnum.WALLET_MANAGE:
-      return WalletManageIcon;
+      iconStr = 'wrench';
+      break;
     case TipButtonEnum.LOCK:
     default:
-      return LockIcon;
+      iconStr = 'lock';
+      break;
   }
+
+  return (
+    <IconComponent
+      cls={classnames('tip-button-send-img-item', {
+        dark: isDarkMode,
+      })}
+      name={iconStr}
+    />
+  );
 };
 
 export const TipButton = ({ title, handleClick, type }: TipButtonProps) => {
-  const MatchedIcon = getTipImg(type);
   const { isDarkMode } = useDarkmode();
   const isSendImg =
     type === TipButtonEnum.SEND || type === TipButtonEnum.RECEIVE;
@@ -496,7 +511,8 @@ export const TipButton = ({ title, handleClick, type }: TipButtonProps) => {
           isSendImg ? 'tip-button-send-img' : 'tip-button-not-send-img'
         )}
       >
-        <MatchedIcon className="tip-button-send-img-item" />
+        {/* <MatchedIcon className="tip-button-send-img-item" /> */}
+        {getTipImg(type)}
       </div>
       <span className="tip-button-send-title">{title}</span>
     </div>

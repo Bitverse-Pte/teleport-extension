@@ -27,7 +27,12 @@
         width: 100%;
     }
 }
+
 .custom-input-container.dark {
+    ::-webkit-input-placeholder {
+        color: rgba(94, 108, 138, 1);
+    }
+
     .custom-search-input {
         background: #02182B;
         color: #fff;
@@ -201,6 +206,7 @@
         color: #FFFFFF;
         background: #083A6A;
     }
+
     .custom-tab-tooltip {
         background: #0A4580;
         color: #FFFFFF;
@@ -228,9 +234,10 @@ div.tip-button-button-item {
         background: @themeColor;
 
         .tip-button-send-img-item {
-            overflow: visible;
+            /* overflow: visible;
             width: 15px;
-            max-height: 17px;
+            max-height: 17px; */
+            fill: #ffffff;
         }
     }
 
@@ -248,9 +255,14 @@ div.tip-button-button-item {
 .tip-button-button-item.dark {
     .tip-button-not-send-img {
         background: #364361;
+
         svg {
             fill: #FFF;
         }
+    }
+
+    .tip-button-send-img-item {
+        fill: #ffffff;
     }
 }
 
@@ -283,6 +295,7 @@ div.tip-button-button-item {
     font-family: MontserratBold;
 
 }
+
 .custom-button-default.dark {
-    background: transparent!important;
+    background: transparent !important;
 }

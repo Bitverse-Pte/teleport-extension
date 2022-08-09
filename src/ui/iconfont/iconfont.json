@@ -6,6 +6,41 @@
   "description": "的",
   "glyphs": [
     {
+      "icon_id": "31146557",
+      "name": "edit",
+      "font_class": "edit",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "31146558",
+      "name": "cancel",
+      "font_class": "cancel",
+      "unicode": "e662",
+      "unicode_decimal": 58978
+    },
+    {
+      "icon_id": "31146559",
+      "name": "receive",
+      "font_class": "receive",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
+      "icon_id": "31146560",
+      "name": "search",
+      "font_class": "search",
+      "unicode": "e664",
+      "unicode_decimal": 58980
+    },
+    {
+      "icon_id": "31146561",
+      "name": "plus-circle",
+      "font_class": "plus-circle1",
+      "unicode": "e665",
+      "unicode_decimal": 58981
+    },
+    {
       "icon_id": "31117277",
       "name": "signature",
       "font_class": "signature",
@@ -55,13 +90,6 @@
       "unicode_decimal": 58977
     },
     {
-      "icon_id": "31114145",
-      "name": "search",
-      "font_class": "search-01",
-      "unicode": "e65c",
-      "unicode_decimal": 58972
-    },
-    {
       "icon_id": "31114188",
       "name": "set",
       "font_class": "set",
@@ -90,13 +118,6 @@
       "unicode_decimal": 58957
     },
     {
-      "icon_id": "31089115",
-      "name": "receive",
-      "font_class": "receive1",
-      "unicode": "e648",
-      "unicode_decimal": 58952
-    },
-    {
       "icon_id": "31088500",
       "name": "menu",
       "font_class": "menu",
@@ -116,13 +137,6 @@
       "font_class": "external-link",
       "unicode": "e657",
       "unicode_decimal": 58967
-    },
-    {
-      "icon_id": "31085365",
-      "name": "edit",
-      "font_class": "edit1",
-      "unicode": "e655",
-      "unicode_decimal": 58965
     },
     {
       "icon_id": "31084719",
@@ -172,13 +186,6 @@
       "font_class": "chevron-up",
       "unicode": "e651",
       "unicode_decimal": 58961
-    },
-    {
-      "icon_id": "30982788",
-      "name": "cancel",
-      "font_class": "cancel1",
-      "unicode": "e647",
-      "unicode_decimal": 58951
     },
     {
       "icon_id": "30982807",
