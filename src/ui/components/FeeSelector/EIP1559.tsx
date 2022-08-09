@@ -217,7 +217,10 @@ function FeeSelector(props) {
             }}
           >
             <span>Customize Gas Fee</span>
-            <IconComponent name="chevron-right" cls="base-text-color" />
+            <IconComponent
+              name="chevron-right"
+              cls="base-text-color right-icon"
+            />
           </div>
         )}
       </div>

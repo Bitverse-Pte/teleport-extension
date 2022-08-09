@@ -98,6 +98,9 @@
           color: #798CAD;
           overflow: auto;
           border-radius: 8px;
+          &::-webkit-scrollbar-corner {
+            background-color: #020C15;
+          }
         }
       }
       .transaction-detail-memo {
@@ -174,8 +177,7 @@
       padding-top: 5px;
       width: 100%;
       .transaction-data-title {
-        padding-left: 10px;
-        margin-top: 10px;
+        margin: 10px 0;
         font-weight: 500;
         font-size: 12px;
         line-height: 17px;
@@ -197,9 +199,6 @@
         border-radius: 8px;
       }
       .transaction-data-value {
-        margin-left: 10px;
-        margin-right: 10px;
-        margin-top: 10px;
         margin-bottom: 10px;
         padding: 10px 14px;
         word-break: break-all;
@@ -358,8 +357,7 @@
       padding-top: 5px;
       width: 100%;
       .transaction-data-title {
-        padding-left: 10px;
-        margin-top: 10px;
+        margin: 10px 0;
         font-weight: 500;
         font-size: 12px;
         line-height: 17px;
@@ -380,9 +378,6 @@
         border-radius: 8px;
       }
       .transaction-data-value {
-        margin-left: 10px;
-        margin-right: 10px;
-        margin-top: 10px;
         margin-bottom: 10px;
         padding: 10px 14px;
         word-break: break-all;
