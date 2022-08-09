@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
+import { ReactComponent as IconEdit } from 'assets/action-icon/edit.svg';
 import { Divider } from 'antd';
 import { utils } from 'ethers';
 import { useTranslation } from 'react-i18next';
@@ -11,16 +11,6 @@ import {
   SenderToRecipient,
   UserPreferencedCurrencyDisplay,
 } from 'ui/components';
-import {
-  getValueFromWeiHex,
-  addHexes,
-  multipyHexes,
-  decGWEIToHexWEI,
-  addCurrencies,
-  conversionUtil,
-  hexWeiToDecGWEI,
-} from 'ui/utils/conversion';
-import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
 import { CustomButton, CustomTab } from 'ui/components/Widgets';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,14 +22,7 @@ import { BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
 
-import { useMethodData } from 'ui/hooks/wallet/useMethodData';
 import { HeaderWithFlex } from 'ui/components/Header';
-import { GAS_ESTIMATE_TYPES } from 'constants/gas';
-import {
-  getGasPriceInHexWei,
-  getRoundedGasPrice,
-} from 'ui/reducer/gas.reducer';
-import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
 import skynet from 'utils/skynet';
 import { Tabs } from 'constants/wallet';
 import clsx from 'clsx';
@@ -386,7 +369,7 @@ const TxDetailComponent = ({
           });
         }}
       >
-        <IconComponent name="edit" cls="edit-icon" />
+        <IconEdit width={16} className="edit-icon" />
         <div>{t('Edit')}</div>
       </div>
       <TransactionDetailItem

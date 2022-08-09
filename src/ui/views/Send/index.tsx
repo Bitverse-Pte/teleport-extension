@@ -12,7 +12,7 @@ import clsx from 'clsx';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
 import { addHexPrefix, isValidAddress } from 'ethereumjs-util';
-
+import { IconComponent } from 'ui/components/IconComponents';
 import {
   EthDenomination,
   getWeiHexFromDecimalValue,
@@ -356,6 +356,7 @@ const Send = () => {
           onChange={handleTokenSelect}
           optionLabelProp="selected"
           options={assetsOptions}
+          suffixIcon={<IconComponent name="chevron-down" cls="chevron-down" />}
         ></Select>
         <p className="send-form-title">{t('Amount')}</p>
         <InputNumber
