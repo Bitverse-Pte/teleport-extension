@@ -99,17 +99,17 @@ const TokenAdd = () => {
           <div className="token-add-item">
             <p className="token-add-item-title">Token Contract Address:</p>
             <p className="token-add-item-content">
-              {transferAddress2Display(state.contractAddress)}
+              {transferAddress2Display(state.contractAddress) || '--'}
             </p>
           </div>
 
           <div className="token-add-item">
             <p className="token-add-item-title">Token Symbol:</p>
-            <p className="token-add-item-content">{state.symbol}</p>
+            <p className="token-add-item-content">{state.symbol || '--'}</p>
           </div>
           <div className="token-add-item">
             <p className="token-add-item-title">Decimals of Precision:</p>
-            <p className="token-add-item-content">{state.decimal}</p>
+            <p className="token-add-item-content">{state.decimal || '--'}</p>
           </div>
         </div>
       </div>
