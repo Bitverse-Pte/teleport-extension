@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3343369 */
-  src: url('iconfont.woff2?t=1659950183764') format('woff2'),
-       url('iconfont.woff?t=1659950183764') format('woff'),
-       url('iconfont.ttf?t=1659950183764') format('truetype'),
-       url('iconfont.svg?t=1659950183764#iconfont') format('svg');
+  src: url('iconfont.woff2?t=1660041461147') format('woff2'),
+       url('iconfont.woff?t=1660041461147') format('woff'),
+       url('iconfont.ttf?t=1660041461147') format('truetype'),
+       url('iconfont.svg?t=1660041461147#iconfont') format('svg');
 }
 
 .iconfont {
@@ -12,6 +12,26 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-edit:before {
+  content: "\e65c";
+}
+
+.icon-cancel:before {
+  content: "\e662";
+}
+
+.icon-receive:before {
+  content: "\e663";
+}
+
+.icon-search:before {
+  content: "\e664";
+}
+
+.icon-plus-circle1:before {
+  content: "\e665";
 }
 
 .icon-signature:before {
@@ -42,10 +62,6 @@
   content: "\e661";
 }
 
-.icon-search-01:before {
-  content: "\e65c";
-}
-
 .icon-set:before {
   content: "\e65e";
 }
@@ -62,10 +78,6 @@
   content: "\e64d";
 }
 
-.icon-receive1:before {
-  content: "\e648";
-}
-
 .icon-menu:before {
   content: "\e64c";
 }
@@ -76,10 +88,6 @@
 
 .icon-external-link:before {
   content: "\e657";
-}
-
-.icon-edit1:before {
-  content: "\e655";
 }
 
 .icon-chevron-down8_8:before {
@@ -108,10 +116,6 @@
 
 .icon-chevron-up:before {
   content: "\e651";
-}
-
-.icon-cancel1:before {
-  content: "\e647";
 }
 
 .icon-a-Arrowswitch:before {
