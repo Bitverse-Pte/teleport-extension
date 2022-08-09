@@ -194,10 +194,12 @@ const AccountManage: React.FC = () => {
           onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img
-              src={isDarkMode ? editImgDark : editImg}
-              alt=""
-              className="wallet-manage-img"
+            <IconComponent
+              name="edit"
+              cls="wallet-manage-img"
+              style={{
+                fill: isDarkMode ? '#ffffff' : '#000000',
+              }}
             />
           </div>
           <span className="wallet-manage-button-item-title">Edit</span>
@@ -213,7 +215,14 @@ const AccountManage: React.FC = () => {
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={addImg} alt="" className="wallet-manage-img" />
+            {/* <img src={addImg} alt="" className="wallet-manage-img" /> */}
+            <IconComponent
+              name="plus-circle"
+              cls="wallet-manage-img"
+              style={{
+                fill: '#42B856',
+              }}
+            />
           </div>
           <span className="wallet-manage-button-item-title">Add</span>
         </div>

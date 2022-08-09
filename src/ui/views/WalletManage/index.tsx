@@ -20,9 +20,6 @@ import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
 import editImgDark from 'assets/editImgDark.svg';
 import importImg from 'assets/importImg.svg';
-import keyDefaultIcon from 'assets/keyDefault.svg';
-import keyActiveIcon from 'assets/keyActive.svg';
-import keyActiveIconDark from 'assets/keyActiveDark.png';
 import { ecosystemToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
@@ -264,11 +261,18 @@ const WalletManage: React.FC = () => {
           onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img
+            <IconComponent
+              name="edit"
+              cls="wallet-manage-img"
+              style={{
+                fill: isDarkMode ? '#ffffff' : '#000000',
+              }}
+            />
+            {/* <img
               src={isDarkMode ? editImgDark : editImg}
               alt=""
               className="wallet-manage-img"
-            />
+            /> */}
           </div>
           <span className="wallet-manage-button-item-title">Edit</span>
         </div>
@@ -277,7 +281,14 @@ const WalletManage: React.FC = () => {
           onClick={handleImportBtnClick}
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={importImg} alt="" className="wallet-manage-img" />
+            {/* <img src={importImg} alt="" className="wallet-manage-img" /> */}
+            <IconComponent
+              name="import"
+              cls="wallet-manage-img"
+              style={{
+                fill: '#1484F5',
+              }}
+            />
           </div>
           <span className="wallet-manage-button-item-title">Import</span>
         </div>
@@ -286,7 +297,14 @@ const WalletManage: React.FC = () => {
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={addImg} alt="" className="wallet-manage-img" />
+            <IconComponent
+              name="plus-circle"
+              cls="wallet-manage-img"
+              style={{
+                fill: '#42B856',
+              }}
+            />
+            {/* <img src={addImg} alt="" className="wallet-manage-img" /> */}
           </div>
           <span className="wallet-manage-button-item-title">Create</span>
         </div>

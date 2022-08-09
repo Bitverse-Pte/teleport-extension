@@ -7,6 +7,7 @@ import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
 import { CustomTab, WalletName } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
 import noWallets from 'assets/noAssets.svg';
+import noAssetsDark from 'assets/noAssetDark.svg';
 import { ecosystemToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import skynet from 'utils/skynet';
 import BitError from 'error';
@@ -163,7 +164,10 @@ const WalletSwitch: React.FC<Props> = (props: Props) => {
             </div>
           ) : (
             <div className="no-data flexCol">
-              <img src={noWallets} className="home-no-assets" />
+              <img
+                src={isDarkMode ? noAssetsDark : noWallets}
+                className="home-no-assets"
+              />
               <span className="no-assets-title">No Wallet</span>
             </div>
           )}
