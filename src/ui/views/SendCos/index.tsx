@@ -4,6 +4,7 @@ import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
+import { IconComponent } from 'ui/components/IconComponents';
 import { getUnit10ByAddress } from 'background/utils';
 import {
   useWallet,
@@ -313,6 +314,7 @@ const Send = () => {
           onChange={handleTokenSelect}
           optionLabelProp="selected"
           options={assetsOptions}
+          suffixIcon={<IconComponent name="chevron-down" cls="chevron-down" />}
         ></Select>
         <p className="send-form-title">{t('Amount')}</p>
         <InputNumber

@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { IconComponent } from '../IconComponents';
 import './SimpleModal.less';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 interface SimpleModalProps {
   title: string | React.ReactNode;
@@ -26,13 +27,16 @@ export function SimpleModal({
   modalCustomStyle = {},
   ...props
 }: SimpleModalProps) {
+  const { isDarkMode } = useDarkmode();
   if (!props.visible) {
     return null;
   }
 
   return (
     <div
-      className={clsx('simple-modal-mask overlay', props.className)}
+      className={clsx('simple-modal-mask overlay', props.className, {
+        dark: isDarkMode,
+      })}
       onClick={props.onClose}
     >
       <div
