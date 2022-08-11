@@ -1,12 +1,6 @@
-import { Button, Tooltip } from 'antd';
+import { Button } from 'antd';
 import clsx from 'clsx';
-import React, {
-  Fragment,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -165,8 +159,8 @@ const NetworkActions = ({ network }: { network: Provider }) => {
   const isProviderEditable = [Ecosystem.EVM].includes(network.ecosystem);
 
   return (
-    <span className="actions flex" onClick={(e) => e.stopPropagation()}>
-      <div className="flex justify-center items-center">
+    <span className="flex actions" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-center">
         <Button
           className={clsx(hoverToDisplayProperties, 'narrow-padding')}
           onClick={handleRemove}
