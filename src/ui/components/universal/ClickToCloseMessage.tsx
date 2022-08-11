@@ -48,7 +48,7 @@ export const createCTCMessage =
         >
           <IconComponent
             name="close"
-            cls="closeIcon base-text-color"
+            cls="closeIcon base-text-color icon-close"
             style={{ width: 8, height: 8 }}
           />
         </div>

@@ -113,7 +113,7 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
             style={{
               display: unlocked ? 'none' : 'block',
             }}
-            cls="icon base-text-color"
+            cls="icon base-text-color icon-close"
             onClick={() => {
               if (props.setVisible) {
                 props.setVisible(false);

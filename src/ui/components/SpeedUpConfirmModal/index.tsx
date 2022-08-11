@@ -41,7 +41,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
       <IconComponent
         name="close"
         onClick={props.handleCloseIconClick}
-        cls="drawer-header-close-icon"
+        cls="drawer-header-close-icon icon-close"
       />
     </div>
   );

@@ -139,7 +139,7 @@ export default (props: EcosystemSelectProps) => {
             <span className="mask-container-title">Chain Type</span>
             <IconComponent
               name="close"
-              cls="base-text-color"
+              cls="base-text-color icon-close"
               onClick={() => setMaskVisible(false)}
             />
           </div>
