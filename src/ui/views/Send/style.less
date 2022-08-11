@@ -54,6 +54,7 @@
             background-color: #F8FAFC !important;
             border-top-left-radius: 8px;
             border-bottom-left-radius: 8px;
+            &:focus {}
         }
         .ant-input-number-lgs {
             /**
@@ -83,12 +84,16 @@
             background-color: #F8FAFC !important;
             border-radius: 8px;
             height: 38px;
+            &::placeholder {
+                color: rgba(163, 180, 204, 1);
+            }
         }
         .tbmy {
-            margin-top: 10px;
+            margin-top: 6px;
             cursor: pointer;
             font-weight: 400;
             font-size: 14px;
+            line-height: 14px;
             color: #1484F5;
         }
 
@@ -232,7 +237,7 @@
     color: #0F83FF;
 }
 .available-container {
-    margin-top: 4px;
+    margin-top: 6px;
     align-items: center;
     font-family: Montserrat;
     font-style: normal;
@@ -248,7 +253,7 @@
         border-radius: 4px;
         text-transform: uppercase;
         font-weight: 800;
-        font-family: MontserratBold;
+        font-family: PingFang SC;
     } 
 }
 .addonSymbol {
@@ -284,6 +289,9 @@
                 border: 1px solid #1484F5!important;
                 box-shadow: none;
                 outline: none;
+            }
+            &::placeholder {
+                color: rgba(94, 108, 138, 1);
             }
         }
         .recent {
@@ -340,6 +348,11 @@
     .ant-input-number {
         background-color: #02182B!important;
         color: #fff;
+        &:focus {
+            border: 1px solid #1484F5!important;
+            box-shadow: none;
+            outline: 0;
+        }
     }
     .ant-input-number-lgs {
         background-color: #02182B!important;
@@ -358,6 +371,11 @@
     }
     .chevron-down {
         fill: #fff;
+    }
+    .ant-input-number-focus {
+        border: 1px solid #1484F5!important;
+        box-shadow: none;
+        outline: 0;
     }
 }
 .assets-option.dark {
