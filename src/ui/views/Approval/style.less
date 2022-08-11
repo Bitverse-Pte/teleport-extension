@@ -116,6 +116,9 @@
           background-color: #F8FAFC !important;
           border-radius: 8px;
           height: 38px;
+          &::placeholder {
+            color: rgba(163, 180, 204, 1);
+          }
         }
       }
       .transaction-detail-item {
@@ -439,9 +442,6 @@ footer {
         fill: #fff;
       }
     }
-    &:hover {
-      background: #052E55;
-    }
   }
   .approval-connect {
     .connect-body {
@@ -592,6 +592,9 @@ footer {
           border: 1px solid #1484F5!important;
           box-shadow: none;
           outline: none;
+        }
+        &::placeholder {
+          color: rgba(94, 108, 138, 1);
         }
       }
       input::placeholder {

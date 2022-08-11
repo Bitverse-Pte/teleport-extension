@@ -429,9 +429,9 @@ const Send = () => {
             </div>
           </div>
         ) : (
-          <span className="tbmy" onClick={myAccountsSelect}>
+          <p className="tbmy" onClick={myAccountsSelect}>
             {t('Transfer between my accounts')}
-          </span>
+          </p>
         )}
 
         <AccountSelect
