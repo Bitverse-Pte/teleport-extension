@@ -6,6 +6,125 @@
   "description": "的",
   "glyphs": [
     {
+      "icon_id": "31180329",
+      "name": "edit_17",
+      "font_class": "edit_17",
+      "unicode": "e67a",
+      "unicode_decimal": 59002
+    },
+    {
+      "icon_id": "31180319",
+      "name": "send_24",
+      "font_class": "send_24",
+      "unicode": "e678",
+      "unicode_decimal": 59000
+    },
+    {
+      "icon_id": "31180320",
+      "name": "send_20",
+      "font_class": "send_20",
+      "unicode": "e679",
+      "unicode_decimal": 59001
+    },
+    {
+      "icon_id": "31177960",
+      "name": "copy_16",
+      "font_class": "copy_16",
+      "unicode": "e677",
+      "unicode_decimal": 58999
+    },
+    {
+      "icon_id": "31177855",
+      "name": "chevron-down_8",
+      "font_class": "chevron-down_8",
+      "unicode": "e675",
+      "unicode_decimal": 58997
+    },
+    {
+      "icon_id": "31177856",
+      "name": "chevron-right_8",
+      "font_class": "chevron-right_8",
+      "unicode": "e676",
+      "unicode_decimal": 58998
+    },
+    {
+      "icon_id": "31177617",
+      "name": "search_16",
+      "font_class": "search_16",
+      "unicode": "e674",
+      "unicode_decimal": 58996
+    },
+    {
+      "icon_id": "31177607",
+      "name": "check_16",
+      "font_class": "check_16",
+      "unicode": "e671",
+      "unicode_decimal": 58993
+    },
+    {
+      "icon_id": "31177608",
+      "name": "edit_16",
+      "font_class": "edit_16",
+      "unicode": "e672",
+      "unicode_decimal": 58994
+    },
+    {
+      "icon_id": "31177612",
+      "name": "trash_16",
+      "font_class": "trash_16",
+      "unicode": "e673",
+      "unicode_decimal": 58995
+    },
+    {
+      "icon_id": "31163452",
+      "name": "close_10",
+      "font_class": "close_10",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "31163455",
+      "name": "edit_12",
+      "font_class": "edit_12",
+      "unicode": "e669",
+      "unicode_decimal": 58985
+    },
+    {
+      "icon_id": "31163456",
+      "name": "close_12",
+      "font_class": "close_12",
+      "unicode": "e66a",
+      "unicode_decimal": 58986
+    },
+    {
+      "icon_id": "31163472",
+      "name": "chevron-right14",
+      "font_class": "chevron-right14",
+      "unicode": "e66b",
+      "unicode_decimal": 58987
+    },
+    {
+      "icon_id": "31163473",
+      "name": "chevron-down_14",
+      "font_class": "chevron-down_14",
+      "unicode": "e66c",
+      "unicode_decimal": 58988
+    },
+    {
+      "icon_id": "31163477",
+      "name": "receive_20",
+      "font_class": "receive_20",
+      "unicode": "e66e",
+      "unicode_decimal": 58990
+    },
+    {
+      "icon_id": "31163482",
+      "name": "receive_24",
+      "font_class": "receive_24",
+      "unicode": "e670",
+      "unicode_decimal": 58992
+    },
+    {
       "icon_id": "31146557",
       "name": "edit",
       "font_class": "edit",

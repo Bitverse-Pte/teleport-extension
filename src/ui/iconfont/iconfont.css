@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3343369 */
-  src: url('iconfont.woff2?t=1660041461147') format('woff2'),
-       url('iconfont.woff?t=1660041461147') format('woff'),
-       url('iconfont.ttf?t=1660041461147') format('truetype'),
-       url('iconfont.svg?t=1660041461147#iconfont') format('svg');
+  src: url('iconfont.woff2?t=1660201104644') format('woff2'),
+       url('iconfont.woff?t=1660201104644') format('woff'),
+       url('iconfont.ttf?t=1660201104644') format('truetype'),
+       url('iconfont.svg?t=1660201104644#iconfont') format('svg');
 }
 
 .iconfont {
@@ -12,6 +12,74 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-edit_17:before {
+  content: "\e67a";
+}
+
+.icon-send_24:before {
+  content: "\e678";
+}
+
+.icon-send_20:before {
+  content: "\e679";
+}
+
+.icon-copy_16:before {
+  content: "\e677";
+}
+
+.icon-chevron-down_8:before {
+  content: "\e675";
+}
+
+.icon-chevron-right_8:before {
+  content: "\e676";
+}
+
+.icon-search_16:before {
+  content: "\e674";
+}
+
+.icon-check_16:before {
+  content: "\e671";
+}
+
+.icon-edit_16:before {
+  content: "\e672";
+}
+
+.icon-trash_16:before {
+  content: "\e673";
+}
+
+.icon-close_10:before {
+  content: "\e668";
+}
+
+.icon-edit_12:before {
+  content: "\e669";
+}
+
+.icon-close_12:before {
+  content: "\e66a";
+}
+
+.icon-chevron-right14:before {
+  content: "\e66b";
+}
+
+.icon-chevron-down_14:before {
+  content: "\e66c";
+}
+
+.icon-receive_20:before {
+  content: "\e66e";
+}
+
+.icon-receive_24:before {
+  content: "\e670";
 }
 
 .icon-edit:before {

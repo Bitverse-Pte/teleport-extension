@@ -73,7 +73,11 @@ export const LogoHeader: React.FC<ILogoHeader> = (props) => {
         style={props.hideClosIcon ? { display: 'none' } : {}}
       >
         {props.component && props.component}
-        <IconComponent name="close" onClick={props.handleCloseClick} cls='icon-close'/>
+        <IconComponent
+          name="close"
+          onClick={props.handleCloseClick}
+          cls="icon-close"
+        />
       </div>
     </div>
   );

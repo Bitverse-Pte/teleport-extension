@@ -195,7 +195,7 @@ const AccountManage: React.FC = () => {
         >
           <div className="wallet-manage-button-wrap flexR">
             <IconComponent
-              name="edit"
+              name="edit_17"
               cls="wallet-manage-img"
               style={{
                 fill: isDarkMode ? '#ffffff' : '#000000',
@@ -241,7 +241,7 @@ const AccountManage: React.FC = () => {
               </div>
               <div className="edit-right flexR">
                 <IconComponent
-                  name="edit"
+                  name="edit_16"
                   cls="base-text-color"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -251,7 +251,7 @@ const AccountManage: React.FC = () => {
                   }}
                 />
                 <IconComponent
-                  name="trash"
+                  name="trash_16"
                   cls="base-text-color right"
                   onClick={(e) => {
                     if (accounts?.length === 1) {

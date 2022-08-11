@@ -262,7 +262,7 @@ const WalletManage: React.FC = () => {
         >
           <div className="wallet-manage-button-wrap flexR">
             <IconComponent
-              name="edit"
+              name="edit_17"
               cls="wallet-manage-img"
               style={{
                 fill: isDarkMode ? '#ffffff' : '#000000',
@@ -411,7 +411,7 @@ const WalletManage: React.FC = () => {
                       }}
                     >
                       <IconComponent
-                        name="edit"
+                        name="edit_16"
                         cls="base-text-color"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -427,7 +427,7 @@ const WalletManage: React.FC = () => {
                         }}
                       />
                       <IconComponent
-                        name="trash"
+                        name="trash_16"
                         cls="base-text-color"
                         onClick={(e) => handleDeleteBtnClick(e, w.hdWalletId)}
                         style={{
