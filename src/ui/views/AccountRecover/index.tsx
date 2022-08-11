@@ -57,7 +57,7 @@ export const AccountHeader = (props: AccountHeaderProps) => {
         name="close"
         style={props.hideClose ? { display: 'none' } : {}}
         onClick={handleBackClick}
-        cls="account-header-close-icon"
+        cls="account-header-close-icon icon-close"
       />
     </div>
   );

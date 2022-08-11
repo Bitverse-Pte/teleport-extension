@@ -53,7 +53,7 @@ export function SimpleModal({
             {title}
           </div>
           <Button type="text" className="ml-auto" onClick={props.onClose}>
-            <IconComponent name="close" />
+            <IconComponent name="close" cls='icon-close'/>
           </Button>
         </div>
         <div className="content">{children}</div>

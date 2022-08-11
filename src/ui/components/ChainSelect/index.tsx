@@ -82,7 +82,7 @@ export default (props: ChainSelectProps) => {
             <span className="mask-container-title">Networks</span>
             <IconComponent
               name="close"
-              cls="base-text-color"
+              cls="base-text-color icon-close"
               onClick={() => setMaskVisible(false)}
             />
           </div>
