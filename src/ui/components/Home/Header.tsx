@@ -1,13 +1,16 @@
 import React, { useContext } from 'react';
 import { Button } from 'antd';
-import walletLogo from 'assets/walletLogo.png';
+import walletLogo from 'assets/logo.svg';
 import './style.less';
 import { NetworkProviderContext } from 'ui/context/NetworkProvider';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
 import SettingIcon from 'assets/settingIcon.svg';
+import { ReactComponent as SettingLogo } from 'assets/settingIcon.svg';
 import { useSelector } from 'react-redux';
 import { getProvider } from 'ui/selectors/selectors';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+
 export function HomeHeader({
   menuOnClick,
   networkOnClick,
@@ -15,9 +18,14 @@ export function HomeHeader({
   menuOnClick: React.MouseEventHandler;
   networkOnClick: React.MouseEventHandler;
 }) {
+  const { isDarkMode } = useDarkmode();
   const currentProvider = useSelector(getProvider);
   return (
-    <div className="flex headerOfMenu justify-between items-center">
+    <div
+      className={clsx('flex headerOfMenu justify-between items-center', {
+        dark: isDarkMode,
+      })}
+    >
       <div className="logo-container">
         <img src={walletLogo} />
       </div>
@@ -37,12 +45,15 @@ export function HomeHeader({
         </span>
         <IconComponent name="chevron-down" cls="expand-list base-text-color" />
       </button>
-      <img
+      {/* <img
         src={SettingIcon}
         style={{ transform: 'scale(1.5)' }}
         className="expand-menu-btn cursor"
         onClick={menuOnClick}
-      />
+      /> */}
+      <button className="expand-menu-btn cursor" onClick={menuOnClick}>
+        <SettingLogo />
+      </button>
       {/* <Button type="text" className="expand-menu-btn" >
         <IconComponent
           name="menu"

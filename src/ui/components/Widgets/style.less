@@ -28,6 +28,17 @@
     }
 }
 
+.custom-input-container.dark {
+    ::-webkit-input-placeholder {
+        color: rgba(94, 108, 138, 1);
+    }
+
+    .custom-search-input {
+        background: #02182B;
+        color: #fff;
+    }
+}
+
 .token-icon {
     width: 32px;
     height: 32px;
@@ -184,6 +195,24 @@
     }
 }
 
+.widgets-tab-container.dark {
+    background: #02182B;
+
+    .tab-item {
+        color: #798CAD;
+    }
+
+    .tab-item-active {
+        color: #FFFFFF;
+        background: #083A6A;
+    }
+
+    .custom-tab-tooltip {
+        background: #0A4580;
+        color: #FFFFFF;
+    }
+}
+
 div.tip-button-button-item {
     align-items: center;
 
@@ -205,10 +234,12 @@ div.tip-button-button-item {
         background: @themeColor;
 
         .tip-button-send-img-item {
-            width: 15px;
-            height: 17px;
+            width: 20px;
+            height: 20px;
+            fill: #ffffff;
         }
     }
+
     div.tip-button-not-send-img {
         background: #FFFFFF;
     }
@@ -216,6 +247,21 @@ div.tip-button-button-item {
     span.tip-button-send-title {
         font-size: 12px;
         font-family: MontserratBold;
+    }
+}
+
+/** darkmode style override */
+.tip-button-button-item.dark {
+    .tip-button-not-send-img {
+        background: #364361;
+
+        svg {
+            fill: #FFF;
+        }
+    }
+
+    .tip-button-send-img-item {
+        fill: #ffffff;
     }
 }
 
@@ -247,4 +293,8 @@ div.tip-button-button-item {
     font-size: 12px;
     font-family: MontserratBold;
 
+}
+
+.custom-button-default.dark {
+    background: transparent !important;
 }

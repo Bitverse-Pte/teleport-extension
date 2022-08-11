@@ -109,10 +109,12 @@
     width: 100%;
     padding: 0 24px;
     box-sizing: border-box;
-    .account-manage-widget-content-name{
+
+    .account-manage-widget-content-name {
       flex: 0 0 42px;
     }
-    .account-manage-widget-content-list{
+
+    .account-manage-widget-content-list {
       flex: 1;
       overflow-y: auto;
     }
@@ -151,6 +153,9 @@
         width: 32px;
         height: 32px;
         margin-right: 12px;
+        box-sizing: border-box;
+        border-radius: 50%;
+        border: 1px solid rgba(248, 250, 252, 1)
       }
     }
 
@@ -170,6 +175,9 @@
             width: 16px;
             height: 16px;
             margin-right: 8px;
+            box-sizing: border-box;
+            border-radius: 50%;
+            border: 1px solid rgba(248, 250, 252, 1)
           }
         }
 
@@ -189,6 +197,8 @@
 
           .copy-icon {
             fill: @themeColor;
+            width: 18px;
+            height: 18px;
           }
         }
       }
@@ -199,4 +209,84 @@
 .ant-collapse-content-box {
   padding-left: 0 !important;
   padding-right: 0 !important;
+}
+
+.account-manage-widget.dark {
+  background: @darkBg;
+  color: #ffffff;
+  fill: #ffffff;
+
+
+  .side-bar {
+    background: #032440;
+
+    .id-item {
+      background: @darkBg;
+
+      .id-item-wrap-wrap {
+        .id-item-wrap {
+          background: #032440;
+        }
+
+        .first-id-item-wrap {
+          background: linear-gradient(180deg, #032440 59.82%, #020C15 100%) !important;
+          transform: matrix(1, 0, 0, -1, 0, 0);
+        }
+      }
+
+
+    }
+
+    .id-item-selected {
+      .id-item-wrap {
+        background: @darkBg  !important;
+      }
+    }
+
+  }
+
+  .ant-collapse {
+
+    .ant-collapse-item {
+
+      .ant-collapse-header {}
+
+      .account-item {
+
+
+        .account-address {
+          color: #ffffff;
+        }
+
+        .account-item-ecosystem-icon {
+          border-color: rgba(54, 67, 97, 1);
+        }
+      }
+
+      .address-container {
+
+        .address-item {
+
+          .address-chain-container {
+            .chain-icon {
+              border-color: rgba(54, 67, 97, 1);
+            }
+          }
+
+          .address-chain-address-container {
+            background: #02182B;
+
+            .address-chain-address {
+              color: #ffffff;
+            }
+
+            .copy-icon {
+              fill: @themeColor;
+            }
+          }
+        }
+      }
+    }
+  }
+
 }

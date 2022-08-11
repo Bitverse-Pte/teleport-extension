@@ -35,6 +35,7 @@ import {
 import { BaseAccount } from 'types/extend';
 import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
+import { ReactComponent as IconEdit } from 'assets/action-icon/edit.svg';
 
 import { useMethodData } from 'ui/hooks/wallet/useMethodData';
 import { HeaderWithFlex } from 'ui/components/Header';
@@ -447,6 +448,7 @@ const TxDetailComponent = ({
 
   return (
     <div className="transaction-detail">
+      <Divider style={{ margin: '16px 0' }} />
       <div
         className="gas-edit-button flex ml-auto"
         onClick={() => {
@@ -456,7 +458,7 @@ const TxDetailComponent = ({
           });
         }}
       >
-        <IconComponent name="edit" cls="edit-icon" />
+        <IconEdit width={16} className="edit-icon" />
         <div>{t('Edit')}</div>
       </div>
       <TransactionDetailItem

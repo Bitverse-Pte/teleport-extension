@@ -7,12 +7,15 @@ import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
 import './style.less';
 import { LogoHeader } from '../Setting';
 import defenseImg from '../../../assets/defense.png';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const Unlock = () => {
   const wallet = useWallet();
   const [, resolveApproval] = useApproval();
   const [psd, setPsd] = useState();
+  const ClickToCloseMessage = useStyledMessage();
 
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
@@ -20,7 +23,7 @@ const Unlock = () => {
       resolveApproval();
     },
     onError(err) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
       });
@@ -31,8 +34,10 @@ const Unlock = () => {
     unlock(psd);
   };
 
+  const { isDarkMode } = useDarkmode();
+
   return (
-    <div className="unlock-container">
+    <div className={clsx('unlock-container', { dark: isDarkMode })}>
       <LogoHeader hideClosIcon />
       <div className="unlock-defense flexCol content-wrap-padding">
         <img src={defenseImg} className="unlock-defense-img" />

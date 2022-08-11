@@ -40,6 +40,7 @@ import { ReactComponent as RocketIcon } from 'assets/rocket.svg';
 import { ActivitiesListParams, TransactionItemParams } from '../typing';
 import { getTokenBalancesOfCurrentAccount } from 'ui/selectors/token.selector';
 import { Token } from 'types/token';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 dayjs.extend(relativeTime);
 
@@ -213,7 +214,6 @@ function EvmTransactionItem({
           type={
             category === TransactionGroupCategories.RECEIVE ? 'receive' : 'send'
           }
-          size={30}
         />
         <div
           className="value-n-status-display flex justify-start items-center cursor-pointer flex-wrap"
@@ -367,6 +367,7 @@ export function EvmTransactionsList({
         .slice(0, limit)
     );
   }, [rawTransactionsGroup, txgFilter, limit]);
+  const { isDarkMode } = useDarkmode();
 
   if (transactions.length === 0) {
     return <NoContent title="activity" />;
@@ -388,6 +389,7 @@ export function EvmTransactionsList({
   return (
     <div
       style={{ height: listContiannerHeight, overflowY: 'scroll' }}
+      className={clsx('activity-list-container', { dark: isDarkMode })}
       onScroll={onContainnerScroll}
     >
       {transactions.map((tx, idx) => (

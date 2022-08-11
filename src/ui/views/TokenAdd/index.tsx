@@ -13,12 +13,14 @@ import { ErrorCode } from 'constants/code';
 import Header from 'ui/components/Header';
 
 import './style.less';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
 import { Ecosystem, Provider } from 'types/network';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const TokenAdd = () => {
   const { state, pathname } = useLocation<{
@@ -34,6 +36,8 @@ const TokenAdd = () => {
   const history = useHistory();
   const wallet = useWallet();
   const { ecosystem }: Provider = useSelector(getProvider);
+  const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const [addToken, addTokenLoading] = useWalletRequest(wallet.addCustomToken, {
     onSuccess() {
@@ -47,7 +51,7 @@ const TokenAdd = () => {
         err.code &&
         err.code === ErrorCode.CUSTOM_ERC20_TOKEN_DUPLICATED
       ) {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Token already added',
           key: 'Token already added',
         });
@@ -71,7 +75,7 @@ const TokenAdd = () => {
   };
 
   return (
-    <div className="token-add flexCol">
+    <div className={clsx('token-add flexCol', { dark: isDarkMode })}>
       <Header title="Add Asset" />
       <div className="token-add-content flexCol content-wrap-padding">
         <p className="token-add-title">Would you like to add this token?</p>
@@ -95,17 +99,17 @@ const TokenAdd = () => {
           <div className="token-add-item">
             <p className="token-add-item-title">Token Contract Address:</p>
             <p className="token-add-item-content">
-              {transferAddress2Display(state.contractAddress)}
+              {transferAddress2Display(state.contractAddress) || '--'}
             </p>
           </div>
 
           <div className="token-add-item">
             <p className="token-add-item-title">Token Symbol:</p>
-            <p className="token-add-item-content">{state.symbol}</p>
+            <p className="token-add-item-content">{state.symbol || '--'}</p>
           </div>
           <div className="token-add-item">
             <p className="token-add-item-title">Decimals of Precision:</p>
-            <p className="token-add-item-content">{state.decimal}</p>
+            <p className="token-add-item-content">{state.decimal || '--'}</p>
           </div>
         </div>
       </div>

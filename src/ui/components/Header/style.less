@@ -15,8 +15,7 @@
     transform: translateY(-50%);
     cursor: pointer;
     fill: #798CAD;
-    width: 20px;
-    height: 24px;
+    height: 14px;
   }
 
   .title {
@@ -60,6 +59,14 @@
   }
 
 }
+.header.dark{
+  svg{
+    fill: #ffffff;
+  }
+  .title{
+    color: #ffffff !important;
+  }
+}
 
 .header-flex {
   display: flex;
@@ -71,8 +78,7 @@
   .back-icon {
     cursor: pointer;
     fill: #798CAD;
-    width: 24px;
-    height: 24px;
+    height: 14px;
   }
   .content {
     max-width: 240px;
@@ -98,13 +104,16 @@
   }
 
   .closeIcon {
-    height: 18px;
-    width: 18px;
+    height: 13px;
+    width: 13px;
     margin-right: 0;
   }
 
   .closeWindowBtn {
     margin-left: auto;
+    &:hover {
+      background: transparent;
+    }
   }
 
   .title {
@@ -129,5 +138,31 @@
     margin-right: 6px;
     height: 28px;
     width: 28px;
+  }
+}
+.headerOfMenu.dark {
+  background: #020C15;
+  .title {
+    color: #fff;
+  }
+  .nologo-title {
+    color: #fff;
+  }
+  .closeWindowBtn {
+    svg {
+      fill: #fff;
+    }
+  }
+}
+/** darkmode style override */
+.header-flex.dark {
+  .content {
+    .network {
+      background: #0E5CAA;
+      color: #fff;
+    }
+  }
+  .back-icon {
+    fill: #fff;
   }
 }

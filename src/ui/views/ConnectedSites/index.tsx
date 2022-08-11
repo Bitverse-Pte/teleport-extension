@@ -2,7 +2,6 @@ import { BaseAccount } from 'types/extend';
 import './style.less';
 import React, { useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Modal } from 'antd';
 import { transferAddress2Display, useAsyncEffect, useWallet } from 'ui/utils';
 import Jazzicon from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
@@ -10,14 +9,17 @@ import { TipButton, WalletName } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
 import { stat } from 'fs';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
-import disconnectDefaultIcon from 'assets/disconnectDefault.svg';
-import disconnectActiveIcon from 'assets/disconnectActive.svg';
-import accountSwitch from 'assets/accountSwitch.svg';
+import { ReactComponent as DisconnectIcon } from 'assets/disconnectDefault.svg';
+import { ReactComponent as AccountSwitchIcon } from 'assets/accountSwitch.svg';
+
 import { useTranslation } from 'react-i18next';
 import { ConnectedSite } from 'background/service/permission';
 import { NoContent } from 'ui/components/universal/NoContent';
 import skynet from 'utils/skynet';
+import { useStyledModal } from 'ui/hooks/style/useStyledModal';
 const { sensors } = skynet;
 interface IConnectedSitesProps {
   isEvm?: boolean;
@@ -29,12 +31,14 @@ interface IConnectedSitesProps {
 const ConnectedSites: React.FC<IConnectedSitesProps> = (
   props: IConnectedSitesProps
 ) => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const location = useLocation();
   const wallet = useWallet();
   const { t } = useTranslation();
   const [account, setAccount] = useState<BaseAccount>();
   const [siteList, setSiteList] = useState<ConnectedSite[]>();
+  const Modal = useStyledModal();
 
   const init = async () => {
     if (props.isEvm) {
@@ -52,7 +56,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
   useAsyncEffect(init, [props.visible]);
 
   const handleRemoveSiteClick = async (site: ConnectedSite) => {
-    Modal.confirm({
+    Modal('confirm')({
       title: <div className="delete-confoirm-title">Confirm</div>,
       content: (
         <div className="delete-confoirm-content">
@@ -96,55 +100,56 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
   };
 
   return (
-    <div className="current-connected-sites flexCol">
-      <div className="page-header">Connected Sites</div>
-      {props.isEvm && (
-        <div className="account-item flexR" key={account?.address}>
-          <div className="account-left flexR">
-            <Jazzicon
-              diameter={30}
-              seed={getUnit10ByAddress(account?.address)}
-            />
-            <div className="account-info flexCol">
-              <WalletName cls="account-name" width={100}>
-                {account?.accountName || account?.hdWalletName}
-              </WalletName>
-              <span className="account-address">
-                {transferAddress2Display(account?.address)}
-              </span>
-            </div>
-          </div>
-
-          <div className="account-right flexR">
-            <div
-              className="account-item-action cursor flexR"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (props.handleOnClose) {
-                  sensors.track('teleport_connected_sites_switch', {
-                    page: location.pathname,
-                  });
-                  props.handleOnClose();
-                }
-              }}
-            >
-              <img
-                src={accountSwitch}
-                className="account-item-action-icon key-default-icon"
+    <div
+      className={clsx('current-connected-sites flexCol', { dark: isDarkMode })}
+    >
+      <div className="current-connected-sites-top">
+        <div className="page-header">Connected Sites</div>
+        {props.isEvm && (
+          <div className="account-item flexR" key={account?.address}>
+            <div className="account-left flexR">
+              <Jazzicon
+                diameter={30}
+                seed={getUnit10ByAddress(account?.address)}
               />
+              <div className="account-info flexCol">
+                <WalletName cls="account-name" width={100}>
+                  {account?.accountName || account?.hdWalletName}
+                </WalletName>
+                <span className="account-address">
+                  {transferAddress2Display(account?.address)}
+                </span>
+              </div>
+            </div>
+
+            <div className="account-right flexR">
+              <div
+                className="account-item-action cursor flexR"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (props.handleOnClose) {
+                    sensors.track('teleport_connected_sites_switch', {
+                      page: location.pathname,
+                    });
+                    props.handleOnClose();
+                  }
+                }}
+              >
+                <AccountSwitchIcon className="account-item-action-icon account-switch-icon" />
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      {props.isEvm && (
-        <div className="content-desc">
-          {t(
-            `${transferAddress2Display(
-              account?.address
-            )} is connected to sites below, which can view your account address.`
-          )}
-        </div>
-      )}
+        )}
+        {props.isEvm && (
+          <div className="content-desc">
+            {t(
+              `${transferAddress2Display(
+                account?.address
+              )} is connected to sites below, which can view your account address.`
+            )}
+          </div>
+        )}
+      </div>
       <div className="connected-site-list flexCol">
         {siteList && siteList.length > 0 ? (
           siteList.map((a) => (
@@ -164,14 +169,7 @@ const ConnectedSites: React.FC<IConnectedSitesProps> = (
                   handleRemoveSiteClick(a);
                 }}
               >
-                <img
-                  src={disconnectDefaultIcon}
-                  className="site-item-action-icon key-default-icon"
-                />
-                <img
-                  src={disconnectActiveIcon}
-                  className="site-item-action-icon key-active-icon"
-                />
+                <DisconnectIcon className="site-item-action-icon disconnect-icon" />
               </div>
             </div>
           ))

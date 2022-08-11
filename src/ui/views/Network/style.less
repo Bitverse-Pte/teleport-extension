@@ -13,6 +13,9 @@
 
   .custom-network-card {
     background-color: #02182B;
+    button svg {
+      fill: #FFF;
+    }
   }
 
   .network-list-header svg {
@@ -68,8 +71,8 @@ h2.category-name {
 
   .networklist-category {
     .chevron-icon {
-      width: 18px;
-      height: 18px;
+      width: 11px;
+      height: 11px;
     }
   }
 }
@@ -80,8 +83,44 @@ h2.category-name {
   padding: 0 9px;
   padding-left: 16px;
   margin: 24px;
+
+  svg {
+    width: 11px;
+  }
 }
 
+.network-edit.dark {
+  background: #02182B;
+  .edit-network-header h1.title {
+    color: #FFFFFF;
+  }
+  .form-deco {
+    border-color: rgb(94, 108, 138);
+    background: #020C15;
+    .form-body {
+      h1 { color: #FFF; }
+      input {
+        background-color: #02182B;
+        color: #FFF;
+      }
+      input::placeholder {
+        color: rgb(94, 108, 138) !important;
+      }
+      input:focus-visible {
+        outline: solid #1484f5;
+      }
+    }
+    .form-action-btn-group {
+      button#submitBtn {
+        background-color: #1484f5;
+        &:disabled {
+          background-color: rgba(20, 132, 245, 0.5);
+        }
+      }
+      
+    }
+  }
+}
 /** network edit page **/
 .network-edit {
   padding: 0;
@@ -108,6 +147,18 @@ h2.category-name {
     padding: 40px 106px;
 
     margin-bottom: 48px;
+    .form-action-btn-group {
+      display: flex;
+      button { 
+        width: 250px;
+      }
+      button#cancelBtn {
+        color: #1484f5;
+        margin-right: 24px;
+        border: 2px solid #1484F5;
+        background: transparent;
+      }
+    }
   }
 
   .input-error {
@@ -130,10 +181,6 @@ h2.category-name {
         color: #A3B4CC;
       }
   }
-  .disabled_button {
-    // override disabled button font color to avoid full blank
-    color: black !important;
-  }
 
   // .ant-form-item-control-input {
     input {
@@ -149,11 +196,8 @@ h2.category-name {
     input::placeholder {
       color: #A3B4CC !important;
     }
-    input::-webkit-input-placeholder {
-      color: #A3B4CC !important;
-    }
     input:last-child {
-      margin-bottom: 0;
+      margin-bottom: 5px;
     }
   // }
   .ant-select-selector {
@@ -166,6 +210,7 @@ h2.category-name {
     overflow-x: hidden;
     margin-bottom: 48px;
     .networkType {
+      background: transparent;
       margin-left: auto;
       color: #1484F5;
     }

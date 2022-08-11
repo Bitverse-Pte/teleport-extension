@@ -6,11 +6,44 @@
   box-sizing: border-box;
   padding-bottom: 24px;
 
+  /** some animation while changing background of this */
+  transition: background-color 0.5s linear;
+
   .setting-button-container{
     height: 124px;
     justify-content: center;
     align-items: center;
     
+  }
+  .theme-selection-bar {
+    .theme-buttons {
+      justify-content: space-between;
+      width: 160px;
+      display: flex;
+      button {
+        width: 44px;
+        height: 44px;
+  
+        background-color: #F8FAFC;
+        /** some animation while changing background of this */
+        transition: background-color 1s linear;
+
+        border-radius: 12px;
+  
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+          fill: #364361
+        }
+        &.selected {
+          background-color: #F0F9FF;
+          svg {
+            fill: #1484F5;
+          }
+        }
+      }
+    }
   }
   .setting-item{
     width:100%;
@@ -26,7 +59,9 @@
     &:hover{
       background:#FAFCFE;
     }
-
+    svg.icon {
+      height: 7px;
+    }
     .tag{
       position:absolute;
       color:#A3B4CC;
@@ -55,7 +90,7 @@
     }
     
     .logo-header-left-title{
-      width: 94px;
+      // width: 94px;
       height: 14px;
       margin-right: 4px;
     }
@@ -63,11 +98,43 @@
   }
   .logo-header-right{
     align-items: center;
-    .svg-icon{
-      margin-left: 25px;
-      fill: #798CAD;
-      width: 16px;
-      height: 16px;
+  }
+}
+/** Style override for darkmode */
+.setting.dark {
+  background-color: #020C15;
+  color: #FFF;
+  // need to fix svg icon color before enable this
+  // .setting-button-container .tip-button-not-send-img {
+  //   background-color: #364361;
+  // }
+  .setting-item{
+    &:hover{
+      background: #052E55;
+    }
+    svg.cursor {
+      fill: #FFF;
     }
   }
+  .theme-selection-bar {
+    .theme-buttons {
+      
+      button {
+        background-color: #364361;
+        /** some animation while changing background of this */
+        svg {
+          fill: #FFF;
+        }
+        &.selected {
+          background-color: #0E5CAA;
+        }
+      }
+    }
+  }
+}
+.logo-header.dark {
+  .logo-header-left-title {
+    fill: #FFF;
+  }
+  .logo-header-right svg { fill: #FFF; }
 }

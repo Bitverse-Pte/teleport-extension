@@ -16,7 +16,8 @@
       }
     }
   }
-  .wallet-manage-br{
+
+  .wallet-manage-br {
     border: 0.5px solid #EDEDED;
     margin-bottom: 24px;
   }
@@ -46,7 +47,7 @@
         }
       }
     }
-    
+
   }
 
 }
@@ -101,6 +102,13 @@
 
 }
 
+.ant-modal-container.dark {
+  .popup-delete-notice {
+    background: rgba(255, 251, 240, 0.1) !important;
+  }
+
+}
+
 .adm-list-item-content,
 .adm-list-default {
   border-color: rgba(0, 0, 0, 0.04) !important;
@@ -126,4 +134,21 @@
   .drawer-header-close-icon {
     fill: #798CAD;
   }
+}
+
+.account-manage.dark {
+  background: @darkBg;
+  color: #ffffff;
+
+  .account-manage-widget-content,
+  .content {
+    svg {
+      fill: #ffffff !important;
+    }
+  }
+
+  .wallet-manage-br {
+    border-color: #364361 !important;
+  }
+
 }

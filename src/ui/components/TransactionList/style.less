@@ -8,14 +8,9 @@
     .mb-8 {
         margin-bottom: 8px !important;
     }
-}
-// not suitable for infinite list
-// .activity:nth-child(even) {
-//     background-color: #FAFCFE;
-// }
-// 
-.activity.is-even {
-    background-color: #FAFCFE;
+    &:hover {
+        background-color: #F8FAFC;
+    }
 }
 .tx-stat-logo {
     margin-right: 16px;
@@ -30,6 +25,9 @@
         height: 100%;
         margin-right: 16px;
     }
+    &.fail { background-color: #FFF3F0; svg {  fill: #E05651; } }
+    &.pending {  background-color: #FFA014; svg { fill: #FFF; } }
+    &.success { background-color: #F2F6FA;  svg { fill: #5E6C8A; } }
 }
 .value-n-status-display {
     margin-right: auto;
@@ -73,6 +71,10 @@
         color: #A3B4CC;
         span.from {
             margin-right: 14px;
+        }
+        svg.icon {
+            height: 7px;
+            cursor: default;
         }
         span.to {
             margin-left: 8px;
@@ -135,4 +137,33 @@
 .grey-05 {
     color: #C5D1E0 !important;
     fill: #C5D1E0 !important;
+}
+
+/** style override for darkmode */
+.activity-list-container.dark {
+    .activity {
+        background: #020C15;
+        color: #FFF;
+        &:hover {
+            background: #02182B;
+        }
+    }
+
+    .value-n-status-display {
+        p.tx-title {
+            color: #FFF;
+        }
+        p.tx-value {
+            color: #FFF;
+        }
+        span.status.default {
+            color: #5E6C8A !important;
+        }
+        div.from-and-to {
+            color: #C5D1E0 !important;
+        }
+        span.date {
+            color: #5E6C8A !important;
+        }
+    }
 }

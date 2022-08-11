@@ -1,17 +1,10 @@
-import { Button, Modal, Tooltip } from 'antd';
+import { Button } from 'antd';
 import clsx from 'clsx';
-import React, {
-  Fragment,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Ecosystem, Provider } from 'types/network';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import {
   NetworkErrorCodeToMessageKey,
   NetworkProviderContext,
@@ -30,6 +23,8 @@ import type {
 import { useWallet } from 'ui/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
+import { useStyledModal } from 'ui/hooks/style/useStyledModal';
 const { sensors } = skynet;
 
 interface NetworkSelectionItemProps {
@@ -53,6 +48,7 @@ export function NetworkSelectionItem({
   const wallet = useWallet();
   const history = useHistory();
   const location = useLocation();
+  const ClickToCloseMessage = useStyledMessage();
   const currentProviderId = useSelector((s) => s.network.provider.id);
   const isSelectedNetwork = useMemo(
     () => network.id === currentProviderId,
@@ -67,7 +63,7 @@ export function NetworkSelectionItem({
       await providerContext?.useProviderById(network.id);
     } catch (error: any) {
       if (error?.code) {
-        ClickToCloseMessage.info(
+        ClickToCloseMessage('info')(
           t(NetworkErrorCodeToMessageKey(error.code), {
             replace: {
               ecosystem_name: currentEcosystem,
@@ -105,9 +101,7 @@ export function NetworkSelectionItem({
       >
         <DragHandleIcon />
       </div>
-      <Tooltip title={network.nickname}>
-        <span className="network-name">{network.nickname}</span>
-      </Tooltip>
+      <span className="network-name">{network.nickname}</span>
       <NetworkActions network={network} />
     </div>
   );
@@ -123,10 +117,11 @@ const NetworkActions = ({ network }: { network: Provider }) => {
   const isSelectedNetwork = useMemo(() => {
     return network.id === currentProviderId;
   }, [network, currentProviderId]);
-
+  const ClickToCloseMessage = useStyledMessage();
+  const Modal = useStyledModal();
   const removeProvider = async () => {
     await providerContext?.removeCustomProvider(network.id);
-    ClickToCloseMessage.success(t('remove_custom_provider_success'));
+    ClickToCloseMessage('success')(t('remove_custom_provider_success'));
   };
 
   const handleRemove = useCallback(
@@ -141,12 +136,12 @@ const NetworkActions = ({ network }: { network: Provider }) => {
         setUnlockPopupVisible(true);
         return;
       }
-      Modal.confirm({
+      Modal('confirm')({
         title: t('Delete_Provider_Ask_Title'),
         content: t('Delete_Provider_Ask_Content'),
         onOk: removeProvider,
         onCancel: () => {
-          ClickToCloseMessage.info(t('remove_custom_provider_cancel'));
+          ClickToCloseMessage('info')(t('remove_custom_provider_cancel'));
         },
       });
     },
@@ -164,8 +159,8 @@ const NetworkActions = ({ network }: { network: Provider }) => {
   const isProviderEditable = [Ecosystem.EVM].includes(network.ecosystem);
 
   return (
-    <span className="actions flex" onClick={(e) => e.stopPropagation()}>
-      <div className="flex justify-center items-center">
+    <span className="flex actions" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-center">
         <Button
           className={clsx(hoverToDisplayProperties, 'narrow-padding')}
           onClick={handleRemove}

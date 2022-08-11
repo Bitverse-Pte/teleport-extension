@@ -16,6 +16,8 @@ import './cosmos.less';
 import { IconComponent } from 'ui/components/IconComponents';
 import { useLocation } from 'react-router-dom';
 import skynet from 'utils/skynet';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 const { sensors } = skynet;
 interface Fee {
   type: string;
@@ -73,6 +75,7 @@ function FeeItem({ gas, selected, onSelect, type }) {
 }
 
 function FeeSelector(props) {
+  const { isDarkMode } = useDarkmode();
   const location = useLocation();
   const gasState: any = useSelector((state) => state.gas);
   const dispatch = useDispatch();
@@ -246,12 +249,14 @@ function FeeSelector(props) {
   // }, [gasState.cosmosCustomGas]);
   return (
     <Drawer
+      className={clsx('fee', {
+        dark: isDarkMode,
+      })}
       placement="bottom"
       height="500px"
       size="large"
       visible={visible}
       closable={false}
-      className="fee"
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0',
@@ -267,7 +272,11 @@ function FeeSelector(props) {
         title="Edit Gas Fee"
         handleCloseIconClick={() => onClose()}
       />
-      <div className="fee-box">
+      <div
+        className={clsx('fee-box', {
+          dark: isDarkMode,
+        })}
+      >
         <ul className="fee-selector">
           {feeList.map((item, index) => (
             <FeeItem
@@ -304,6 +313,8 @@ function FeeSelector(props) {
                       <div className="numeric-input">
                         <input
                           type="number"
+                          min="0"
+                          step="1e-18"
                           defaultValue={customGas}
                           onChange={(e) => {
                             onSaveCustom(e);

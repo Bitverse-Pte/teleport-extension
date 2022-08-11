@@ -13,19 +13,22 @@ import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
 import { CustomTab, WalletName } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
 import noAssets from 'assets/noAssets.svg';
+import noAssetsDark from 'assets/noAssetDark.svg';
 import { Delete, Rename } from '../AccountManage';
 import { ErrorCode } from 'constants/code';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
+import editImgDark from 'assets/editImgDark.svg';
 import importImg from 'assets/importImg.svg';
-import keyDefaultIcon from 'assets/keyDefault.svg';
-import keyActiveIcon from 'assets/keyActive.svg';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { ecosystemToIconSVG } from 'ui/utils/networkCategoryToIcon';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 import BitError from 'error';
 const { sensors } = skynet;
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
+
 export interface WalletHeaderProps {
   title: string;
   handleDoneClick: () => void;
@@ -62,6 +65,8 @@ const WalletManage: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState<BaseAccount>();
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [unlockType, setUnlockType] = useState('edit');
+  const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const queryWallets = async () => {
     const accounts: HdAccountStruct[] = await wallet.getWalletList();
@@ -155,7 +160,7 @@ const WalletManage: React.FC = () => {
       page: location.pathname,
     });
     if (walletName.length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -166,12 +171,12 @@ const WalletManage: React.FC = () => {
       .catch((e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error({
+          ClickToCloseMessage('error')({
             content: 'Name already exists',
             key: 'Name already exists',
           });
         } else {
-          ClickToCloseMessage.error({
+          ClickToCloseMessage('error')({
             content: 'Unknown error, please try again later',
             key: 'Unknown error, please try again later',
           });
@@ -187,7 +192,7 @@ const WalletManage: React.FC = () => {
   const handleDeleteBtnClick = (e, hdWalletId) => {
     sensors.track('teleport_wallet_manage_delete', { page: location.pathname });
     if (hdWalletAccounts.length + simpleWalletAccounts.length === 1) {
-      ClickToCloseMessage.warning('Please keep alive at least one account');
+      ClickToCloseMessage('warning')('Please keep alive at least one account');
       return;
     }
     e.stopPropagation();
@@ -228,7 +233,7 @@ const WalletManage: React.FC = () => {
   };
 
   return (
-    <div className="wallet-manage flexCol">
+    <div className={clsx('wallet-manage flexCol', { dark: isDarkMode })}>
       <UnlockModal
         title="Unlock Wallet"
         visible={unlockPopupVisible}
@@ -256,7 +261,18 @@ const WalletManage: React.FC = () => {
           onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={editImg} alt="" className="wallet-manage-img" />
+            <IconComponent
+              name="edit_17"
+              cls="wallet-manage-img"
+              style={{
+                fill: isDarkMode ? '#ffffff' : '#000000',
+              }}
+            />
+            {/* <img
+              src={isDarkMode ? editImgDark : editImg}
+              alt=""
+              className="wallet-manage-img"
+            /> */}
           </div>
           <span className="wallet-manage-button-item-title">Edit</span>
         </div>
@@ -265,7 +281,14 @@ const WalletManage: React.FC = () => {
           onClick={handleImportBtnClick}
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={importImg} alt="" className="wallet-manage-img" />
+            {/* <img src={importImg} alt="" className="wallet-manage-img" /> */}
+            <IconComponent
+              name="import"
+              cls="wallet-manage-img"
+              style={{
+                fill: '#1484F5',
+              }}
+            />
           </div>
           <span className="wallet-manage-button-item-title">Import</span>
         </div>
@@ -274,7 +297,14 @@ const WalletManage: React.FC = () => {
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={addImg} alt="" className="wallet-manage-img" />
+            <IconComponent
+              name="plus-circle"
+              cls="wallet-manage-img"
+              style={{
+                fill: '#42B856',
+              }}
+            />
+            {/* <img src={addImg} alt="" className="wallet-manage-img" /> */}
           </div>
           <span className="wallet-manage-button-item-title">Create</span>
         </div>
@@ -353,14 +383,25 @@ const WalletManage: React.FC = () => {
                         display: isEdit ? 'none' : 'flex',
                       }}
                     >
-                      <img
+                      <IconComponent
+                        name="key"
+                        cls={clsx('key-default-icon')}
+                        style={
+                          isDarkMode
+                            ? {
+                                fill: '#ffffff',
+                              }
+                            : {}
+                        }
+                      />
+                      {/* <img
                         src={keyDefaultIcon}
                         className="home-no-assets key-default-icon"
                       />
                       <img
-                        src={keyActiveIcon}
+                        src={isDarkMode ? keyActiveIconDark : keyActiveIcon}
                         className="home-no-assets key-active-icon"
-                      />
+                      /> */}
                     </div>
 
                     <div
@@ -370,7 +411,7 @@ const WalletManage: React.FC = () => {
                       }}
                     >
                       <IconComponent
-                        name="edit"
+                        name="edit_16"
                         cls="base-text-color"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -386,7 +427,7 @@ const WalletManage: React.FC = () => {
                         }}
                       />
                       <IconComponent
-                        name="trash"
+                        name="trash_16"
                         cls="base-text-color"
                         onClick={(e) => handleDeleteBtnClick(e, w.hdWalletId)}
                         style={{
@@ -400,7 +441,10 @@ const WalletManage: React.FC = () => {
             </div>
           ) : (
             <div className="no-data flexCol">
-              <img src={noAssets} className="home-no-assets" />
+              <img
+                src={isDarkMode ? noAssetsDark : noAssets}
+                className="home-no-assets"
+              />
               <span className="no-assets-title">No Wallet</span>
             </div>
           )}

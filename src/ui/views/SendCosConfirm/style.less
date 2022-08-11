@@ -73,6 +73,10 @@
         fill: #1484F5;
         color:  #1484F5;
         margin: 8px 0;
+        font-size: 12px;
+        .edit-icon {
+          margin-right: 4px;
+        }
       }
       .transaction-detail-item {
         white-space: pre-line;
@@ -133,17 +137,13 @@
       padding-top: 5px;
       width: 100%;
       .transaction-data-title {
-        padding-left: 10px;
-        margin-top: 10px;
+        margin: 10px 0;
         font-weight: 500;
         font-size: 12px;
         line-height: 17px;
         color: #202226;
       }
       .transaction-data-params {
-        margin-left: 10px;
-        margin-right: 10px;
-        margin-top: 10px;
         margin-bottom: 10px;
         padding: 10px 14px;
         //word-break: break-all;
@@ -155,11 +155,9 @@
         font-size: 12px;
         line-height: 17px;
         color: #9EA2A9;
+        border-radius: 8px;
       }
       .transaction-data-value {
-        margin-left: 10px;
-        margin-right: 10px;
-        margin-top: 10px;
         margin-bottom: 10px;
         padding: 10px 14px;
         word-break: break-all;
@@ -172,6 +170,7 @@
         line-height: 17px;
         color: #9EA2A9;
         overflow-y: auto;
+        border-radius: 8px;
       }
     }
 
@@ -210,4 +209,39 @@ footer {
   background-color: #fff;
   border-top: 0.5px solid #D6DFEC;
   width: 100%;
+}
+.approval.dark {
+  background: #020C15;
+  color: #fff;
+  .approval-tx {
+    background: #020C15;
+    .top-part-container {
+      background: linear-gradient(180deg, #083A6A 0%, rgba(3, 36, 64, 0) 100%);
+    }
+    .tx-button-container {
+      background: #020C15;
+    }
+    .transaction-detail-detailText {
+      color: #fff!important;
+    }
+    .transaction-data {
+      .transaction-data-title {
+        color: #fff;
+      }
+      .transaction-data-params, .transaction-data-value {
+        background: #02182B;
+        color: #798CAD;
+      }
+    }
+  }
+  .dec {
+    color: #fff;
+  }
+  .symbol {
+      color: #fff;
+  }
+  .ant-divider {
+    border: 0.5px solid #364361;
+    color: #364361;
+  }
 }

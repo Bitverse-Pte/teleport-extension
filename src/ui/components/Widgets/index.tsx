@@ -9,20 +9,23 @@ import classnames from 'classnames';
 import './style.less';
 import { utils } from 'ethers';
 import { Tabs, TipButtonEnum } from 'constants/wallet';
-import SendImg from '../../../assets/send.svg';
-import ReceiveImg from '../../../assets/receive.svg';
-import LockImg from '../../../assets/lock.svg';
-import WalletManageImg from '../../../assets/walletManage.svg';
+import { ReactComponent as SendIcon } from '../../../assets/send.svg';
+import { ReactComponent as ReceiveIcon } from '../../../assets/receive.svg';
+import { ReactComponent as LockIcon } from '../../../assets/lock.svg';
+import { ReactComponent as WalletManageIcon } from '../../../assets/walletManage.svg';
 import { PresetNetworkId } from 'constants/defaultNetwork';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 export interface SearchInputProps {
   onChange: (value) => void;
 }
 
 export const SearchInput = (props) => {
+  const { isDarkMode } = useDarkmode();
   return (
-    <div className="custom-input-container">
-      <IconComponent name="search" cls="search-icon" />
+    <div className={clsx('custom-input-container', { dark: isDarkMode })}>
+      <IconComponent name="search_16" cls="search-icon" />
       <input {...props} className={'custom-search-input'} />
     </div>
   );
@@ -173,7 +176,13 @@ interface CustomElementProps extends Omit<any, DeletedProps> {
   cls?: string;
 }
 export const CustomButton = ({ cls, ...props }: CustomElementProps) => {
-  return <Button {...props} className={`custom-button ${cls ? cls : ''}`} />;
+  const { isDarkMode } = useDarkmode();
+  return (
+    <Button
+      {...props}
+      className={clsx(`custom-button ${cls ? cls : ''}`, { dark: isDarkMode })}
+    />
+  );
 };
 
 interface CustomInputProps extends CustomElementProps {
@@ -401,9 +410,10 @@ export interface TabInterface {
 export const CustomTab = (props: TabInterface) => {
   const [tooltip, setTooltip] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
+  const { isDarkMode } = useDarkmode();
 
   return (
-    <div className="widgets-tab-container flexR">
+    <div className={clsx('widgets-tab-container flexR', { dark: isDarkMode })}>
       <span
         className={classnames('tab-item', 'cursor', {
           'tab-item-active': props.currentTab === Tabs.FIRST,
@@ -454,37 +464,57 @@ export interface TipButtonProps {
   handleClick: () => void;
 }
 
-export const TipButton = (props: TipButtonProps) => {
-  const getTipImg = (type: TipButtonEnum) => {
-    switch (type) {
-      case TipButtonEnum.SEND:
-        return SendImg;
-      case TipButtonEnum.RECEIVE:
-        return ReceiveImg;
-      case TipButtonEnum.WALLET_MANAGE:
-        return WalletManageImg;
-      case TipButtonEnum.LOCK:
-        return LockImg;
-    }
-  };
+const getTipImg = (type: TipButtonEnum) => {
+  const { isDarkMode } = useDarkmode();
+  let iconStr;
+
+  switch (type) {
+    case TipButtonEnum.SEND:
+      iconStr = 'send_20';
+      break;
+    case TipButtonEnum.RECEIVE:
+      iconStr = 'receive_20';
+      break;
+    case TipButtonEnum.WALLET_MANAGE:
+      iconStr = 'wrench';
+      break;
+    case TipButtonEnum.LOCK:
+    default:
+      iconStr = 'lock';
+      break;
+  }
+
+  return (
+    <IconComponent
+      cls={classnames('tip-button-send-img-item', {
+        dark: isDarkMode,
+      })}
+      name={iconStr}
+    />
+  );
+};
+
+export const TipButton = ({ title, handleClick, type }: TipButtonProps) => {
+  const { isDarkMode } = useDarkmode();
+  const isSendImg =
+    type === TipButtonEnum.SEND || type === TipButtonEnum.RECEIVE;
   return (
     <div
-      className="tip-button-button-item flexCol cursor"
-      onClick={() => props.handleClick()}
+      className={classnames('tip-button-button-item flexCol cursor', {
+        dark: isDarkMode,
+      })}
+      onClick={() => handleClick()}
     >
       <div
-        className={classnames('flex tip-button-img', {
-          'tip-button-send-img':
-            props.type === TipButtonEnum.SEND ||
-            props.type === TipButtonEnum.RECEIVE,
-          'tip-button-not-send-img':
-            props.type !== TipButtonEnum.SEND &&
-            props.type !== TipButtonEnum.RECEIVE,
-        })}
+        className={classnames(
+          'flex tip-button-img',
+          isSendImg ? 'tip-button-send-img' : 'tip-button-not-send-img'
+        )}
       >
-        <img src={getTipImg(props.type)} className="tip-button-send-img-item" />
+        {/* <MatchedIcon className="tip-button-send-img-item" /> */}
+        {getTipImg(type)}
       </div>
-      <span className="tip-button-send-title">{props.title}</span>
+      <span className="tip-button-send-title">{title}</span>
     </div>
   );
 };

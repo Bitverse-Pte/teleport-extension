@@ -7,14 +7,14 @@ import Jazzicon from 'react-jazzicon';
 import { WalletName } from '../Widgets';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Tabs } from 'constants/wallet';
-import keyDefaultIcon from 'assets/keyDefault.svg';
-import keyActiveIcon from 'assets/keyActive.svg';
-import siteDefaultIcon from 'assets/siteDefault.svg';
-import siteActiveIcon from 'assets/siteActive.svg';
+import { ReactComponent as KeyIcon } from 'assets/keyDefault.svg';
+import { ReactComponent as SiteIcon } from 'assets/siteDefault.svg';
 import classnames from 'classnames';
 import skynet from 'utils/skynet';
 import { getUnit10ByAddress } from 'background/utils';
 import { Divider } from 'antd';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const { sensors } = skynet;
 
@@ -29,6 +29,7 @@ interface AccountSwitchProps {
 const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
   props: AccountSwitchProps
 ) => {
+  const { isDarkMode } = useDarkmode();
   const wallet = useWallet();
   const history = useHistory();
   const location = useLocation();
@@ -55,7 +56,11 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
   }, [props.visible]);
 
   return (
-    <div className="current-wallet-account-switch flexCol">
+    <div
+      className={clsx('current-wallet-account-switch flexCol', {
+        dark: isDarkMode,
+      })}
+    >
       <p
         className=" content-wrap-padding"
         style={walletName ? {} : { display: 'none' }}
@@ -84,10 +89,7 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
                 }
               }}
             >
-              <img
-                src={siteDefaultIcon}
-                className="connected-sites-action-icon key-default-icon"
-              />
+              <SiteIcon className="connected-sites-action-icon site-default-icon" />
             </div>
           </div>
         </div>
@@ -140,14 +142,7 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
                       });
                     }}
                   >
-                    <img
-                      src={keyDefaultIcon}
-                      className="account-item-action-icon key-default-icon"
-                    />
-                    <img
-                      src={keyActiveIcon}
-                      className="account-item-action-icon key-active-icon"
-                    />
+                    <KeyIcon className="key-default-icon" />
                   </div>
                   {props.isEvm && (
                     <div
@@ -165,14 +160,7 @@ const CurrentWalletAccountSwitch: React.FC<AccountSwitchProps> = (
                         }
                       }}
                     >
-                      <img
-                        src={siteDefaultIcon}
-                        className="account-item-action-icon key-default-icon"
-                      />
-                      <img
-                        src={siteActiveIcon}
-                        className="account-item-action-icon key-active-icon"
-                      />
+                      <SiteIcon className="account-item-action-icon site-default-icon" />
                     </div>
                   )}
                 </div>

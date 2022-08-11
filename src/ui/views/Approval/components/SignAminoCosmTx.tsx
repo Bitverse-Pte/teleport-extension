@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
+import { ReactComponent as IconEdit } from 'assets/action-icon/edit.svg';
 import {
   NetworkDisplay,
   SenderToRecipient,
@@ -198,6 +199,7 @@ const SignAminoCosmTx = ({
               <Input
                 className="customInputStyle"
                 value={signDoc?.memo}
+                placeholder="please enter memo"
                 //defaultValue={memo}
                 onClick={(e) => e.stopPropagation()}
                 onChange={(e) => handleMemoChange(e.target.value)}
@@ -210,7 +212,7 @@ const SignAminoCosmTx = ({
                 setVisible(true);
               }}
             >
-              <IconComponent name="edit" cls="edit-icon" />
+              <IconEdit width={16} className="edit-icon" />
               <div>{t('Edit')}</div>
             </div>
             <div className="transaction-detail-item">

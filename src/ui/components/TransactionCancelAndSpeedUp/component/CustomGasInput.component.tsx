@@ -33,10 +33,7 @@ export function CustomGasInput({
   }
 
   return (
-    <div
-      className="flex items-center flex-col custom-gas"
-      style={{ marginTop: 4 }}
-    >
+    <div className="flex items-center flex-col custom-gas">
       <div className="field">
         <h1 className="form-title bold">Gas Limit</h1>
         <InputNumber<string>

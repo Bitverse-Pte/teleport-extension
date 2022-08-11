@@ -35,7 +35,6 @@ import Guide from '../../../assets/guide.svg';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import CurrentWalletAccountSwitch from 'ui/components/CurrentWalletAccountSwitch';
 import WalletSwitch from 'ui/components/WalletSwitch';
 import { addEllipsisToEachWordsInTheEnd } from 'ui/helpers/utils/currency-display.util';
@@ -45,12 +44,12 @@ import { getProvider } from 'ui/selectors/selectors';
 import { useSelector } from 'react-redux';
 import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
-const onCopy = () => {
-  sensors.track('teleport_home_copy_account', { page: location.pathname });
-  ClickToCloseMessage.success('Copied');
-};
 const Home = () => {
+  const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
@@ -71,6 +70,12 @@ const Home = () => {
   const currentChain: Provider = useSelector(getProvider);
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [guideVisible, setGuideVisisble] = useState(false);
+  const ClickToCloseMessage = useStyledMessage();
+
+  const onCopy = () => {
+    sensors.track('teleport_home_copy_account', { page: location.pathname });
+    ClickToCloseMessage('success')('Copied');
+  };
 
   const getTokenBalancesAsync = async () => {
     const balances = await wallet.getTokenBalancesAsync().catch((e) => {
@@ -254,7 +259,7 @@ const Home = () => {
   const handleExplorerLinkClick = () => {
     console.log(currentChain);
     if (!currentChain?.rpcPrefs?.blockExplorerUrl) {
-      ClickToCloseMessage.success('Please set your block explorer');
+      ClickToCloseMessage('success')('Please set your block explorer');
       return;
     }
     switch (currentChain.ecosystem) {
@@ -316,7 +321,11 @@ const Home = () => {
   };
 
   return (
-    <div className="home flexCol">
+    <div
+      className={clsx('home flexCol', {
+        dark: isDarkMode,
+      })}
+    >
       <Spin spinning={createAccountLoading}>
         <div
           className="guide_container"
@@ -357,43 +366,48 @@ const Home = () => {
           </div>
 
           <div className="home-preview-container flexCol content-wrap-padding">
-            <div
-              className="home-preview-top-container flexR"
-              onClick={() => {
-                sensors.track('teleport_home_accounts', {
-                  page: location.pathname,
-                });
-                setPopupVisible(true);
-              }}
-            >
-              <div className="home-preview-top-left flexR cursor">
+            <div className="home-preview-container-top-wrap flexR">
+              <div className="home-preview-top-top-left">
                 <Jazzicon
-                  diameter={16}
+                  diameter={30}
                   seed={getUnit10ByAddress(account?.address)}
                 />
-                <span className="home-preview-top-account-name">
-                  {account?.accountCreateType === AccountCreateType.MNEMONIC
-                    ? account?.accountName
-                    : account?.hdWalletName}
-                </span>
               </div>
-              <IconComponent name="chevron-down" cls="chevron-down" />
-            </div>
-            <div className="home-preview-address-container flexR">
-              <span className="home-preview-address">
-                ({transferAddress2Display(account?.address)})
-              </span>
-              <div className="home-preview-icon-container flexR">
-                <CopyToClipboard text={account?.address} onCopy={onCopy}>
-                  <IconComponent name="copy" cls="copy" />
-                </CopyToClipboard>
-                <IconComponent
-                  name="external-link"
-                  cls="explorer"
-                  onClick={handleExplorerLinkClick}
-                />
+              <div className="home-preview-top-right">
+                <div
+                  className="home-preview-top-container flexR cursor"
+                  onClick={() => {
+                    sensors.track('teleport_home_accounts', {
+                      page: location.pathname,
+                    });
+                    setPopupVisible(true);
+                  }}
+                >
+                  <WalletName width={200} cls="home-preview-top-account-name">
+                    {account?.accountCreateType === AccountCreateType.MNEMONIC
+                      ? account?.accountName
+                      : account?.hdWalletName}
+                  </WalletName>
+                  <IconComponent name="chevron-down" cls="chevron-down" />
+                </div>
+                <div className="home-preview-address-container flexR">
+                  <span className="home-preview-address">
+                    ({transferAddress2Display(account?.address)})
+                  </span>
+                  <div className="home-preview-icon-container flexR">
+                    <CopyToClipboard text={account?.address} onCopy={onCopy}>
+                      <IconComponent name="copy" cls="copy" />
+                    </CopyToClipboard>
+                    <IconComponent
+                      name="external-link"
+                      cls="explorer"
+                      onClick={handleExplorerLinkClick}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+
             <div className="home-preview-balance flexR">
               <WalletName width={250} cls="home-preview-balance-amount">
                 {denom2SymbolRatio(
@@ -560,7 +574,9 @@ const Home = () => {
         >
           <div
             style={{ width: '100%', height: '100%' }}
-            className="account-switch-drawer flexCol"
+            className={clsx('account-switch-drawer flexCol', {
+              dark: isDarkMode,
+            })}
           >
             <div className="account-switch-header flexR content-wrap-padding">
               <IconComponent
@@ -592,7 +608,7 @@ const Home = () => {
                 >
                   Manage Account
                   <IconComponent
-                    name="chevron-right"
+                    name="chevron-right_8"
                     cls="icon chevron-right"
                   />
                 </span>
@@ -608,6 +624,9 @@ const Home = () => {
             />
           </div>
           <Drawer
+            className={clsx('connected-sites-drawer', {
+              dark: isDarkMode,
+            })}
             placement="top"
             closable={true}
             closeIcon={<IconComponent name="back" cls="icon back-icon" />}
@@ -658,7 +677,9 @@ const Home = () => {
         >
           <div
             style={{ width: '100%', height: '100%' }}
-            className="account-switch-drawer flexCol"
+            className={clsx('account-switch-drawer flexCol', {
+              dark: isDarkMode,
+            })}
           >
             <div className="account-switch-header flexR content-wrap-padding">
               <IconComponent
@@ -683,7 +704,10 @@ const Home = () => {
                 }}
               >
                 Manage Wallet
-                <IconComponent name="chevron-right" cls="icon chevron-right" />
+                <IconComponent
+                  name="chevron-right_8"
+                  cls="icon chevron-right"
+                />
               </span>
             </div>
             <WalletSwitch

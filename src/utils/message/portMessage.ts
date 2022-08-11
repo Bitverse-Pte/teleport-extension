@@ -30,7 +30,10 @@ class PortMessage extends Message {
     });
 
     this.port.onDisconnect.addListener(() => {
-      console.error('service worker disconnected, reconnecting...');
+      console.error(
+        'service worker disconnected, reconnecting...  name:',
+        name
+      );
       this.connect(name);
       this._listen();
     });

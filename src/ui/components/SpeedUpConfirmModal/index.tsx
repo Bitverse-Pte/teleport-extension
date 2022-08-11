@@ -20,6 +20,7 @@ import {
   getMaximumGasTotalInHexWei,
   getMinimumGasTotalInHexWei,
 } from 'utils/gas';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 const toFixedDigits =
   (digits = 7) =>
@@ -40,7 +41,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
       <IconComponent
         name="close"
         onClick={props.handleCloseIconClick}
-        cls="drawer-header-close-icon"
+        cls="drawer-header-close-icon icon-close"
       />
     </div>
   );
@@ -123,6 +124,7 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
     baseFeePerGas: baseFee?.toString(),
   });
   const nativeToken = useSelector(getCurrentProviderNativeToken);
+  const { isDarkMode } = useDarkmode();
 
   return (
     <Drawer
@@ -130,6 +132,7 @@ export const SpeedUpConfirmModal: React.FC<PropsInterface> = ({
       placement="bottom"
       closable={false}
       height={isGasDetailExpanded ? '360px' : '286px'}
+      className={clsx('speedup-confirm-drawer', { dark: isDarkMode })}
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0 24px 24px 24px',

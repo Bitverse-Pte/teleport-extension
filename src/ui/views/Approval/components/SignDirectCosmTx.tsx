@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { NetworkDisplay } from 'ui/components';
 import { HeaderWithFlex } from 'ui/components/Header';
 import { CustomButton, CustomTab, TokenIcon } from 'ui/components/Widgets';
+import { ReactComponent as IconEdit } from 'assets/action-icon/edit.svg';
 import {
   getTotalPricesByAmountAndPrice,
   useApproval,
@@ -200,6 +201,7 @@ const SignDirectCosmTx = ({
                 className="customInputStyle"
                 value={signDoc?.txBody?.memo}
                 //defaultValue={memo}
+                placeholder="please enter memo"
                 onClick={(e) => e.stopPropagation()}
                 onChange={(e) => handleMemoChange(e.target.value)}
               />
@@ -211,7 +213,7 @@ const SignDirectCosmTx = ({
                 setVisible(true);
               }}
             >
-              <IconComponent name="edit" cls="edit-icon" />
+              <IconEdit width={16} className="edit-icon" />
               <div>{t('Edit')}</div>
             </div>
             <div className="transaction-detail-item">

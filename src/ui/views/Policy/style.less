@@ -24,16 +24,32 @@
         .policy-summary{
             font-size: 16px;
         }
+
+        .policy-level-one{
+            text-indent: 16px;
+        }
         
         .policy-level-two{
-            text-indent: 8px;
+            text-indent: 14px;
         }
         .policy-level-three{
-            text-indent: 16px;
+            text-indent: 12px;
         }
 
 
 
     }
 
+}
+/** style override for darkmode */
+.policy-container.dark {
+    background-color: #02182B;
+    color: #FFF;
+    .policy-title {
+        color: #EEE;
+    }
+    .header {
+        svg { fill: #FFF; }
+        span.title { color: #FFF; }
+    }
 }

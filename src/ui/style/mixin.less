@@ -2,7 +2,7 @@
 
 @baseTextColor: #364361;
 @themeColor: #1484F5;
-;
+@darkBg: #020C15;
 
 @baseHeaderHeight: 64px;
 
@@ -39,7 +39,6 @@
 .svg-icon {
   width: 16px;
   height: 16px;
-  color: #ffffff;
 }
 
 .hide {
@@ -102,4 +101,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.dark {
+  .ant-drawer-mask {
+    background: rgba(54, 67, 97, 0.5);
+  }
+}
+
+.ant-drawer.dark {
+  .ant-drawer-header .back-icon {
+    fill: #fff;
+  }
 }

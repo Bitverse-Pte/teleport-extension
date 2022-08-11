@@ -48,9 +48,8 @@
     align-items: center;
     justify-content: center;
     img {
-      height: 22px;
-      width: 22px;
-      border-radius: 100%;
+      height: 32px;
+      width: 32px;
     }
   }
   .network-select-bar {
@@ -73,7 +72,27 @@
     }
   }
   .expand-list {
-    width: 12px;
-    height: 12px;
+    width: 7px;
+  }
+}
+.home {
+  .headerOfMenu.dark {
+    .logo-container {
+      background: #000;
+    }
+    .network-select-bar {
+      background-color: #0E5CAA!important;
+      color: #fff;
+    }
+    .expand-list {
+      fill: #fff;
+    }
+    .expand-menu-btn {
+      svg {
+        path:not(:first-child) {
+          stroke: #fff;
+        }
+      }
+    }
   }
 }

@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Drawer } from 'antd';
 import { CustomButton, CustomPasswordInput } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import { useWallet, useWalletRequest } from 'ui/utils';
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 import './style.less';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 interface DrawerHeaderProps {
   title: string;
@@ -20,7 +22,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
         <IconComponent
           name="close"
           onClick={props.handleCloseIconClick}
-          cls="drawer-header-close-icon"
+          cls="drawer-header-close-icon icon-close"
         />
       )}
     </div>
@@ -40,6 +42,8 @@ export const UnlockModal: React.FC<PropsInterface> = (
 ) => {
   const [value, setValue] = useState('');
   const wallet = useWallet();
+  const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const [unlock, loading] = useWalletRequest(wallet.unlock, {
     onSuccess() {
@@ -52,7 +56,7 @@ export const UnlockModal: React.FC<PropsInterface> = (
       }
     },
     onError(err) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
       });
@@ -65,6 +69,9 @@ export const UnlockModal: React.FC<PropsInterface> = (
 
   return (
     <Drawer
+      className={clsx('ant-modal-container unlock-drawer', {
+        dark: isDarkMode,
+      })}
       visible={props.visible}
       placement="bottom"
       closable={false}
@@ -72,6 +79,7 @@ export const UnlockModal: React.FC<PropsInterface> = (
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0 24px 24px 24px',
+        //background: '#020C15',
       }}
       contentWrapperStyle={{
         borderRadius: '16px 16px 0 0',
@@ -80,7 +88,11 @@ export const UnlockModal: React.FC<PropsInterface> = (
       }}
       key="top"
     >
-      <div className="backup-popup-container flexCol">
+      <div
+        className={clsx('backup-popup-container flexCol', {
+          dark: isDarkMode,
+        })}
+      >
         <DrawerHeader
           title={props.title}
           hideCloseIcon={props.hideCloseIcon}

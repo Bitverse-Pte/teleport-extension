@@ -6,6 +6,8 @@ import { ActivitiesListParams } from '../typing';
 import { CosmosTransactionItem } from './TxItem.component';
 import { getTransactionsForCurrentProviderAndAccount } from 'ui/selectors/cosmos-transaction.selector';
 import { getTokenBalancesOfCurrentAccount } from 'ui/selectors/token.selector';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 
 const PAGE_INCREMENT = 10;
 
@@ -44,6 +46,8 @@ export function CosmosTransactionsList({
     // simple pagination like MetaMask
     .slice(0, limit);
 
+  const { isDarkMode } = useDarkmode();
+
   if (transactions.length === 0) {
     return <NoContent title="activity" />;
   }
@@ -64,6 +68,7 @@ export function CosmosTransactionsList({
   return (
     <div
       style={{ height: listContiannerHeight, overflowY: 'scroll' }}
+      className={clsx('activity-list-container', { dark: isDarkMode })}
       onScroll={onContainnerScroll}
     >
       {transactions.map((tx, idx) => (

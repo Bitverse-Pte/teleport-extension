@@ -6,15 +6,17 @@ import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import './index.less';
-import { ClickToCloseMessage } from '../universal/ClickToCloseMessage';
 import { IconComponent } from '../IconComponents';
-
-const onCopy = () => {
-  ClickToCloseMessage.success('Copied');
-};
+import clsx from 'clsx';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 function Address({ checksummedAddress, name }) {
   const { t } = useTranslation();
+  const ClickToCloseMessage = useStyledMessage();
+  const onCopy = () => {
+    ClickToCloseMessage('success')('Copied');
+  };
   return (
     <div
       className="sender"
@@ -42,6 +44,7 @@ const SenderToRecipient = ({
   recipientAddress,
   needChecksum = true,
 }) => {
+  const { isDarkMode } = useDarkmode();
   const checksummedSenderAddress = needChecksum
     ? toChecksumHexAddress(senderAddress)
     : senderAddress;
@@ -49,7 +52,7 @@ const SenderToRecipient = ({
     ? toChecksumHexAddress(recipientAddress)
     : recipientAddress;
   return (
-    <div className="sender-to-recipient flexR">
+    <div className={clsx('sender-to-recipient flexR', { dark: isDarkMode })}>
       <Address
         checksummedAddress={checksummedSenderAddress}
         name={senderName}

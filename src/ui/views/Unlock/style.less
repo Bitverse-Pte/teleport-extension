@@ -40,5 +40,53 @@
     }
 
   }
+  .password-input {
+    &:hover {
+        input.ant-input {
+            background: #ffffff;
+        }
+    }
 
+    input.ant-input {
+        &:focus {
+            background: #ffffff !important;
+        }
+    }
+}
+
+}
+
+/** darkmode style override */
+.unlock-container.dark {
+  background-color: #020C15;
+  color: #FFF;
+  min-height: 100vh;
+  .unlock-defense-notice {
+    color: #C5D1E0;
+  }
+
+  .password-input {
+    background-color: #02182B !important;
+    border-color: transparent !important;
+    &:hover,&:active,&:focus,&:focus-within {
+      border-color: #1484F5 !important;
+    }
+    input {
+      background-color: #02182B !important;
+      color: #FFF;
+      &:focus {
+        background: #02182B !important;
+    }
+    }
+    input::placeholder {
+      color: rgb(94, 108, 138) !important;
+    }
+    input:focus-visible {
+      outline: none;
+    }
+
+    .ant-input-suffix {
+      svg.ant-input-password-icon { fill: #FFF }
+    }
+  }
 }

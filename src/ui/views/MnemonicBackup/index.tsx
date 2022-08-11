@@ -10,9 +10,11 @@ import { CustomButton } from 'ui/components/Widgets';
 import './style.less';
 import { AccountHeader } from '../AccountRecover';
 import classnames from 'classnames';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const MnemonicBackup = () => {
   const { t } = useTranslation();
@@ -24,6 +26,9 @@ const MnemonicBackup = () => {
   const { state, pathname } = useLocation<{
     mnemonic: string;
   }>();
+
+  const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   useEffect(() => {
     countDownTimer.current = setInterval(() => {
@@ -75,7 +80,7 @@ const MnemonicBackup = () => {
   };
 
   return (
-    <div className="backup flexCol">
+    <div className={clsx('backup flexCol', { dark: isDarkMode })}>
       <AccountHeader title="Backup Mnemonic" hideClose />
       <div className="content">
         <ul
@@ -145,7 +150,7 @@ const MnemonicBackup = () => {
         <CopyToClipboard
           text={mnemonic}
           onCopy={() => {
-            ClickToCloseMessage.success('Copied');
+            ClickToCloseMessage('success')('Copied');
           }}
         >
           <CustomButton

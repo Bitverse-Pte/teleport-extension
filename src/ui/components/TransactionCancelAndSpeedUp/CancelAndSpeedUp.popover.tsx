@@ -27,6 +27,7 @@ import { TierItem } from './component/FeeTier/TierItem.component';
 import { priorityLevelToI18nKey } from './component/FeeTier/constant';
 import { useAdd10PctTxParams } from './hooks/useAdd10PctTx';
 import { SpeedUpConfirmModal } from '../SpeedUpConfirmModal';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 
 interface CancelAndSpeedUpPopoverParams {
   editGasMode: EDIT_GAS_MODES;
@@ -77,22 +78,21 @@ const DrawerHeader = (props: {
   const { t } = useTranslation();
   return (
     <div className="drawer-header-container-common drawer-header-network flexR with-padding-x-24 flex-wrap">
-      <span className="drawer-header-title">{props.title}</span>
+      <div className="title-and-subtitle">
+        <span className="drawer-header-title">{props.title}</span>
+        <h6 className="flex items-center flex-wrap w-full subtitle">
+          {t('cancelSpeedUpLabel', {
+            replace: {
+              $1: 'replace',
+            },
+          })}
+        </h6>
+      </div>
       <IconComponent
         name="close"
         onClick={props.handleCloseIconClick}
-        cls="drawer-header-close-icon"
+        cls="drawer-header-close-icon icon-close"
       />
-      <h6
-        className="flex items-center flex-wrap w-full"
-        style={{ fontSize: 12 }}
-      >
-        {t('cancelSpeedUpLabel', {
-          replace: {
-            $1: 'replace',
-          },
-        })}
-      </h6>
     </div>
   );
 };
@@ -205,10 +205,12 @@ const CancelSpeedupPopoverImplementation = ({
     }
   }, [gasLimit, currentBlockMaxGasLimit]);
 
+  const { isDarkMode } = useDarkmode();
+
   return (
     <>
       <Drawer
-        height={shouldDrawerExpanded ? 536 : 422}
+        height={shouldDrawerExpanded ? 536 : 402}
         visible={showPopOver}
         onClose={(e) => {
           e.stopPropagation();
@@ -217,6 +219,7 @@ const CancelSpeedupPopoverImplementation = ({
         }}
         placement="bottom"
         closable={false}
+        className={clsx('speedUp-popover', { dark: isDarkMode })}
         bodyStyle={{
           boxSizing: 'border-box',
           padding: '0',
@@ -301,7 +304,7 @@ const CancelSpeedupPopoverImplementation = ({
                     name={`chevron-${
                       selectedGasTier == PRIORITY_LEVELS.CUSTOM ? 'up' : 'down'
                     }`}
-                    cls="base-text-color"
+                    cls="base-text-color gas-custom-panel-toggle"
                   />
                 </div>
               </div>
@@ -315,12 +318,7 @@ const CancelSpeedupPopoverImplementation = ({
             </div>
           </div>
         </div>
-        <div
-          className="with-padding-x-24"
-          style={{
-            marginTop: 24,
-          }}
-        >
+        <div className="with-padding-x-24">
           <Button
             type="primary"
             onClick={() => setConfirmPopupVisible(true)}

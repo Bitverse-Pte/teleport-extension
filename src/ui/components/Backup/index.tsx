@@ -7,7 +7,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { AccountCreateType } from 'types/extend';
 import { CustomButton, CustomPasswordInput } from '../Widgets';
 import { IconComponent } from '../IconComponents';
-import { ClickToCloseMessage } from '../universal/ClickToCloseMessage';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 export interface IBackupProps {
   visible: boolean;
@@ -22,6 +22,7 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
   const [mnemonic, setMnemonic] = useState('');
   const [privateKey, setPrivateKey] = useState('');
   const wallet = useWallet();
+  const ClickToCloseMessage = useStyledMessage();
 
   const handleNextBtnClick = () => {
     checksumPsd();
@@ -54,7 +55,7 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
 
   const checksumPsd = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
       });
@@ -112,7 +113,7 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
             style={{
               display: unlocked ? 'none' : 'block',
             }}
-            cls="icon base-text-color"
+            cls="icon base-text-color icon-close"
             onClick={() => {
               if (props.setVisible) {
                 props.setVisible(false);
@@ -192,7 +193,7 @@ const Backup: React.FC<IBackupProps> = (props: IBackupProps) => {
                 ? mnemonic
                 : privateKey
             }
-            onCopy={() => ClickToCloseMessage.success('Copied')}
+            onCopy={() => ClickToCloseMessage('success')('Copied')}
           >
             <CustomButton
               type="primary"

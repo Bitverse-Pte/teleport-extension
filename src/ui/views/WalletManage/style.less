@@ -226,23 +226,26 @@
               width: 72px;
               height: 56px;
 
-              &:hover {
-                background: #F0F9FF;
-              }
-
               .key-default-icon {
                 display: block;
-              }
-
-              .key-active-icon {
-                display: none;
+                width: 20px;
+                height: 20px;
+                fill: @baseTextColor;
               }
 
               &:hover {
+                background: #F0F9FF;
 
                 .key-default-icon {
-                  display: none;
+                  fill: @themeColor;
                 }
+              }
+
+
+
+              .key-active-icon {}
+
+              &:hover {
 
                 .key-active-icon {
                   display: block;
@@ -348,4 +351,66 @@
     border-radius: 8px;
     text-align: center;
   }
+}
+
+.wallet-manage.dark,
+.account-manage.dark {
+  background: @darkBg;
+  color: #ffffff;
+
+  .account-container {
+    svg {
+      fill: #ffffff !important;
+    }
+  }
+
+  .wallet-manage-button-container {
+    justify-content: space-between;
+    align-items: flex-start;
+
+    ._edit {
+      .wallet-manage-button-wrap {
+        background: rgba(248, 250, 252, 0.1);
+      }
+
+    }
+
+    ._import {
+      .wallet-manage-button-wrap {
+        background: rgba(248, 250, 252, 0.1);
+      }
+    }
+
+    ._add {
+      .wallet-manage-button-wrap {
+        background: rgba(240, 255, 254, 0.1);
+      }
+
+    }
+
+
+  }
+
+  .account-container {
+
+    .list {
+      .item {
+        .normal-container {
+          &:hover {
+            background: #0E5CAA !important;
+          }
+        }
+
+        &:hover {
+          background: #02182B;
+        }
+      }
+
+      ._active {
+        background: #052E55 !important;
+      }
+    }
+
+  }
+
 }

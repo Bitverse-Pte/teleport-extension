@@ -3,13 +3,17 @@ import React, { useState } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.png';
-import TeleportText from 'assets/teleportText.svg';
+import { ReactComponent as TeleportTextSVG } from 'assets/teleportText.svg';
+import { ReactComponent as LightIcon } from 'assets/theme/light.svg';
+import { ReactComponent as MoonIcon } from 'assets/theme/moon.svg';
+import { ReactComponent as SystemIcon } from 'assets/theme/system.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
 import Switch from 'react-switch';
-import { stat } from 'fs';
 import skynet from 'utils/skynet';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 const { sensors } = skynet;
 interface ISettingFeat {
   title: string;
@@ -56,18 +60,24 @@ export interface ILogoHeader {
 }
 
 export const LogoHeader: React.FC<ILogoHeader> = (props) => {
+  const { isDarkMode } = useDarkmode();
   return (
-    <div className="logo-header flexR">
+    <div className={clsx('logo-header flexR', { dark: isDarkMode })}>
       <div className="logo-header-left flexR">
         <img src={walletLogo} className="logo-header-left-logo" />
-        <img src={TeleportText} className="logo-header-left-title" />
+        {/* <img src={TeleportText} className="logo-header-left-title" /> */}
+        <TeleportTextSVG className="logo-header-left-title" />
       </div>
       <div
         className="logo-header-right flexR"
         style={props.hideClosIcon ? { display: 'none' } : {}}
       >
         {props.component && props.component}
-        <IconComponent name="close" onClick={props.handleCloseClick} />
+        <IconComponent
+          name="close"
+          onClick={props.handleCloseClick}
+          cls="icon-close"
+        />
       </div>
     </div>
   );
@@ -81,6 +91,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   const history = useHistory();
   const location = useLocation();
   const wallet = useWallet();
+  const { isDarkMode, setDarkmode, darkmodeSetting } = useDarkmode();
   const [isDefaultWallet, setIsDefaultWallet] = useState(false);
 
   const init = async () => {
@@ -129,7 +140,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
   };
 
   return (
-    <div className="setting flexCol">
+    <div className={clsx('setting flexCol', { dark: isDarkMode })}>
       <LogoHeader handleCloseClick={props.handleCloseClick} />
       <div className="setting-button-container content-wrap-padding flexR">
         <TipButton
@@ -159,6 +170,39 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           onChange={handleDefaultWalletChange}
         />
       </div>
+      <div
+        className="setting-item flexR cursor theme-selection-bar"
+        key="theme-select"
+      >
+        <span className="title">Theme</span>
+        <span className="tag" style={{ display: 'none' }}></span>
+        <div className="theme-buttons">
+          <button
+            className={clsx({
+              selected: darkmodeSetting === 'light',
+            })}
+            onClick={() => setDarkmode('light')}
+          >
+            <LightIcon />
+          </button>
+          <button
+            className={clsx({
+              selected: darkmodeSetting === 'dark',
+            })}
+            onClick={() => setDarkmode('dark')}
+          >
+            <MoonIcon />
+          </button>
+          <button
+            className={clsx({
+              selected: darkmodeSetting === 'system',
+            })}
+            onClick={() => setDarkmode('system')}
+          >
+            <SystemIcon />
+          </button>
+        </div>
+      </div>
       {SettingFeat.map((setting: ISettingFeat, i) => (
         <div
           className="setting-item flexR cursor"
@@ -168,7 +212,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           <span className="title">{setting.title}</span>
           <span
             className="tag"
-            style={{ display: setting?.opts?.tag ? 'block' : 'none' }}
+            style={{ display: setting?.opts?.tag ? 'contents' : 'none' }}
           >
             {setting?.opts?.tag}
           </span>

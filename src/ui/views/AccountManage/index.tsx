@@ -18,13 +18,16 @@ import {
 import { WalletHeader } from '../WalletManage';
 import addImg from 'assets/addImg.svg';
 import editImg from 'assets/editImg.svg';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
+import editImgDark from 'assets/editImgDark.svg';
 import AccountManageWidget from 'ui/components/AccountManageWidget';
 import { ErrorCode } from 'constants/code';
 import { UnlockModal } from 'ui/components/UnlockModal';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 import { useHistory } from 'react-router-dom';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const AccountManage: React.FC = () => {
   const [accounts, setAccounts] = useState<any>([]);
@@ -39,12 +42,15 @@ const AccountManage: React.FC = () => {
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
   const history = useHistory();
+  const { isDarkMode } = useDarkmode();
 
   const { state, pathname } = useLocation<{
     hdWalletId: string;
     hdWalletName: string;
     accountCreateType: AccountCreateType;
   }>();
+  const ClickToCloseMessage = useStyledMessage();
+
   const { hdWalletId, hdWalletName, accountCreateType } = state;
 
   const queryAccounts = async () => {
@@ -78,12 +84,12 @@ const AccountManage: React.FC = () => {
       onError: (e) => {
         console.error(e.code);
         if (e?.code === ErrorCode.WALLET_NAME_REPEAT) {
-          ClickToCloseMessage.error({
+          ClickToCloseMessage('error')({
             content: 'Name already exists',
             key: 'Name already exists',
           });
         } else {
-          ClickToCloseMessage.error({
+          ClickToCloseMessage('error')({
             content: 'Unknown error, please try again later',
             key: 'Unknown error, please try again later',
           });
@@ -97,7 +103,7 @@ const AccountManage: React.FC = () => {
   const onRenameConfirm = async (accountName) => {
     sensors.track('teleport_account_manage_rename_confirm', { page: pathname });
     if (accountName.length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -106,7 +112,7 @@ const AccountManage: React.FC = () => {
     const renamed = await wallet
       .renameDisplayAccount(hdWalletId, accountName, currentAccountIndex)
       .catch((e) => {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Name already exist',
           key: 'Name already exist',
         });
@@ -155,7 +161,7 @@ const AccountManage: React.FC = () => {
   };
 
   return (
-    <div className="account-manage flexCol">
+    <div className={clsx('account-manage flexCol', { dark: isDarkMode })}>
       <UnlockModal
         title="Unlock Wallet"
         visible={unlockPopupVisible}
@@ -188,7 +194,13 @@ const AccountManage: React.FC = () => {
           onClick={() => handleEdit()}
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={editImg} alt="" className="wallet-manage-img" />
+            <IconComponent
+              name="edit_17"
+              cls="wallet-manage-img"
+              style={{
+                fill: isDarkMode ? '#ffffff' : '#000000',
+              }}
+            />
           </div>
           <span className="wallet-manage-button-item-title">Edit</span>
         </div>
@@ -203,7 +215,14 @@ const AccountManage: React.FC = () => {
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div className="wallet-manage-button-wrap flexR">
-            <img src={addImg} alt="" className="wallet-manage-img" />
+            {/* <img src={addImg} alt="" className="wallet-manage-img" /> */}
+            <IconComponent
+              name="plus-circle"
+              cls="wallet-manage-img"
+              style={{
+                fill: '#42B856',
+              }}
+            />
           </div>
           <span className="wallet-manage-button-item-title">Add</span>
         </div>
@@ -222,7 +241,7 @@ const AccountManage: React.FC = () => {
               </div>
               <div className="edit-right flexR">
                 <IconComponent
-                  name="edit"
+                  name="edit_16"
                   cls="base-text-color"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -232,11 +251,11 @@ const AccountManage: React.FC = () => {
                   }}
                 />
                 <IconComponent
-                  name="trash"
+                  name="trash_16"
                   cls="base-text-color right"
                   onClick={(e) => {
                     if (accounts?.length === 1) {
-                      ClickToCloseMessage.warning(
+                      ClickToCloseMessage('warning')(
                         'Please keep alive at least one account'
                       );
                       return;
@@ -301,10 +320,12 @@ export interface IAddProps {
 
 export const Add: React.FC<IAddProps> = (props: IAddProps) => {
   const [value, setValue] = useState('');
+  const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const handleConfirmBtnClick = () => {
     if (value.trim().length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -320,6 +341,7 @@ export const Add: React.FC<IAddProps> = (props: IAddProps) => {
     <Drawer
       visible={props.visible}
       placement="bottom"
+      className={clsx('ant-modal-container flexCol', { dark: isDarkMode })}
       closable={false}
       height="208px"
       bodyStyle={{
@@ -377,13 +399,18 @@ interface DrawerHeaderProps {
 }
 
 const DrawerHeader = (props: DrawerHeaderProps) => {
+  const { isDarkMode } = useDarkmode();
   return (
-    <div className="drawer-header-container-common flexR">
+    <div
+      className={clsx('drawer-header-container-common flexR', {
+        dark: isDarkMode,
+      })}
+    >
       <span className="drawer-header-title">{props.title}</span>
       <IconComponent
         name="close"
         onClick={props.handleCloseIconClick}
-        cls="drawer-header-close-icon"
+        cls="drawer-header-close-icon icon-close"
       />
     </div>
   );
@@ -391,6 +418,8 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
 
 export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
   const [value, setValue] = useState(props.defaultValue);
+  const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const resetState = () => {
     setValue(props.defaultValue);
@@ -412,7 +441,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
       return;
     }
     if (value.trim().length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -428,6 +457,7 @@ export const Rename: React.FC<IRenameProps> = (props: IRenameProps) => {
       visible={props.visible}
       placement="bottom"
       closable={false}
+      className={clsx('ant-modal-container flexCol', { dark: isDarkMode })}
       height="208px"
       bodyStyle={{
         boxSizing: 'border-box',
@@ -477,6 +507,8 @@ export interface IDeleteProps {
 export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
   const [psd, setPsd] = useState('');
   const wallet = useWallet();
+  const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
   const resetState = () => {
     setPsd('');
@@ -490,7 +522,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
 
   const handleConfirmBtnClick = async () => {
     const checksumPassed = await wallet.verifyPassword(psd).catch((e) => {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
       });
@@ -506,6 +538,7 @@ export const Delete: React.FC<IDeleteProps> = (props: IDeleteProps) => {
     <Drawer
       visible={props.visible}
       placement="bottom"
+      className={clsx('ant-modal-container flexCol', { dark: isDarkMode })}
       closable={false}
       height="284px"
       bodyStyle={{

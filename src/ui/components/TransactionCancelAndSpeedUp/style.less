@@ -1,9 +1,9 @@
 .cancel-speedup-popover_wrapper {
-    height: 273px;
+    height: 270px;
     overflow-y: auto;
     .tier-select {
         .list {
-            height: 240px;
+            height: 230px;
             overflow-y: auto;
         }
         .list.expanded {
@@ -16,10 +16,13 @@
         .tier-header {
             display: flex;
     
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             border-radius: 8px;
     
             font-size: 16px;
+            * {
+                line-height: 24px;
+            }
             .level-name {
                 width: 96px;
             }
@@ -58,23 +61,28 @@
                     display: inline-block;
                     text-align: right;
                 }
+                svg.gas-custom-panel-toggle {
+                    width: 10px;
+                }
             }
-        }
-        .tier.selected {
-            background-color: #D6EFFF;
-        }
-        .tier.disabled {
-            color: #808080b5;
-            cursor: not-allowed;
-        }
-        .tier:hover {
-            background-color: #E1E8F0;
+            &.selected {
+                background-color: #D6EFFF;
+            }
+            &.disabled {
+                color: #808080b5;
+                cursor: not-allowed;
+            }
+            &:hover {
+                background-color: #E1E8F0;
+            }
         }
     }
 
     .custom-gas {
         background: #F8FAFC;
         margin: 12px 24px;
+        padding-top: 12px;
+        padding-bottom: 24px;
         border-radius: 8px;
         .field {
             width: 100%;
@@ -132,5 +140,69 @@
 }
 
 .drawer-header-network {
-    height: 72px !important;
+    height: 36px !important;
+    margin-top: 24px;
+    margin-bottom: 26px;
+    .title-and-subtitle {
+        .drawer-header-title {
+            line-height: 18px;
+        }
+        h6.subtitle {
+            font-size: 12px;
+            margin-top: 6px;
+            line-height: 12px;
+            margin-bottom: 0;
+        }
+    }
+}
+
+/** style override for darkmode **/
+.speedUp-popover.dark .ant-drawer-body {
+    background: #020C15;
+    color: #EEE;
+
+    .drawer-header-close-icon {
+        fill: #FFFFFF;
+    }
+
+    .drawer-header-container-common h6 {
+        color: #798CAD;
+    }
+
+    .tier-select {
+        .tier {
+            &.selected { background: #052E55; }
+            &.disabled {
+                color: #808080b5;
+                cursor: not-allowed;
+            }
+            &:hover { background: #02182B; }
+
+            .maximum-charge svg {
+                fill: #FFF;
+            }
+        }
+    }
+
+    .custom-gas {
+        background: #02182B;
+        .field {
+            .form-title {
+                color: #FFF;
+            }
+            .ant-input-number {
+                background: transparent;
+                input { color: #FFF; }
+                border-color: #5e6c8a !important;
+            }
+
+            .ant-input-number-group-wrapper {
+                border-color: #5e6c8a !important;
+                .ant-input-number-group-addon {
+                    color: #5e6c8a !important
+                }
+            }
+        }
+        
+    }
 }

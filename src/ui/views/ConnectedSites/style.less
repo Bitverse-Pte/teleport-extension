@@ -5,7 +5,9 @@
     height: 100%;
     flex: 1;
     box-sizing: border-box;
-    padding: 28px 24px;
+    .current-connected-sites-top {
+      padding: 28px 24px 0;
+    }
     .page-header {
         font-family: 'MontserratBold';
         font-style: normal;
@@ -99,7 +101,7 @@
             flex: 0 0 64px;
             // cursor: pointer;
             box-sizing: border-box;
-            
+            padding: 0 24px;
             .site-item-left {
                 align-items: center;
                 .site-icon {
@@ -132,24 +134,15 @@
                 align-items: center;
                 background: #F8FAFC;
                 box-sizing: border-box;
-                .site-item-action-icon {
-                  height: 14px;
-                }
-                .key-default-icon {
-                  display: block;
-                }
-                .key-active-icon {
-                  display: none;
-                }
                 &:hover {
                   background: #F0F9FF;
-      
-                  .key-default-icon {
-                    display: none;
-                  }
-      
-                  .key-active-icon {
-                    display: block;
+                  .disconnect-icon {
+                    path:first-child {
+                      stroke: #E05651;
+                    }
+                    path:last-child {
+                      fill: #E05651;
+                    }
                   }
                 }
                 &:last-child {
@@ -161,7 +154,7 @@
               background: #F8FAFC;
       
               .site-item-right {
-                border: 0.5px solid #E1E8F0;
+                // border: 0.5px solid #E1E8F0;
                 &:hover {
                   background: #FFF3F0;;
                   border: none;
@@ -217,4 +210,63 @@
 }
 .ant-modal-confirm .ant-modal-body{
   padding-top: 20px;
+}
+
+.current-connected-sites.dark {
+  background: #020C15;
+  color: #fff;
+  .page-header {
+    color: #ffffff
+  }
+  .account-item {
+    border: 1px solid #364361;
+    .account-left {
+      .account-info .account-address {
+        color: #5E6C8A;
+      }
+    }
+  }
+  .content-desc {
+    color: #fff;
+  }
+
+  .connected-site-list {
+    .site-item {
+      .site-item-left {
+        .site-origin {
+          color: #C5D1E0;
+        }
+      }
+      .site-item-right {
+        background: #364361;
+        .disconnect-icon {
+          path:first-child {
+            stroke: #fff;
+          }
+          path:last-child {
+            fill: #fff;
+          }
+        }
+        &:hover {
+          background: #FFF3F0;
+          .disconnect-icon {
+            path:first-child {
+              stroke: #E05651;
+            }
+            path:last-child {
+              fill: #E05651;
+            }
+          }
+        }
+      }
+      &:hover {
+        background: #052E55;
+      }
+    }
+  }
+  .account-switch-icon {
+    path:last-child {
+      stroke: #fff;
+    }
+  }
 }

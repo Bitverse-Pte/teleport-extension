@@ -20,6 +20,9 @@ html,
 body {
   color: @baseTextColor;
   font-family: Montserrat;
+  .icon-close {
+    width: 11px;
+  }
 }
 
 // /**
@@ -35,14 +38,19 @@ body {
 
 *::-webkit-scrollbar {
   -webkit-appearance: none;
-  width: 7px;
-  height: 7px;
+  width: 4px;
+  height: 4px;
 }
 
 *::-webkit-scrollbar-thumb {
   border-radius: 4px;
-  background-color: rgba(0,0,0,.5);
+  background-color: #C5D1E0;
+  box-shadow: 0 0 1px rgba(255,255,255,.5);
   -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
+.dark::-webkit-scrollbar-thumb,.dark *::-webkit-scrollbar-thumb {
+  background-color: #5E6C8A;
 }
 
 .expanded-view .popup-size,

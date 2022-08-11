@@ -8,10 +8,11 @@ import React, {
 import { Input, InputNumber, Select, Spin } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
 import { addHexPrefix, isValidAddress } from 'ethereumjs-util';
-
+import { IconComponent } from 'ui/components/IconComponents';
 import {
   EthDenomination,
   getWeiHexFromDecimalValue,
@@ -52,6 +53,7 @@ import {
 } from 'ui/reducer/send.reducer';
 import { shortenAddress } from 'ui/utils/utils';
 import { UnlockModal } from 'ui/components/UnlockModal';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 
@@ -72,6 +74,7 @@ const Send = () => {
   const wallet = useWallet();
   const [selected, setSelected] = useState<BaseAccount | undefined>();
   const { t } = useTranslation();
+  const { isDarkMode } = useDarkmode();
   //const [form] = Form.useForm();
   const [fromAccount, setFromAccount] = useState<BaseAccount>();
   const [amount, setAmount] = useState<string>('0');
@@ -278,7 +281,11 @@ const Send = () => {
   const assetsOptions = tokens.map((t: Token) => {
     return {
       label: (
-        <div className="assets-option flexR">
+        <div
+          className={clsx('assets-option flexR', {
+            dark: isDarkMode,
+          })}
+        >
           <div className="assets-option-left flexR">
             <TokenIcon token={t} scale={0.8} />
             <span className="assets-option-symbol">{t.symbol}</span>
@@ -302,7 +309,9 @@ const Send = () => {
 
   return (
     <div
-      className="send flexCol"
+      className={clsx('send flexCol', {
+        dark: isDarkMode,
+      })}
       onClick={() => {
         if (showToList) {
           /**
@@ -342,11 +351,12 @@ const Send = () => {
         <Select
           dropdownMatchSelectWidth
           style={{ width: '100%' }}
-          //dropdownClassName="assets-option assets-option-symbol assets-option-right"
+          dropdownClassName={clsx('send-dropdown', { dark: isDarkMode })}
           value={selectedToken?.symbol}
           onChange={handleTokenSelect}
           optionLabelProp="selected"
           options={assetsOptions}
+          suffixIcon={<IconComponent name="chevron-down" cls="chevron-down" />}
         ></Select>
         <p className="send-form-title">{t('Amount')}</p>
         <InputNumber
@@ -378,11 +388,13 @@ const Send = () => {
         />
         <div className="available-container flexR">
           Available:{' '}
-          {denom2SymbolRatio(
-            selectedToken?.amount || 0,
-            selectedToken?.decimal || 0
-          )}{' '}
-          {selectedToken?.symbol?.toUpperCase()}{' '}
+          <span>
+            {denom2SymbolRatio(
+              selectedToken?.amount || 0,
+              selectedToken?.decimal || 0
+            )}{' '}
+            {selectedToken?.symbol?.toUpperCase()}{' '}
+          </span>
           <button onClick={handleMaxClick} className="max-icon">
             MAX
           </button>
@@ -417,9 +429,9 @@ const Send = () => {
             </div>
           </div>
         ) : (
-          <span className="tbmy" onClick={myAccountsSelect}>
+          <p className="tbmy" onClick={myAccountsSelect}>
             {t('Transfer between my accounts')}
-          </span>
+          </p>
         )}
 
         <AccountSelect

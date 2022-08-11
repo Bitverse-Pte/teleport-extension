@@ -10,6 +10,8 @@ import './feeSelector.less';
 import { IconComponent } from 'ui/components/IconComponents';
 import { useLocation } from 'react-router-dom';
 import skynet from 'utils/skynet';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import clsx from 'clsx';
 const { sensors } = skynet;
 interface Fee {
   type: string;
@@ -40,6 +42,7 @@ const DrawerHeader = (props: DrawerHeaderProps) => {
   );
 };
 function FeeSelector(props) {
+  const { isDarkMode } = useDarkmode();
   const location = useLocation();
   const gasState: any = useSelector((state) => state.gas);
   const dispatch = useDispatch();
@@ -163,7 +166,9 @@ function FeeSelector(props) {
       size="large"
       visible={visible}
       closable={false}
-      className="fee"
+      className={clsx('fee', {
+        dark: isDarkMode,
+      })}
       bodyStyle={{
         boxSizing: 'border-box',
         padding: '0',
@@ -179,7 +184,11 @@ function FeeSelector(props) {
         title="Edit Gas Fee"
         handleCloseIconClick={() => onClose()}
       />
-      <div className="fee-box">
+      <div
+        className={clsx('fee-box', {
+          dark: isDarkMode,
+        })}
+      >
         <ul className="fee-selector">
           {feeList.map((item, index) => (
             <FeeItem
@@ -208,7 +217,10 @@ function FeeSelector(props) {
             }}
           >
             <span>Customize Gas Fee</span>
-            <IconComponent name="chevron-right" cls="base-text-color" />
+            <IconComponent
+              name="chevron-right"
+              cls="base-text-color right-icon"
+            />
           </div>
         )}
       </div>
@@ -228,7 +240,9 @@ function FeeSelector(props) {
         size="large"
         visible={customVisible}
         closable={false}
-        className="fee"
+        className={clsx('custom-fee-box', {
+          dark: isDarkMode,
+        })}
         bodyStyle={{
           boxSizing: 'border-box',
           padding: '0 20px 20px',

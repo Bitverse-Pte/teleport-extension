@@ -1,12 +1,11 @@
 import React, { useMemo, useState, useContext } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { Checkbox, Input } from 'antd';
 import { usePolicyAgreed, useWallet, useWalletRequest } from 'ui/utils';
 import './style.less';
 import { CreateAccountOpts, ImportAccountOpts } from 'types/extend';
-import { CoinType, Provider } from 'types/network';
+import { Provider } from 'types/network';
 import {
   CustomButton,
   CustomInput,
@@ -17,23 +16,23 @@ import {
 import { ErrorCode } from 'constants/code';
 import { IconComponent } from 'ui/components/IconComponents';
 import { Tabs } from 'constants/wallet';
-import { ClickToCloseMessage } from 'ui/components/universal/ClickToCloseMessage';
 import skynet from 'utils/skynet';
-import { PresetNetworkId } from 'constants/defaultNetwork';
 import EcosystemSelect from 'ui/components/EcosystemSelect';
-import { NetworkProviderContext } from 'ui/context/NetworkProvider';
+import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
 const { sensors } = skynet;
-
 const { TextArea } = Input;
 
 export interface AccountHeaderProps {
   title: string;
   hideClose?: boolean;
+  isScroll?: boolean;
   handleCloseIconClick?: () => void;
 }
 
 export const AccountHeader = (props: AccountHeaderProps) => {
+  const { isDarkMode } = useDarkmode();
   const handleBackClick = () => {
     sensors.track('teleport_account_manage_closed', {
       page: location.pathname,
@@ -47,13 +46,18 @@ export const AccountHeader = (props: AccountHeaderProps) => {
   };
 
   return (
-    <div className="account-header-container flexR">
+    <div
+      className={clsx('account-header-container flexR', {
+        dark: isDarkMode,
+        isScroll: props.isScroll,
+      })}
+    >
       <span className="account-header-title">{props.title}</span>
       <IconComponent
         name="close"
         style={props.hideClose ? { display: 'none' } : {}}
         onClick={handleBackClick}
-        cls="account-header-close-icon"
+        cls="account-header-close-icon icon-close"
       />
     </div>
   );
@@ -67,6 +71,7 @@ const AccountRecover = () => {
   const [textareaActive, setTextareaActive] = useState(false);
   const [mnemonic, setMnemonic] = useState('');
   const [privateKey, setPrivateKey] = useState('');
+  const [isScroll, setIsScroll] = useState(false);
 
   // const mnemonicError = useSeedPhraseValidation(mnemonic);
   // const privateKeyError = usePrivateKeyValidation(privateKey);
@@ -78,12 +83,15 @@ const AccountRecover = () => {
   const [policyShow, updateStoragePolicyAgreed] = usePolicyAgreed();
   const [passwordCheckPassed, setPasswordCheckPassed] = useState(false);
   const [privateKeyChains, setPrivateKeyChains] = useState<Provider[]>([]);
-  const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
-    PresetNetworkId | string
-  >();
+  const { isDarkMode } = useDarkmode();
+  const ClickToCloseMessage = useStyledMessage();
 
-  const providerContext = useContext(NetworkProviderContext);
-  const { t } = useTranslation();
+  /* const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
+    PresetNetworkId | string
+  >(); */
+
+  //const providerContext = useContext(NetworkProviderContext);
+  //const { t } = useTranslation();
 
   const handleSuccessCallback = async () => {
     updateStoragePolicyAgreed();
@@ -107,32 +115,32 @@ const AccountRecover = () => {
 
     switch (e?.code) {
       case ErrorCode.ADDRESS_REPEAT:
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Account already exists',
           key: 'Account already exists',
         });
         break;
       case ErrorCode.INVALID_MNEMONIC:
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Invalid mnemonic',
           key: 'Invalid mnemonic',
         });
         break;
       case ErrorCode.INVALID_PRIVATE_KEY:
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Invalid private key',
           key: 'Invalid private key',
         });
         break;
       case ErrorCode.WALLET_NAME_REPEAT:
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'Name already exists',
           key: 'Name already exists',
         });
         break;
       default:
         //It will misled developer if using the same error msg
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: 'unexcept error',
           key: 'unexcept error',
         });
@@ -186,7 +194,7 @@ const AccountRecover = () => {
 
   const submit = () => {
     if (name.trim().length > 20) {
-      ClickToCloseMessage.error({
+      ClickToCloseMessage('error')({
         content: 'Name length should be 1-20 characters',
         key: 'Name length should be 1-20 characters',
       });
@@ -194,7 +202,7 @@ const AccountRecover = () => {
     }
     if (policyShow) {
       if (psd.trim() !== confirmPsd.trim()) {
-        ClickToCloseMessage.error({
+        ClickToCloseMessage('error')({
           content: "Password don't match",
           key: "Password don't match",
         });
@@ -230,10 +238,22 @@ const AccountRecover = () => {
     }
   };
 
+  const onBodyScroll = (e) => {
+    console.log();
+    if (e.target.scrollTop > 0) {
+      setIsScroll(true);
+    } else {
+      setIsScroll(false);
+    }
+  };
+
   return (
-    <div className="recover flexCol">
-      <AccountHeader title="Import Wallet" />
-      <div className="account-recover-content content-wrap-padding">
+    <div className={clsx('recover flexCol', { dark: isDarkMode })}>
+      <AccountHeader title="Import Wallet" isScroll={isScroll} />
+      <div
+        className="account-recover-content content-wrap-padding"
+        onScroll={onBodyScroll}
+      >
         <CustomTab
           tab1="Mnemonic"
           tab2="Private Key"
@@ -272,7 +292,7 @@ const AccountRecover = () => {
               setPrivateKey(e.target.value.trim());
             }}
             placeholder="Enter private key"
-            cls="private-key-input"
+            cls="private-key-input custom-password-input"
           />
         </div>
         {importType === Tabs.SECOND ? (
@@ -282,7 +302,7 @@ const AccountRecover = () => {
           style={importType === Tabs.FIRST ? { display: 'none' } : {}}
           handleEcosystemSelect={(chains: Provider[], originChainId) => {
             setPrivateKeyChains(chains);
-            setPrivateKeyMasterChain(originChainId);
+            //setPrivateKeyMasterChain(originChainId);
           }}
         />
         <p className="account-recover-title">Wallet name</p>
@@ -296,7 +316,7 @@ const AccountRecover = () => {
           }}
           onBlur={() => {
             if (name.trim().length > 20) {
-              ClickToCloseMessage.error({
+              ClickToCloseMessage('error')({
                 content: 'Name length should be 1-20 characters',
                 key: 'Name length should be 1-20 characters',
               });
@@ -313,6 +333,7 @@ const AccountRecover = () => {
             Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
+            cls="custom-password-input"
             onChange={(e) => {
               setPsd(e.target.value);
             }}
@@ -326,6 +347,7 @@ const AccountRecover = () => {
           />
           <p className="account-recover-title">Confirm password</p>
           <CustomPasswordInput
+            cls="custom-password-input"
             onChange={(e) => {
               setConfirmPsd(e.target.value);
             }}
@@ -335,7 +357,7 @@ const AccountRecover = () => {
                 e.target.value?.trim() &&
                 psd.trim() !== e.target.value?.trim()
               ) {
-                ClickToCloseMessage.error({
+                ClickToCloseMessage('error')({
                   content: "Password don't match",
                   key: "Password don't match",
                 });

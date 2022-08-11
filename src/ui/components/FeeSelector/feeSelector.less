@@ -38,6 +38,9 @@
     margin-top: 24px;
     font-weight: 700;
     font-family: MontserratBold;
+    .right-icon {
+      height: 8px;
+    }
   }
   .gas-fee-bottom {
     position: absolute;
@@ -69,6 +72,8 @@
   }
   .drawer-header-close-icon{
     fill:#798CAD;
+    height: 10px;
+    width: 10px;
   }
 }
 .drawer-header-type2 {
@@ -78,3 +83,38 @@
     text-align: center;
   }
 }
+
+.fee.dark {
+  .ant-drawer-body {
+    background: #020C15;
+    .drawer-header-container {
+      .drawer-header-title {
+        color: #fff;
+      }
+    }
+  }
+  .custom-box {
+    background-color: #02182B;
+    color: #fff;
+    svg {
+      fill: #fff;
+    }
+  }
+}
+.custom-fee-box.dark {
+  .drawer-header-container {
+    background: #020C15;
+    border-bottom: 1px solid #032440;
+    .drawer-header-title {
+      color: #fff;
+      font-weight: 800;
+    }
+    svg {
+      fill: #fff;
+    }
+  }
+  .ant-drawer-body {
+    background: #020C15;
+  }
+}
+@import "./dark";
