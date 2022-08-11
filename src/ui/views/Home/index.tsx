@@ -608,7 +608,7 @@ const Home = () => {
                 >
                   Manage Account
                   <IconComponent
-                    name="chevron-right"
+                    name="chevron-right_8"
                     cls="icon chevron-right"
                   />
                 </span>
@@ -704,7 +704,10 @@ const Home = () => {
                 }}
               >
                 Manage Wallet
-                <IconComponent name="chevron-right" cls="icon chevron-right" />
+                <IconComponent
+                  name="chevron-right_8"
+                  cls="icon chevron-right"
+                />
               </span>
             </div>
             <WalletSwitch

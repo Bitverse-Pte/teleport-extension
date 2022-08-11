@@ -294,7 +294,7 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
                                 }
                               >
                                 <IconComponent
-                                  name="copy"
+                                  name="copy_16"
                                   cls="copy-icon"
                                   onClick={(e) => {
                                     e.stopPropagation();

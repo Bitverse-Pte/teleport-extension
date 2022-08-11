@@ -25,7 +25,7 @@ export const SearchInput = (props) => {
   const { isDarkMode } = useDarkmode();
   return (
     <div className={clsx('custom-input-container', { dark: isDarkMode })}>
-      <IconComponent name="search" cls="search-icon" />
+      <IconComponent name="search_16" cls="search-icon" />
       <input {...props} className={'custom-search-input'} />
     </div>
   );
@@ -470,10 +470,10 @@ const getTipImg = (type: TipButtonEnum) => {
 
   switch (type) {
     case TipButtonEnum.SEND:
-      iconStr = 'send';
+      iconStr = 'send_20';
       break;
     case TipButtonEnum.RECEIVE:
-      iconStr = 'receive';
+      iconStr = 'receive_20';
       break;
     case TipButtonEnum.WALLET_MANAGE:
       iconStr = 'wrench';

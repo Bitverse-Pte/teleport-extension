@@ -451,7 +451,7 @@
     height: 60px;
     flex: 0 0 60px;
 
-    
+
   }
 
   div.account-switch-accounts {
@@ -476,6 +476,8 @@
       .chevron-right {
         fill: @themeColor;
         height: 8px;
+        width: 8px;
+        margin-left: 8px;
       }
     }
   }
@@ -484,6 +486,7 @@
 .account-switch-drawer.dark {
   background: #020C15;
   color: #fff;
+
   .account-switch-header {
     svg.icon-close {
       fill: #FFF;
@@ -500,10 +503,8 @@
 .home.dark {
   background: #010C15;
 
-  .ant-spin-nested-loading{
-    .ant-spin-spinning{
-      background: rgba(136, 166, 236, 0.1) !important;
-    }
+  .ant-spin-nested-loading {
+    .ant-spin-spinning {}
   }
 
   .headerOfMenu {
