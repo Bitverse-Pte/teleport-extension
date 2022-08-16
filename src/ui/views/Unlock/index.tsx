@@ -23,6 +23,7 @@ const Unlock = () => {
       resolveApproval();
     },
     onError(err) {
+      console.error('unlock failed:', err.code, err.message, err);
       ClickToCloseMessage('error')({
         content: 'Wrong password',
         key: 'Wrong password',
