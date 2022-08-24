@@ -178,8 +178,14 @@ const SignTx = ({ params, origin }) => {
         decGWEIToHexWEI(suggestedMaxPriorityFeePerGas).toString()
       );
       setMaxPriorityFeePerGas(_maxPriorityFeePerGas);
-      const _a = addHexes(_maxFeePerGas, _maxPriorityFeePerGas).toString();
-      const total = multipyHexes(_a, gasLimitRef.current).toString();
+      const calGasFee = Math.min(
+        Number(suggestedMaxPriorityFeePerGas) +
+          Number(gasFeeEstimates.estimatedBaseFee),
+        Number(suggestedMaxFeePerGas)
+      );
+      const calGasFeeHex = addHexPrefix(decGWEIToHexWEI(calGasFee).toString());
+      // const _a2 = addHexes(_maxFeePerGas, _maxPriorityFeePerGas).toString();
+      const total = multipyHexes(calGasFeeHex, gasLimitRef.current).toString();
       setTotalGasFee(addHexPrefix(total));
     }
   };

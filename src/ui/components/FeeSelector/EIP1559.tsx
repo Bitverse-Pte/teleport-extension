@@ -12,6 +12,8 @@ import { useLocation } from 'react-router-dom';
 import skynet from 'utils/skynet';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { addHexPrefix } from 'ethereumjs-util';
+import { decGWEIToHexWEI } from 'ui/utils/conversion';
 const { sensors } = skynet;
 interface Fee {
   type: string;
@@ -53,6 +55,8 @@ function FeeSelector(props) {
     maxFeePerGas,
     maxPriorityFeePerGas,
   } = props;
+  const [customMFPG, setCustomMFPG] = useState(maxFeePerGas);
+  const [customMPFPG, setCustomMPFPG] = useState(maxPriorityFeePerGas);
   const wallet = useWallet();
   const [selectFee, setSelectFee] = useState('medium');
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -63,6 +67,16 @@ function FeeSelector(props) {
   const onSelect = (type) => {
     dispatch({ type: SET_CUSTOM_TYPE, value: true });
     setSelectFee(type);
+    // update custom fee selector values
+    const selectFee = feeList.filter((item) => item.type === type)[0];
+    const _mpfg = addHexPrefix(
+      decGWEIToHexWEI(selectFee?.suggestedMaxFeePerGas).toString()
+    );
+    const _mpfpg = addHexPrefix(
+      decGWEIToHexWEI(selectFee?.suggestedMaxPriorityFeePerGas).toString()
+    );
+    setCustomMFPG(_mpfg);
+    setCustomMPFPG(_mpfpg);
   };
   const fetchGasFeeEstimates = async () => {
     const res = await wallet.fetchGasFeeEstimates();
@@ -263,8 +277,8 @@ function FeeSelector(props) {
           selectFee={feeList.filter((e) => e.type === selectFee)[0]}
           gasLimit={gasLimit}
           onSubmit={onSaveCustom}
-          maxFeePerGas={maxFeePerGas}
-          maxPriorityFeePerGas={maxPriorityFeePerGas}
+          maxFeePerGas={customMFPG}
+          maxPriorityFeePerGas={customMPFPG}
         />
       </Drawer>
     </Drawer>
