@@ -29,6 +29,38 @@ export enum TipButtonEnum {
   LOCK,
 }
 
+export enum MnemonicCount {
+  WORDS_12 = 'words_12',
+  WORDS_15 = 'words_15',
+  WORDS_18 = 'words_18',
+  WORDS_21 = 'words_21',
+  WORDS_24 = 'words_24',
+}
+
+export const MnemonicCountList = [
+  {
+    type: MnemonicCount.WORDS_12,
+    count: 12,
+  },
+
+  {
+    type: MnemonicCount.WORDS_15,
+    count: 15,
+  },
+  {
+    type: MnemonicCount.WORDS_18,
+    count: 18,
+  },
+  {
+    type: MnemonicCount.WORDS_21,
+    count: 21,
+  },
+  {
+    type: MnemonicCount.WORDS_24,
+    count: 24,
+  },
+];
+
 export const ecosystemMapping: {
   [key in keyof typeof Ecosystem]: {
     ecosystemName: string;
