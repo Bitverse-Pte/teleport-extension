@@ -33,11 +33,11 @@ export const SearchInput = (props) => {
 
 export interface TokenIconProps {
   token:
-    | Pick<
-        Token,
-        'symbol' | 'decimal' | 'contractAddress' | 'isNative' | 'chainCustomId'
-      >
-    | undefined;
+  | Pick<
+    Token,
+    'symbol' | 'decimal' | 'contractAddress' | 'isNative' | 'chainCustomId'
+  >
+  | undefined;
   radius?: number;
   scale?: number;
 }
@@ -302,15 +302,14 @@ export const PasswordCheckPassed: React.FC<PasswordCheckPassedProps> = (
       <div className="password-check-pass-container">
         <div className="password-check-pass-top flexR">
           <div className="password-check-pass-item flexR">
-            <img
-              src={passwordChecked}
-              style={{ display: lengthPass ? 'block' : 'none' }}
-              className="password-check-pass-icon"
-            />
-            <img
-              src={passwordUnchecked}
-              style={{ display: lengthPass ? 'none' : 'block' }}
-              className="password-check-pass-icon"
+            <IconComponent
+              name={lengthPass ? 'checkbox' : 'select-off'}
+              cls={clsx(
+                "password-check-pass-icon",
+                {
+                  'icon-default': !lengthPass,
+                }
+              )}
             />
             <p
               className={classnames('password-check-pass-title', {
@@ -321,15 +320,14 @@ export const PasswordCheckPassed: React.FC<PasswordCheckPassedProps> = (
             </p>
           </div>
           <div className="password-check-pass-item flexR">
-            <img
-              src={passwordChecked}
-              style={{ display: uppercasePass ? 'block' : 'none' }}
-              className="password-check-pass-icon"
-            />
-            <img
-              src={passwordUnchecked}
-              style={{ display: uppercasePass ? 'none' : 'block' }}
-              className="password-check-pass-icon"
+            <IconComponent
+              name={uppercasePass ? 'checkbox' : 'select-off'}
+              cls={clsx(
+                "password-check-pass-icon",
+                {
+                  'icon-default': !uppercasePass,
+                }
+              )}
             />
             <p
               className={classnames('password-check-pass-title', {
@@ -342,15 +340,14 @@ export const PasswordCheckPassed: React.FC<PasswordCheckPassedProps> = (
         </div>
         <div className="password-check-pass-top flexR">
           <div className="password-check-pass-item flexR">
-            <img
-              src={passwordChecked}
-              style={{ display: numberPass ? 'block' : 'none' }}
-              className="password-check-pass-icon"
-            />
-            <img
-              src={passwordUnchecked}
-              style={{ display: numberPass ? 'none' : 'block' }}
-              className="password-check-pass-icon"
+            <IconComponent
+              name={numberPass ? 'checkbox' : 'select-off'}
+              cls={clsx(
+                "password-check-pass-icon",
+                {
+                  'icon-default': !numberPass,
+                }
+              )}
             />
             <p
               className={classnames('password-check-pass-title', {
@@ -361,15 +358,14 @@ export const PasswordCheckPassed: React.FC<PasswordCheckPassedProps> = (
             </p>
           </div>
           <div className="password-check-pass-item flexR">
-            <img
-              src={passwordChecked}
-              style={{ display: symbolPass ? 'block' : 'none' }}
-              className="password-check-pass-icon"
-            />
-            <img
-              src={passwordUnchecked}
-              style={{ display: symbolPass ? 'none' : 'block' }}
-              className="password-check-pass-icon"
+            <IconComponent
+              name={symbolPass ? 'checkbox' : 'select-off'}
+              cls={clsx(
+                "password-check-pass-icon",
+                {
+                  'icon-default': !symbolPass,
+                }
+              )}
             />
             <p
               className={classnames('password-check-pass-title', {

@@ -6,6 +6,20 @@
   "description": "的",
   "glyphs": [
     {
+      "icon_id": "31476208",
+      "name": "checkbox",
+      "font_class": "checkbox",
+      "unicode": "e67d",
+      "unicode_decimal": 59005
+    },
+    {
+      "icon_id": "31407124",
+      "name": "icon:16:eye2",
+      "font_class": "a-icon16eye2",
+      "unicode": "e67b",
+      "unicode_decimal": 59003
+    },
+    {
       "icon_id": "31180329",
       "name": "edit_17",
       "font_class": "edit_17",

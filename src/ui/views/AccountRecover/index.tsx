@@ -342,7 +342,7 @@ const AccountRecover = () => {
   const setSeedType = (seedType: MnemonicCount) => {
     _setSeedType(seedType);
     setShownMnemonicIndex(-1);
-
+    setErrorMnemonicIndexList([]);
     const selected = MnemonicCountList.find((m) => m.type === seedType);
     if (selected) {
       setSeedWords((seedWords) => {
@@ -457,7 +457,7 @@ const AccountRecover = () => {
             ))}
           </div>
           <span className="account-recover-mnemonic-count-selector-text">
-            words phrase
+            seed phrase
           </span>
         </div>
         <div
