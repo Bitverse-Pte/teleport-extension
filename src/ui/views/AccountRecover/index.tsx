@@ -279,6 +279,15 @@ const AccountRecover = () => {
       .split(' ')
       .map((word) => word.trim());
 
+    if (errorMnemonicIndexList.includes(index)) {
+      const errorList = cloneDeep(errorMnemonicIndexList);
+      errorList.splice(
+        errorList.findIndex((e) => e === index),
+        1
+      );
+      setErrorMnemonicIndexList(errorList);
+    }
+
     if (
       words.length === 12 ||
       words.length === 15 ||
