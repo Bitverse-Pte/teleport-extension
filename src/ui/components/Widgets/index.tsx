@@ -33,11 +33,11 @@ export const SearchInput = (props) => {
 
 export interface TokenIconProps {
   token:
-  | Pick<
-    Token,
-    'symbol' | 'decimal' | 'contractAddress' | 'isNative' | 'chainCustomId'
-  >
-  | undefined;
+    | Pick<
+        Token,
+        'symbol' | 'decimal' | 'contractAddress' | 'isNative' | 'chainCustomId'
+      >
+    | undefined;
   radius?: number;
   scale?: number;
 }
@@ -304,12 +304,9 @@ export const PasswordCheckPassed: React.FC<PasswordCheckPassedProps> = (
           <div className="password-check-pass-item flexR">
             <IconComponent
               name={lengthPass ? 'checkbox' : 'select-off'}
-              cls={clsx(
-                "password-check-pass-icon",
-                {
-                  'icon-default': !lengthPass,
-                }
-              )}
+              cls={clsx('password-check-pass-icon', {
+                'icon-default': !lengthPass,
+              })}
             />
             <p
               className={classnames('password-check-pass-title', {
@@ -322,12 +319,9 @@ export const PasswordCheckPassed: React.FC<PasswordCheckPassedProps> = (
           <div className="password-check-pass-item flexR">
             <IconComponent
               name={uppercasePass ? 'checkbox' : 'select-off'}
-              cls={clsx(
-                "password-check-pass-icon",
-                {
-                  'icon-default': !uppercasePass,
-                }
-              )}
+              cls={clsx('password-check-pass-icon', {
+                'icon-default': !uppercasePass,
+              })}
             />
             <p
               className={classnames('password-check-pass-title', {
@@ -342,12 +336,9 @@ export const PasswordCheckPassed: React.FC<PasswordCheckPassedProps> = (
           <div className="password-check-pass-item flexR">
             <IconComponent
               name={numberPass ? 'checkbox' : 'select-off'}
-              cls={clsx(
-                "password-check-pass-icon",
-                {
-                  'icon-default': !numberPass,
-                }
-              )}
+              cls={clsx('password-check-pass-icon', {
+                'icon-default': !numberPass,
+              })}
             />
             <p
               className={classnames('password-check-pass-title', {
@@ -360,12 +351,9 @@ export const PasswordCheckPassed: React.FC<PasswordCheckPassedProps> = (
           <div className="password-check-pass-item flexR">
             <IconComponent
               name={symbolPass ? 'checkbox' : 'select-off'}
-              cls={clsx(
-                "password-check-pass-icon",
-                {
-                  'icon-default': !symbolPass,
-                }
-              )}
+              cls={clsx('password-check-pass-icon', {
+                'icon-default': !symbolPass,
+              })}
             />
             <p
               className={classnames('password-check-pass-title', {
