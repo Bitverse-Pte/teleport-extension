@@ -39,7 +39,16 @@ const SignText = ({ params }) => {
 
   const parsedData = useMemo(() => {
     console.info('SignText::parsedData data:', data);
-    return isHexString(data) ? utils.toUtf8String(data) : data;
+    if (isHexString(data)) {
+      try {
+        return utils.toUtf8String(data);
+      } catch {
+        console.log('SignText::parsedData Fail to decode:');
+      }
+      return data;
+    } else {
+      return data;
+    }
   }, [data]);
 
   return (

@@ -15,11 +15,13 @@ import {
 } from 'ui/components/Widgets';
 import { ErrorCode } from 'constants/code';
 import { IconComponent } from 'ui/components/IconComponents';
-import { Tabs } from 'constants/wallet';
+import { MnemonicCount, MnemonicCountList, Tabs } from 'constants/wallet';
 import skynet from 'utils/skynet';
 import EcosystemSelect from 'ui/components/EcosystemSelect';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
+import * as bip39 from 'bip39';
+import { cloneDeep } from 'lodash';
 
 const { sensors } = skynet;
 const { TextArea } = Input;
@@ -68,8 +70,6 @@ const AccountRecover = () => {
   const location = useLocation();
   const [importType, setImportType] = useState(Tabs.FIRST);
   const [agreed, setAgreed] = useState(false);
-  const [textareaActive, setTextareaActive] = useState(false);
-  const [mnemonic, setMnemonic] = useState('');
   const [privateKey, setPrivateKey] = useState('');
   const [isScroll, setIsScroll] = useState(false);
 
@@ -85,6 +85,17 @@ const AccountRecover = () => {
   const [privateKeyChains, setPrivateKeyChains] = useState<Provider[]>([]);
   const { isDarkMode } = useDarkmode();
   const ClickToCloseMessage = useStyledMessage();
+
+  const [shownMnemonicIndex, setShownMnemonicIndex] = useState(-1);
+
+  const [seedType, _setSeedType] = useState(MnemonicCount.WORDS_12);
+  const [seedWords, setSeedWords] = useState<string[]>(
+    new Array<string>(12).fill('')
+  );
+
+  const [errorMnemonicIndexList, setErrorMnemonicIndexList] = useState<
+    number[]
+  >([]);
 
   /* const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
     PresetNetworkId | string
@@ -167,14 +178,16 @@ const AccountRecover = () => {
       const str =
         (policyShow &&
           (!agreed ||
-            (importType === Tabs.FIRST && !mnemonic) ||
+            (importType === Tabs.FIRST &&
+              (seedWords.length < 9 || errorMnemonicIndexList.length > 0)) ||
             (importType === Tabs.SECOND && !privateKey) ||
             !psd ||
             !confirmPsd ||
             !name.trim() ||
             !passwordCheckPassed)) ||
         (!policyShow &&
-          ((importType === Tabs.FIRST && !mnemonic) ||
+          ((importType === Tabs.FIRST &&
+            (seedWords.length < 9 || errorMnemonicIndexList.length > 0)) ||
             (importType === Tabs.SECOND && !privateKey) ||
             !name.trim()));
       return Boolean(str);
@@ -182,14 +195,16 @@ const AccountRecover = () => {
     policyShow
       ? [
           name,
+          importType,
           agreed,
-          mnemonic,
+          seedWords,
+          errorMnemonicIndexList,
           privateKey,
           psd,
           confirmPsd,
           passwordCheckPassed,
         ]
-      : [name, mnemonic, privateKey]
+      : [importType, name, seedWords, errorMnemonicIndexList, privateKey]
   );
 
   const submit = () => {
@@ -215,9 +230,20 @@ const AccountRecover = () => {
      * no problem to hide other tabs
      */
     if (importType === Tabs.FIRST) {
+      let invalidPhrase = false;
+      const errorList = cloneDeep(errorMnemonicIndexList);
+      seedWords.forEach((w, i: number) => {
+        if (!bip39.wordlists.english.includes(w)) {
+          invalidPhrase = true;
+          errorList.push(i);
+        }
+      });
+      setErrorMnemonicIndexList(errorList);
+      if (invalidPhrase) return;
+      console.log(seedWords.join(' ').trim());
       const importAccountOpts: CreateAccountOpts = {
         name: name.trim(),
-        mnemonic: mnemonic.trim(),
+        mnemonic: seedWords.join(' ').trim(),
       };
       if (policyShow) {
         importAccountOpts.password = psd;
@@ -247,6 +273,134 @@ const AccountRecover = () => {
     }
   };
 
+  const handlePaste = (index: number, value: string) => {
+    const words = value
+      .trim()
+      .split(' ')
+      .map((word) => word.trim());
+
+    if (errorMnemonicIndexList.includes(index)) {
+      const errorList = cloneDeep(errorMnemonicIndexList);
+      errorList.splice(
+        errorList.findIndex((e) => e === index),
+        1
+      );
+      setErrorMnemonicIndexList(errorList);
+    }
+
+    if (
+      words.length === 12 ||
+      words.length === 15 ||
+      words.length === 18 ||
+      words.length === 21 ||
+      words.length === 24
+    ) {
+      // 12/24 words are treated specially.
+      // Regardless of where it is pasted from, if it is a valid seed, it will be processed directly.
+      if (bip39.validateMnemonic(words.join(' '))) {
+        switch (words.length) {
+          case 12:
+            setSeedType(MnemonicCount.WORDS_12);
+            break;
+          case 15:
+            setSeedType(MnemonicCount.WORDS_15);
+            break;
+          case 18:
+            setSeedType(MnemonicCount.WORDS_18);
+            break;
+          case 21:
+            setSeedType(MnemonicCount.WORDS_21);
+            break;
+          case 24:
+            setSeedType(MnemonicCount.WORDS_24);
+            break;
+        }
+        setSeedWords(words);
+        return;
+      }
+    }
+
+    let newSeedWords = seedWords.slice();
+    const expectedLength = Math.min(index + words.length, 24);
+
+    if (seedWords.length < expectedLength) {
+      newSeedWords = newSeedWords.concat(
+        new Array(expectedLength - seedWords.length).fill('')
+      );
+
+      if (expectedLength > 21) {
+        setSeedType(MnemonicCount.WORDS_24);
+      } else if (expectedLength > 18) {
+        setSeedType(MnemonicCount.WORDS_21);
+      } else if (expectedLength > 15) {
+        setSeedType(MnemonicCount.WORDS_18);
+      } else if (expectedLength > 12) {
+        setSeedType(MnemonicCount.WORDS_15);
+      } else {
+        setSeedType(MnemonicCount.WORDS_12);
+      }
+    }
+
+    for (let i = index; i < expectedLength; i++) {
+      newSeedWords[i] = words[i - index];
+    }
+
+    setSeedWords(newSeedWords);
+  };
+
+  const setSeedType = (seedType: MnemonicCount) => {
+    _setSeedType(seedType);
+    setShownMnemonicIndex(-1);
+    setErrorMnemonicIndexList([]);
+    const selected = MnemonicCountList.find((m) => m.type === seedType);
+    if (selected) {
+      setSeedWords((seedWords) => {
+        switch (seedType) {
+          case MnemonicCount.WORDS_12:
+            if (seedWords.length < 12) {
+              return seedWords.concat(
+                new Array(12 - seedWords.length).fill('')
+              );
+            } else {
+              return seedWords.slice(0, 12);
+            }
+          case MnemonicCount.WORDS_15:
+            if (seedWords.length < 15) {
+              return seedWords.concat(
+                new Array(15 - seedWords.length).fill('')
+              );
+            } else {
+              return seedWords.slice(0, 15);
+            }
+          case MnemonicCount.WORDS_18:
+            if (seedWords.length < 18) {
+              return seedWords.concat(
+                new Array(18 - seedWords.length).fill('')
+              );
+            } else {
+              return seedWords.slice(0, 18);
+            }
+          case MnemonicCount.WORDS_21:
+            if (seedWords.length < 21) {
+              return seedWords.concat(
+                new Array(21 - seedWords.length).fill('')
+              );
+            } else {
+              return seedWords.slice(0, 21);
+            }
+          case MnemonicCount.WORDS_24:
+            if (seedWords.length < 24) {
+              return seedWords.concat(
+                new Array(24 - seedWords.length).fill('')
+              );
+            } else {
+              return seedWords.slice(0, 24);
+            }
+        }
+      });
+    }
+  };
+
   return (
     <div className={clsx('recover flexCol', { dark: isDarkMode })}>
       <AccountHeader title="Import Wallet" isScroll={isScroll} />
@@ -262,26 +416,133 @@ const AccountRecover = () => {
             setImportType(tab);
           }}
         />
-        <p className="account-recover-title">
+        <p className="account-recover-title">Wallet name</p>
+        <CustomInput
+          placeholder="Enter wallet name"
+          onChange={(e) => {
+            /**
+             * use `.trim()` to avoid space in front or end.
+             */
+            setName(e.target.value.trim());
+          }}
+          onBlur={() => {
+            if (name.trim().length > 20) {
+              ClickToCloseMessage('error')({
+                content: 'Name length should be 1-20 characters',
+                key: 'Name length should be 1-20 characters',
+              });
+              return;
+            }
+          }}
+        />
+        <p className="account-recover-title mnemonic-title">
           {importType === Tabs.FIRST ? 'Mnemonic' : 'Wallet Private key'}
         </p>
-        <div className={clsx(importType !== Tabs.FIRST && 'hidden')}>
-          <TextArea
-            className={clsx('recover-textarea', {
-              'textarea-active': textareaActive,
-            })}
-            onFocus={() => setTextareaActive(true)}
-            /**
-             * DK suggested that we should use `onBlur` instead of `onChange`
-             * so we only fire setField when losing focus
-             */
-            onBlur={(e) => {
-              setMnemonic(e.target.value);
-              setTextareaActive(false);
-            }}
-            placeholder="Click on the space to change words"
-            rows={4}
-          />
+        <div
+          className={clsx(
+            importType !== Tabs.FIRST && 'hidden',
+            'account-recover-mnemonic-count-selector-container flexR'
+          )}
+        >
+          <span className="account-recover-mnemonic-count-selector-text">
+            I have
+          </span>
+          <div className="account-recover-mnemonic-count-selector-item-container flexR">
+            {MnemonicCountList.map((m) => (
+              <span
+                className={clsx(
+                  'account-recover-mnemonic-count-selector-item cursor',
+                  {
+                    'item-active': m.type === seedType,
+                  }
+                )}
+                key={m.type}
+                onClick={() => {
+                  setSeedType(m.type);
+                }}
+              >
+                {m.count}
+              </span>
+            ))}
+          </div>
+          <span className="account-recover-mnemonic-count-selector-text">
+            seed phrase
+          </span>
+        </div>
+        <div
+          className={clsx(
+            importType !== Tabs.FIRST && 'hidden',
+            'account-recover-mnemonic-container'
+          )}
+        >
+          {seedWords.map((word, index) => {
+            return (
+              <div key={index} className="mnemonic-item-container flexR">
+                <div className="mnemonic-index">{index + 1}.</div>
+                <Input
+                  type={shownMnemonicIndex === index ? 'text' : 'password'}
+                  className={clsx('mnemonic-item-input', {
+                    'error-mnemonic-input':
+                      errorMnemonicIndexList.includes(index),
+                  })}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    handlePaste(index, e.clipboardData.getData('text'));
+                  }}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    const errorList = cloneDeep(errorMnemonicIndexList);
+                    if (errorList.includes(index)) {
+                      errorList.splice(
+                        errorList.findIndex((p) => p === index),
+                        1
+                      );
+                      setErrorMnemonicIndexList(errorList);
+                    }
+                    if (
+                      shownMnemonicIndex >= 0 &&
+                      shownMnemonicIndex !== index
+                    ) {
+                      setShownMnemonicIndex(-1);
+                    }
+
+                    const newSeedWords = seedWords.slice();
+                    newSeedWords[index] = e.target.value.trim();
+                    setSeedWords(newSeedWords);
+                  }}
+                  value={word}
+                  suffix={
+                    <div
+                      style={{
+                        position: 'absolute',
+                        right: '8px',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        zIndex: 1000,
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShownMnemonicIndex((prev) => {
+                          if (prev === index) {
+                            return -1;
+                          }
+                          return index;
+                        });
+                      }}
+                    >
+                      {shownMnemonicIndex === index ? (
+                        <IconComponent name="eye" cls="base-text-color" />
+                      ) : (
+                        <IconComponent name="eye-off" cls="base-text-color" />
+                      )}
+                    </div>
+                  }
+                />
+              </div>
+            );
+          })}
         </div>
         <div className={clsx(importType !== Tabs.SECOND && 'hidden')}>
           <CustomPasswordInput
@@ -305,25 +566,7 @@ const AccountRecover = () => {
             //setPrivateKeyMasterChain(originChainId);
           }}
         />
-        <p className="account-recover-title">Wallet name</p>
-        <CustomInput
-          placeholder="Enter wallet name"
-          onChange={(e) => {
-            /**
-             * use `.trim()` to avoid space in front or end.
-             */
-            setName(e.target.value.trim());
-          }}
-          onBlur={() => {
-            if (name.trim().length > 20) {
-              ClickToCloseMessage('error')({
-                content: 'Name length should be 1-20 characters',
-                key: 'Name length should be 1-20 characters',
-              });
-              return;
-            }
-          }}
-        />
+
         <div
           className="password-container"
           style={{ display: policyShow ? 'block' : 'none' }}
@@ -387,6 +630,17 @@ const AccountRecover = () => {
         </div>
       </div>
       <div className="button content-wrap-padding">
+        <span
+          className="invalid-phrase"
+          style={{
+            display:
+              importType === Tabs.FIRST && errorMnemonicIndexList.length > 0
+                ? 'block'
+                : 'none',
+          }}
+        >
+          Invalid word
+        </span>
         <CustomButton
           type="primary"
           cls="theme"

@@ -15,7 +15,13 @@ class PortMessage extends Message {
     return true;
   }
   connect = (name?: string) => {
-    console.error('begin connecting, connect name is:', name);
+    const time = new Date();
+    console.error(
+      'begin connecting, connect name is:',
+      name,
+      'time:',
+      `${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`
+    );
     this.port = browser.runtime.connect(undefined, name ? { name } : undefined);
     this.port.onMessage.addListener(({ _type_, data }) => {
       if (_type_ === `${this._EVENT_PRE}message`) {
@@ -30,9 +36,12 @@ class PortMessage extends Message {
     });
 
     this.port.onDisconnect.addListener(() => {
+      const time = new Date();
       console.error(
         'service worker disconnected, reconnecting...  name:',
-        name
+        name,
+        'time:',
+        `${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`
       );
       this.connect(name);
       this._listen();
