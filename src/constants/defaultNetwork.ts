@@ -123,7 +123,7 @@ export const defaultNetworks: {
     rpcUrl: 'https://public-node-api.klaytnapi.com/v1/cypress',
     chainId: '0x2019',
     ticker: 'ETH',
-    nickname: 'Klaytn Mainnet Cypress',
+    nickname: 'Klaytn',
     rpcPrefs: {
       blockExplorerUrl: 'https://scope.klaytn.com',
     },
