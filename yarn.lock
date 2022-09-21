@@ -2442,19 +2442,20 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-6.10.0.tgz#c012c1ecc1a0e53d50e6af381618dca5268461c1"
   integrity sha512-lLseUPEhSFUXYTKj6q7s2O3s2vW2ebgA11vMAlKodXGf5AFw4zUoEbTz9CoFOC9jS6xY4Qr8BmRnxP/odT4Uuw==
 
-"@metamask/contract-metadata@^1.30.0":
-  version "1.31.0"
-  resolved "https://registry.npmjs.org/@metamask/contract-metadata/-/contract-metadata-1.31.0.tgz#9e3e46de7a955ea1ca61f7db20d9a17b5e91d3d0"
-  integrity sha512-4FBJkg/vDiYp/thIiZknxrJ0lfsj2eWIPenwlNZmoqOhoL4VqhK5eKWxi+EuGMvv9taP+QBRk6Key7wC1uL78A==
+"@metamask/contract-metadata@^1.31.0":
+  version "1.36.0"
+  resolved "https://registry.yarnpkg.com/@metamask/contract-metadata/-/contract-metadata-1.36.0.tgz#8e277190195e9c26733752457d2004d149fd7e0e"
+  integrity sha512-weTsrXfDQHOgYaiI5giMcOAsD3ChcwnoryasT7xmAfLSKIbKP3RTTUu63VWYBoFCBZugHrhKD6z+N+nm8qAWBQ==
 
-"@metamask/controllers@^20.1.0":
-  version "20.1.0"
-  resolved "https://registry.npmjs.org/@metamask/controllers/-/controllers-20.1.0.tgz#1d8386dc22d14f9fd9feb8b3cc8314d663587550"
-  integrity sha512-Z/7uLGXZWbCBbtCybR3jo1bx3mcvZRUSm1i43od4dnJoQo2+Veq4ePrFVgPKS3WtLIM/hzZuI7UTAQ9HNX9aew==
+"@metamask/controllers@^25.1.0":
+  version "25.1.0"
+  resolved "https://registry.yarnpkg.com/@metamask/controllers/-/controllers-25.1.0.tgz#2efee24a9a2b03ab2a2b0422c8f250931c269560"
+  integrity sha512-syndn2lIhtlACzaqjDrw23dJzw8pZ6en4Cr35C7B9RRS87EhahUqkPP73moAzLtvbyqtBlAUO1HHrqV3lw4E5g==
   dependencies:
     "@ethereumjs/common" "^2.3.1"
     "@ethereumjs/tx" "^3.2.1"
-    "@metamask/contract-metadata" "^1.30.0"
+    "@metamask/contract-metadata" "^1.31.0"
+    "@metamask/metamask-eth-abis" "^2.1.0"
     "@types/uuid" "^8.3.0"
     abort-controller "^3.0.0"
     async-mutex "^0.2.6"
@@ -2471,14 +2472,11 @@
     ethereumjs-wallet "^1.0.1"
     ethers "^5.4.1"
     ethjs-unit "^0.1.6"
-    ethjs-util "^0.1.6"
-    human-standard-collectible-abi "^1.0.2"
-    human-standard-multi-collectible-abi "^1.0.2"
-    human-standard-token-abi "^2.0.0"
     immer "^9.0.6"
     isomorphic-fetch "^3.0.0"
     jsonschema "^1.2.4"
-    nanoid "^3.1.12"
+    multiformats "^9.5.2"
+    nanoid "^3.1.31"
     punycode "^2.1.1"
     single-call-balance-checker-abi "^1.0.0"
     uuid "^8.3.2"
@@ -2501,6 +2499,11 @@
   version "2.1.0"
   resolved "https://registry.npmjs.org/@metamask/etherscan-link/-/etherscan-link-2.1.0.tgz#c0be8e68445b7b83cf85bcc03a56cdf8e256c973"
   integrity sha512-ADuWlTUkFfN2vXlz81Bg/0BA+XRor+CdK1055p6k7H6BLIPoDKn9SBOFld9haQFuR9cKh/JYHcnlSIv5R4fUEw==
+
+"@metamask/metamask-eth-abis@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@metamask/metamask-eth-abis/-/metamask-eth-abis-2.1.0.tgz#316c2e72373506f1a0120b76e432760a27eb6806"
+  integrity sha512-T8LBEB0PQo0N1tZQKZ2K8BGmv+IDLcXkzt8Pn7x0YnwZD6YpCIvKqYM3iy2fJ6wFXeCvRKqpn4K6EqwnkSJAbQ==
 
 "@metamask/obs-store@^6.0.2":
   version "6.0.2"
@@ -7170,7 +7173,7 @@ ethjs-util@0.1.3:
     is-hex-prefixed "1.0.0"
     strip-hex-prefix "1.0.0"
 
-ethjs-util@0.1.6, ethjs-util@^0.1.3, ethjs-util@^0.1.6:
+ethjs-util@0.1.6, ethjs-util@^0.1.3:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/ethjs-util/-/ethjs-util-0.1.6.tgz#f308b62f185f9fe6237132fb2a9818866a5cd536"
   integrity sha512-CUnVOQq7gSpDHZVVrQW8ExxUETWrnrvXYvYz55wOU8Uj4VCgw56XC2B/fVqQN+f7gmrnRHSLVnFAwsCuNwji8w==
@@ -8140,21 +8143,6 @@ human-signals@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
-
-human-standard-collectible-abi@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.npmjs.org/human-standard-collectible-abi/-/human-standard-collectible-abi-1.0.2.tgz#077bae9ed1b0b0b82bc46932104b4b499c941aa0"
-  integrity sha512-nD3ITUuSAIBgkaCm9J2BGwlHL8iEzFjJfTleDAC5Wi8RBJEXXhxV0JeJjd95o+rTwf98uTE5MW+VoBKOIYQh0g==
-
-human-standard-multi-collectible-abi@^1.0.2:
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/human-standard-multi-collectible-abi/-/human-standard-multi-collectible-abi-1.0.4.tgz#981625bc1a6bea5fef90567f9e12c11581fac497"
-  integrity sha512-ylR9JDXClDJAxWD/QJxsjXJJdLTUmhipTquMAgrfybXL3qX3x3P/vmKg92A7qFu7SqVOf2hyv5dA8vX0j+0Thg==
-
-human-standard-token-abi@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/human-standard-token-abi/-/human-standard-token-abi-2.0.0.tgz#e0c2057596d0a1d4a110f91f974a37f4b904f008"
-  integrity sha512-m1f5DiIvqaNmpgphNqx2OziyTCj4Lvmmk28uMSxGWrOc9/lMpAKH8UcMPhvb13DMNZPzxn07WYFhxOGKuPLryg==
 
 hyphenate-style-name@^1.0.2:
   version "1.0.4"
@@ -10130,6 +10118,11 @@ multicodec@^1.0.0:
     buffer "^5.6.0"
     varint "^5.0.0"
 
+multiformats@^9.5.2:
+  version "9.9.0"
+  resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.9.0.tgz#c68354e7d21037a8f1f8833c8ccd68618e8f1d37"
+  integrity sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==
+
 multihashes@^0.4.15, multihashes@~0.4.15:
   version "0.4.21"
   resolved "https://registry.yarnpkg.com/multihashes/-/multihashes-0.4.21.tgz#dc02d525579f334a7909ade8a122dabb58ccfcb5"
@@ -10173,10 +10166,15 @@ nanoid@^2.0.0:
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-2.1.11.tgz#ec24b8a758d591561531b4176a01e3ab4f0f0280"
   integrity sha512-s/snB+WGm6uwi0WjsZdaVcuf3KJXlfGl2LcxgwkEwJF0D/BWzVWAZW/XY4bFaiR7s0Jk3FPvlnepg1H1b1UwlA==
 
-nanoid@^3.1.12, nanoid@^3.1.23, nanoid@^3.1.30:
+nanoid@^3.1.23, nanoid@^3.1.30:
   version "3.1.30"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.30.tgz#63f93cc548d2a113dc5dfbc63bfa09e2b9b64362"
   integrity sha512-zJpuPDwOv8D2zq2WRoMe1HsfZthVewpel9CAvTfc/2mBD1uUT/agc5f7GHGWXlYkFvi1mVxe4IjvP2HNrop7nQ==
+
+nanoid@^3.1.31:
+  version "3.3.4"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
+  integrity sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==
 
 native-request@^1.0.5:
   version "1.1.0"
