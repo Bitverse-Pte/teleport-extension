@@ -46,7 +46,7 @@ export function getContractMethodData(
     }
 
     // dispatch(loadingMethodDataStarted());
-    console.debug('loadingMethodData');
+    console.debug('loadingMethodData', prefixedData);
 
     return getMethodDataAsync(fourBytePrefix, provider).then(
       ({ name, params }) => {
