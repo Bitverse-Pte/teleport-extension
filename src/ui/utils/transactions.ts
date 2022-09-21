@@ -78,18 +78,20 @@ export async function getMethodDataAsync(
       return null;
     });
 
-    if (!registry) {
-      // @todo: we need the `global.ethereumProvider`
-      // registry = new MethodRegistry({ provider: global.ethereumProvider });
-      // network is for lookup, use ETH mainnet here
-      registry = new MethodRegistry({ provider, network: '1' });
-    }
+    registry = new MethodRegistry({ provider, network: '1' });
 
-    let sig: string | undefined | null = await registry.lookup(fourBytePrefix);
+    // if (!registry) {
+    //   // @todo: we need the `global.ethereumProvider`
+    //   // registry = new MethodRegistry({ provider: global.ethereumProvider });
+    //   // network is for lookup, use ETH mainnet here
+    // registry = new MethodRegistry({ provider, network: '1' });
+    // }
 
-    if (!sig) {
-      sig = await fourByteSig;
-    }
+    // let sig: string | undefined | null = await registry.lookup(fourBytePrefix);
+    const sig = await fourByteSig;
+    // if (!sig) {
+    //   sig = await fourByteSig;
+    // }
 
     if (!sig) {
       return {};

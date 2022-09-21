@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 // import { getKnownMethodData } from '../selectors/selectors';
 // import {
 //   getStatusKey,
@@ -21,7 +21,6 @@ import { useTranslation } from 'react-i18next';
 import {
   PENDING_STATUS_HASH,
   TOKEN_CATEGORY_HASH,
-  Transaction,
   TransactionGroup,
   TransactionGroupCategories,
   TransactionStatuses,
@@ -35,7 +34,6 @@ import {
   stripHttpSchemes,
 } from 'ui/utils/utils';
 import { useCurrencyDisplay } from './useCurrencyDisplay';
-import { getKnownMethodData } from 'ui/selectors/selectors';
 import { get } from 'lodash';
 import { Token } from 'types/token';
 import { useMethodData } from './useMethodData';
@@ -125,14 +123,14 @@ export function useTransactionDisplayData(
 
   const { from: senderAddress, to } = initialTransaction.txParams || {};
 
-  let methodData: ReturnType<typeof useMethodData>;
-  /**
-   * avoid infinite loop when txParams.data is useless
-   */
-  if (type !== TransactionTypes.DEPLOY_CONTRACT) {
-    // for smart contract interactions, methodData can be used to derive the name of the action being taken
-    methodData = useMethodData(initialTransaction.txParams.data);
-  }
+  const methodData: ReturnType<typeof useMethodData> = useMethodData(
+    /**
+     * avoid infinite loop when txParams.data is useless
+     */
+    type !== TransactionTypes.DEPLOY_CONTRACT
+      ? initialTransaction.txParams.data
+      : undefined
+  );
 
   const displayedStatusKey = getStatusKey(primaryTransaction);
   const isPending = displayedStatusKey in PENDING_STATUS_HASH;
