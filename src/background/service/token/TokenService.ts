@@ -80,7 +80,6 @@ class TokenService {
 
   compareDifferenceFromConfig() {
     const storageTokens = cloneDeep(this.store.getState().tokens || []);
-    console.error(storageTokens);
     DEFAULT_TOKEN_CONFIG.forEach((t: Token) => {
       if (
         storageTokens.every(

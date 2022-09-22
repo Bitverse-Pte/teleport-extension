@@ -1,4 +1,5 @@
 @import '../../style/index.less';
+
 .send-cos {
     width: 100%;
     height: 100%;
@@ -19,15 +20,17 @@
             padding-top: 10px;
             padding-bottom: 10px;
             margin-bottom: 16px;
-            .account-name{
-                margin:0 6px;
+
+            .account-name {
+                margin: 0 6px;
                 font-family: MontserratBold;
                 font-style: normal;
                 font-size: 14px;
                 line-height: 100%;
                 align-items: flex-end;
                 color: #364361;
-              }
+            }
+
             .account-address {
                 margin-top: 6px;
                 font-family: Montserrat;
@@ -36,14 +39,14 @@
                 font-size: 14px;
                 line-height: 100%;
                 color: #798CAD;
-                cursor:pointer;
+                cursor: pointer;
             }
-            
+
         }
 
         .ant-select-selector {
-            border-radius: 8px!important;
-            height: 38px!important;
+            border-radius: 8px !important;
+            height: 38px !important;
         }
 
         .ant-input-number {
@@ -55,6 +58,7 @@
             border-top-left-radius: 8px;
             border-bottom-left-radius: 8px;
         }
+
         .ant-input-number-lgs {
             /**
               * Override default style
@@ -64,6 +68,7 @@
             border-top-right-radius: 8px;
             border-bottom-right-radius: 8px;
         }
+
         .ant-input-number-group-addon {
             /**
               * Override default style
@@ -74,19 +79,23 @@
             border-top-right-radius: 8px;
             border-bottom-right-radius: 8px;
         }
+
         .ant-select-selector {
             border: 0 !important;
             background-color: #F8FAFC !important;
         }
+
         .customInputStyle {
             border: 0 !important;
             background-color: #F8FAFC !important;
             border-radius: 8px;
             height: 38px;
+
             &::placeholder {
                 color: rgba(163, 180, 204, 1);
             }
         }
+
         .tbmy {
             margin-top: 6px;
             cursor: pointer;
@@ -99,7 +108,7 @@
         .ant-card-head {
             border: 0;
         }
-        
+
         .send-form-title {
             font-family: MontserratBold;
             font-style: normal;
@@ -108,9 +117,91 @@
             display: flex;
             align-items: flex-end;
             color: #364361;
-            margin: 24px 0 12px 0; 
+            margin: 24px 0 12px 0;
         }
-        
+
+        .das {
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0px 4px 8px rgba(94, 139, 255, 0.2);
+            border-radius: 8px;
+            z-index: 2;
+            position: relative;
+            background-color: #fff;
+            padding-top: 10px;
+            margin-top: 2px;
+            font-family: MontserratBold;
+            font-size: 14px;
+            max-height: 140px;
+
+            .das-account {
+                width: 100%;
+                color: @themeColor;
+                padding: 0 16px;
+                height: 30px;
+                line-height: 30px;
+                flex: 0 0 30px;
+            }
+
+            .das-accounts-wrap {
+                width: 100%;
+                flex: 1;
+                overflow-y: auto;
+
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+
+
+                .das-address-container {
+                    justify-content: space-between;
+                    align-items: center;
+                    height: 36px;
+                    padding: 0 16px;
+
+                    &:hover {
+                        background: #F8FAFC;
+
+                        .das-address {
+                            color: #5E6C8A;
+                        }
+                    }
+
+                    .das-address {
+                        line-height: 36px;
+                    }
+
+                    .das-tag {
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        background: #E1E8F0;
+                        max-width: 100px;
+                        font-family: Montserrat;
+                    }
+                }
+            }
+        }
+
+        .das-input-suffix {
+            align-items: center;
+            font-size: 14px;
+
+            .das-input-suffix-address {
+                font-weight: 500;
+            }
+
+            .das-input-suffix-tag {
+                margin-left: 8px;
+                text-align: center;
+                width: 55px;
+                height: 22px;
+                line-height: 22px;
+                background: #99D3FF;
+                border-radius: 8px;
+                font-family: MontserratBold;
+            }
+        }
+
         .recent {
             width: 100%;
             box-sizing: border-box;
@@ -121,6 +212,7 @@
             background-color: #fff;
             padding-top: 10px;
             margin-top: 2px;
+
             .recent-title {
                 align-items: flex-start;
                 padding: 4px 4px 4px 16px;
@@ -132,9 +224,11 @@
                 line-height: 100%;
                 color: #798CAD;
             }
+
             .recent-body {
                 max-height: 150px;
                 overflow-y: auto;
+
                 .recent-item {
                     font-family: 'MontserratBold';
                     font-style: normal;
@@ -149,8 +243,14 @@
 
             }
         }
-        
-        
+
+        .send-das-error-notice {
+            color: #CC3939;
+            margin-top: 10px;
+        }
+
+
+
     }
 
     .send-btn-con {
@@ -164,11 +264,14 @@
         bottom: 0;
         position: fixed;
         width: 100%;
+
         .button-inner {
             width: 100%;
         }
+
         .gas-limit-container {
             margin-bottom: 5px;
+
             .gas-limit-title {
                 margin-right: 5px;
                 font-family: 'Montserrat';
@@ -177,6 +280,7 @@
                 font-size: 14px;
                 color: #364361;
             }
+
             .gas-limit-value {
                 font-family: 'Montserrat';
                 font-style: normal;
@@ -185,8 +289,9 @@
                 color: #364361;
             }
         }
-        
+
     }
+
     .chevron-down {
         fill: @baseTextColor;
         height: 14px;
@@ -197,6 +302,7 @@
         .nologo-title {
             margin-left: 24px;
         }
+
         .closeWindowBtn {
             margin-right: 8px;
         }
@@ -205,35 +311,44 @@
 
 .assets-option-cos-wrapper {
     align-items: flex-start;
-    img.token-icon, span.token-icon {
+
+    img.token-icon,
+    span.token-icon {
         margin-top: 3px;
         margin-right: 10px
     }
+
     .flex-wrap {
         flex-wrap: wrap;
     }
+
     .assets-option {
         margin-right: 10px;
     }
+
     .assets-option {
         width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
+
         .assets-option-symbol {
             // margin-left: 10px;
             color: #364361;
             font-family: MontserratBold;
             font-weight: bolder;
         }
+
         .assets-option-symbol-name {
             margin-left: 10px;
             color: #A3B4CC;
         }
+
         .assets-option-left {
             align-items: center;
             line-height: 38px;
         }
+
         .assets-option-right {
             float: right;
         }
@@ -245,36 +360,42 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     .assets-option-symbol {
         // margin-left: 10px;
         color: #364361;
         font-family: MontserratBold;
         font-weight: bolder;
     }
+
     .assets-option-symbol-name {
         margin-left: 10px;
         color: #A3B4CC;
     }
+
     .assets-option-left {
         align-items: center;
         line-height: 38px;
     }
+
     .assets-option-right {
         float: right;
     }
 }
 
 .left-10 {
-    margin-left: 10px!important;
+    margin-left: 10px !important;
 }
 
 .card-title {
-    font-size:12px;
+    font-size: 12px;
     color: #0F83FF;
 }
+
 .icon {
     color: #0F83FF;
 }
+
 .available-container {
     margin-top: 6px;
     align-items: center;
@@ -284,9 +405,11 @@
     font-size: 14px;
     line-height: 100%;
     color: #798CAD;
+
     span {
         margin-left: 10px;
     }
+
     .max-icon {
         margin-left: 10px;
         background-color: #1484F5;
@@ -296,8 +419,9 @@
         text-transform: uppercase;
         font-weight: 800;
         font-family: PingFang SC;
-    } 
+    }
 }
+
 .addonSymbol {
     font-weight: 600;
     font-size: 14px;
@@ -307,42 +431,54 @@
     align-items: flex-end;
     color: #202226;
 }
+
 .send-cos.dark {
     background: #020C15;
+
     .send-container {
         background: #020C15;
+
         .from-container {
             background: #02182B;
+
             .account-name {
                 color: #fff;
             }
+
             .account-address {
                 color: #798CAD;
             }
         }
+
         .send-form-title {
             color: #fff;
         }
+
         .customInputStyle {
             background-color: #02182B !important;
             color: #fff;
-            border: 1px solid #02182B!important;
+            border: 1px solid #02182B !important;
+
             &:focus {
-                border: 1px solid #1484F5!important;
+                border: 1px solid #1484F5 !important;
                 box-shadow: none;
                 outline: 0;
             }
+
             &::placeholder {
                 color: rgba(94, 108, 138, 1);
             }
         }
+
         .recent {
             background-color: #020C15;
             color: #fff;
+
             .recent-title {
                 background: #02182B;
                 color: #798CAD;
             }
+
             .recent-body {
                 .recent-item {
                     color: #fff;
@@ -350,85 +486,134 @@
 
             }
         }
+
+        .ant-input {
+            background: #02182B !important;
+            border-color: #02182B !important;
+            color: #ffffff;
+        }
+
+        .ant-input-suffix {
+            .das-input-suffix-tag {
+                background: #0A4580;
+            }
+        }
+
+        .das {
+            background: #020C15;
+
+            .das-address-container {
+                .das-tag {
+                    background: #364361 !important;
+                    color: #ffffff !important;
+                }
+
+                &:hover {
+                    background: #02182B !important;
+
+                }
+            }
+        }
     }
+
     .available-container {
         color: #798CAD;
+
         span {
             color: #fff;
         }
+
         .max-icon {
             background: #1484F5;
             color: #020C15;
         }
     }
+
     .send-btn-con {
         .gas-limit-container {
             .gas-limit-title {
                 color: #798CAD;
             }
+
             .gas-limit-value {
                 color: #798CAD;
             }
         }
     }
+
     .ant-select-selector {
-        background-color: #02182B!important;
+        background-color: #02182B !important;
     }
+
     .assets-option {
         .assets-option-symbol {
             color: #FFFFFF;
         }
+
         .assets-option-symbol-name {
             color: #5E6C8A;
         }
     }
+
     .ant-select-arrow {
         color: #fff;
     }
 
     .ant-input-number {
-        background-color: #02182B!important;
+        background-color: #02182B !important;
         color: #fff;
     }
+
     .ant-input-number-lgs {
-        background-color: #02182B!important;
+        background-color: #02182B !important;
         color: #fff;
     }
+
     .ant-input-number-group-addon {
-        background-color: #02182B!important;
+        background-color: #02182B !important;
         color: #fff;
     }
+
     .addonSymbol {
         color: #fff;
     }
+
     .send-btn-con {
-        background-color: #02182B!important;
+        background-color: #02182B !important;
         margin: 0;
     }
+
     .chevron-down {
         fill: #fff;
     }
 }
+
 .assets-option-cos-wrapper.dark {
     background-color: #020C15;
+
     .assets-option-symbol {
         color: #FFFFFF;
     }
+
     .assets-option-symbol-name {
         color: #5E6C8A;
     }
+
     .assets-option {
         .assets-option-right {
             color: #fff;
         }
     }
 }
+
 .send-dropdown.dark {
     background-color: #020C15;
     box-shadow: 0px 4px 8px rgba(94, 139, 255, 0.2);
+
     .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
         background-color: #020C15;
     }
+
     .ant-select-item-option {
         background-color: #020C15;
     }
