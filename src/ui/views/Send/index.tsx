@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import { Input, InputNumber, Select, Spin } from 'antd';
+import { Input, InputNumber, Select, Spin, Tooltip } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
@@ -526,11 +526,13 @@ const Send = () => {
                     key={i}
                     onClick={() => handleDasClick(das)}
                   >
-                    <span className="das-address">
-                      {`${(das.value as any).substr(0, 6)}...${(
-                        das.value as any
-                      ).substr(-4)}`}
-                    </span>
+                    <Tooltip placement="top" title={das.value || ''}>
+                      <span className="das-address">
+                        {`${(das.value as any).substr(0, 6)}...${(
+                          das.value as any
+                        ).substr(-4)}`}
+                      </span>
+                    </Tooltip>
                     <span
                       className={`das-tag ellipsis ${!das.label && 'none'}`}
                       style={!das.label ? { display: 'none' } : {}}

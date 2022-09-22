@@ -1,5 +1,5 @@
 import React, { useState, createContext } from 'react';
-import { Input, InputNumber, Select, Spin } from 'antd';
+import { Input, InputNumber, Select, Tooltip } from 'antd';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
@@ -11,6 +11,7 @@ import {
   useAsyncEffect,
   denom2SymbolRatio,
   removeCommas,
+  useDebounce,
 } from 'ui/utils';
 import { transferAddress2Display } from 'ui/utils';
 import { IDisplayAccountInfo } from 'ui/components/AccountSwitch';
@@ -31,8 +32,12 @@ import { Bech32Address } from '@keplr-wallet/cosmos';
 import { getProvider } from 'ui/selectors/selectors';
 import { Provider } from 'types/network';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { createInstance } from 'dotbit';
+import { IDas } from '../Send';
+import { PresetNetworkId } from 'constants/defaultNetwork';
 
 const { sensors } = skynet;
+const dotbit = createInstance();
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -65,6 +70,12 @@ const Send = () => {
   const [selectedToken, setSelectedToken] = useState<Token>();
   const [recentAddressList, setRecentAddressList] = useState<string[]>();
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
+  const [toConfirmAddress, setConfirmToAddress] = useState<string>('');
+  const [dasListShow, setDasListShow] = useState<boolean>(false);
+  const [dasTagShow, setDasTagShow] = useState<boolean>(false);
+  const [dasErrorShow, setDasErrorShow] = useState<boolean>(false);
+  const [dasAccount, setDasAccount] = useState('');
+  const [dasAddresses, setDasAddresses] = useState<IDas[]>([]);
 
   const chainId = useSelector(getCurrentChainId);
   const draftTransaction = useSelector(
@@ -163,10 +174,15 @@ const Send = () => {
       setUnlockPopupVisible(true);
       return;
     }
-    await wallet.addContactByDefaultName(toAddress);
+    await wallet.addContactByDefaultName(toConfirmAddress);
     history.push({
       pathname: '/confirm-send-cos',
-      state: { amount, recipient: toAddress, memo, token: selectedToken },
+      state: {
+        amount,
+        recipient: toConfirmAddress,
+        memo,
+        token: selectedToken,
+      },
     });
   };
 
@@ -196,11 +212,52 @@ const Send = () => {
   };
 
   const handleToAddressChanged = (val) => {
+    if (val) {
+      setShowToList(false);
+    } else {
+      setShowToList(true);
+    }
     setToAddress(val);
+    if (val.endsWith('.bit')) {
+      debounceFunc(val);
+      setDasAccount(val);
+    } else {
+      setConfirmToAddress(val);
+      setDasAddresses([]);
+      setDasListShow(false);
+      setDasTagShow(false);
+      setDasErrorShow(false);
+    }
     // if (isValidAddress(val)) {
     //   dispatch(updateRecipient({ address: val, nickname: '' }));
     // }
   };
+
+  const debounceFunc = useDebounce(async (val) => {
+    let coinType = '-1';
+    if (currentChain.id === PresetNetworkId.COSMOS_HUB) {
+      coinType = '118';
+    }
+    const accounts = await dotbit.addrs(val, coinType).catch((e) => {
+      console.error(e);
+      setDasErrorShow(true);
+    });
+    if (accounts && accounts.length > 0) {
+      const dasList = accounts.filter((d: IDas) => d.type === 'address');
+      console.log(dasList);
+      if (dasList?.length > 0) {
+        setDasAddresses(dasList as any);
+        setConfirmToAddress(dasList[0].value);
+        setDasListShow(true);
+        setDasTagShow(true);
+        setDasErrorShow(false);
+      } else {
+        setDasErrorShow(true);
+      }
+    } else {
+      setDasErrorShow(true);
+    }
+  }, 1500);
 
   const handleAmountChanged = (val) => {
     setAmount(val);
@@ -210,7 +267,7 @@ const Send = () => {
 
   const invalidate = () => {
     return (
-      !isValidAddress(toAddress) ||
+      !isValidAddress(toConfirmAddress) ||
       !amount ||
       Number(amount) <= 0 ||
       !selectedToken ||
@@ -219,6 +276,35 @@ const Send = () => {
           utils.formatUnits(selectedToken?.amount, selectedToken?.decimal)
         ).lessThan(amount))
     );
+  };
+
+  const dasConfirmAddress = () => {
+    return dasTagShow ? (
+      <div className="das-input-suffix flexR">
+        {toConfirmAddress && (
+          <span className="das-input-suffix-address">
+            {`${(toConfirmAddress as any).substr(0, 4)}...${(
+              toConfirmAddress as any
+            ).substr(-4)}`}
+          </span>
+        )}
+        <span
+          className="das-input-suffix-tag cursor"
+          onClick={() => {
+            setDasListShow((pre) => !pre);
+          }}
+        >
+          DAS
+        </span>
+      </div>
+    ) : (
+      <span />
+    );
+  };
+
+  const handleDasClick = (value) => {
+    setConfirmToAddress(value.value);
+    setDasListShow(false);
   };
 
   const addonSymbol = (
@@ -368,10 +454,45 @@ const Send = () => {
           placeholder={t('Enter Address')}
           value={toAddress}
           className="customInputStyle"
-          onFocus={() => setShowToList(true)}
+          onFocus={(e) => {
+            if (!e.target.value) {
+              setShowToList(true);
+            }
+          }}
+          suffix={dasConfirmAddress()}
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => handleToAddressChanged(e.target.value)}
         />
+        {dasListShow && (
+          <div className="das flexCol">
+            <span className="das-account">{dasAccount}</span>
+            <div className="das-accounts-wrap">
+              {dasAddresses.map((das: IDas, i) => {
+                return (
+                  <div
+                    className="das-address-container flexR cursor"
+                    key={i}
+                    onClick={() => handleDasClick(das)}
+                  >
+                    <Tooltip placement="top" title={das.value || ''}>
+                      <span className="das-address">
+                        {`${(das.value as any).substr(0, 6)}...${(
+                          das.value as any
+                        ).substr(-4)}`}
+                      </span>
+                    </Tooltip>
+                    <span
+                      className={`das-tag ellipsis ${!das.label && 'none'}`}
+                      style={!das.label ? { display: 'none' } : {}}
+                    >
+                      {das.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         {showToList ? (
           <div className="recent">
             <div className="recent-title">{t('Recent Address')}</div>
@@ -393,13 +514,20 @@ const Send = () => {
             </div>
           </div>
         ) : (
-          <p className="tbmy" onClick={myAccountsSelect}>
-            {t('Transfer between my accounts')}
-          </p>
+          !dasErrorShow &&
+          dasAddresses.length === 0 && (
+            <p className="tbmy" onClick={myAccountsSelect}>
+              {t('Transfer between my accounts')}
+            </p>
+          )
         )}
-
+        {dasErrorShow ? (
+          <p className="send-das-error-notice">
+            No address has been set for this name
+          </p>
+        ) : null}
         <AccountSelect
-          currentToAddress={toAddress}
+          currentToAddress={toConfirmAddress}
           visible={accountSelectPopupVisible}
           onClose={(selected?: BaseAccount) => {
             if (selected) {
