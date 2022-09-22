@@ -58,6 +58,9 @@ import { useDarkmode } from 'ui/hooks/useDarkMode';
 import skynet from 'utils/skynet';
 const { sensors } = skynet;
 import { createInstance } from 'dotbit';
+import { getProvider } from 'ui/selectors/selectors';
+import { Provider } from 'types/network';
+import { PresetNetworkId } from 'constants/defaultNetwork';
 
 export const AccountSelectContext = createContext<{
   selected?: IDisplayAccountInfo;
@@ -105,6 +108,7 @@ const Send = () => {
   const [recentAddressList, setRecentAddressList] = useState<string[]>();
   const [unlockPopupVisible, setUnlockPopupVisible] = useState(false);
 
+  const currentChain: Provider = useSelector(getProvider);
   const chainId = useSelector(getCurrentChainId);
   const draftTransaction = useSelector(
     (state) => state.send.draftTransaction.txParams
@@ -273,13 +277,14 @@ const Send = () => {
       setShowToList(true);
     }
     setToAddress(val);
-    if (isValidAddress(val)) {
-      dispatch(updateRecipient({ address: val, nickname: '' }));
-    }
+
     if (val.endsWith('.bit')) {
       debounceFunc(val);
       setDasAccount(val);
     } else {
+      if (isValidAddress(val)) {
+        dispatch(updateRecipient({ address: val, nickname: '' }));
+      }
       setConfirmToAddress(val);
       setDasAddresses([]);
       setDasListShow(false);
@@ -289,7 +294,15 @@ const Send = () => {
   };
 
   const debounceFunc = useDebounce(async (val) => {
-    const accounts = await dotbit.records(val).catch((e) => {
+    let coinType;
+    if (currentChain.id === PresetNetworkId.BSC) {
+      coinType = '9006';
+    } else if (currentChain.id === PresetNetworkId.POLYGON) {
+      coinType = '966';
+    } else {
+      coinType = '60';
+    }
+    const accounts = await dotbit.addrs(val, coinType).catch((e) => {
       console.error(e);
       setDasErrorShow(true);
     });
@@ -299,6 +312,11 @@ const Send = () => {
       if (dasList?.length > 0) {
         setDasAddresses(dasList as any);
         setConfirmToAddress(dasList[0].value);
+        if (isValidAddress(dasList[0].value)) {
+          dispatch(
+            updateRecipient({ address: dasList[0].value, nickname: '' })
+          );
+        }
         setDasListShow(true);
         setDasTagShow(true);
         setDasErrorShow(false);
@@ -372,7 +390,14 @@ const Send = () => {
             ).substr(-4)}`}
           </span>
         )}
-        <span className="das-input-suffix-tag">DAS</span>
+        <span
+          className="das-input-suffix-tag cursor"
+          onClick={() => {
+            setDasListShow((pre) => !pre);
+          }}
+        >
+          DAS
+        </span>
       </div>
     ) : (
       <span />
