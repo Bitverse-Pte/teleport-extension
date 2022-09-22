@@ -179,3 +179,22 @@ export function usePolicyAgreed() {
   };
   return [policyShow, updateStoragePolicyAgreed] as const;
 }
+
+export function useDebounce(fn, wait) {
+  const { current } = useRef({ fn, timer: null as unknown as NodeJS.Timeout });
+  useEffect(() => {
+    current.fn = fn;
+  }, [current.fn, fn]);
+
+  return useCallback(
+    (...args: any[]) => {
+      if (current.timer) {
+        clearTimeout(current.timer as unknown as number);
+      }
+      current.timer = setTimeout(() => {
+        current.fn.call(current.fn, ...args);
+      }, wait);
+    },
+    [current.fn, current.timer, wait]
+  );
+}
