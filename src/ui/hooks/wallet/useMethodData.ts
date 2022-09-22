@@ -27,17 +27,23 @@ export function useMethodData(data?: string) {
   const backgroundCtrler = useWallet();
   const provider = useSelector(currentEthProviderSelector);
   const getContractMethodData = useCallback(
-    (methodData) =>
-      dispatch(
+    (methodData?: string) => {
+      console.debug('getContractMethodData::triggered');
+      return dispatch(
         getContractMethodDataAction(methodData, provider, backgroundCtrler)
-      ),
+      );
+    },
     [dispatch, backgroundCtrler, provider]
   );
 
   useEffect(() => {
-    if (data) {
+    /**
+     * only trigger if no data exist for data
+     */
+    if (!knownMethodData && data) {
+      console.debug(`getContractMethodData for ${data}`);
       getContractMethodData(data);
     }
-  }, [getContractMethodData, data]);
+  }, [getContractMethodData, data, knownMethodData]);
   return knownMethodData;
 }

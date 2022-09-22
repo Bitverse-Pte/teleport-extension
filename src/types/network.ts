@@ -79,6 +79,7 @@ export interface Provider extends Network {
     | 'FANTOM'
     | 'AVAX'
     | 'OP'
+    | 'KLAY'
     | 'COSMOS_HUB'
     | 'OSMOSIS'
     | 'SECRET_NETWORK'

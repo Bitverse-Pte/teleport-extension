@@ -682,6 +682,19 @@ export const DEFAULT_TOKEN_CONFIG: Token[] = [
     display: true,
   },
   {
+    symbol: 'KLAY',
+    decimal: 18,
+    name: 'KLAY',
+    denom: '',
+    icon: '',
+    chainCustomId: PresetNetworkId.KLAY,
+    isNative: true,
+    isCustom: false,
+    contractAddress: '',
+
+    display: true,
+  },
+  {
     symbol: 'Tele',
     decimal: 18,
     name: 'Tele',
