@@ -34,7 +34,7 @@
     "@keplr-wallet/unit": "^0.10.5",
     "@ledgerhq/hw-app-eth": "^6.0.2",
     "@ledgerhq/hw-transport-webusb": "^6.0.2",
-    "@metamask/controllers": "^25.1.0",
+    "@metamask/controllers": "^31.1.0",
     "@metamask/eth-ledger-bridge-keyring": "^0.6.0",
     "@metamask/etherscan-link": "^2.1.0",
     "@metamask/obs-store": "^6.0.2",
