@@ -69,7 +69,7 @@
     "dayjs": "^1.10.5",
     "debounce": "^1.2.1",
     "deepmerge": "^4.2.2",
-    "dotbit": "^0.4.6",
+    "dotbit": "^0.4.7",
     "dotenv": "^10.0.0",
     "elliptic": "^6.5.4",
     "eth-block-tracker": "^5.0.1",
