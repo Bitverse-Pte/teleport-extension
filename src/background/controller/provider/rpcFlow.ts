@@ -91,8 +91,29 @@ const flowContext = flow
     return next();
   })
   .use(async (ctx, next) => {
+    const {
+      request: {
+        data: { params, method },
+      },
+    } = ctx;
+    if (params && Array.isArray(params) && params.length > 0) {
+      const opts = {
+        jsonrpc: '2.0',
+        method: method,
+        origin: 'metamask',
+      };
+      const initParams = await txController.newUnapprovedTransaction(
+        params[0],
+        opts
+      );
+      ctx.initParams = initParams;
+    }
+    return next();
+  })
+  .use(async (ctx, next) => {
     // check need approval
     const {
+      initParams,
       request: {
         data: { params, method },
         session: { origin, name, icon },
@@ -105,6 +126,9 @@ const flowContext = flow
       ctx.request.requestedApproval = true;
       // fix the request param from dapp, should compatiable with send from app.
       if (approvalType === 'SignTx' && !params[0].txParam) {
+        if (initParams.txParams.gasPrice) {
+          params[0].gasPrice = initParams.txParams.gasPrice;
+        }
         if (!params[0].type) {
           params[0].type =
             (await networkPreferenceService.getEIP1559Compatibility())
@@ -112,12 +136,7 @@ const flowContext = flow
               : TransactionEnvelopeTypes.LEGACY;
         }
         // the .txParam is used for display origin info in SignTx page
-        params[0].txParam = {
-          from: params[0].from,
-          to: params[0].to,
-          value: params[0].value,
-          type: params[0].type,
-        };
+        params[0].txParam = initParams.txParams;
         if (!params[0].gas) {
           const txMeta = cloneDeep(params[0]);
           txMeta.txParams = {
@@ -160,7 +179,7 @@ const flowContext = flow
     return next();
   })
   .use(async (ctx) => {
-    const { approvalRes, mapMethod, request } = ctx;
+    const { approvalRes, mapMethod, request, initParams } = ctx;
     // process request
     const [approvalType] =
       Reflect.getMetadata('APPROVAL', providerController, mapMethod) || [];
@@ -172,6 +191,7 @@ const flowContext = flow
       providerController[mapMethod]({
         ...request,
         approvalRes,
+        initParams,
       })
     );
 
