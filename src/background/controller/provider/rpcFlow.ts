@@ -96,7 +96,12 @@ const flowContext = flow
         data: { params, method },
       },
     } = ctx;
-    if (params && Array.isArray(params) && params.length > 0) {
+    if (
+      params &&
+      Array.isArray(params) &&
+      params.length > 0 &&
+      method === 'eth_sendTransaction'
+    ) {
       const opts = {
         jsonrpc: '2.0',
         method: method,
