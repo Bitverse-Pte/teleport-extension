@@ -14,6 +14,7 @@ export enum PresetNetworkId {
   COSMOS_HUB = 'cosmos_hub',
   OSMOSIS = 'osmosis',
   SECRET_NETWORK = 'secret_network',
+  KLAY = 'klay',
 
   KAVA = 'KAVA',
   CRYPTO_ORG = 'CRYPTO_ORG',
@@ -113,6 +114,18 @@ export const defaultNetworks: {
     nickname: 'Optimistic Ethereum',
     rpcPrefs: {
       blockExplorerUrl: 'https://optimistic.etherscan.io',
+    },
+    ...EVMProviderSharedProperties,
+  },
+  [CHAINS.KLAY]: {
+    id: PresetNetworkId.KLAY,
+    type: CHAINS.KLAY,
+    rpcUrl: 'https://public-node-api.klaytnapi.com/v1/cypress',
+    chainId: '0x2019',
+    ticker: 'ETH',
+    nickname: 'Klaytn',
+    rpcPrefs: {
+      blockExplorerUrl: 'https://scope.klaytn.com',
     },
     ...EVMProviderSharedProperties,
   },

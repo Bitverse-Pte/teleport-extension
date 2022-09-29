@@ -22,6 +22,7 @@ export enum CHAINS {
   AVAX = 'AVAX',
   OP = 'OP',
   CELO = 'CELO',
+  KLAY = 'KLAY',
 
   COSMOS_HUB = 'COSMOS_HUB',
   OSMOSIS = 'OSMOSIS',

@@ -90,6 +90,31 @@ const flowContext = flow
 
     return next();
   })
+  // .use(async (ctx, next) => {
+  //   const {
+  //     request: {
+  //       data: { params, method },
+  //     },
+  //   } = ctx;
+  //   if (
+  //     params &&
+  //     Array.isArray(params) &&
+  //     params.length > 0 &&
+  //     method === 'eth_sendTransaction'
+  //   ) {
+  //     const opts = {
+  //       jsonrpc: '2.0',
+  //       method: method,
+  //       origin: 'metamask',
+  //     };
+  //     const initParams = await txController.newUnapprovedTransaction(
+  //       params[0],
+  //       opts
+  //     );
+  //     ctx.initParams = initParams;
+  //   }
+  //   return next();
+  // })
   .use(async (ctx, next) => {
     // check need approval
     const {
