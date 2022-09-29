@@ -215,7 +215,37 @@ class ProviderController extends BaseController {
     result: any;
   }) => {
     if (options.pushed) return options.result;
-    const { initParams } = options;
+    const {
+      data: {
+        params: [txParams],
+      },
+      session: { origin },
+      approvalRes,
+    } = cloneDeep(options);
+    const opts = {
+      jsonrpc: '2.0',
+      method: txParams.method,
+      origin: 'metamask',
+    };
+    delete txParams.txParam;
+    txParams.gas = approvalRes.gas;
+    if (txParams.type === TransactionEnvelopeTypes.FEE_MARKET) {
+      txParams.maxFeePerGas = approvalRes.maxFeePerGas;
+      txParams.maxPriorityFeePerGas = approvalRes.maxPriorityFeePerGas;
+    } else {
+      if (approvalRes.gasPrice !== '0x0') {
+        txParams.gasPrice = approvalRes.gasPrice;
+      }
+    }
+    console.debug(
+      'txController.newUnapprovedTransaction ===> start:',
+      txParams,
+      opts
+    );
+    const initParams = await txController.newUnapprovedTransaction(
+      txParams,
+      opts
+    );
     console.debug(
       'txController.updateAndApproveTransaction ===> initParams',
       initParams
