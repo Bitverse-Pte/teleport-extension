@@ -232,6 +232,7 @@ class ProviderController extends BaseController {
     if (txParams.type === TransactionEnvelopeTypes.FEE_MARKET) {
       txParams.maxFeePerGas = approvalRes.maxFeePerGas;
       txParams.maxPriorityFeePerGas = approvalRes.maxPriorityFeePerGas;
+      delete txParams.gasPrice;
     } else {
       if (approvalRes.gasPrice !== '0x0') {
         txParams.gasPrice = approvalRes.gasPrice;
