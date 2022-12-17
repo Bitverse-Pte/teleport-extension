@@ -115,7 +115,8 @@ function CustomFee(props) {
           <CustomButton
             type="primary"
             htmlType="submit"
-            className="save-gas-btn"
+            cls="save-gas-btn"
+            block
           >
             Save
           </CustomButton>
