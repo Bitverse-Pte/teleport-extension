@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ACCOUNT_CREATE_TYPE } from '../../../constants/index';
