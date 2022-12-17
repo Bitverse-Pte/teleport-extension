@@ -348,7 +348,10 @@ const WalletManage: React.FC = () => {
                 >
                   <div
                     className="circle flexR"
-                    style={{ background: WALLET_THEME_COLOR[i % 5] }}
+                    style={{
+                      background: WALLET_THEME_COLOR[i % 5],
+                      color: '#171727',
+                    }}
                   >
                     {w?.hdWalletName?.substr(0, 1)}
                     <div

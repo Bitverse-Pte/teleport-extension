@@ -1,97 +1,96 @@
 @import '../../style/mixin';
 
 .account-select {
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
-  padding-top:8px;
+  padding-top: 8px;
   font-family: MontserratBold;
-  .header{
-    height:25px;
+  .header {
+    height: 25px;
     flex: 0 0 25px;
     box-sizing: border-box;
-    margin-bottom:18px;
+    margin-bottom: 18px;
   }
 
-  .content{
-    width:100%;
-    height:0;
+  .content {
+    width: 100%;
+    height: 0;
     flex: 1;
-    .side-bar{
-      width:54px;
-      flex:0 0 54px;
-      height:100%;
+    .side-bar {
+      width: 54px;
+      flex: 0 0 54px;
+      height: 100%;
       box-sizing: border-box;
-      padding-top:18px;
+      padding-top: 18px;
       overflow-y: auto;
       align-items: center;
-      background:#EFF7FF;
+      background: #eff7ff;
       border-radius: 0 23px 0 0;
-      .id-item{
-        width:30px;
-        height:30px;
-        flex:0 0 30px;
-        border-radius:15px;
+      .id-item {
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+        border-radius: 15px;
         justify-content: center;
         align-items: center;
-        font-size:14px;
-        color:#ffffff;
-        margin-bottom:20px;
-        opacity:.25;
-        cursor:pointer;
+        font-size: 14px;
+        color: #ffffff;
+        margin-bottom: 20px;
+        opacity: 0.25;
+        cursor: pointer;
       }
-      .active-item{
-        width:40px;
-        height:40px;
-        flex:0 0 40px;
-        border-radius:12px;
-        opacity:1;
+      .active-item {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border-radius: 12px;
+        opacity: 1;
       }
     }
-    .account-container{
-      flex:1;
-      width:100%;
+    .account-container {
+      flex: 1;
+      width: 100%;
       box-sizing: border-box;
-      .wallet-name{
-        margin:0 6px 10px;
-        font-size:13px;
-        font-weight:500;
-        height:20px;
-        flex:0 0 20px;
+      .wallet-name {
+        margin: 0 6px 10px;
+        font-size: 13px;
+        font-weight: 500;
+        height: 20px;
+        flex: 0 0 20px;
         margin-left: 24px;
       }
-      .accounts{
-        width:100%;
-        box-sizing:border-box;
-        flex:1;
+      .accounts {
+        width: 100%;
+        box-sizing: border-box;
+        flex: 1;
         overflow-y: auto;
-        .account-item{
+        .account-item {
           align-items: center;
           justify-content: space-between;
-          height:64px;
-          flex:0 0 64px;
-          cursor:pointer;
+          height: 64px;
+          flex: 0 0 64px;
+          cursor: pointer;
           box-sizing: border-box;
-          padding-right:25px;
+          padding-right: 25px;
           padding-left: 24px;
-          &:hover{
-            background:#FAFCFE;
+          &:hover {
+            background: #fafcfe;
           }
-          .account-left{
+          .account-left {
             align-items: center;
-            .account-info{
+            .account-info {
               align-items: flex-start;
-              margin-left:14px;
-              .account-name{
-                font-size:14px;
-                font-weight:500;
+              margin-left: 14px;
+              .account-name {
+                font-size: 14px;
+                font-weight: 500;
               }
-              .account-address{
-                font-size:12px;
-                color:#9EA2A9;
-                font-family: "Montserrat";
+              .account-address {
+                font-size: 12px;
+                color: #9ea2a9;
+                font-family: 'Montserrat';
               }
-
             }
           }
         }
@@ -125,26 +124,26 @@
 .account-select.dark {
   background: #171727;
   color: #fff;
-  .content{
-    .side-bar{
+  .content {
+    .side-bar {
       background: #032440;
     }
-    .account-container{
-      .accounts{
-        .account-item{
-          &:hover{
-            background:#032440;
+    .account-container {
+      .accounts {
+        .account-item {
+          &:hover {
+            background: #032440;
           }
         }
       }
     }
   }
   .widgets-tab-container {
-    background: #02182B;
-    color: #798CAD;
+    background: #202030;
+    color: #798cad;
     .tab-item {
-      background: #02182B;
-      color: #798CAD;
+      background: #02182b;
+      color: #71757a;
     }
     .tab-item-active {
       color: #FFFFFF;

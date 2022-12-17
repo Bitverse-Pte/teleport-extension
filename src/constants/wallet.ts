@@ -5,11 +5,11 @@ export const MIN_PASSWORD_LENGTH = 8;
 export const POLICY_AGREED = 'policy_agreed';
 
 export const WALLET_THEME_COLOR: string[] = [
-  '#0F83FF',
-  '#FFA800',
-  '#57CC75',
-  '#E33376',
-  '#000000',
+  '#56FAA5',
+  '#FFFFFF',
+  '#FFA014',
+  '#1BD6AA',
+  '#865CFF',
 ];
 
 export enum TOKEN_MANAGE_TAB {

@@ -11,7 +11,7 @@
     line-height: 1;
   }
 
-  .account-header-container{
+  .account-header-container {
     padding-left: 0;
     flex: 0 0 64px;
     height: 64px;
@@ -28,7 +28,7 @@
       position: relative;
       box-sizing: border-box;
       padding: 16px 14px;
-      background: #EFF7FF;
+      background: #eff7ff;
       border-radius: 16px;
       margin-bottom: 24px;
       .flexR;
@@ -61,7 +61,13 @@
         top: 0;
         left: 0;
         position: absolute;
-        background: url(../../../assets/Mask.png) no-repeat 0 0;
+        // background: url(../../../assets/Mask.png) no-repeat 0 0;
+        background: linear-gradient(
+          180deg,
+          rgba(86, 250, 165, 0.5) 0%,
+          rgba(0, 1, 2, 0) 100%
+        );
+        backdrop-filter: blur(12px);
         z-index: 1;
         color: #fff;
         .flexCol;
@@ -95,19 +101,17 @@
 
         .mnemonic-check-button-disabled {
           opacity: 0.5;
-          color: #A3B4CC !important;
-
+          color: #a3b4cc !important;
         }
 
         .mnemonic-check-button {
           color: @themeColor;
-          background: #FFFFFF;
           width: 240px;
           height: 36px;
           text-align: center;
           line-height: 36px;
-          background: #FFFFFF;
-          border: 1px solid #56FAA5;
+          background: #171727;
+          border: 1px solid #56faa5;
           box-sizing: border-box;
           border-radius: 8px;
           margin-top: 24px;
@@ -115,11 +119,9 @@
           font-size: 14px;
         }
       }
-
     }
 
     .notice-section {
-
       .notice {
         font-size: 14px;
         font-weight: 500;
@@ -127,7 +129,6 @@
       }
 
       .notice-container {
-
         .notice-item {
           font-size: 12px;
           margin-bottom: 8px;
@@ -143,18 +144,17 @@
         font-size: 18px;
         line-height: 20px;
         margin-bottom: 12px;
-        color: #FFA014;
+        color: #ffa014;
       }
 
       .mnemonic-backup-attention-content {
         font-family: Montserrat;
         font-size: 14px;
         line-height: 20px;
-        color: #5E6C8A;
+        color: #d7dce0;
         margin-bottom: 12px;
       }
     }
-
   }
 
   .backup-button-container {
@@ -165,7 +165,6 @@
       margin-bottom: 10px;
     }
   }
-
 }
 
 .backup.dark {
@@ -173,11 +172,11 @@
   color: #ffffff;
 
   .mnemonic-backup-attention {
-    color: #C5D1E0 !important;
+    color: #c5d1e0 !important;
   }
-  .mnemonic-container{
-    background: #02182B;
-    .phrase{
+  .mnemonic-container {
+    background: #02182b;
+    .phrase {
       background: #171727 !important;
       color: #ffffff !important;
     }
@@ -185,7 +184,7 @@
   .mnemonic-backup-attention-content {
     color: rgba(197, 209, 224, 1) !important;
   }
-  .custom-button-default{
+  .custom-button-default {
     background: @darkBg;
   }
 }

@@ -1,121 +1,118 @@
 @import '../../style/mixin';
 
 .account-create {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+
+  //padding: 0 @pagePaddingLeft;
+  p {
+    margin-bottom: 0;
+    line-height: 1;
+  }
+
+  .content {
+    flex: 1;
     box-sizing: border-box;
+    overflow-y: auto;
 
-    //padding: 0 @pagePaddingLeft;
-    p {
-        margin-bottom: 0;
-        line-height: 1;
+    .account-create-title {
+      font-family: MontserratBold;
+      font-size: 16px;
+      margin-bottom: 12px;
     }
 
-    .content {
-        flex: 1;
-        box-sizing: border-box;
-        overflow-y: auto;
-
-        .account-create-title {
-            font-family: MontserratBold;
-            font-size: 16px;
-            margin-bottom: 12px;
-        }
-
-        .account-create-name-input {
-            margin-bottom: 24px;
-        }
-
-        .password-container {
-            .account-create-notice {
-                font-size: 12px;
-                line-height: 18px;
-                color: #798CAD;
-                margin-bottom: 12px;
-            }
-
-            .custom-password-input {
-                margin-bottom: 12px;
-
-                &:hover {
-                    input.ant-input {
-                        background: #ffffff !important;
-                    }
-                }
-
-                input.ant-input {
-                    &:focus {
-                        background: #ffffff !important;
-                    }
-                }
-            }
-        }
+    .account-create-name-input {
+      margin-bottom: 24px;
     }
 
-    .button {
-        margin-bottom: 40px;
-    }
+    .password-container {
+      .account-create-notice {
+        font-size: 12px;
+        line-height: 18px;
+        color: #798cad;
+        margin-bottom: 12px;
+      }
 
+      .custom-password-input {
+        margin-bottom: 12px;
+
+        &:hover {
+          input.ant-input {
+            background: #ffffff !important;
+          }
+        }
+
+        input.ant-input {
+          &:focus {
+            background: #ffffff !important;
+          }
+        }
+      }
+    }
+  }
+
+  .button {
+    margin-bottom: 40px;
+  }
 }
 
 .policy {
-    margin-top: 12px;
-    justify-content: center;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 17px;
+  margin-top: 12px;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 17px;
 
-    .policy-title {
-        margin-left: 8px;
+  .policy-title {
+    margin-left: 8px;
+  }
+
+  .policy-link {
+    color: @themeColor;
+
+    &:hover {
+      text-decoration: underline;
     }
-
-    .policy-link {
-        color: @themeColor;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
+  }
 }
 
 .account-create.dark {
-    background: @darkBg;
-    color: #ffffff;
+  background: @darkBg;
+  color: #ffffff;
 
-    .content {
-        svg {
-            fill: #ffffff;
-        }
-
-        input,
-        .custom-input {
-            background: #02182B !important;
-            border-color: #02182B !important;
-            color: #ffffff;
-        }
-
-        input::placeholder {
-            color: #5E6C8A !important;
-        }
-
-        input::-webkit-input-placeholder {
-            color: #5E6C8A !important;
-        }
-
-        .custom-password-input {
-
-            &:hover {
-                input.ant-input {
-                    background: #02182B !important
-                }
-            }
-
-            input.ant-input {
-                &:focus {
-                    background: #02182B !important
-                }
-            }
-        }
+  .content {
+    svg {
+      fill: #ffffff;
     }
 
+    input,
+    .custom-input {
+      background: #202030 !important;
+      border-color: #202030 !important;
+      color: #ffffff;
+    }
+
+    input::placeholder {
+      color: #5e6c8a !important;
+    }
+
+    input::-webkit-input-placeholder {
+      color: #5e6c8a !important;
+    }
+
+    .custom-password-input {
+      &:hover {
+        input.ant-input {
+          background: #02182b !important;
+        }
+      }
+
+      input.ant-input {
+        &:focus {
+          background: #02182b !important;
+        }
+      }
+    }
+  }
 }
