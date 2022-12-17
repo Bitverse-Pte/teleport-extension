@@ -99,7 +99,7 @@
       background: #202030 !important;
       border-color: #202030 !important;
       color: #ffffff;
-      &:hover{
+      &.hover:hover{
         border: 1px solid #56FAA5 !important;
       }
     }
@@ -112,25 +112,24 @@
       color: #5e6c8a !important;
     }
 
-    // .custom-password-input {
-    //   &:hover {
-        
-    //     border-radius: 8px;
-    //     input.ant-input {
-    //       background: #202030 !important;
-    //     }
-    //   }
+    .custom-password-input {
+      &:hover {
+        border-radius: 8px;
+        input.ant-input {
+          background: #202030 !important;
+        }
+      }
 
-    //   &:focus {
-    //     border: 1px solid #56FAA5 !important;
-    //     border-radius: 8px;
-    //   }
+      // &:focus {
+      //   border: 1px solid #56FAA5 !important;
+      //   border-radius: 8px;
+      // }
 
-    //   input.ant-input {
-    //     &:focus {
-    //       background: #202030 !important;
-    //     }
-    //   }
-    // }
+      input.ant-input {
+        &:focus {
+          background: #202030 !important;
+        }
+      }
+    }
   }
 }
