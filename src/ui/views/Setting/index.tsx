@@ -159,7 +159,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
         <span className="tag" style={{ display: 'none' }}></span>
         <Switch
           onColor="#CDEBFF"
-          onHandleColor="#1484F5"
+          onHandleColor="#56FAA5"
           offColor="#A3B4CC"
           offHandleColor="#FFFFFF"
           uncheckedIcon={false}

@@ -85,7 +85,7 @@ async function restoreAppState() {
 function updateBadge() {
   const count = notificationService.getApproval() ? '1' : '';
   chrome.action.setBadgeText({ text: count });
-  chrome.action.setBadgeBackgroundColor({ color: '#1484F5' });
+  chrome.action.setBadgeBackgroundColor({ color: '#56FAA5' });
 }
 
 restoreAppState();

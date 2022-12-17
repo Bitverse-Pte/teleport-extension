@@ -286,7 +286,7 @@ const WalletManage: React.FC = () => {
               name="import"
               cls="wallet-manage-img"
               style={{
-                fill: '#1484F5',
+                fill: '#56FAA5',
               }}
             />
           </div>

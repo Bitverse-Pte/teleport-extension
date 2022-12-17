@@ -12,7 +12,7 @@
 </g>
 <path d="M259 351C259 345.477 263.477 341 269 341H285C290.523 341 295 345.477 295 351V351C295 356.523 290.523 361 285 361H269C263.477 361 259 356.523 259 351V351Z" fill="#CDEBFF"/>
 <g filter="url(#filter0_d_18475_221574)">
-<circle cx="285" cy="351" r="8" fill="#1484F5"/>
+<circle cx="285" cy="351" r="8" fill="#56FAA5"/>
 </g>
 <g filter="url(#filter1_d_18475_221574)">
 <rect x="40" y="323" width="280" height="55" stroke="#0F83FF" stroke-width="2" shape-rendering="crispEdges"/>

@@ -41,13 +41,13 @@ export default function CopyOrOpenInScan({
         <IconComponent
           name="copy"
           cls="some-padding"
-          style={{ width: '12px', height: '12px', fill: '#1484F5' }}
+          style={{ width: '12px', height: '12px', fill: '#56FAA5' }}
         />
       </CopyToClipboard>
       <IconComponent
         name="external-link"
         cls="explorer some-padding"
-        style={{ width: '12px', height: '12px', fill: '#1484F5' }}
+        style={{ width: '12px', height: '12px', fill: '#56FAA5' }}
         onClick={handleExplorerClick}
       />
     </div>
