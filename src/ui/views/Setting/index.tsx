@@ -4,6 +4,7 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
 import walletLogo from 'assets/walletLogo.png';
 import { ReactComponent as TeleportTextSVG } from 'assets/teleportText.svg';
+import { ReactComponent as BitverseLogoSVG } from 'assets/bitverse-logo.svg';
 import { ReactComponent as LightIcon } from 'assets/theme/light.svg';
 import { ReactComponent as MoonIcon } from 'assets/theme/moon.svg';
 import { ReactComponent as SystemIcon } from 'assets/theme/system.svg';
@@ -63,10 +64,10 @@ export const LogoHeader: React.FC<ILogoHeader> = (props) => {
   const { isDarkMode } = useDarkmode();
   return (
     <div className={clsx('logo-header flexR', { dark: isDarkMode })}>
-      <div className="logo-header-left flexR">
-        <img src={walletLogo} className="logo-header-left-logo" />
+      <div className="logo-wrap">
+        {/* <img src={walletLogo} className="logo-header-left-logo" /> */}
         {/* <img src={TeleportText} className="logo-header-left-title" /> */}
-        <TeleportTextSVG className="logo-header-left-title" />
+        <BitverseLogoSVG className="logo-header-left-title" />
       </div>
       <div
         className="logo-header-right flexR"
