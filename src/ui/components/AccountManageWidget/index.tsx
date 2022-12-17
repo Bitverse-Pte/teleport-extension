@@ -212,7 +212,9 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
                 >
                   {account?.ethAddress ? (
                     <Jazzicon
-                      paperStyles={account.selected ? { borderRadius: '12px' } : {}}
+                      paperStyles={
+                        account.selected ? { borderRadius: '12px' } : {}
+                      }
                       diameter={account.selected ? 40 : 30}
                       seed={getUnit10ByAddress(account?.ethAddress)}
                     />

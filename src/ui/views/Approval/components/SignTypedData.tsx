@@ -1,4 +1,3 @@
-import { Button } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +6,7 @@ import { NetworkDisplay } from 'ui/components';
 import { useApproval, useWallet, transferAddress2Display } from 'ui/utils';
 import Jazzicon from 'react-jazzicon';
 import { getUnit10ByAddress } from 'background/utils';
-import { WalletName } from '../../../components/Widgets';
+import { CustomButton, WalletName } from '../../../components/Widgets';
 import { FallbackSiteLogo } from 'ui/components';
 import * as ethUtil from 'ethereumjs-util';
 
@@ -86,23 +85,22 @@ const SignTypedData = ({ params }) => {
       </div>
       <footer className="connect-footer">
         <div className={clsx(['action-buttons mt-4'])}>
-          <Button
+          <CustomButton
             type="primary"
-            size="large"
-            className={clsx(itemsCenteredCls, 'w-full mt-2', 'mb-14')}
             onClick={() => resolveApproval({})}
+            cls="theme tx-btn-container-top mb-14"
+            block
           >
             {t('Sign')}
-          </Button>
-          <Button
-            size="large"
-            type="primary"
-            ghost
-            className={clsx(itemsCenteredCls, 'w-full mt-2')}
+          </CustomButton>
+          <CustomButton
+            type="default"
+            cls="custom-button-default"
             onClick={() => rejectApproval('User rejected the request.')}
+            block
           >
             {t('Decline')}
-          </Button>
+          </CustomButton>
         </div>
       </footer>
     </div>
