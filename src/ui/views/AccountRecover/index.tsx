@@ -418,6 +418,7 @@ const AccountRecover = () => {
         />
         <p className="account-recover-title">Wallet name</p>
         <CustomInput
+          cls="hover"
           placeholder="Enter wallet name"
           onChange={(e) => {
             /**

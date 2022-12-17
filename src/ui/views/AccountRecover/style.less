@@ -62,14 +62,12 @@
       &:hover {
         input.ant-input {
           background: #ffffff !important;
-          font-size: 24px;
         }
       }
 
       input.ant-input {
         &:focus {
           background: #ffffff !important;
-          font-size: 24px;
         }
       }
     }
@@ -152,11 +150,11 @@
           box-sizing: border-box;
           width: 130px;
           height: 30px;
-          font-size: 24px;
+          font-size: 14px;
         }
 
         &:hover {
-          border-color: @themeColor;
+          border-color: @themeColor !important;
         }
       }
 
@@ -322,7 +320,10 @@
       background: #202030 !important;
       border-color: #202030 !important;
       color: #ffffff;
-      font-size: 24px;
+      font-size: 14px;
+      &.hover:hover{
+        border: solid 1px #56FAA5 !important;
+      }
     }
 
     input::placeholder {
@@ -343,6 +344,7 @@
 
     .custom-password-input {
       &:hover {
+        border: solid 1px #56FAA5 !important;
         input.ant-input {
           background: #202030 !important;
         }
