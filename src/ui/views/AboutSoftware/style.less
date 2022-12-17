@@ -68,7 +68,6 @@
 /** darkmode related overrides */
 .about-software.dark {
     background: #000;
-    height: 100%;
 
     .header {
         svg { fill: #FFF; }
@@ -83,5 +82,29 @@
         background-color: #202030;
         color: #FFF;
         span.url { color: #FFF; }
+    }
+    .ml-auto {
+        fill: #fff;
+    }
+    .about-qrcode-container {
+        display: flex;
+        padding: 24px 0;
+        .qrcode_box {
+            &:first-child {
+                margin-right: 20px;
+            }
+            &_title {
+                color: #fff;
+                font-size: 12px;
+                font-weight: 700;
+                text-align: center;
+                margin-bottom: 8px;
+            }
+            .about-qrcode {
+                flex: 1;
+                width: 90px;
+                height: 90px;
+            }
+        }
     }
 }
