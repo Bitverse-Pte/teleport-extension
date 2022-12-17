@@ -351,7 +351,6 @@ const Home = () => {
             history.push('/network');
           }}
         />
-        <div className="home-bg"></div>
         <div className="home-content">
           <div
             className="home-content-name-wrap content-wrap-padding flexR cursor"
