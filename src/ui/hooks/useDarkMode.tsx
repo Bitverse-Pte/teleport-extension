@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useLocalStorage, useMedia } from 'react-use';
 
 export type DarkModeSetting = 'light' | 'dark' | 'system';
@@ -17,10 +17,12 @@ type DarkmodeCxtProviderProps = {
 };
 
 export function DarkmodeCxtProvider({ children }: DarkmodeCxtProviderProps) {
-  const [darkmodeSetting, setDarkmode] = useLocalStorage<DarkModeSetting>(
-    'darkmode-setting',
-    'system'
-  );
+  // const [darkmodeSetting, setDarkmode] = useLocalStorage<DarkModeSetting>(
+  //   'darkmode-setting',
+  //   'dark'
+  // );
+  const [darkmodeSetting, setDarkmode] = useState<DarkModeSetting>('dark');
+
   return (
     <DarkmodeContext.Provider value={[darkmodeSetting, setDarkmode]}>
       {children}
@@ -37,6 +39,7 @@ export function useDarkmode() {
    * we go `system` by default
    */
   const [darkmodeSetting, setDarkmode] = useContext(DarkmodeContext);
+
   /**
    * enable darkmode only when:
    * - the user set to dark manually
