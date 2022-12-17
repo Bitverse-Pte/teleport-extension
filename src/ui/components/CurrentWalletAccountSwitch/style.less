@@ -190,11 +190,11 @@
   .accounts {
     .account-item {
       &:hover {
-        background: #052E55 !important;
+        background: rgba(0, 255, 186, 0.1) !important;
       }
       .account-right {
         .account-item-action {
-          background: #364361;
+          background: #313438;
           .key-default-icon {
             fill: #fff;
             rect {
@@ -210,13 +210,19 @@
             }
           }
           &:hover {
-            background: #0E5CAA;
+            background: #313438;
+
+            .site-default-icon {
+              path {
+                stroke: @themeColor;
+              }
+            }
           }
         }
       }
     }
     .account-list-active {
-      background: #052E55 !important;
+      background: rgba(0, 255, 186, 0.1) !important;
     }
   }
 }
