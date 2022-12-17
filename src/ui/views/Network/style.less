@@ -1,3 +1,5 @@
+@import '../../style/mixin.less';
+
 .colorful_dot {
   margin-right: 0.25rem;
   font-size: 1.5rem;
@@ -12,7 +14,9 @@
   }
 
   .custom-network-card {
-    background-color: #02182B;
+    background-color: @darkBg;
+    border: 1px solid #404347;
+    border-radius: 8px;
     button svg {
       fill: #FFF;
     }
@@ -56,12 +60,12 @@
 }
 
 h2.category-name {
-  font-family: Montserrat;
+  font-family: MontserratBold;
   font-size: 14px;
   font-style: normal;
   line-height: 14px;
   text-align: left;
-  color: #798CAD;
+  color: #FFFFFF;
 }
 
 .networkList {
