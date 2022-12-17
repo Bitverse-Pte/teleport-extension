@@ -6,6 +6,7 @@ import { Form, Button } from 'antd';
 import { hexWEIToDecGWEI } from '../../../utils/conversion';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { CustomButton } from '../Widgets';
 
 function CustomFee(props) {
   const { isDarkMode } = useDarkmode();
@@ -111,9 +112,13 @@ function CustomFee(props) {
           </div>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="save-gas-btn">
+          <CustomButton
+            type="primary"
+            htmlType="submit"
+            className="save-gas-btn"
+          >
             Save
-          </Button>
+          </CustomButton>
         </Form.Item>
       </Form>
     </div>

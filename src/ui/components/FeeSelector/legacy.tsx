@@ -13,6 +13,7 @@ import skynet from 'utils/skynet';
 import { hexWEIToDecGWEI } from '../../../utils/conversion';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { CustomButton } from '../Widgets';
 
 const { sensors } = skynet;
 
@@ -144,9 +145,13 @@ function FeeSelectorLegacy(props) {
             </div>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="save-gas-btn">
+            <CustomButton
+              type="primary"
+              htmlType="submit"
+              className="save-gas-btn"
+            >
               Confirm
-            </Button>
+            </CustomButton>
           </Form.Item>
         </Form>
       </div>
