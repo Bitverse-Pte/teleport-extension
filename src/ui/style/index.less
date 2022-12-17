@@ -4,22 +4,18 @@
 @import './overwrite';
 
 @font-face {
-  font-family: MontserratMedium;
-  src: url('../../assets/font/Montserrat-Medium.ttf');
-}
-@font-face {
-  font-family: Montserrat;
-  src: url('../../assets/font/Montserrat-Regular.ttf');
-}
-@font-face {
-  font-family: MontserratBold;
-  src: url('../../assets/font/Montserrat-Bold.ttf');
+  font-family: 'IBM Plex Sans';
+  font-display: fallback;
+  src: url('https://www.bybit.com/bycsi-root/common-static/infra-static/assets/fonts/IBMPlexSans/IBMPlexSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
 }
 
 html,
 body {
   color: @baseTextColor;
-  font-family: Montserrat;
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'Microsoft YaHei', Roboto, Arial, sans-serif !important;
   .icon-close {
     width: 11px;
   }
@@ -86,11 +82,6 @@ button:focus {
   color: #818a99;
   font-size: 14px;
   line-height: 14px;
-}
-
-.font-roboto-mono {
-  font-family: 'Roboto', sans-serif;
-  font-family: 'Roboto Mono', monospace;
 }
 
 .create-new-header {

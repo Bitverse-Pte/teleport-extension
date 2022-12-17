@@ -21,7 +21,7 @@ export const enum Blue {
 }
 
 export const enum Green {
-  '02' = '#42B856',
+  '02' = '#56FAA5',
   '06' = '#C9F0CB',
   '07' = '#F0FFF0',
 }

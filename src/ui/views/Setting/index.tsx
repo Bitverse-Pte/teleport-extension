@@ -152,10 +152,10 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
         <span className="title">Default Wallet</span>
         <span className="tag" style={{ display: 'none' }}></span>
         <Switch
-          onColor="#CDEBFF"
+          onColor="#1D363E"
           onHandleColor="#56FAA5"
-          offColor="#A3B4CC"
-          offHandleColor="#FFFFFF"
+          offColor="#404347"
+          offHandleColor="#71757A"
           uncheckedIcon={false}
           checkedIcon={false}
           height={20}

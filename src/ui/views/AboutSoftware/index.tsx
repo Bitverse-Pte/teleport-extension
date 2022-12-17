@@ -45,7 +45,7 @@ export default function AboutSoftware() {
             alt="Teleport Network Logo"
             className="web-icon"
           />
-          <span className="url">https://teleport.network</span>
+          <span className="url">https://bitverse.zone/</span>
           <IconComponent name="chevron-right" cls="ml-auto" />
         </div>
       </div>
