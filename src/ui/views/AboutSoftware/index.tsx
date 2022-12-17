@@ -1,11 +1,12 @@
 import React from 'react';
 import Header from 'ui/components/Header';
-import TeleportLogoURI from 'assets/walletLogo.png';
+import TeleportLogoURI from 'assets/logo.svg';
 import './style.less';
 import { useTranslation } from 'react-i18next';
 import { IconComponent } from 'ui/components/IconComponents';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { ReactComponent as TlpTextLogo } from 'assets/teleportText.svg';
 
 export default function AboutSoftware() {
   const version = process.env.version;
@@ -26,6 +27,7 @@ export default function AboutSoftware() {
           alt="Teleport Network Logo"
           className="logo"
         />
+        <TlpTextLogo className="logotext" viewBox="0 0 102 13" />
         <p className="software-version flexR">V {process.env.version}</p>
         <p className="software-introductions">
           {t('about_software_introductions', {

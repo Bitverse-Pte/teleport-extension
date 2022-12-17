@@ -3,7 +3,7 @@ import { Button } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ACCOUNT_CREATE_TYPE } from '../../../constants/index';
-import walletLogo from 'assets/walletLogo.png';
+import walletLogo from 'assets/Logo.svg';
 import { ReactComponent as TlpTextLogo } from 'assets/teleportText.svg';
 
 import './style.less';
@@ -32,7 +32,6 @@ const Welcome = () => {
     <div className={clsx('welcome-container', { dark: isDarkMode })}>
       <div className="logo-container">
         <img src={walletLogo} className="logo" />
-        {/* <img src={TeleportText} className="logo-header-left-title" /> */}
         <TlpTextLogo className="logo-header-left-title" viewBox="0 0 102 13" />
         <p className="welcome-to">Welcome to Teleport Wallet</p>
       </div>

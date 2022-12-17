@@ -29,7 +29,7 @@ import { TransactionListRouter } from 'ui/components/TransactionList';
 import './style.less';
 import { Tabs, TipButtonEnum } from 'constants/wallet';
 import { NoContent } from 'ui/components/universal/NoContent';
-import AddTokenImg from '../../../assets/addToken.svg';
+import AddTokenImg from '../../../assets/addToken.png';
 import ArrowRight from '../../../assets/arrowRight.svg';
 import Guide from '../../../assets/guide.svg';
 import skynet from 'utils/skynet';
