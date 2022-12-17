@@ -93,8 +93,8 @@
         height: 24px;
         background: #56FAA5;
         border-radius: 8px;
-        color: #FFFFFF;
-
+        color: #171727;
+        font-weight: 700;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -141,11 +141,13 @@
 
 /** style override for darkmode */
 .activity-list-container.dark {
-    .activity {
+    .activity:nth-child(odd){
         background: #171727;
+    }
+    .activity {
         color: #FFF;
-        &:hover {
-            background: #02182B;
+        &:hover,&:active {
+            background: rgba(0, 255, 186, 0.1);
         }
     }
 
