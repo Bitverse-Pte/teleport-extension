@@ -7,7 +7,8 @@ const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 const DarkmodeContext = React.createContext<
   [DarkModeSetting | undefined, (val: DarkModeSetting) => void]
 >([
-  'system',
+  // 'system', // origin value
+  'dark',
   () => console.error('DarkmodeContext::error: setter is not overrided'),
 ]);
 
