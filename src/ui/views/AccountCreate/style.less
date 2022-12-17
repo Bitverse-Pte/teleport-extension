@@ -24,6 +24,14 @@
 
     .account-create-name-input {
       margin-bottom: 24px;
+      &:hover {
+        border: 1px solid #56FAA5 !important;
+        border-radius: 8px;
+      }
+      &:focus {
+        border: 1px solid #56FAA5 !important;
+        border-radius: 8px;
+      }
     }
 
     .password-container {
@@ -103,14 +111,21 @@
 
     .custom-password-input {
       &:hover {
+        border: 1px solid #56FAA5 !important;
+        border-radius: 8px;
         input.ant-input {
-          background: #02182b !important;
+          background: #202030 !important;
         }
+      }
+
+      &:focus {
+        border: 1px solid #56FAA5 !important;
+        border-radius: 8px;
       }
 
       input.ant-input {
         &:focus {
-          background: #02182b !important;
+          background: #202030 !important;
         }
       }
     }

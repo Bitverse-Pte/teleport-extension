@@ -105,7 +105,7 @@ const AccountCreate = () => {
 
   return (
     <div className={clsx('account-create flexCol', { dark: isDarkMode })}>
-      <AccountHeader title="Create Wallet1" />
+      <AccountHeader title="Create Wallet" />
       <div className="content content-wrap-padding">
         <p className="account-create-title">Wallet name</p>
         <CustomInput
