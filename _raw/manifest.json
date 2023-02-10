@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_appName__",
   "short_name": "__MSG_appName__",
-  "version": "0.3.6",
+  "version": "0.5.0",
   "default_locale": "en",
   "description": "__MSG_appDescription__",
   "icons": {
@@ -20,10 +20,10 @@
       "48": "images/icons/48.png",
       "128": "images/icons/128.png"
     },
-    "default_title": "TeleportWallet",
+    "default_title": "BitverseWallet",
     "default_popup": "popup.html"
   },
-  "author": "https://teleport.network/",
+  "author": "https://bitverse.zone/",
   "background": {
     "service_worker": "bg-loader.js"
   },
@@ -39,11 +39,12 @@
       "js": ["vendor/trezor/trezor-content-script.js"]
     }
   ],
-  "content_security_policy": {
-  },
+  "content_security_policy": {},
   "permissions": ["storage", "activeTab", "notifications"],
-  "web_accessible_resources": [{
-    "resources": ["pageProvider.js"],
-    "matches": ["<all_urls>"]
-  }]
+  "web_accessible_resources": [
+    {
+      "resources": ["pageProvider.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
