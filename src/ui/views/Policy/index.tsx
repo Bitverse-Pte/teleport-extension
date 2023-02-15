@@ -10,20 +10,20 @@ const Policy = () => {
     <div className={clsx('policy-container flexCol', { dark: isDarkMode })}>
       <Header title="Privacy Policy" />
       <div className="policy-content content-wrap-padding">
-        <h3 className="policy-title">Teleport Wallet Terms of Use</h3>
+        <h3 className="policy-title">Bitverse Wallet Terms of Use</h3>
         <p className="policy-time">Last updated: 21 March 2022</p>
         <p className="policy-summary">
           These terms of use (“Terms” or “Agreement”) govern your use of the
-          website located at <b>teleport.network</b> (“Site”), Teleport wallet
+          website located at <b>Bitverse.network</b> (“Site”), Bitverse wallet
           and any other related tools, products or services made available to
           you on the same (“Service(s)”) which are developed and owned
-          independently by Teleport LLC, a company incorporated under the laws
-          of St. Vincent and the Grenadines (“Teleport”, “Company”, “we” or
+          independently by Bitverse LLC, a company incorporated under the laws
+          of St. Vincent and the Grenadines (“Bitverse”, “Company”, “we” or
           “us”). Certain features of the Site and Service may be subject to
           additional guidelines, terms, or rules, which will be posted on the
           Site in connection with such features. All such additional terms,
           guidelines, and rules are incorporated by reference into these Terms
-          and constitute a legally binding agreement between you and Teleport in
+          and constitute a legally binding agreement between you and Bitverse in
           relation to your use of the Service. Any personal information
           submitted in connection with your use of the Service is subject to our
           Privacy Policy, which is hereby incorporated by reference into these
@@ -114,9 +114,9 @@ const Policy = () => {
           transactions.
         </p>
         <p className="policy-level-two">
-          2.3. Teleport wallet does not support all existing tokens. You
-          understand that you shall not use Teleport wallet to handle any
-          non-supported tokens. Teleport wallet is only a tool for you to manage
+          2.3. Bitverse wallet does not support all existing tokens. You
+          understand that you shall not use Bitverse wallet to handle any
+          non-supported tokens. Bitverse wallet is only a tool for you to manage
           your tokens and is not an exchange or a trading platform. For the
           purpose of this Agreement, the word “transaction” refers to
           transferring and receiving tokens, which is substantially different
@@ -425,7 +425,7 @@ const Policy = () => {
         </p>
         <p className="policy-level-three">
           6.1.7. Subject to these Terms, you have full ownership and sole
-          control of the assets within your Teleport wallet and the decision to
+          control of the assets within your Bitverse wallet and the decision to
           conduct any transaction is your sole decision, not the decision or
           responsibility of us or any third party.
         </p>
@@ -550,7 +550,7 @@ const Policy = () => {
           do not offer exchange services of any kind.
         </p>
         <p className="policy-level-two">
-          7.7. You expressly acknowledge and agree that as the Teleport wallet
+          7.7. You expressly acknowledge and agree that as the Bitverse wallet
           is: (a) not a service; and (b) non-custodial in nature, and you are
           solely responsible for your activity and any risk of loss at all
           times. As such, we make no representations or warranty that the Site
@@ -807,7 +807,7 @@ const Policy = () => {
           12.9. Contact. If you have any questions regarding these Terms, please
           contact us at <b>[INSERT CONTACT EMAIL]</b>.
         </p>
-        <h3 className="policy-title">Teleport Wallet Privacy Policy</h3>
+        <h3 className="policy-title">Bitverse Wallet Privacy Policy</h3>
         <p className="policy-time">Last updated: 21 March 2022</p>
         <p className="policy-summary">
           We respect your privacy and are committed to protecting your privacy
@@ -816,7 +816,7 @@ const Policy = () => {
           protect your privacy. To ensure transparency, this Privacy Policy
           describes our information-handling practices when you access the Site
           and use the Services. All the definitions used in this Privacy Policy
-          shall have the same meaning as in the Teleport Wallet Terms of Use
+          shall have the same meaning as in the Bitverse Wallet Terms of Use
           unless this Policy sets a different meaning.
         </p>
         <p className="policy-summary">

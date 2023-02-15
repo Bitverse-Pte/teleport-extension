@@ -32,7 +32,7 @@ const Welcome = () => {
       <div className="logo-container">
         <img src={walletLogo} className="logo" />
         <TlpTextLogo className="logo-header-left-title" viewBox="0 0 102 13" />
-        <p className="welcome-to">Welcome to Teleport Wallet</p>
+        <p className="welcome-to">Welcome to Bitverse Wallet</p>
       </div>
 
       <div className="btn-container">

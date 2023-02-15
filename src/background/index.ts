@@ -47,7 +47,7 @@ let appStoreLoaded = false;
 //   head?.appendChild(icon);
 //   const name = document.createElement('meta');
 //   name.name = 'name';
-//   name.content = 'TeleportWallet';
+//   name.content = 'BitverseWallet';
 //   head?.appendChild(name);
 //   const description = document.createElement('meta');
 //   description.name = 'description';

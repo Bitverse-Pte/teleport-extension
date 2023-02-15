@@ -39,7 +39,7 @@ const SettingFeat: ISettingFeat[] = [
      * link start with http(s) will be open in a new page
      * since it's not in the extension's context
      */
-    link: 'https://docs.teleportwallet.io/',
+    link: 'https://www.bitverse.zone/',
     showChevronRight: true,
   },
   {

@@ -27,13 +27,6 @@ export default function AboutSoftware() {
         <img src={BitverseLogoImg} alt="Bitverse Logo" className="logo" />
         <TlpTextLogo className="logotext" viewBox="0 0 102 13" />
         <p className="software-version flexR">V {process.env.version}</p>
-        <p className="software-introductions">
-          {t('about_software_introductions', {
-            replace: {
-              software_name: 'Teleport Wallet',
-            },
-          })}
-        </p>
         <div
           className="jump-to-home-page cursor-pointer flex"
           onClick={goToWWW}
@@ -56,6 +49,13 @@ export default function AboutSoftware() {
             <img src={QrCodeImg_IOS} alt="ios" className="about-qrcode" />
           </div>
         </div>
+        <p className="software-introductions">
+          {t('about_software_introductions', {
+            replace: {
+              software_name: 'Bitverse Wallet',
+            },
+          })}
+        </p>
       </div>
     </div>
   );
