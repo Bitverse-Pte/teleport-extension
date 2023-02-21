@@ -11,19 +11,19 @@ const Policy = () => {
       <Header title="Privacy Policy" />
       <div className="policy-content content-wrap-padding">
         <h3 className="policy-title">Bitverse Wallet Terms of Use</h3>
-        <p className="policy-time">Last updated: August 30, 2022</p>
+        <p className="policy-time">Last updated: 30 August 2022</p>
         <p className="policy-summary">
           These terms of use (“Terms” or “Agreement”) govern your use of the
           website located at <b>bitverse.zone</b> (“Site”), Bitverse Wallet
           and any other related tools, products or services made available to
           you on the same (“Service(s)”) which are developed and owned
-          independently by Teleport LLC, a company incorporated under the laws
-          of St. Vincent and the Grenadines (“Teleport”, “Company”, “we” or
+          independently by Bitverse LLC, a company incorporated under the laws
+          of St. Vincent and the Grenadines (Bitverse, “Company”, “we” or
           “us”). Certain features of the Site and Service may be subject to
           additional guidelines, terms, or rules, which will be posted on the
           Site in connection with such features. All such additional terms,
           guidelines, and rules are incorporated by reference into these Terms
-          and constitute a legally binding agreement between you and Teleport in
+          and constitute a legally binding agreement between you and Bitverse in
           relation to your use of the Service. Any personal information
           submitted in connection with your use of the Service is subject to our
           Privacy Policy, which is hereby incorporated by reference into these

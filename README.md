@@ -1,4 +1,4 @@
-# TeleportWallet
+# BitverseWallet
 
  > A multi-chain & multi-ID Wallet
 
