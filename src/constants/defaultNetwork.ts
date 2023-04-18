@@ -1,4 +1,10 @@
 import { CoinType, Ecosystem, Provider } from 'types/network';
+import {
+  MANTLE_TESTNET_NAME,
+  MANTLE_TEST_RPC_URL,
+  MANTLE_TEST_NETWORK_ID,
+  MANTLE_TEST_EXPLORER_URL,
+} from '../constants/network';
 import { Bech32Address } from 'utils/cosmos/bech32';
 import { CHAINS } from './chain';
 
@@ -15,6 +21,9 @@ export enum PresetNetworkId {
   OSMOSIS = 'osmosis',
   SECRET_NETWORK = 'secret_network',
   KLAY = 'klay',
+
+  MANTLE_TEST = 'MANTLE_TEST',
+  MANTLE_MAINNET = 'MANTLE_MAINNET',
 
   KAVA = 'KAVA',
   CRYPTO_ORG = 'CRYPTO_ORG',
@@ -80,6 +89,21 @@ export const defaultNetworks: {
       blockExplorerUrl: 'https://polygonscan.com',
     },
     ...EVMProviderSharedProperties,
+  },
+  [CHAINS.MANTLE_TEST]: {
+    id: PresetNetworkId.MANTLE_TEST,
+    type: CHAINS.MANTLE_TEST,
+    rpcUrl: MANTLE_TEST_RPC_URL,
+    chainId: MANTLE_TEST_NETWORK_ID,
+    ticker: 'BIT',
+    nickname: MANTLE_TESTNET_NAME,
+    rpcPrefs: {
+      blockExplorerUrl: MANTLE_TEST_EXPLORER_URL,
+    },
+    chainName: MANTLE_TESTNET_NAME,
+    coinType: CoinType.BIT,
+    ecosystem: Ecosystem.EVM,
+    prefix: '0x',
   },
   [CHAINS.FTM]: {
     id: PresetNetworkId.FTM,

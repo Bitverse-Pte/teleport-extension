@@ -11,6 +11,7 @@ export const RINKEBY_NETWORK_ID = '4';
 export const GOERLI_NETWORK_ID = '5';
 export const KOVAN_NETWORK_ID = '42';
 export const LOCALHOST_NETWORK_ID = '1337';
+export const MANTLE_TEST_NETWORK_ID = '5001';
 
 export const MAINNET_CHAIN_ID = '0x1';
 export const ROPSTEN_CHAIN_ID = '0x3';
@@ -33,6 +34,7 @@ export const ROPSTEN_DISPLAY_NAME = 'Ropsten';
 export const RINKEBY_DISPLAY_NAME = 'Rinkeby';
 export const KOVAN_DISPLAY_NAME = 'Kovan';
 export const MAINNET_DISPLAY_NAME = 'Ethereum Mainnet';
+export const MANTLE_TESTNET_NAME = 'Mantle Testnet';
 export const GOERLI_DISPLAY_NAME = 'Goerli';
 
 const infuraProjectId = process.env.INFURA_PROJECT_ID;
@@ -44,6 +46,9 @@ export const RINKEBY_RPC_URL = getRpcUrl('rinkeby');
 export const KOVAN_RPC_URL = getRpcUrl('kovan');
 export const MAINNET_RPC_URL = getRpcUrl('mainnet');
 export const GOERLI_RPC_URL = getRpcUrl('goerli');
+export const MANTLE_TEST_RPC_URL = 'https://rpc.testnet.mantle.xyz/';
+
+export const MANTLE_TEST_EXPLORER_URL = 'https://explorer.testnet.mantle.xyz/';
 
 export const ETH_SYMBOL = 'ETH';
 export const WETH_SYMBOL = 'WETH';
