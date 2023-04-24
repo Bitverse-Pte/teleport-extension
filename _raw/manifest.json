@@ -40,7 +40,7 @@
     }
   ],
   "content_security_policy": {},
-  "permissions": ["storage", "activeTab", "notifications"],
+  "permissions": ["storage", "activeTab", "notifications", "tabs"],
   "web_accessible_resources": [
     {
       "resources": ["pageProvider.js"],

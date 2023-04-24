@@ -290,12 +290,27 @@ window.addEventListener('message', function (event) {
         // set provider isMetamask attribute as isDefaultWallet to fit different dapp scenario
         provider.isMetaMask = isDefaultWallet;
         if (isDefaultWallet) {
-          Object.defineProperty(window, 'ethereum', {
-            value: new Proxy(provider, {
-              deleteProperty: () => true,
-            }),
-            writable: false,
-          });
+          chrome.tabs.query(
+            { active: true, currentWindow: true },
+            function (tabs) {
+              const url = tabs[0].url || '';
+              if (!url.includes('bybit.com')) {
+                Object.defineProperty(window, 'ethereum', {
+                  value: new Proxy(provider, {
+                    deleteProperty: () => true,
+                  }),
+                  writable: true,
+                });
+              } else {
+                Object.defineProperty(window, 'teleport', {
+                  value: new Proxy(provider, {
+                    deleteProperty: () => true,
+                  }),
+                  writable: true,
+                });
+              }
+            }
+          );
         }
       });
 
