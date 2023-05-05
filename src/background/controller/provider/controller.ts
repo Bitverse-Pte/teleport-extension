@@ -214,6 +214,7 @@ class ProviderController extends BaseController {
     pushed: boolean;
     result: any;
   }) => {
+    console.log(options, 'options');
     if (options.pushed) return options.result;
     const {
       data: {

@@ -48,13 +48,19 @@ const deleteSession = (id) => {
 
 const broadcastEvent = (ev, data?, origin?) => {
   let sessions: any[] = [];
+  // eslint-disable-next-line no-debugger
+  // debugger;
   sessionMap.forEach((session, key) => {
-    if (permissionService.hasPerssmion(session.origin)) {
-      sessions.push({
-        key,
-        ...session,
-      });
-    }
+    // if (!permissionService.hasPerssmion(session.origin)) {
+    //   sessions.push({
+    //     key,
+    //     ...session,
+    //   });
+    // }
+    sessions.push({
+      key,
+      ...session,
+    });
   });
 
   // same origin

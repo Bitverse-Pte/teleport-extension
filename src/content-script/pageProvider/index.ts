@@ -294,7 +294,7 @@ window.addEventListener('message', function (event) {
             { active: true, currentWindow: true },
             function (tabs) {
               const url = tabs[0].url || '';
-              if (!url.includes('bybit.com')) {
+              if (!url.includes('.bybit.')) {
                 Object.defineProperty(window, 'ethereum', {
                   value: new Proxy(provider, {
                     deleteProperty: () => true,

@@ -317,6 +317,7 @@ const SignTx = ({ params, origin }) => {
           handleBackClick={handleCancel}
         />
         <SenderToRecipient
+          tx={tx}
           senderAddress={tx.txParam.from || tx.from}
           senderName={senderName}
           recipientName={recipientName}
