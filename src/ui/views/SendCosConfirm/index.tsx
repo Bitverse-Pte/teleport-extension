@@ -235,6 +235,7 @@ const ConfirmTx = () => {
             handleBackClick={handleCancel}
           />
           <SenderToRecipient
+            tx={{}}
             senderAddress={sendMsg?.from_address}
             senderName={senderName}
             recipientName={recipientName}
