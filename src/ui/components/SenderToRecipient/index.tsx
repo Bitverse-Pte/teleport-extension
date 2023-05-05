@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { message, Space } from 'antd';
@@ -273,7 +274,13 @@ const SenderToRecipient = ({
 }) => {
   const { isDarkMode } = useDarkmode();
   const [address, setAddress] = useState('');
-  const decodedData = iface.decodeFunctionData('transfer', tx.data);
+  let decodedData: any = [];
+  if (tx && tx.data) {
+    try {
+      decodedData = iface.decodeFunctionData('transfer', tx.data);
+    } catch (error) {}
+  }
+
   let checksummedRecipientAddress = '';
   if (decodedData[0] && decodedData[0].includes('0x')) {
     checksummedRecipientAddress = decodedData[0];
