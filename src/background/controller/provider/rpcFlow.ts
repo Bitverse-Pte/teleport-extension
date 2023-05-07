@@ -143,6 +143,8 @@ const flowContext = flow
           to: params[0].to,
           value: params[0].value,
           type: params[0].type,
+          maxFeePerGas: params[0].maxFeePerGas, // add
+          gasLimit: params[0].gas, // add
         };
         if (!params[0].gas) {
           const txMeta = cloneDeep(params[0]);
