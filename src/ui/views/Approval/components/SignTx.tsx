@@ -414,6 +414,22 @@ const TxDetailComponent = ({
     return `${totalDec} ${currency || ''}`;
   };
 
+  const renderMaxFeeGasAmount = () => {
+    const { gasLimit, maxFeePerGas } = tx.txParam;
+    let maxFeeDisplay: any;
+    if (gasLimit && maxFeePerGas) {
+      // 2个16进制的数相乘
+      maxFeeDisplay = multipyHexes(maxFeePerGas, gasLimit);
+      return `${maxFeeDisplay} ${currency || ''}`;
+    } else {
+      maxFeeDisplay = getValueFromWeiHex({
+        value: totalGasfee,
+        numberOfDecimals: 10,
+      });
+    }
+    return `${maxFeeDisplay} ${currency || ''}`;
+  };
+
   const renderTotalGasFeeFiat = () => {
     const totalDec = getTotalPricesByAmountAndPrice(
       totalGasfee,
@@ -474,7 +490,7 @@ const TxDetailComponent = ({
         subTitle={undefined}
         detailText={`${renderTotalGasFeeAmount()}`}
         detailSubText={renderTotalGasFeeFiat()}
-        detailMax={`Max fee: ${renderTotalGasFeeAmount()}`}
+        detailMax={`Max fee: ${renderMaxFeeGasAmount()}`}
       />
       <Divider style={{ margin: '16px 0' }} />
       <TransactionDetailItem
