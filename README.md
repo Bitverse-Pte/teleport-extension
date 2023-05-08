@@ -4,6 +4,14 @@
 
 ## develop
 
+必须新建 .env 文件，增加内容：
+
+```bash
+INFURA_PROJECT_ID=xxxx
+```
+
+防止打包后没有infuraId报错。
+
 ```bash
 # 安装依赖
 yarn

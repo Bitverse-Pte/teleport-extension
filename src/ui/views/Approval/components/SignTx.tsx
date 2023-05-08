@@ -23,6 +23,7 @@ import {
   addCurrencies,
   conversionUtil,
   hexWeiToDecGWEI,
+  hexToDecimal,
 } from 'ui/utils/conversion';
 import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
@@ -48,6 +49,7 @@ import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
 import skynet from 'utils/skynet';
 import { Tabs } from 'constants/wallet';
 import { hexWEIToDecGWEI } from 'utils/conversion';
+import { ethers } from 'ethers';
 const { sensors } = skynet;
 
 const normalizeHex = (value: string | number) => {
@@ -419,8 +421,10 @@ const TxDetailComponent = ({
     const { gasLimit, maxFeePerGas } = tx.txParam;
     let maxFeeDisplay: any;
     if (gasLimit && maxFeePerGas) {
-      // 2个16进制的数相乘
-      maxFeeDisplay = multipyHexes(maxFeePerGas, gasLimit);
+      const bnGasLimit = ethers.BigNumber.from(gasLimit);
+      const bnMaxFeePerGas = ethers.BigNumber.from(maxFeePerGas);
+      maxFeeDisplay = bnGasLimit.mul(bnMaxFeePerGas).toString();
+      maxFeeDisplay = ethers.utils.formatUnits(maxFeeDisplay, 'ether');
       return `${maxFeeDisplay} ${currency || ''}`;
     } else {
       maxFeeDisplay = getValueFromWeiHex({
