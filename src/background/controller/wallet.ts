@@ -39,6 +39,7 @@ import { CustomGasSettings } from 'types/tx';
 import { BigNumberish } from 'ethers';
 import { CosmosChainInfo } from 'types/cosmos';
 import { KeplrGetKeyResponseInterface } from 'types/keyBase';
+import { getSymbolByERC20Contract, parseErc20Data } from './parseERC20';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -701,6 +702,13 @@ export class WalletController extends BaseController {
       customGas,
       chainId
     );
+  };
+  // add
+  parseErc20Data = (data: string) => {
+    return parseErc20Data(data);
+  };
+  getSymbolByERC20Contract = (contractAddress: string) => {
+    return getSymbolByERC20Contract(contractAddress);
   };
 }
 
