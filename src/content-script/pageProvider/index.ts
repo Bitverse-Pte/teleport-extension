@@ -295,12 +295,13 @@ window.addEventListener('message', function (event) {
             function (tabs) {
               const url = tabs[0].url || '';
               if (!url.includes('.bybit.')) {
-                Object.defineProperty(window, 'ethereum', {
-                  value: new Proxy(provider, {
-                    deleteProperty: () => true,
-                  }),
-                  writable: true,
-                });
+                // 根据web3的需求，在 bybit 域名下不要注入 ethereum
+                // Object.defineProperty(window, 'ethereum', {
+                //   value: new Proxy(provider, {
+                //     deleteProperty: () => true,
+                //   }),
+                //   writable: true,
+                // });
               } else {
                 Object.defineProperty(window, 'teleport', {
                   value: new Proxy(provider, {
@@ -315,12 +316,15 @@ window.addEventListener('message', function (event) {
       });
 
     if (!window.ethereum) {
-      window.ethereum = new Proxy(provider, {
-        deleteProperty: () => true,
-      });
+      // 同上
+      // window.ethereum = new Proxy(provider, {
+      //   deleteProperty: () => true,
+      // });
 
       window.web3 = {
-        currentProvider: window.ethereum,
+        currentProvider: new Proxy(provider, {
+          deleteProperty: () => true,
+        }),
       };
     }
     window.teleport = new Proxy(provider, {
