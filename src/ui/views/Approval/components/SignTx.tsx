@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { intToHex, isHexPrefixed, addHexPrefix } from 'ethereumjs-util';
 import { Divider } from 'antd';
@@ -23,7 +23,6 @@ import {
   addCurrencies,
   conversionUtil,
   hexWeiToDecGWEI,
-  hexToDecimal,
 } from 'ui/utils/conversion';
 import { ETH, TransactionEnvelopeTypes } from 'constants/transaction';
 import { Token } from 'types/token';
@@ -34,7 +33,6 @@ import {
   hideLoadingIndicator,
 } from 'ui/reducer/appState.reducer';
 import { BaseAccount } from 'types/extend';
-import { IconComponent } from 'ui/components/IconComponents';
 import FeeSelector from 'ui/components/FeeSelector';
 import { ReactComponent as IconEdit } from 'assets/action-icon/edit.svg';
 
@@ -48,7 +46,6 @@ import {
 import { MIN_GAS_LIMIT_HEX } from 'ui/context/send.constants';
 import skynet from 'utils/skynet';
 import { Tabs } from 'constants/wallet';
-import { hexWEIToDecGWEI } from 'utils/conversion';
 import { ethers } from 'ethers';
 // import { getSymbolByERC20Contract, parseErc20Data } from 'ui/utils/parseERC20';
 const { sensors } = skynet;
@@ -124,6 +121,8 @@ const SignTx = ({ params, origin }) => {
   const [totalGasfee, setTotalGasFee] = useState<string>('0x0');
 
   const functionMethod = useMethodData(tx.data);
+
+  const [currentTx, setCurrentTx] = useState(tx);
 
   const initState = async () => {
     const gas = await wallet.fetchGasFeeEstimates();
@@ -266,80 +265,32 @@ const SignTx = ({ params, origin }) => {
     return nativeToken;
   }, [tokens, prices]);
 
-  useEffect(() => {
-    getTxToken();
-  }, [tokens, tx]);
-
-  const getTxToken = () => {
-    let txTokenRet: Token | undefined;
+  const getTxTokenAsync = async () => {
     if (functionMethod?.name === 'transfer') {
+      console.log('getTxToken transfer', tx);
       // 1. 根据 to 获取symbol
-      wallet.getSymbolByERC20Contract(tx.to).then((symbol) => {
-        // 2. 解析 data , 获取转账金额 value   tx.data
-        wallet.parseErc20Data(tx.data).then(({ params }) => {
-          // 3. 将 value 赋值给 tx.value
-          tx.value = ethers.utils.hexlify(Number(params[1].value));
-          tx.txParam.symbol = symbol;
-          txTokenRet = tokens.find((t: Token) => t.symbol === symbol);
-          return txTokenRet;
-        });
+      const symbol = await wallet.getSymbolByERC20Contract(tx.to);
+
+      // 2. 解析 data , 获取转账金额 value   tx.data
+      const { params } = await wallet.parseErc20Data(tx.data);
+      // 3. 将 value 赋值给 tx.value
+      console.log('parseErc20Data 22 total ', params[1].value);
+      // tx.value = ethers.BigNumber.from(params[1].value).toHexString();
+      // tx.txParam.symbol = symbol;
+      setCurrentTx({
+        ...tx,
+        value: ethers.BigNumber.from(params[1].value).toHexString(),
+        txParam: {
+          ...tx.txParam,
+          symbol,
+        },
       });
     } else {
       // 原生代币
-      const nativeToken = tokens.find((t: Token) => t.isNative);
-      txTokenRet = nativeToken;
-      return txTokenRet;
     }
   };
 
-  // const txToken = useMemo(() => {
-  //   let txTokenRet: Token | undefined;
-  //   console.log('11111, useMemo.txToken ');
-
-  //   if (functionMethod?.name === 'transfer') {
-  //     console.log('22222, in erc20 transfer ');
-  //     // todo
-  //     // 现请求接口再赋值, 有问题
-  //     // 1. 根据 to 获取symbol
-  //     wallet.getSymbolByERC20Contract(tx.to).then((symbol) => {
-  //       console.log('getSymbolByERC20Contract.symbol = ', symbol);
-  //       // 2. 解析 data , 获取转账金额 value   tx.data
-  //       wallet.parseErc20Data(tx.data).then(({ params }) => {
-  //         console.log('parseErc20Data.result = ', params);
-  //         // 3. 将 value 赋值给 tx.value
-  //         tx.value = ethers.utils.hexlify(Number(params[1].value));
-  //         console.log('在第二个callback中, symbol = ', symbol);
-
-  //         tx.txParam.symbol = symbol;
-  //         txTokenRet = tokens.find((t: Token) => t.symbol === symbol);
-
-  //         console.log('txTokenRet = ', txTokenRet);
-
-  //         return txTokenRet;
-  //       });
-  //     });
-
-  //     // 直接赋值, 没问题
-  //     // const erc20Value = 20000;
-  //     // const symbol = 'USDT';
-  //     // tx.txParam.symbol = symbol;
-  //     // tx.value = ethers.utils.hexlify(erc20Value);
-  //     // txTokenRet = tokens.find((t: Token) => t.symbol === tx.txParam.symbol);
-  //     // return txTokenRet;
-  //   } else {
-  //     console.log('33333,  原生代币');
-  //     // 原生代币
-  //     txTokenRet = nativeToken;
-  //     return txTokenRet;
-  //   }
-
-  //   // console.log('functionMethod?.name = ', functionMethod?.name);
-  //   // console.log('txTokenRet = ', txTokenRet);
-  //   // const txToken = tx.txParam.symbol
-  //   //   ? tokens.find((t: Token) => t.symbol === tx.txParam.symbol)
-  //   //   : nativeToken;
-  //   // return txToken;
-  // }, [tokens, tx]);
+  useAsyncEffect(getTxTokenAsync, [tokens]);
 
   const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
 
@@ -357,9 +308,9 @@ const SignTx = ({ params, origin }) => {
           />
           {tabType === Tabs.FIRST && (
             <TxDetailComponent
-              tx={tx}
+              tx={currentTx}
               tokens={tokens}
-              symbol={tx.txParam.symbol}
+              symbol={currentTx.txParam.symbol}
               nativeToken={nativeToken}
               setVisible={setVisible}
               totalGasfee={totalGasfee}
@@ -373,9 +324,9 @@ const SignTx = ({ params, origin }) => {
     return (
       <div className="tx-details-tab-container flex">
         <TxDetailComponent
-          tx={tx}
+          tx={currentTx}
           tokens={tokens}
-          symbol={tx.txParam.symbol}
+          symbol={currentTx.txParam.symbol}
           nativeToken={nativeToken}
           setVisible={setVisible}
           totalGasfee={totalGasfee}
@@ -393,23 +344,23 @@ const SignTx = ({ params, origin }) => {
           handleBackClick={handleCancel}
         />
         <SenderToRecipient
-          tx={tx}
-          senderAddress={tx.txParam.from || tx.from}
+          tx={currentTx}
+          senderAddress={currentTx.txParam.from || currentTx.from}
           senderName={senderName}
           recipientName={recipientName}
-          recipientAddress={tx.txParam.to || tx.to}
+          recipientAddress={currentTx.txParam.to || currentTx.to}
         />
         <TxSummaryComponent
           action={params.method}
-          value={valueToDisplay(tx)}
+          value={valueToDisplay(currentTx)}
           tokens={tokens}
-          symbol={tx.txParam.symbol}
+          symbol={currentTx.txParam.symbol}
           origin={origin}
         />
       </div>
       {renderContent()}
       <FeeSelector
-        gasLimit={Number(tx.gas || addHexPrefix(MIN_GAS_LIMIT_HEX))}
+        gasLimit={Number(currentTx.gas || addHexPrefix(MIN_GAS_LIMIT_HEX))}
         supportsEIP1559={supportsEIP1559}
         visible={visible}
         onClose={() => setVisible(false)}
@@ -457,9 +408,10 @@ const TxDetailComponent = ({
   currency: any;
 }) => {
   const { t } = useTranslation();
-  const nt = tokens.find((t: Token) => t.isNative);
-  const token = tokens.find((t: Token) => t.symbol === symbol) ?? nt;
-  const isNative = () => currency === token?.symbol;
+  const token = tokens.find((t: Token) => t.symbol === symbol);
+  const isNative = () => currency === nativeToken?.symbol;
+  // console.log('TxDetailComponent token = ', tokens, token, tx);
+  // console.log('TxDetailComponent symbol = ', symbol, nativeToken);
 
   const renderTotalMaxAmount = () => {
     if (isNative()) {
