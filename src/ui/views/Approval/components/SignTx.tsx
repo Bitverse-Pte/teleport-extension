@@ -267,14 +267,15 @@ const SignTx = ({ params, origin }) => {
 
   const getTxTokenAsync = async () => {
     if (functionMethod?.name === 'transfer') {
-      console.log('getTxToken transfer', tx);
+      // console.log('getTxToken transfer', tx);
       // 1. 根据 to 获取symbol
       const symbol = await wallet.getSymbolByERC20Contract(tx.to);
+      // console.log('symbol ===  tokens', symbol, tokens);
 
       // 2. 解析 data , 获取转账金额 value   tx.data
       const { params } = await wallet.parseErc20Data(tx.data);
       // 3. 将 value 赋值给 tx.value
-      console.log('parseErc20Data 22 total ', params[1].value);
+      // console.log('parseErc20Data 22 total ', params[1].value);
       // tx.value = ethers.BigNumber.from(params[1].value).toHexString();
       // tx.txParam.symbol = symbol;
       setCurrentTx({
@@ -287,6 +288,9 @@ const SignTx = ({ params, origin }) => {
       });
     } else {
       // 原生代币
+      setCurrentTx({
+        ...tx,
+      });
     }
   };
 
@@ -310,7 +314,7 @@ const SignTx = ({ params, origin }) => {
             <TxDetailComponent
               tx={currentTx}
               tokens={tokens}
-              symbol={currentTx.txParam.symbol}
+              symbol={currentTx.txParam.symbol || nativeToken?.symbol}
               nativeToken={nativeToken}
               setVisible={setVisible}
               totalGasfee={totalGasfee}
@@ -326,7 +330,7 @@ const SignTx = ({ params, origin }) => {
         <TxDetailComponent
           tx={currentTx}
           tokens={tokens}
-          symbol={currentTx.txParam.symbol}
+          symbol={currentTx.txParam.symbol || nativeToken?.symbol}
           nativeToken={nativeToken}
           setVisible={setVisible}
           totalGasfee={totalGasfee}
@@ -354,7 +358,7 @@ const SignTx = ({ params, origin }) => {
           action={params.method}
           value={valueToDisplay(currentTx)}
           tokens={tokens}
-          symbol={currentTx.txParam.symbol}
+          symbol={currentTx.txParam.symbol || nativeToken?.symbol}
           origin={origin}
         />
       </div>
@@ -408,12 +412,24 @@ const TxDetailComponent = ({
   currency: any;
 }) => {
   const { t } = useTranslation();
-  const token = tokens.find((t: Token) => t.symbol === symbol);
-  const isNative = () => currency === nativeToken?.symbol;
-  // console.log('TxDetailComponent token = ', tokens, token, tx);
-  // console.log('TxDetailComponent symbol = ', symbol, nativeToken);
+  let token = tokens.find((t: Token) => t.symbol === symbol);
+  const isNative = () => currency === symbol;
+  // const nativeTokenNew = tokens.find((t: Token) => t.isNative);
+  console.log('isNative() === ', isNative());
 
   const renderTotalMaxAmount = () => {
+    if (!token && symbol === 'USDt') {
+      token = {
+        symbol: 'USDt',
+        decimal: 6,
+        name: '',
+        denom: '',
+        isNative: false,
+        isCustom: false,
+        chainCustomId: '',
+      };
+    }
+
     if (isNative()) {
       const totalHex = addHexPrefix(
         addHexes(valueToDisplay(tx), totalGasfee).toString()
@@ -491,11 +507,13 @@ const TxDetailComponent = ({
       token?.decimal || 0,
       token?.price || 0
     );
+    console.log('renderTotalMaxFiat --- totalTxDec', totalTxDec);
     const totalGasDec = getTotalPricesByAmountAndPrice(
       totalGasfee,
       nativeToken?.decimal || 0,
       nativeToken?.price || 0
     );
+    console.log('renderTotalMaxFiat --- totalGasDec', totalGasDec);
     try {
       const totalAmountDec = addCurrencies(totalTxDec, totalGasDec, {
         aBase: 10,
@@ -565,8 +583,19 @@ const TxDataComponent = ({ tx }) => {
 };
 
 const TxSummaryComponent = ({ action, value, tokens, origin, symbol }) => {
-  const token = tokens.find((t: Token) => t.symbol === symbol);
-  const nativeToken = tokens.find((t: Token) => t.isNative);
+  let token = tokens.find((t: Token) => t.symbol === symbol);
+  // const nativeToken = tokens.find((t: Token) => t.isNative);
+  if (symbol === 'fUSDT') {
+    token = {
+      symbol: 'fUSDT',
+      decimal: 6,
+    };
+  } else if (symbol === 'USDt') {
+    token = {
+      symbol: 'USDt',
+      decimal: 6,
+    };
+  }
 
   return (
     <div className="tx-summary">
@@ -574,10 +603,7 @@ const TxSummaryComponent = ({ action, value, tokens, origin, symbol }) => {
         {origin === 'https://teleport.network' ? null : <div>{origin}</div>}
       </div>
       <div className="tx-summary-currency">
-        <UserPreferencedCurrencyDisplay
-          value={value}
-          token={token ?? nativeToken}
-        />
+        <UserPreferencedCurrencyDisplay value={value} token={token} />
       </div>
     </div>
   );

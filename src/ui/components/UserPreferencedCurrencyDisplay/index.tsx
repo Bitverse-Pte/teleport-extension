@@ -11,16 +11,31 @@ export default function UserPreferencedCurrencyDisplay({
   token,
   isEVM = true,
 }) {
-  const multiplier = Math.pow(10, Number(token?.decimal || 0));
+  console.log('--- UserPreferencedCurrencyDisplay --- ', token);
+
   let decimalValueString = '';
   if (isEVM) {
-    decimalValueString = conversionUtil(addHexPrefix(value), {
-      fromNumericBase: 'hex',
-      toNumericBase: 'dec',
-      toCurrency: token?.symbol || ETH,
-      conversionRate: multiplier,
-      invertConversionRate: true,
-    });
+    if (token) {
+      const multiplier = Math.pow(10, Number(token?.decimal || 0));
+      decimalValueString = conversionUtil(addHexPrefix(value), {
+        fromNumericBase: 'hex',
+        toNumericBase: 'dec',
+        toCurrency: token?.symbol || ETH,
+        conversionRate: multiplier,
+        invertConversionRate: true,
+      });
+    } else {
+      if (token?.symbol === 'fUSDT') {
+        const multiplier = Math.pow(10, Number(token?.decimal || 0));
+        decimalValueString = conversionUtil(addHexPrefix(value), {
+          fromNumericBase: 'hex',
+          toNumericBase: 'dec',
+          toCurrency: 'USDT',
+          conversionRate: multiplier,
+          invertConversionRate: true,
+        });
+      }
+    }
   } else {
     decimalValueString = Number(value).toString();
   }
