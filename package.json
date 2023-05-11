@@ -1,6 +1,6 @@
 {
   "name": "bitverse-wallet",
-  "version": "0.5.0",
+  "version": "0.5.5",
   "description": "A multi-chain & multi-ID Wallet",
   "scripts": {
     "clean": "rm -rf dist && mkdir dist && cp -r _raw/* dist",
