@@ -274,39 +274,61 @@ const WalletManage: React.FC = () => {
               className="wallet-manage-img"
             /> */}
           </div>
-          <span className="wallet-manage-button-item-title">Edit</span>
+          <span
+            className="wallet-manage-button-item-title"
+            style={{ color: '#fff' }}
+          >
+            Edit
+          </span>
         </div>
         <div
           className="wallet-manage-button-item cursor flexCol _import"
           onClick={handleImportBtnClick}
         >
-          <div className="wallet-manage-button-wrap flexR">
+          <div
+            className="wallet-manage-button-wrap flexR"
+            style={{ background: '#56FAA5' }}
+          >
             {/* <img src={importImg} alt="" className="wallet-manage-img" /> */}
             <IconComponent
               name="import"
               cls="wallet-manage-img"
               style={{
-                fill: '#1484F5',
+                fill: '#364361',
               }}
             />
           </div>
-          <span className="wallet-manage-button-item-title">Import</span>
+          <span
+            className="wallet-manage-button-item-title"
+            style={{ color: '#fff' }}
+          >
+            Import
+          </span>
         </div>
         <div
           onClick={handleCreateBtnClick}
           className="wallet-manage-button-item cursor flexCol _add"
         >
-          <div className="wallet-manage-button-wrap flexR">
+          <div
+            className="wallet-manage-button-wrap flexR"
+            style={{ background: '#FFC701' }}
+          >
             <IconComponent
               name="plus-circle"
               cls="wallet-manage-img"
               style={{
-                fill: '#42B856',
+                fill: '#364361',
+                background: '#FFC701',
               }}
             />
             {/* <img src={addImg} alt="" className="wallet-manage-img" /> */}
           </div>
-          <span className="wallet-manage-button-item-title">Create</span>
+          <span
+            className="wallet-manage-button-item-title"
+            style={{ color: '#fff' }}
+          >
+            Create
+          </span>
         </div>
       </div>
       <div className="tab-container flexR content-wrap-padding">
@@ -348,7 +370,10 @@ const WalletManage: React.FC = () => {
                 >
                   <div
                     className="circle flexR"
-                    style={{ background: WALLET_THEME_COLOR[i % 5] }}
+                    style={{
+                      background: WALLET_THEME_COLOR[i % 5],
+                      color: '#171727',
+                    }}
                   >
                     {w?.hdWalletName?.substr(0, 1)}
                     <div

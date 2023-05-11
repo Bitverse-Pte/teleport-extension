@@ -12,7 +12,7 @@
 }
 
 .ant-modal.dark .ant-modal-content {
-  background: #020C15;
+  background: #171727;
 
   .ant-modal-confirm-body {
     span.ant-modal-confirm-title,
@@ -26,8 +26,62 @@
   .ant-modal-confirm-btns {
     button.ant-btn:not(.ant-btn-primary) {
       background: transparent !important;
-      color: #1484F5 !important;
-      border-color: #1484F5 !important;
+      color: #56FAA5 !important;
+      border-color: #56FAA5 !important;
     }
+  }
+}
+
+.ant-checkbox {
+  .ant-checkbox-inner {
+    background-color: transparent;
+  }
+}
+.ant-checkbox-checked {
+  .ant-checkbox-inner {
+    background-color: #56faa5;
+    border-color: #56faa5;
+    &::after {
+      border-color: #171727;
+    }
+  }
+}
+.ant-checkbox-checked::after,
+.ant-checkbox-wrapper:hover .ant-checkbox-inner,
+.ant-checkbox:hover .ant-checkbox-inner,
+.ant-checkbox-input:focus + .ant-checkbox-inner {
+  border-color: #56faa5;
+}
+
+.ant-spin-container,
+.loading-overlay-container {
+  .ant-spin {
+    color: #56faa5;
+    .ant-spin-dot-item {
+      background: #56faa5;
+    }
+  }
+}
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  box-shadow: 0px 4px 8px rgba(0, 229, 168, 0.2);
+}
+
+.ant-btn-primary,
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background: #56FAA5;
+  border-color: #56FAA5;
+  color: #171727;
+}
+
+.ctc-msg.dark .ant-message-notice-content {
+  background: #202030;
+  .ant-message-custom-content span:last-child .toast-close-button {
+    background: #404347;
+  }
+  .icon-close {
+    fill: #D7DCE0;
   }
 }

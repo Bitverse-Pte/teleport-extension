@@ -22,11 +22,11 @@ jobs:
       - name: Create zip
         uses: "montudor/action-zip@v1"
         with:
-            args: zip -qq -r "teleport-wallet-${{ github.sha }}.zip" dist
+            args: zip -qq -r "bitverse-wallet-${{ github.sha }}.zip" dist
       - uses: actions/upload-artifact@v2
         with:
-          name: "teleport-wallet-${{ github.sha }}.zip"
-          path: "./teleport-wallet-${{ github.sha }}.zip"
+          name: "bitverse-wallet-${{ github.sha }}.zip"
+          path: "./bitverse-wallet-${{ github.sha }}.zip"
 
   release-to-github:
     needs: Build
@@ -35,11 +35,11 @@ jobs:
     steps: 
         - uses: actions/download-artifact@v2
           with:
-            name: "teleport-wallet-${{ github.sha }}.zip"
+            name: "bitverse-wallet-${{ github.sha }}.zip"
         - uses: "marvinpinto/action-automatic-releases@latest"
           with:
             repo_token: "${{ secrets.RELEASE_TOKEN }}"
             automatic_release_tag: "latest"
             title: "Development Build ${{ github.sha }}"
             files: |
-              ./teleport-wallet-${{ github.sha }}.zip
+              ./bitverse-wallet-${{ github.sha }}.zip

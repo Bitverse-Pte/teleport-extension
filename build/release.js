@@ -10,7 +10,7 @@ async function release() {
   const input = await prompt({
     type: 'input',
     name: 'version',
-    message: '[TeleportWallet] Please input the release version:'
+    message: '[BitverseWallet] Please input the release version:'
   });
   const manifestPath = path.resolve(PROJECT_ROOT, '_raw', 'manifest.json');
   const manifest = fs.readJSONSync(manifestPath);
@@ -28,7 +28,7 @@ async function release() {
 function bundle(version) {
   shell.exec('yarn build:pro');
   const distPath = path.resolve(PROJECT_ROOT, 'dist');
-  zipdir(distPath, { saveTo: `TeleportWallet_v${version}.zip` });
+  zipdir(distPath, { saveTo: `BitverseWallet_v${version}.zip` });
 }
 
 release().then(bundle);

@@ -7,13 +7,16 @@
     .page-container {
         padding: 0 24px;
         img.logo {
-            margin-top: 43px;
-            width: 95.5px;
-            height: 95.5px;
-            margin-bottom: 10px;
+            margin-top: 40px;
+            width: 96px;
+            height: 96px;
+        }
+        .logotext{
+            width: 110px;
+            height: 44px;
         }
         .software-version {
-            font-family: Montserrat;
+            
             font-size: 14px;
             font-style: normal;
             font-weight: 400;
@@ -28,12 +31,11 @@
         .software-introductions {
             margin-bottom: 40px;
 
-            font-family: Montserrat;
+            
             font-size: 14px;
             font-style: normal;
             font-weight: 400;
             text-align: justified;
-            color: #5E6C8A;
         }
         .jump-to-home-page {
             justify-content: center;
@@ -51,7 +53,7 @@
                 margin-right: 4px;
             }
             span.url {
-                font-family: MontserratBold;
+                
                 font-size: 14px;
                 color: #364361;
             }
@@ -66,7 +68,6 @@
 /** darkmode related overrides */
 .about-software.dark {
     background: #000;
-    height: 100%;
 
     .header {
         svg { fill: #FFF; }
@@ -74,11 +75,36 @@
     }
 
     .software-introductions {
-        color: #C5D1E0;
+        color: #71757A;
     }
 
     .jump-to-home-page {
-        background-color: #02182B;
+        background-color: #202030;
+        color: #FFF;
         span.url { color: #FFF; }
+    }
+    .ml-auto {
+        fill: #fff;
+    }
+    .about-qrcode-container {
+        display: flex;
+        padding: 24px 0;
+        .qrcode_box {
+            &:first-child {
+                margin-right: 20px;
+            }
+            &_title {
+                color: #fff;
+                font-size: 12px;
+                font-weight: 700;
+                text-align: center;
+                margin-bottom: 8px;
+            }
+            .about-qrcode {
+                flex: 1;
+                width: 90px;
+                height: 90px;
+            }
+        }
     }
 }

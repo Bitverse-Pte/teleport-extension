@@ -110,7 +110,7 @@ const AccountCreate = () => {
         <p className="account-create-title">Wallet name</p>
         <CustomInput
           placeholder="Enter wallet name"
-          cls="account-create-name-input"
+          cls="account-create-name-input hover"
           onChange={(e) => {
             setName(e.target.value);
           }}
@@ -134,7 +134,7 @@ const AccountCreate = () => {
             Will be used to encrypt your data and unlock your wallet.
           </p>
           <CustomPasswordInput
-            cls="custom-password-input"
+            cls="custom-password-input hover"
             onChange={(e) => {
               setPsd(e.target.value);
             }}
@@ -148,7 +148,7 @@ const AccountCreate = () => {
           />
           <p className="account-create-title">Confirm password</p>
           <CustomPasswordInput
-            cls="custom-password-input"
+            cls="custom-password-input hover"
             onChange={(e) => {
               setConfirmPsd(e.target.value);
             }}

@@ -16,6 +16,7 @@ export enum CoinType {
   SECRET_NETWORK = 529,
   CRYPTO_ORG = 394,
   KAVA = 459,
+  BIT = 10005001,
 }
 
 export enum Ecosystem {
@@ -88,6 +89,8 @@ export interface Provider extends Network {
     | 'UMEE'
     | 'EVMOS'
     | 'JUNO'
+    | 'MANTLE_TEST'
+    | 'MANTLE'
     | 'rpc';
 }
 

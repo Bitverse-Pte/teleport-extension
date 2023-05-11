@@ -29,7 +29,7 @@ export const getTotalPricesByAmountAndPrice = (
     const pow = Math.pow(10, Number(decimal));
     const formats = new BigNumber(amount).div(pow);
     const prices = new BigNumber(formats).times(price);
-    return new BigNumber(prices.toFixed(2, 1)).toFormat();
+    return new BigNumber(prices.toFixed(2, 1)).toFormat(2);
   }
   return '';
 };

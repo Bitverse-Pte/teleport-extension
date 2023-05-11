@@ -2,11 +2,7 @@ import './style.less';
 import React, { useState } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { IconComponent } from 'ui/components/IconComponents';
-import walletLogo from 'assets/walletLogo.png';
-import { ReactComponent as TeleportTextSVG } from 'assets/teleportText.svg';
-import { ReactComponent as LightIcon } from 'assets/theme/light.svg';
-import { ReactComponent as MoonIcon } from 'assets/theme/moon.svg';
-import { ReactComponent as SystemIcon } from 'assets/theme/system.svg';
+import { ReactComponent as BitverseLogoSVG } from 'assets/bitverse-logo.svg';
 import { useAsyncEffect, useWallet } from 'ui/utils';
 import { TipButton } from 'ui/components/Widgets';
 import { TipButtonEnum } from 'constants/wallet';
@@ -43,7 +39,7 @@ const SettingFeat: ISettingFeat[] = [
      * link start with http(s) will be open in a new page
      * since it's not in the extension's context
      */
-    link: 'https://docs.teleportwallet.io/',
+    link: 'https://www.bitverse.zone/',
     showChevronRight: true,
   },
   {
@@ -63,10 +59,8 @@ export const LogoHeader: React.FC<ILogoHeader> = (props) => {
   const { isDarkMode } = useDarkmode();
   return (
     <div className={clsx('logo-header flexR', { dark: isDarkMode })}>
-      <div className="logo-header-left flexR">
-        <img src={walletLogo} className="logo-header-left-logo" />
-        {/* <img src={TeleportText} className="logo-header-left-title" /> */}
-        <TeleportTextSVG className="logo-header-left-title" />
+      <div className="logo-wrap">
+        <BitverseLogoSVG className="logo-header-left-title" />
       </div>
       <div
         className="logo-header-right flexR"
@@ -158,10 +152,10 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
         <span className="title">Default Wallet</span>
         <span className="tag" style={{ display: 'none' }}></span>
         <Switch
-          onColor="#CDEBFF"
-          onHandleColor="#1484F5"
-          offColor="#A3B4CC"
-          offHandleColor="#FFFFFF"
+          onColor="#1D363E"
+          onHandleColor="#56FAA5"
+          offColor="#404347"
+          offHandleColor="#71757A"
           uncheckedIcon={false}
           checkedIcon={false}
           height={20}
@@ -170,7 +164,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
           onChange={handleDefaultWalletChange}
         />
       </div>
-      <div
+      {/* <div
         className="setting-item flexR cursor theme-selection-bar"
         key="theme-select"
       >
@@ -202,7 +196,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
             <SystemIcon />
           </button>
         </div>
-      </div>
+      </div> */}
       {SettingFeat.map((setting: ISettingFeat, i) => (
         <div
           className="setting-item flexR cursor"

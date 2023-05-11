@@ -3,7 +3,7 @@
 .home {
   height: 100%;
   box-sizing: border-box;
-  font-family: Montserrat;
+  
   position: relative;
 
   p,
@@ -36,8 +36,8 @@
       line-height: 34px;
       text-align: center;
       font-size: 14px;
-      color: #ffffff;
-      font-family: MontserratBold;
+      color: @darkBg;
+      
     }
   }
 
@@ -53,17 +53,6 @@
     }
   }
 
-  .home-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 246px;
-    background: url(../../../assets/homeBg.png) no-repeat 0 0;
-    background-size: 100% 100%;
-    z-index: -1;
-  }
-
   .home-content {
     box-sizing: border-box;
     padding-top: 2px;
@@ -71,11 +60,11 @@
     .home-content-name-wrap {
       align-items: center;
       font-size: 12px;
-      font-family: MontserratBold;
-      color: @themeColor;
+      
+      color: #fff;
       height: 28px;
       line-height: 28px;
-
+      margin-bottom: 4px;
       .home-wallet-name {
         margin-left: 5px;
       }
@@ -88,10 +77,12 @@
       align-items: center;
       box-sizing: border-box;
       padding: 12px 16px 0 16px;
-      background: rgba(255, 255, 255, 0.6);
-      box-shadow: 0px 4px 16px rgba(94, 139, 255, 0.1);
-      border-radius: 16px 16px 0px 0px;
-      margin-bottom: 68px;
+      background: url(../../../assets/homeBg2.png) no-repeat center -82px;
+      backdrop-filter: blur(35px);
+      box-shadow: 0 -1px 0 1px rgba(255,255,255,0.5);
+      border-radius: 16px;
+      margin-bottom: 60px;
+      color: #fff;
 
       .home-preview-container-top-wrap {
         align-items: center;
@@ -112,10 +103,10 @@
             justify-content: space-between;
             width: 100%;
             align-items: center;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
 
             .home-preview-top-account-name {
-              font-family: MontserratBold;
+              
             }
 
             .chevron-down {
@@ -135,7 +126,7 @@
 
             .home-preview-address {
               font-size: 12px;
-              color: #5E6C8A;
+              color: #ADB1B8;
               margin-right: 9px;
             }
 
@@ -164,12 +155,12 @@
         margin-bottom: 8px;
 
         span.home-preview-balance-amount {
-          font-family: MontserratBold;
+          
           font-size: 30px;
         }
 
         span.home-preview-balance-symbol {
-          font-family: MontserratBold;
+          
           font-size: 16px;
           margin-left: 3px;
           position: relative;
@@ -197,7 +188,7 @@
             width: 48px;
             height: 48px;
             background: #FFFFFF;
-            box-shadow: 0px 4px 8px rgba(94, 139, 255, 0.2);
+            box-shadow: 0px 4px 8px rgba(0, 255, 186, 0.2);
             border-radius: 24px;
             justify-content: center;
             align-items: center;
@@ -215,7 +206,7 @@
 
           span.home-preview-send-title {
             font-size: 12px;
-            font-family: MontserratBold;
+            
           }
         }
       }
@@ -259,7 +250,7 @@
 
             .wallet-icon-char {
               font-weight: 500;
-              font-family: PingFang HK;
+              
               font-size: 12px;
               line-height: 18px;
               color: #ffffff;
@@ -339,7 +330,7 @@
 
         .btn {
           width: 127px;
-          font-family: Montserrat;
+          
         }
       }
     }
@@ -356,10 +347,10 @@
   height: 0;
 
   .search-container {
-    height: 24px;
+    height: 36px;
     flex: 0 0 24px;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
     justify-content: space-between;
 
     .wrap {
@@ -381,6 +372,7 @@
     width: 100%;
     padding-bottom: 20px;
     height: 0;
+    background: #010C15;
 
     .token-item {
       width: 100%;
@@ -405,7 +397,7 @@
           .balance {
             font-size: 14px;
             line-height: 20px;
-            font-family: MontserratBold;
+            
             max-width: 240px;
           }
 
@@ -430,6 +422,7 @@
   height: 100%;
   justify-content: center;
   align-items: center;
+  margin-top: 16px;
 
   .home-no-assets {
     width: 90px;
@@ -462,13 +455,13 @@
     align-items: center;
 
     span.account-switch-accounts-title {
-      font-family: MontserratBold;
+      
       font-size: 24px;
     }
 
     span.account-switch-accounts-manage-wallet-container {
       font-size: 12px;
-      font-family: MontserratBold;
+      
       color: @themeColor;
       margin-right: -4px;
       align-items: center;
@@ -484,7 +477,7 @@
 }
 
 .account-switch-drawer.dark {
-  background: #020C15;
+  background: #171727;
   color: #fff;
 
   .account-switch-header {
@@ -507,45 +500,21 @@
     .ant-spin-spinning {}
   }
 
-  .headerOfMenu {
-    z-index: 2;
-    background: #052E55;
-  }
-
-  .home-bg {
-    background: #052E55;
-    border-radius: 0px 0px 16px 16px;
-    z-index: 1;
-  }
-
   .home-content {
     z-index: 2;
+    background: url(../../../assets/homeBg2.png) no-repeat center -54px;
 
     .home-preview-container {
-      background: #042340;
-      box-shadow: 0px 4px 16px rgba(94, 139, 255, 0.1);
-      color: #fff;
-
       .home-preview-top-container {
         .chevron-down {
           fill: #fff !important;
         }
       }
-
-      .home-preview-address-container {
-        background-color: #042340;
-
-        .home-preview-address {
-          color: #E1E8F0;
-        }
-      }
-
       div.home-preview-dollar {
-        color: #E1E8F0;
+        color: #fff;
+        margin-bottom: 10px;
       }
     }
-
-    .home-content-name-wrap {}
   }
 
   .assets-container {
@@ -553,7 +522,7 @@
       color: #fff;
 
       &:hover {
-        background: #042340;
+        background: rgba(0, 255, 186, 0.1)
       }
 
       .right-icon {
@@ -567,7 +536,7 @@
 
 .connected-sites-drawer.dark {
   .ant-drawer-header {
-    background: #020C15;
+    background: #171727;
 
     .back-icon {
       fill: #798CAD;

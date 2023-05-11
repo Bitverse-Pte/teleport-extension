@@ -1,3 +1,5 @@
+@import '../../style/mixin.less';
+
 .colorful_dot {
   margin-right: 0.25rem;
   font-size: 1.5rem;
@@ -5,14 +7,16 @@
 
 /** darkmode related override */
 .network-page-container.dark {
-  background-color: #020C15;
+  background-color: #171727;
 
   .chevron-icon {
     fill: #FFF;
   }
 
   .custom-network-card {
-    background-color: #02182B;
+    background-color: @darkBg;
+    border: 1px solid #404347;
+    border-radius: 8px;
     button svg {
       fill: #FFF;
     }
@@ -24,7 +28,7 @@
 }
 .network-page-container {
 
-  font-family: Montserrat;
+  
   height: 100%;
   // padding: 0 12px;
 
@@ -56,12 +60,12 @@
 }
 
 h2.category-name {
-  font-family: Montserrat;
+  
   font-size: 14px;
   font-style: normal;
   line-height: 14px;
   text-align: left;
-  color: #798CAD;
+  color: #FFFFFF;
 }
 
 .networkList {
@@ -90,29 +94,28 @@ h2.category-name {
 }
 
 .network-edit.dark {
-  background: #02182B;
+  background: @darkBg;
   .edit-network-header h1.title {
     color: #FFFFFF;
   }
   .form-deco {
-    border-color: rgb(94, 108, 138);
-    background: #020C15;
+    background: #171727;
     .form-body {
       h1 { color: #FFF; }
       input {
-        background-color: #02182B;
+        background-color: #313438;
         color: #FFF;
       }
       input::placeholder {
-        color: rgb(94, 108, 138) !important;
+        color: #71757A !important;
       }
       input:focus-visible {
-        outline: solid #1484f5;
+        outline: solid #56FAA5;
       }
     }
     .form-action-btn-group {
       button#submitBtn {
-        background-color: #1484f5;
+        background-color: #56FAA5;
         &:disabled {
           background-color: rgba(20, 132, 245, 0.5);
         }
@@ -131,7 +134,7 @@ h2.category-name {
   vertical-align: middle;
 
   .edit-network-header h1.title {
-    font-family: 'MontserratBold';
+    
     font-size: 32px;
     line-height: 100%;
     color: #364361;
@@ -140,7 +143,7 @@ h2.category-name {
 
   form.form-deco {
     background: #FFFFFF;
-    border: 2px solid #1484F5;
+    border: 2px solid #56FAA5;
     box-sizing: border-box;
     backdrop-filter: blur(24px);
     border-radius: 20px;
@@ -153,9 +156,9 @@ h2.category-name {
         width: 250px;
       }
       button#cancelBtn {
-        color: #1484f5;
+        color: #56FAA5;
         margin-right: 24px;
-        border: 2px solid #1484F5;
+        border: 2px solid #56FAA5;
         background: transparent;
       }
     }
@@ -175,9 +178,9 @@ h2.category-name {
       margin-bottom: 12px;
       font-size: 16px;
       color: #364361;
-      font-family: MontserratBold;
+      
       span {
-        font-family: Montserrat;
+        
         color: #A3B4CC;
       }
   }
@@ -212,7 +215,7 @@ h2.category-name {
     .networkType {
       background: transparent;
       margin-left: auto;
-      color: #1484F5;
+      color: #56FAA5;
     }
   }
   .form-body > h1,input,.input-error,.input-warning {
@@ -265,7 +268,7 @@ h2.category-name {
     }
     span.label {
       color: #364361;
-      font-family: "MontserratBold";
+      
       font-size: 16px;
     }
     span.label::before {

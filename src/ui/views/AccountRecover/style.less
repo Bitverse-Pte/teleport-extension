@@ -2,380 +2,378 @@
 
 .ant-input:focus,
 .ant-input-focused {
-    box-shadow: none !important;
+  box-shadow: none !important;
 }
 
 .recover {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+
+  p {
+    margin: 0;
+    line-height: 1;
+  }
+
+  .account-recover-content {
+    flex: 1;
     box-sizing: border-box;
+    overflow-y: auto;
+    padding-bottom: 20px;
+    margin-top: -16px;
 
-    p {
-        margin: 0;
-        line-height: 1;
+    &::-webkit-scrollbar {
+      display: none;
     }
 
-    .account-recover-content {
-        flex: 1;
-        box-sizing: border-box;
-        overflow-y: auto;
-        padding-bottom: 20px;
-        margin-top: -16px;
+    .account-recover-tab {
+      width: 100%;
+      height: 36px;
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 8px;
+      justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+      padding: 0 2px;
+      margin-bottom: 24px;
 
-        &::-webkit-scrollbar {
-            display: none;
-        }
-
-        .account-recover-tab {
-            width: 100%;
-            height: 36px;
-            background: rgba(0, 0, 0, 0.03);
-            border-radius: 8px;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-            padding: 0 2px;
-            margin-bottom: 24px;
-
-            .tab-item {
-                width: 147px;
-                height: 32px;
-                line-height: 32px;
-                text-align: center;
-                border-radius: 6px;
-                font-size: 14px;
-                color: #A3B4CC;
-                font-family: MontserratBold;
-            }
-
-            .tab-item-active {
-                color: @baseTextColor;
-                background: #FFFFFF;
-            }
-        }
-
-        .custom-password-input {
-
-            svg {
-                fill: @baseTextColor;
-            }
-
-            &:hover {
-                input.ant-input {
-                    background: #ffffff !important;
-                }
-            }
-
-            input.ant-input {
-                &:focus {
-                    background: #ffffff !important;
-                }
-            }
-        }
-
-    }
-
-    .account-recover-title {
-        font-family: MontserratBold;
-        font-size: 16px;
-        margin-bottom: 12px;
-    }
-
-    .mnemonic-title {
-        margin-top: 20px;
-    }
-
-    .account-recover-mnemonic-count-selector-container {
-        align-items: center;
+      .tab-item {
+        width: 147px;
+        height: 32px;
+        line-height: 32px;
+        text-align: center;
+        border-radius: 6px;
         font-size: 14px;
-        margin: 16px 0 20px 0;
+        color: #a3b4cc;
+        
+      }
 
-        .account-recover-mnemonic-count-selector-item-container {
-            width: 159px;
-            height: 30px;
-            align-items: center;
-            justify-content: center;
-            background: #F0F9FF;
-            border-radius: 4px;
-            margin: 0 8px;
-
-            .account-recover-mnemonic-count-selector-item {
-                width: 26px;
-                height: 22px;
-                border-radius: 4px;
-                color: #798CAD;
-                font-size: 14px;
-                text-align: center;
-                line-height: 22px;
-                margin-right: 5px;
-                font-family: MontserratBold;
-
-                &:last-child {
-                    margin-right: 0;
-                }
-            }
-
-            .item-active {
-                background: @themeColor;
-                color: #ffffff;
-            }
-        }
+      .tab-item-active {
+        color: @baseTextColor;
+        background: #ffffff;
+      }
     }
 
-    .account-recover-mnemonic-container {
-        width: 100%;
-        /* height: 120px;
+    .custom-password-input {
+      svg {
+        fill: @baseTextColor;
+      }
+
+      &:hover {
+        input.ant-input {
+          background: #ffffff !important;
+        }
+      }
+
+      input.ant-input {
+        &:focus {
+          background: #ffffff !important;
+        }
+      }
+    }
+  }
+
+  .account-recover-title {
+    
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .mnemonic-title {
+    margin-top: 20px;
+  }
+
+  .account-recover-mnemonic-count-selector-container {
+    align-items: center;
+    font-size: 14px;
+    margin: 16px 0 20px 0;
+
+    .account-recover-mnemonic-count-selector-item-container {
+      width: 159px;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+      background: #f0f9ff;
+      border-radius: 4px;
+      margin: 0 8px;
+
+      .account-recover-mnemonic-count-selector-item {
+        width: 26px;
+        height: 22px;
+        border-radius: 4px;
+        color: #798cad;
+        font-size: 14px;
+        text-align: center;
+        line-height: 22px;
+        margin-right: 5px;
+        
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      .item-active {
+        background: @themeColor;
+        color: #171727;
+      }
+    }
+  }
+
+  .account-recover-mnemonic-container {
+    width: 100%;
+    /* height: 120px;
         overflow-y: auto; */
-        display: grid;
-        grid-template-columns: repeat(2, 151px);
-        grid-template-rows: repeat(6, 32px);
-        grid-row-gap: 12px;
-        grid-column-gap: 10px;
-        justify-content: center;
-        align-items: center;
+    display: grid;
+    grid-template-columns: repeat(2, 151px);
+    grid-template-rows: repeat(6, 32px);
+    grid-row-gap: 12px;
+    grid-column-gap: 10px;
+    justify-content: center;
+    align-items: center;
 
+    .mnemonic-item-container {
+      align-items: center;
 
-
-        .mnemonic-item-container {
-            align-items: center;
-
-            .ant-input-affix-wrapper {
-                padding: 0;
-                border: 1px solid #F8FAFC;
-                border-radius: 8px;
-                box-sizing: border-box;
-                overflow: auto;
-                box-shadow: none;
-                width: 132px;
-                height: 32px;
-
-                .ant-input {
-                    padding: 0 12px 0 10px;
-                    box-sizing: border-box;
-                    width: 130px;
-                    height: 30px;
-                }
-
-                &:hover {
-                    border-color: @themeColor;
-                }
-            }
-
-            .mnemonic-index {
-                font-size: 12px;
-                width: 26px;
-                font-family: MontserratBold;
-            }
-
-            .mnemonic-item-input {
-                .ant-input-suffix {
-                    margin-left: 0;
-
-                    .svg-icon {
-                        fill: #A3B4CC;
-                    }
-                }
-            }
-
-            .error-mnemonic-input {
-                border-color: #E05651 !important;
-            }
-        }
-    }
-
-    .select-container {
-        margin-bottom: 24px;
-    }
-
-    .password-container {
-        margin-top: 20px;
-
-        .account-create-notice {
-            font-size: 12px;
-            line-height: 18px;
-            color: #798CAD;
-            margin-bottom: 12px;
-        }
-    }
-
-    .recover-textarea {
-        resize: none;
-        border: 1px solid #F2F6FA;
-        box-sizing: border-box;
+      .ant-input-affix-wrapper {
+        padding: 0;
+        border: 1px solid #f8fafc;
         border-radius: 8px;
-        height: 86px;
+        box-sizing: border-box;
+        overflow: auto;
         box-shadow: none;
-        margin-bottom: 24px;
+        width: 132px;
+        height: 32px;
+
+        .ant-input {
+          padding: 0 12px 0 10px;
+          box-sizing: border-box;
+          width: 130px;
+          height: 30px;
+          font-size: 14px;
+        }
 
         &:hover {
-            .textarea-active
+          border-color: @themeColor !important;
         }
-    }
+      }
 
-    .private-key-input {
-        margin-bottom: 24px;
-    }
+      .mnemonic-index {
+        font-size: 12px;
+        width: 26px;
+        
+      }
 
-    .textarea-active {
-        background: #ffffff !important;
-        border-color: @themeColor  !important;
-    }
+      .mnemonic-item-input {
+        .ant-input-suffix {
+          margin-left: 0;
 
-    .private-key {
-        margin-bottom: 20px;
-    }
-
-    .button {
-        position: relative;
-        padding-top: 26px;
-        margin-bottom: 20px;
-        width: 100%;
-        margin-left: 0;
-        padding-left: 24px;
-        padding-right: 24px;
-        box-shadow: 0px -4px 16px rgba(94, 139, 255, 0.1);
-
-        .invalid-phrase {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            top: 4px;
-            color: #E05651;
-            font-size: 12px;
+          .svg-icon {
+            fill: #71757a;
+          }
         }
-    }
+      }
 
-    .secret-error-detail {
-        color: #E05651;
-        margin-bottom: 12px;
+      .error-mnemonic-input {
+        border-color: #e05651 !important;
+      }
     }
+  }
+
+  .select-container {
+    margin-bottom: 24px;
+  }
+
+  .password-container {
+    margin-top: 20px;
+
+    .account-create-notice {
+      font-size: 12px;
+      line-height: 18px;
+      color: #798cad;
+      margin-bottom: 12px;
+    }
+  }
+
+  .recover-textarea {
+    resize: none;
+    border: 1px solid #f2f6fa;
+    box-sizing: border-box;
+    border-radius: 8px;
+    height: 86px;
+    box-shadow: none;
+    margin-bottom: 24px;
+
+    &:hover {
+      .textarea-active;
+    }
+  }
+
+  .private-key-input {
+    margin-bottom: 24px;
+  }
+
+  .textarea-active {
+    background: #ffffff !important;
+    border-color: @themeColor !important;
+  }
+
+  .private-key {
+    margin-bottom: 20px;
+  }
+
+  .button {
+    position: relative;
+    padding-top: 26px;
+    margin-bottom: 20px;
+    width: 100%;
+    margin-left: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+    box-shadow: 0px -4px 16px rgba(94, 139, 255, 0.1);
+
+    .invalid-phrase {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 4px;
+      color: #e05651;
+      font-size: 12px;
+    }
+  }
+
+  .secret-error-detail {
+    color: #e05651;
+    margin-bottom: 12px;
+  }
 }
 
 .policy {
-    margin-top: 12px;
-    justify-content: center;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 17px;
+  margin-top: 12px;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 17px;
 
-    .policy-title {
-        margin-left: 8px;
+  .policy-title {
+    margin-left: 8px;
+  }
+
+  .policy-link {
+    color: @themeColor;
+
+    &:hover {
+      text-decoration: underline;
     }
-
-    .policy-link {
-        color: @themeColor;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
+  }
 }
 
 .account-header-container {
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 @pagePaddingLeft;
-    height: 88px;
-    flex: 0 0 88px;
-    align-items: center;
-    margin-bottom: 16px;
-    transition: all .14s linear;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 @pagePaddingLeft;
+  height: 88px;
+  flex: 0 0 88px;
+  align-items: center;
+  margin-bottom: 16px;
+  transition: all 0.14s linear;
 
-    .account-header-title {
-        font-size: 24px;
-        transition: all .14s linear;
-        font-family: MontserratBold;
-    }
+  .account-header-title {
+    font-size: 24px;
+    transition: all 0.14s linear;
+    
+  }
 
-    .account-header-close-icon {
-        fill: #A3B4CC;
-        width: 10px;
-    }
+  .account-header-close-icon {
+    fill: #a3b4cc;
+    width: 10px;
+  }
 }
 
 .isScroll {
-    height: 64px;
-    flex: 0 0 64px;
+  height: 64px;
+  flex: 0 0 64px;
 
-    .account-header-title {
-        font-size: 18px;
-    }
+  .account-header-title {
+    font-size: 18px;
+  }
 }
 
 .account-header-container.dark {
-    svg {
-        fill: #ffffff;
-    }
+  svg {
+    fill: #ffffff;
+  }
 }
 
 .recover.dark {
-    background: @darkBg;
-    color: #ffffff;
+  background: @darkBg;
+  color: #ffffff;
 
-    .account-recover-content {
-        svg {
-            fill: #ffffff;
-        }
-
-        input,
-        textarea,
-        .custom-input {
-            background: #02182B !important;
-            border-color: #02182B !important;
-            color: #ffffff;
-        }
-
-        input::placeholder {
-            color: #5E6C8A !important;
-        }
-
-        input::-webkit-input-placeholder {
-            color: #5E6C8A !important;
-        }
-
-        textarea::placeholder {
-            color: #5E6C8A !important;
-        }
-
-        textarea::-webkit-input-placeholder {
-            color: #5E6C8A !important;
-        }
-
-        .custom-password-input {
-
-            &:hover {
-                input.ant-input {
-                    background: #02182B !important
-                }
-            }
-
-            input.ant-input {
-                &:focus {
-                    background: #02182B !important
-                }
-            }
-        }
-
-
+  .account-recover-content {
+    svg {
+      fill: #ffffff;
     }
 
-    .account-recover-mnemonic-count-selector-container {
-        align-items: center;
-        font-size: 14px;
-        margin: 16px 0 20px 0;
-
-        .account-recover-mnemonic-count-selector-item-container {
-            background: #052E55;
-        }
+    input,
+    textarea,
+    .custom-input {
+      background: #202030 !important;
+      border-color: #202030 !important;
+      color: #ffffff;
+      font-size: 14px;
+      &.hover:hover{
+        border: solid 1px #56FAA5 !important;
+      }
     }
 
-    .account-recover-mnemonic-container {
-        .mnemonic-item-container {
-            .ant-input-affix-wrapper {
-                border-color: #02182B;
-                background: #02182B;
-            }
-
-        }
+    input::placeholder {
+      color: #5e6c8a !important;
     }
+
+    input::-webkit-input-placeholder {
+      color: #5e6c8a !important;
+    }
+
+    textarea::placeholder {
+      color: #5e6c8a !important;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #5e6c8a !important;
+    }
+
+    .custom-password-input {
+      &:hover {
+        border: solid 1px #56FAA5 !important;
+        input.ant-input {
+          background: #202030 !important;
+        }
+      }
+
+      input.ant-input {
+        &:focus {
+          background: #202030 !important;
+        }
+      }
+    }
+  }
+
+  .account-recover-mnemonic-count-selector-container {
+    align-items: center;
+    font-size: 14px;
+    margin: 16px 0 20px 0;
+
+    .account-recover-mnemonic-count-selector-item-container {
+      background: #202030;
+    }
+  }
+
+  .account-recover-mnemonic-container {
+    .mnemonic-item-container {
+      .ant-input-affix-wrapper {
+        border-color: #202030;
+        background: #202030;
+      }
+    }
+  }
 }

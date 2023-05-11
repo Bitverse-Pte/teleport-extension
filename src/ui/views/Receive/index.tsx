@@ -17,6 +17,7 @@ import skynet from 'utils/skynet';
 import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
+import { CustomButton } from 'ui/components/Widgets';
 
 const { sensors } = skynet;
 
@@ -84,9 +85,9 @@ const SendToken = () => {
               });
             }}
           >
-            <Button type="primary" block className="copy-btn">
+            <CustomButton type="primary" cls="theme copy-btn" block>
               {t('copy_to_clipboard')}
-            </Button>
+            </CustomButton>
           </CopyToClipboard>
         </div>
       </div>

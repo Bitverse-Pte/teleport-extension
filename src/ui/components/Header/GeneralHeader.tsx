@@ -1,9 +1,8 @@
 import React from 'react';
 import { Button } from 'antd';
-import walletLogo from 'assets/walletLogo.png';
+import walletLogo from 'assets/logo.svg';
 import './style.less';
 import { useHistory } from 'react-router';
-import { Space } from 'antd';
 import { IconComponent } from '../IconComponents';
 import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';

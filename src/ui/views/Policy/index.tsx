@@ -10,7 +10,7 @@ const Policy = () => {
     <div className={clsx('policy-container flexCol', { dark: isDarkMode })}>
       <Header title="Privacy Policy" />
       <div className="policy-content content-wrap-padding">
-        <h3 className="policy-title">Teleport Wallet Terms of Use</h3>
+        <h3 className="policy-title">Bitverse Wallet Terms of Use</h3>
         <p className="policy-time">Last updated: 21 March 2022</p>
         <p className="policy-summary">
           These terms of use (“Terms” or “Agreement”) govern your use of the

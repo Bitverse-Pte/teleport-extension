@@ -290,22 +290,41 @@ window.addEventListener('message', function (event) {
         // set provider isMetamask attribute as isDefaultWallet to fit different dapp scenario
         provider.isMetaMask = isDefaultWallet;
         if (isDefaultWallet) {
-          Object.defineProperty(window, 'ethereum', {
-            value: new Proxy(provider, {
-              deleteProperty: () => true,
-            }),
-            writable: false,
-          });
+          chrome.tabs.query(
+            { active: true, currentWindow: true },
+            function (tabs) {
+              const url = tabs[0].url || '';
+              if (!url.includes('.bybit.')) {
+                // 根据web3的需求，在 bybit 域名下不要注入 ethereum
+                // Object.defineProperty(window, 'ethereum', {
+                //   value: new Proxy(provider, {
+                //     deleteProperty: () => true,
+                //   }),
+                //   writable: true,
+                // });
+              } else {
+                Object.defineProperty(window, 'teleport', {
+                  value: new Proxy(provider, {
+                    deleteProperty: () => true,
+                  }),
+                  writable: true,
+                });
+              }
+            }
+          );
         }
       });
 
     if (!window.ethereum) {
-      window.ethereum = new Proxy(provider, {
-        deleteProperty: () => true,
-      });
+      // 同上
+      // window.ethereum = new Proxy(provider, {
+      //   deleteProperty: () => true,
+      // });
 
       window.web3 = {
-        currentProvider: window.ethereum,
+        currentProvider: new Proxy(provider, {
+          deleteProperty: () => true,
+        }),
       };
     }
     window.teleport = new Proxy(provider, {

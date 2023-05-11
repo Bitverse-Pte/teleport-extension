@@ -1,6 +1,6 @@
 {
   "appName": {
-    "message": "Teleport Wallet",
+    "message": "Bitverse Wallet",
     "description": "The name of the application"
   },
   "appDescription": {
@@ -988,7 +988,7 @@
     "message": "Do not use screenshots or network transmission to backup and save"
   },
   "about_software_introductions": {
-    "message": "{{software_name}} is a secured multi-chain & multi-Identity browser extension wallet for crypto transfers, enabling decentralized applications(dApps) interaction on Ethereum, Cosmos, Polkadot, Solana and so on."
+    "message": "Bitverse browser extension is a secured multi-chain & multi-ID wallet for crypto transfers, enabling decentralized applications (dApps) interacts on EVM networks (like Ethereum, Polygon, etc), and non-EVM networks (like Cosmos networks) for web side users. Bitverse has also launched a MPC wallet for App side users"
   },
   "copy__successfully": {
     "message": "Copy successfully"

@@ -1,6 +1,6 @@
 .activity {
     padding: 16px 24px;
-    font-family: Montserrat;
+    
     p {
         margin: 0;
         margin-bottom: 8px !important;
@@ -33,14 +33,14 @@
     margin-right: auto;
     p.tx-title {
         font-weight: 500;
-        font-family: MontserratBold;
+        
         font-size: 14px;
         color: #364361;
         flex: 0 0 50%;
     }
     p.tx-value {
         font-weight: 500;
-        font-family: MontserratBold;
+        
         font-size: 14px;
         color: #364361;
     }
@@ -57,7 +57,7 @@
     }
     span.status.pending {
         color: #FFA014;
-        font-family: MontserratBold;
+        
     }
     span.status.default {
         color: #A3B4CC;
@@ -91,10 +91,10 @@
     button.gasBtn {
         padding: 4px;
         height: 24px;
-        background: #1484F5;
+        background: #56FAA5;
         border-radius: 8px;
-        color: #FFFFFF;
-
+        color: #171727;
+        font-weight: 700;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -141,11 +141,16 @@
 
 /** style override for darkmode */
 .activity-list-container.dark {
+    .activity:nth-child(odd){
+        background: rgba(0, 255, 186, 0.04);;
+    }
+    .activity:nth-child(even){
+      background: #020C15;
+  }
     .activity {
-        background: #020C15;
         color: #FFF;
-        &:hover {
-            background: #02182B;
+        &:hover,&:active {
+            background: rgba(0, 255, 186, 0.1);
         }
     }
 

@@ -220,7 +220,7 @@ const AccountManage: React.FC = () => {
               name="plus-circle"
               cls="wallet-manage-img"
               style={{
-                fill: '#42B856',
+                fill: '#56FAA5',
               }}
             />
           </div>

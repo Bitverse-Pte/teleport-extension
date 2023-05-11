@@ -13,7 +13,7 @@
     box-sizing: border-box;
     margin-bottom: 12px;
     font-size: 16px;
-    font-family: MontserratBold;
+    
     color: @themeColor;
   }
 
@@ -29,7 +29,7 @@
 
     .connected-sites-left {
       align-items: center;
-      font-family: 'Montserrat';
+      
       font-style: normal;
       font-weight: 400;
       font-size: 16px;
@@ -85,7 +85,7 @@
 
           .account-name {
             font-size: 14px;
-            font-family: MontserratBold;
+            
             line-height: 1;
             margin-bottom: 4px;
           }
@@ -123,17 +123,17 @@
           &:hover {
             background: #F0F9FF;
             .key-default-icon {
-              fill: #1484F5;
+              fill: #56FAA5;
               rect {
-                fill: #1484F5;
+                fill: #56FAA5;
               }
               path {
-                fill: #1484F5;
+                fill: #56FAA5;
               }
             }
             .site-default-icon {
               path {
-                stroke: #1484F5;
+                stroke: #56FAA5;
               }
             }
           }
@@ -190,11 +190,11 @@
   .accounts {
     .account-item {
       &:hover {
-        background: #052E55 !important;
+        background: rgba(0, 255, 186, 0.1) !important;
       }
       .account-right {
         .account-item-action {
-          background: #364361;
+          background: #313438;
           .key-default-icon {
             fill: #fff;
             rect {
@@ -210,13 +210,19 @@
             }
           }
           &:hover {
-            background: #0E5CAA;
+            background: #313438;
+
+            .site-default-icon {
+              path {
+                stroke: @themeColor;
+              }
+            }
           }
         }
       }
     }
     .account-list-active {
-      background: #052E55 !important;
+      background: rgba(0, 255, 186, 0.1) !important;
     }
   }
 }

@@ -124,6 +124,7 @@ const flowContext = flow
       },
       mapMethod,
     } = ctx;
+    console.log(ctx, 'ctx');
     const [approvalType, condition] =
       Reflect.getMetadata('APPROVAL', providerController, mapMethod) || [];
     if (approvalType && (!condition || !condition(ctx.request))) {
@@ -142,6 +143,8 @@ const flowContext = flow
           to: params[0].to,
           value: params[0].value,
           type: params[0].type,
+          maxFeePerGas: params[0].maxFeePerGas, // add
+          gasLimit: params[0].gas, // add
         };
         if (!params[0].gas) {
           const txMeta = cloneDeep(params[0]);

@@ -13,7 +13,7 @@
     p {
       margin-bottom: 0;
       &:nth-child(1) {
-        opacity: .4;
+        opacity: 0.4;
       }
     }
   }
@@ -27,7 +27,6 @@
       width: 100%;
       height: 110px;
       .network {
-        font-family: 'MontserratBold';
         font-style: normal;
         font-weight: 700;
         font-size: 18px;
@@ -42,7 +41,6 @@
         box-sizing: border-box;
         padding: 10px 24px;
         .tx-summary-origin {
-          font-family: 'MontserratBold';
           font-weight: 700;
           font-size: 14px;
           line-height: 100%;
@@ -50,7 +48,7 @@
         }
       }
     }
-    
+
     .tx-details-tab-container {
       padding: 0 24px;
       overflow-y: auto;
@@ -62,15 +60,15 @@
       width: 100%;
       .gas-edit-button {
         cursor: pointer;
-        font-family: "MontserratBold";
+
         justify-content: center;
         align-items: center;
         width: 72px;
         height: 24px;
-        background: #F0F9FF;
+        background: #202030;
         border-radius: 8px;
-        fill: #1484F5;
-        color:  #1484F5;
+        fill: #56faa5;
+        color: #56faa5;
         margin: 8px 0;
         font-size: 12px;
         .edit-icon {
@@ -79,7 +77,6 @@
       }
       .transaction-detail-messages {
         .transaction-detail-messages-title {
-          font-family: "MontserratBold";
           font-weight: 500;
           font-size: 14px;
           line-height: 20px;
@@ -95,17 +92,16 @@
           font-weight: 500;
           font-size: 12px;
           line-height: 17px;
-          color: #798CAD;
+          color: #798cad;
           overflow: auto;
           border-radius: 8px;
           &::-webkit-scrollbar-corner {
-            background-color: #020C15;
+            background-color: #171727;
           }
         }
       }
       .transaction-detail-memo {
         .transaction-detail-memo-title {
-          font-family: "MontserratBold";
           font-weight: 500;
           font-size: 14px;
           line-height: 20px;
@@ -113,7 +109,7 @@
         .customInputStyle {
           margin-top: 5px;
           border: 0 !important;
-          background-color: #F8FAFC !important;
+          background-color: #f8fafc !important;
           border-radius: 8px;
           height: 38px;
           &::placeholder {
@@ -128,7 +124,6 @@
         .transaction-detail-item-key {
           display: inline-block;
           .transaction-detail-title {
-            font-family: "MontserratBold";
             font-weight: 500;
             font-size: 14px;
             line-height: 20px;
@@ -139,7 +134,7 @@
             line-height: 17px;
             display: flex;
             align-items: flex-end;
-            color: #9EA2A9;
+            color: #9ea2a9;
           }
         }
         .transaction-detail-item-values {
@@ -151,26 +146,23 @@
           text-align: right;
           color: #202226;
           .transaction-detail-detailText {
-            font-family: MontserratBold;
             font-style: normal;
             font-size: 14px;
             color: #364361;
             margin-bottom: 8px;
           }
           .transaction-detail-detailSubText {
-            font-family: Montserrat;
             font-style: normal;
             font-weight: normal;
             font-size: 12px;
-            color: #798CAD;
+            color: #adb1b8;
             margin-bottom: 12px;
           }
           .transaction-detail-detailMax {
-            font-family: Montserrat;
             font-style: normal;
             font-weight: normal;
             font-size: 12px;
-            color: #798CAD;
+            color: #adb1b8;
           }
         }
       }
@@ -197,7 +189,7 @@
         font-weight: 500;
         font-size: 12px;
         line-height: 17px;
-        color: #9EA2A9;
+        color: #9ea2a9;
         overflow: auto;
         border-radius: 8px;
       }
@@ -212,7 +204,7 @@
         font-weight: 500;
         font-size: 12px;
         line-height: 17px;
-        color: #9EA2A9;
+        color: #9ea2a9;
         border-radius: 8px;
       }
     }
@@ -227,14 +219,14 @@
       padding: 10px 24px;
       background: white;
       .tx-btn-container-top {
-          margin-bottom: 14px;
+        margin-bottom: 14px;
       }
     }
-    
+
     .send {
       .est-price {
         margin: 8px 0 0 0;
-        color: #818A99;
+        color: #818a99;
         font-size: 12px;
       }
     }
@@ -244,10 +236,10 @@
     position: relative;
     width: 100%;
     height: 100%;
-    background: #FFFFFF;
+    background: #ffffff;
     .top-part-container {
-      background: url(../../../assets/confirm-mask.png) no-repeat 0 0;
-      backdrop-filter: blur(24px);
+      // background: url(../../../assets/confirm-mask.png) no-repeat 0 0;
+      // backdrop-filter: blur(24px);
       width: 100%;
       height: 220px;
       .tx-summary {
@@ -255,9 +247,12 @@
         justify-content: space-between;
         align-items: center;
         box-sizing: border-box;
-        // margin-bottom: 4px;
         padding: 24px;
+        position: absolute;
+        top: 120px;
+
         .tx-summary-origin {
+          margin-bottom: 6px;
           font-weight: 500;
           font-size: 14px;
           line-height: 20px;
@@ -265,7 +260,7 @@
         .tx-summary-action {
           font-size: 12px;
           line-height: 17px;
-          color: #9EA2A9;
+          color: #9ea2a9;
         }
         .tx-summary-currency {
           font-weight: 500;
@@ -275,7 +270,7 @@
         }
       }
     }
-    
+
     .tx-details-tab-container {
       padding: 0 24px;
       overflow-y: auto;
@@ -286,15 +281,15 @@
       width: 100%;
       .gas-edit-button {
         cursor: pointer;
-        font-family: "MontserratBold";
+
         justify-content: center;
         align-items: center;
         width: 72px;
         height: 24px;
-        background: #F0F9FF;
+        background: #202030;
         border-radius: 8px;
-        fill: #1484F5;
-        color:  #1484F5;
+        fill: #56faa5;
+        color: #56faa5;
         margin: 8px 0;
         font-size: 12px;
         .edit-icon {
@@ -308,7 +303,6 @@
         .transaction-detail-item-key {
           display: inline-block;
           .transaction-detail-title {
-            font-family: "MontserratBold";
             font-weight: 500;
             font-size: 14px;
             line-height: 20px;
@@ -319,7 +313,7 @@
             line-height: 17px;
             display: flex;
             align-items: flex-end;
-            color: #9EA2A9;
+            color: #9ea2a9;
           }
         }
         .transaction-detail-item-values {
@@ -331,26 +325,23 @@
           text-align: right;
           color: #202226;
           .transaction-detail-detailText {
-            font-family: MontserratBold;
             font-style: normal;
             font-size: 14px;
             color: #364361;
             margin-bottom: 8px;
           }
           .transaction-detail-detailSubText {
-            font-family: Montserrat;
             font-style: normal;
             font-weight: normal;
             font-size: 12px;
-            color: #798CAD;
+            color: #adb1b8;
             margin-bottom: 12px;
           }
           .transaction-detail-detailMax {
-            font-family: Montserrat;
             font-style: normal;
             font-weight: normal;
             font-size: 12px;
-            color: #798CAD;
+            color: #adb1b8;
           }
         }
       }
@@ -377,7 +368,7 @@
         font-weight: 500;
         font-size: 12px;
         line-height: 17px;
-        color: #9EA2A9;
+        color: #9ea2a9;
         border-radius: 8px;
       }
       .transaction-data-value {
@@ -391,7 +382,7 @@
         font-weight: 500;
         font-size: 12px;
         line-height: 17px;
-        color: #9EA2A9;
+        color: #9ea2a9;
         border-radius: 8px;
       }
     }
@@ -406,22 +397,19 @@
       padding: 10px 24px;
       background: white;
       .tx-btn-container-top {
-          margin-bottom: 14px;
+        margin-bottom: 14px;
       }
     }
-    
+
     .send {
       .est-price {
         margin: 8px 0 0 0;
-        color: #818A99;
+        color: #818a99;
         font-size: 12px;
       }
     }
-      
   }
 }
-  
-  
 
 footer {
   padding: 20px 20px 24px;
@@ -429,11 +417,11 @@ footer {
   // bottom: 0;
   // left: 0;
   background-color: #fff;
-  border-top: 0.5px solid #D6DFEC;
+  border-top: 0.5px solid #d6dfec;
   width: 100%;
 }
 .approval.dark {
-  background: #020C15;
+  background: #171727;
   color: #fff;
   min-height: 100vh;
   .approval-connect .connect-body .account-item {
@@ -445,7 +433,7 @@ footer {
   }
   .approval-connect {
     .connect-body {
-      .network-item{
+      .network-item {
         .chain-name {
           color: #fff;
         }
@@ -460,18 +448,22 @@ footer {
       color: #fff;
     }
     .addChain-showchain-detail-card {
-      background-color: #02182B;
+      background-color: #202030;
       .addChain-showchain-detail-item .addChain-showchain-detail-item-name {
         color: #fff;
       }
+      a {
+        color: #56faa5;
+      }
     }
   }
+
   .addtoken-container {
     .add-token h1 {
       color: #fff;
     }
     .add-token .token-detail {
-      background-color: #02182B;
+      background-color: #202030;
       .token-item .content {
         color: #fff;
       }
@@ -488,15 +480,15 @@ footer {
     }
   }
   .approval-tx {
-    background: #020C15;
+    background: url(../../../assets/homeBg2.png) no-repeat top center #171727;
     .top-part-container {
-      background: linear-gradient(180deg, #083A6A 0%, rgba(3, 36, 64, 0) 100%);
+      background: none;
     }
     .tx-button-container {
-      background: #020C15;
+      background: #171727;
     }
     .transaction-detail-detailText {
-      color: #fff!important;
+      color: #fff !important;
     }
     .tx-summary-currency {
       .dec {
@@ -511,43 +503,44 @@ footer {
         color: #fff;
       }
       .transaction-data-params {
-        background: #02182B;
-        color: #798CAD;
+        background: #202030;
+        color: #71757a;
       }
       .transaction-data-value {
-        background: #02182B;
-        color: #798CAD;
+        background: #202030;
+        color: #71757a;
       }
     }
   }
   .approval-sign {
     .sign-title {
       color: #fff;
-      background: #083A6A;
+      background: #171727;
       margin: 0;
       padding: 10px 0;
     }
     .top-part-container {
-      background: linear-gradient(180deg, #083A6A 0%, rgba(3, 36, 64, 0) 100%);
+      background: #171727;
       .network {
-        background: #0E5CAA;
+        background: #171727;
+        border: 1px solid #adb1b8;
         color: #fff;
       }
       .from-container {
-        background: #052E55;
+        background: #202030;
         .account-name {
           color: #fff;
         }
         .account-address {
-          color:#A3B4CC;
+          color: #a3b4cc;
         }
       }
       .site-container {
-        background: #052E55;
+        background: #202030;
         color: #fff;
         .site-info__text {
           .site-info__subtext {
-            color:#A3B4CC;
+            color: #a3b4cc;
           }
         }
       }
@@ -557,8 +550,8 @@ footer {
         color: #fff;
       }
       .sign-data {
-        background: #02182B;
-        color: #798CAD;
+        background: #202030;
+        color: #71757a;
       }
     }
     footer {
@@ -566,9 +559,9 @@ footer {
     }
   }
   .approval-tx-sign-amino {
-    background: #020C15;
+    background: #171727;
     .top-part-container {
-      background: linear-gradient(180deg, #083A6A 0%, rgba(3, 36, 64, 0) 100%);
+      background: #171727;
       .network {
         color: #fff;
       }
@@ -581,15 +574,15 @@ footer {
     }
     .transaction-detail {
       .transaction-detail-messages .transaction-detail-messages-value {
-        background: #02182B;
-        color: #798CAD;
+        background: #02182b;
+        color: #798cad;
       }
       .transaction-detail-memo .customInputStyle {
-        background-color: #02182B!important;
-        border: 1px solid #02182B!important;
+        background-color: #02182b !important;
+        border: 1px solid #02182b !important;
         color: #fff;
         &:focus {
-          border: 1px solid #1484F5!important;
+          border: 1px solid #56faa5 !important;
           box-shadow: none;
           outline: none;
         }
@@ -598,9 +591,11 @@ footer {
         }
       }
       input::placeholder {
-        color: #5E6C8A !important;
+        color: #5e6c8a !important;
       }
-      .transaction-detail-item .transaction-detail-item-values .transaction-detail-detailText {
+      .transaction-detail-item
+        .transaction-detail-item-values
+        .transaction-detail-detailText {
         color: #fff;
       }
     }
@@ -612,12 +607,12 @@ footer {
         color: #fff;
       }
       .transaction-data-params {
-        background: #02182B;
-        color: #798CAD;
+        background: #02182b;
+        color: #798cad;
       }
       .transaction-data-value {
-        background: #02182B;
-        color: #798CAD;
+        background: #02182b;
+        color: #798cad;
       }
     }
   }
@@ -626,6 +621,6 @@ footer {
     color: #364361;
   }
   footer {
-    background: #020C15;
+    background: #171727;
   }
 }

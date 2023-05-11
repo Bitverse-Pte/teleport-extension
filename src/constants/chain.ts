@@ -4,6 +4,7 @@ import {
   KOVAN_RPC_URL,
   MAINNET_RPC_URL,
   GOERLI_RPC_URL,
+  MANTLE_TEST_RPC_URL,
 } from './network';
 
 export enum CHAINS {
@@ -33,6 +34,8 @@ export enum CHAINS {
   UMEE = 'UMEE',
   EVMOS = 'EVMOS',
   JUNO = 'JUNO',
+
+  MANTLE_TEST = 'MANTLE_TEST',
 }
 
 export const CHAIN_TO_RPC_URL_MAP = {
@@ -41,6 +44,7 @@ export const CHAIN_TO_RPC_URL_MAP = {
   [CHAINS.RINKEBY]: RINKEBY_RPC_URL,
   [CHAINS.ROPSTEN]: ROPSTEN_RPC_URL,
   [CHAINS.GOERLI]: GOERLI_RPC_URL,
+  [CHAINS.MANTLE_TEST]: MANTLE_TEST_RPC_URL,
 };
 
 export const TOKEN_STORE_KEY = 'token';
