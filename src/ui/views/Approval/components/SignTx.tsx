@@ -238,6 +238,8 @@ const SignTx = ({ params, origin }) => {
   const fetchNativePrice = async () => {
     dispatch(showLoadingIndicator());
     const tokens = await wallet.getTokenBalancesAsync();
+    console.log('### tokens = ', tokens);
+
     const prices = await wallet.queryTokenPrices();
     if (prices) setPrices(prices);
     if (tokens) setTokens(tokens);
@@ -283,6 +285,7 @@ const SignTx = ({ params, origin }) => {
         value: ethers.BigNumber.from(params[1].value).toHexString(),
         txParam: {
           ...tx.txParam,
+          value: ethers.BigNumber.from(params[1].value).toHexString(),
           symbol,
         },
       });
@@ -294,7 +297,7 @@ const SignTx = ({ params, origin }) => {
     }
   };
 
-  useAsyncEffect(getTxTokenAsync, [tokens]);
+  useAsyncEffect(getTxTokenAsync, []);
 
   const supportsEIP1559 = tx.type === TransactionEnvelopeTypes.FEE_MARKET;
 
@@ -413,15 +416,24 @@ const TxDetailComponent = ({
 }) => {
   const { t } = useTranslation();
   let token = tokens.find((t: Token) => t.symbol === symbol);
-  const isNative = () => currency === symbol;
-  // const nativeTokenNew = tokens.find((t: Token) => t.isNative);
-  console.log('isNative() === ', isNative());
 
-  const renderTotalMaxAmount = () => {
-    if (!token && symbol === 'USDt') {
+  if (!token) {
+    if (symbol === 'fUSDT') {
+      token = {
+        symbol: 'fUSDT',
+        decimal: 6,
+        price: 1,
+        name: '',
+        denom: '',
+        isNative: false,
+        isCustom: false,
+        chainCustomId: '',
+      };
+    } else if (symbol === 'USDt') {
       token = {
         symbol: 'USDt',
         decimal: 6,
+        price: 1,
         name: '',
         denom: '',
         isNative: false,
@@ -429,7 +441,17 @@ const TxDetailComponent = ({
         chainCustomId: '',
       };
     }
+  } else {
+    if (symbol === 'USDT' && !token?.price) {
+      token.price = 1;
+    }
+  }
 
+  const isNative = () => currency === symbol;
+  // const nativeTokenNew = tokens.find((t: Token) => t.isNative);
+  console.log('isNative() === ', isNative());
+
+  const renderTotalMaxAmount = () => {
     if (isNative()) {
       const totalHex = addHexPrefix(
         addHexes(valueToDisplay(tx), totalGasfee).toString()
@@ -482,12 +504,29 @@ const TxDetailComponent = ({
   };
 
   const renderTotalGasFeeFiat = () => {
-    const totalDec = getTotalPricesByAmountAndPrice(
+    console.log(
+      `上面计算gas费的法币部分,totalGasfee = ${totalGasfee}, isNative() = ${isNative()}, nativeToken = `,
+      nativeToken
+    );
+    if (isNative()) {
+      const totalDec = getTotalPricesByAmountAndPrice(
+        totalGasfee,
+        nativeToken?.decimal || 0,
+        nativeToken?.price || 0
+      );
+      return `$ ${totalDec}`;
+    }
+
+    const totalGasDec = getTotalPricesByAmountAndPrice(
       totalGasfee,
       nativeToken?.decimal || 0,
       nativeToken?.price || 0
     );
-    return `$ ${totalDec}`;
+    console.log(
+      `111 --- totalGasDec = ${totalGasDec}, totalGasfee = ${totalGasfee}`
+    );
+
+    return `$ ${totalGasDec}`;
   };
 
   const renderTotalMaxFiat = () => {
@@ -502,12 +541,15 @@ const TxDetailComponent = ({
       );
       return `$ ${totalDec}`;
     }
+    console.log('计算下面gas tx = ', tx, token, nativeToken);
+
     const totalTxDec = getTotalPricesByAmountAndPrice(
       valueToDisplay(tx),
       token?.decimal || 0,
       token?.price || 0
     );
     console.log('renderTotalMaxFiat --- totalTxDec', totalTxDec);
+
     const totalGasDec = getTotalPricesByAmountAndPrice(
       totalGasfee,
       nativeToken?.decimal || 0,
@@ -584,7 +626,6 @@ const TxDataComponent = ({ tx }) => {
 
 const TxSummaryComponent = ({ action, value, tokens, origin, symbol }) => {
   let token = tokens.find((t: Token) => t.symbol === symbol);
-  // const nativeToken = tokens.find((t: Token) => t.isNative);
   if (symbol === 'fUSDT') {
     token = {
       symbol: 'fUSDT',
