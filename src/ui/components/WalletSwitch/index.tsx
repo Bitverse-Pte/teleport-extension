@@ -13,6 +13,7 @@ import skynet from 'utils/skynet';
 import BitError from 'error';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { renderAccountCreateType } from 'ui/helpers/utils/account.util';
 const { sensors } = skynet;
 
 interface Props {
@@ -26,6 +27,7 @@ const WalletSwitch: React.FC<Props> = (props: Props) => {
   const location = useLocation();
   const wallet = useWallet();
   const [hdWalletAccounts, setHdWalletAccount] = useState<any>([]);
+  const [mpcWalletAccounts, setMPCWalletAccount] = useState<any>([]);
   const [simpleWalletAccounts, setSimpleWalletAccount] = useState<
     HdAccountStruct[]
   >([]);
@@ -35,6 +37,7 @@ const WalletSwitch: React.FC<Props> = (props: Props) => {
   const queryWallets = async () => {
     const accounts: HdAccountStruct[] = await wallet.getWalletList();
     const hdWallets: HdAccountStruct[] = [],
+      mpcWallets: HdAccountStruct[] = [],
       simpleWallets: HdAccountStruct[] = [];
     if (accounts?.length > 0) {
       accounts.forEach((a: HdAccountStruct) => {
@@ -44,10 +47,13 @@ const WalletSwitch: React.FC<Props> = (props: Props) => {
           a.accounts[0]?.accountCreateType === AccountCreateType.PRIVATE_KEY
         ) {
           simpleWallets.push(a);
+        } else if (a.accounts[0]?.accountCreateType === AccountCreateType.MPC) {
+          mpcWallets.push(a);
         }
       });
       setHdWalletAccount(hdWallets);
       setSimpleWalletAccount(simpleWallets);
+      setMPCWalletAccount(mpcWallets);
     }
 
     const current: BaseAccount = await wallet.getCurrentAccount();
@@ -86,6 +92,51 @@ const WalletSwitch: React.FC<Props> = (props: Props) => {
       });
   };
 
+  const makeList = (list, accountCreateType) => {
+    return list.map((w: HdAccountStruct, i: number) => (
+      <div
+        className={`item wallet-switch-item flexR ${
+          currentAccount?.hdWalletId === w?.hdWalletId ? '_active' : ''
+        }`}
+        key={w.hdWalletId}
+        onClick={() => {
+          handleWalletClick(w);
+        }}
+      >
+        <div
+          className="circle flexR"
+          style={{ background: WALLET_THEME_COLOR[i % 5] }}
+        >
+          {w?.hdWalletName?.substr(0, 1)}
+          <div
+            className="circle-wrap flexR"
+            style={{
+              display: accountType === Tabs.SECOND ? 'flex' : 'none',
+            }}
+          >
+            <img
+              src={ecosystemToIconSVG(w?.accounts[0]?.ecosystem)}
+              className="circle-ecosystem-icon"
+            />
+          </div>
+        </div>
+        <div className="right flexR">
+          <WalletName cls="name-account-name" width={200}>
+            {w?.hdWalletName} ({renderAccountCreateType(accountCreateType)})
+          </WalletName>
+          <IconComponent
+            name="check"
+            cls="base-text-color"
+            style={{
+              display:
+                currentAccount?.hdWalletId === w?.hdWalletId ? 'block' : 'none',
+            }}
+          />
+        </div>
+      </div>
+    ));
+  };
+
   return (
     <div
       className={clsx('wallet-manage flexCol wallet-manage-wallet-switch', {
@@ -94,7 +145,7 @@ const WalletSwitch: React.FC<Props> = (props: Props) => {
     >
       <div className="tab-container flexR content-wrap-padding">
         <CustomTab
-          tab1="ID Wallet"
+          tab1="MPC Wallet 2"
           currentTab={accountType}
           tab2="Normal Wallet"
           showToolTips
@@ -109,58 +160,18 @@ const WalletSwitch: React.FC<Props> = (props: Props) => {
         <div className="account-container flexR">
           {(accountType === Tabs.FIRST
             ? hdWalletAccounts
-            : simpleWalletAccounts
+            : hdWalletAccounts.concat(simpleWalletAccounts)
           ).length > 0 ? (
             <div className="list flexCol">
-              {(accountType === Tabs.FIRST
-                ? hdWalletAccounts
-                : simpleWalletAccounts
-              ).map((w: HdAccountStruct, i: number) => (
-                <div
-                  className={`item wallet-switch-item flexR ${
-                    currentAccount?.hdWalletId === w?.hdWalletId
-                      ? '_active'
-                      : ''
-                  }`}
-                  key={w.hdWalletId}
-                  onClick={() => {
-                    handleWalletClick(w);
-                  }}
-                >
-                  <div
-                    className="circle flexR"
-                    style={{ background: WALLET_THEME_COLOR[i % 5] }}
-                  >
-                    {w?.hdWalletName?.substr(0, 1)}
-                    <div
-                      className="circle-wrap flexR"
-                      style={{
-                        display: accountType === Tabs.SECOND ? 'flex' : 'none',
-                      }}
-                    >
-                      <img
-                        src={ecosystemToIconSVG(w?.accounts[0]?.ecosystem)}
-                        className="circle-ecosystem-icon"
-                      />
-                    </div>
-                  </div>
-                  <div className="right flexR">
-                    <WalletName cls="name-account-name" width={100}>
-                      {w?.hdWalletName}
-                    </WalletName>
-                    <IconComponent
-                      name="check"
-                      cls="base-text-color"
-                      style={{
-                        display:
-                          currentAccount?.hdWalletId === w?.hdWalletId
-                            ? 'block'
-                            : 'none',
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
+              {accountType === Tabs.FIRST
+                ? makeList(mpcWalletAccounts, AccountCreateType.MPC)
+                : null}
+              {accountType === Tabs.SECOND
+                ? makeList(hdWalletAccounts, AccountCreateType.MNEMONIC)
+                : null}
+              {accountType === Tabs.SECOND
+                ? makeList(simpleWalletAccounts, AccountCreateType.PRIVATE_KEY)
+                : null}
             </div>
           ) : (
             <div className="no-data flexCol">

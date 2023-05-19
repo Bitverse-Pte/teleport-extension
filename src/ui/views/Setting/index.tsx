@@ -138,7 +138,7 @@ const Setting: React.FC<ISettingProps> = (props: ISettingProps) => {
       <LogoHeader handleCloseClick={props.handleCloseClick} />
       <div className="setting-button-container content-wrap-padding flexR">
         <TipButton
-          title="Manage Wallet"
+          title="Manage Wallet b"
           type={TipButtonEnum.WALLET_MANAGE}
           handleClick={handleWalletManageClick}
         />
