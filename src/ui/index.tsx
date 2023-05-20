@@ -90,6 +90,7 @@ const wallet: Record<string, any> = new Proxy(
   {},
   {
     get(obj, key) {
+      console.log('-------wallet proxy:', key);
       switch (key) {
         default:
           return function (...params: any) {
@@ -105,12 +106,14 @@ const wallet: Record<string, any> = new Proxy(
 );
 
 portMessageChannel.listen((data) => {
+  console.log('UI 监听来之 background portMessageChannel.listen', data);
   if (data.type === 'broadcast') {
     eventBus.emit(data.method, data.params);
   }
 });
 
 eventBus.addEventListener(EVENTS.broadcastToBackground, (data) => {
+  console.log('UI 往 background broadcastToBackground', data);
   portMessageChannel.request({
     type: 'broadcast',
     method: data.method,

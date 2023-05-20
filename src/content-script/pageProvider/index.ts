@@ -15,7 +15,7 @@ import { Keplr } from 'types/cosmos';
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
     console.log(
-      `%c [teleport] (${new Date().toTimeString().substr(0, 8)}) ${event}`,
+      `%c [bitverse] (${new Date().toTimeString().substr(0, 8)}) ${event}`,
       'font-weight: bold; background-color: #6AB5FF; color: white;',
       ...args
     );
@@ -116,10 +116,14 @@ export class EthereumProvider extends EventEmitter {
     });
 
     try {
-      const { chainId, accounts, networkVersion, isUnlocked }: any =
-        await this.request({
-          method: 'getProviderState',
-        });
+      const {
+        chainId,
+        accounts,
+        networkVersion,
+        isUnlocked,
+      }: any = await this.request({
+        method: 'getProviderState',
+      });
       if (isUnlocked) {
         this._isUnlocked = true;
         this._state.isUnlocked = true;
@@ -275,6 +279,7 @@ declare global {
 window.addEventListener('message', function (event) {
   // We only accept messages from ourselves
   if (event.source != window) return;
+  console.log('addEventListener message', event);
 
   if (event.data.type && event.data.type == 'INIT_TELEPORT_PROVIDER') {
     const channelName = event.data.channelName;

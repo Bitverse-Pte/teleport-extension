@@ -1,9 +1,20 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import * as Comlink from 'comlink';
+import init, {
+  initThreadPool,
+  test,
+  ecdsa_keygen_first_handle,
+  ecdsa_keygen_second_handle,
+  test_key_gen_first_msg,
+  ecdsa_chaincode_first_handle,
+  ecdsa_chaincode_second_handle_and_return_master_key,
+  ecdsa_build_sign_first_request,
+  ecdsa_sign_first_handle,
+} from './mpc_wallet_core_wasm/pkg';
+// import * as Comlink from 'comlink';
 
-const webWorker = new Worker(new URL('./worker.ts', import.meta.url));
-const work = Comlink.wrap(webWorker);
+// const webWorker = new Worker(new URL('./worker.ts', import.meta.url));
+// const work = Comlink.wrap(webWorker);
 
 const instance = axios.create({
   baseURL: 'http://api2.bitverse-dev-1.bitverse.zone',
@@ -38,7 +49,7 @@ export async function keyGen() {
   const id = JSON.parse(kg_party_one_first_message)[0];
   const kg_first_message = JSON.parse(kg_party_one_first_message)[1];
 
-  const keyGenFirstHandleResult = await work.ecdsa_keygen_first_handle(id);
+  const keyGenFirstHandleResult = await ecdsa_keygen_first_handle(id);
   console.log('keyGenFirstHandleResult', keyGenFirstHandleResult);
 
   ///// keygen second
@@ -53,7 +64,7 @@ export async function keyGen() {
   //
   const kg_second_message = kg_party_one_second_message_result.data.result;
 
-  const keyGenSecondHandleResult = await work.ecdsa_keygen_second_handle(
+  const keyGenSecondHandleResult = await ecdsa_keygen_second_handle(
     id,
     kg_first_message,
     JSON.parse(kg_second_message)
@@ -75,9 +86,7 @@ export async function keyGen() {
   }
   const cc_party_one_first_message =
     cc_party_one_first_message_result.data.result;
-  const chainCodeFirstHandleResult = await work.ecdsa_chaincode_first_handle(
-    id
-  );
+  const chainCodeFirstHandleResult = await ecdsa_chaincode_first_handle(id);
   console.log('chainCodeFirstHandleResult', chainCodeFirstHandleResult);
 
   ///// chain_code second
@@ -97,7 +106,7 @@ export async function keyGen() {
     cc_party_one_second_message_result.data.result;
 
   //// swap Masterkey
-  const chainCodeSecondHandleResult = await work.ecdsa_chaincode_second_handle_and_return_master_key(
+  const chainCodeSecondHandleResult = await ecdsa_chaincode_second_handle_and_return_master_key(
     id,
     keyGenSecondHandleResult.party_two_paillier,
     JSON.parse(kg_second_message),
@@ -119,7 +128,7 @@ export async function sign(
   c_message_le_hex: string,
   coinId: string
 ) {
-  const signFirstRequestResult = await work.ecdsa_build_sign_first_request(id);
+  const signFirstRequestResult = await ecdsa_build_sign_first_request(id);
 
   console.log('signFirstRequestResult', signFirstRequestResult);
 
@@ -147,7 +156,7 @@ export async function sign(
   const c_x_pos = coinId || '60'; // coin id
   const c_y_pos = '1'; // 固定1
 
-  const signFirstHandleResult = await work.ecdsa_sign_first_handle(
+  const signFirstHandleResult = await ecdsa_sign_first_handle(
     c_message_le_hex,
     mk,
     c_x_pos,

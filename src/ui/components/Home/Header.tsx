@@ -20,6 +20,10 @@ export function HomeHeader({
 }) {
   const { isDarkMode } = useDarkmode();
   const currentProvider = useSelector(getProvider);
+
+  const expandClick = (e) => {
+    chrome.tabs.create({ url: location.href });
+  };
   return (
     <div
       className={clsx('flex headerOfMenu justify-between items-center', {
@@ -51,6 +55,9 @@ export function HomeHeader({
         className="expand-menu-btn cursor"
         onClick={menuOnClick}
       /> */}
+      <button className="expand-menu-btn cursor" onClick={expandClick}>
+        expand
+      </button>
       <button className="expand-menu-btn cursor" onClick={menuOnClick}>
         <SettingLogo />
       </button>
