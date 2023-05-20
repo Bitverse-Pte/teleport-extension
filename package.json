@@ -221,6 +221,7 @@
     "zip-dir": "^2.0.0"
   },
   "resolutions": {
+    "bitverse-http-client": "file:./http-lib",
     "eth-method-registry": "2.0.0",
     "xhr2": "file:./xhr2",
     "libsodium": "file:./etc/noop",
