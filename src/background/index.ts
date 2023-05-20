@@ -96,7 +96,6 @@ notificationService.on(UPDATE_BADGE, updateBadge);
 
 // for page provider
 browser.runtime.onConnect.addListener((port) => {
-  debugger;
   console.log(
     '----- background browser.runtime.onConnect.addListener port',
     port
