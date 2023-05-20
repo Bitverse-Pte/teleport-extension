@@ -1750,6 +1750,11 @@ class KeyringService extends EventEmitter {
     }
     return difference;
   }
+
+  public hasOwnPassword(): boolean {
+    // 临时
+    return !!this.password
+  }
 }
 
 export default new KeyringService();
