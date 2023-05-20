@@ -21,6 +21,7 @@ const SingleToken = lazy(() => import('ui/views/SingleToken'));
 const TokenAdd = lazy(() => import('ui/views/TokenAdd'));
 const AboutSoftware = lazy(() => import('ui/views/AboutSoftware'));
 const MnemonicCheck = lazy(() => import('ui/views/MnemonicCheck'));
+const MPCWalletBackUp = lazy(() => import('ui/views/MPCWalletBackUp'));
 const ActivityDetail = lazy(
   () => import('ui/views/Transaction/TransactionDetail')
 );
@@ -103,6 +104,10 @@ const Main = () => {
 
         <LazyPrivateRoute exact path="/policy">
           <Policy />
+        </LazyPrivateRoute>
+
+        <LazyPrivateRoute exact path="/mpcwalletbackup">
+          <MPCWalletBackUp />
         </LazyPrivateRoute>
 
         {/* Remove these two routes when we feel good about them  */}
