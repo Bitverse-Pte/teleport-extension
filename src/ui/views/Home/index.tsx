@@ -53,16 +53,20 @@ const Home = () => {
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
-  const [account2ConnectedSite, setAccount2ConnectedSite] =
-    useState<BaseAccount>();
+  const [
+    account2ConnectedSite,
+    setAccount2ConnectedSite,
+  ] = useState<BaseAccount>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
-  const [walletManagePopupVisible, setWalletManagePopupVisible] =
-    useState(false);
+  const [walletManagePopupVisible, setWalletManagePopupVisible] = useState(
+    false
+  );
   const [createAccountLoading, setCreateAccountLoading] = useState(false);
   const [tokenListLoading, setTokenListLoading] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
-  const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
-    useState(false);
+  const [connectedSitePopupVisible, setConnectedSitePopupVisible] = useState(
+    false
+  );
   const [tabType, setTabType] = useState(Tabs.FIRST);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
@@ -358,9 +362,12 @@ const Home = () => {
           >
             <img src={ArrowRight} className="home-content-name-arrow-right" />
             <WalletName width={200} cls="home-wallet-name">
-              {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
+              {/* {account?.accountCreateType === AccountCreateType.PRIVATE_KEY
                 ? 'Normal Wallet'
-                : `ID Wallet: ${account?.hdWalletName}`}
+                : `ID Wallet: ${account?.hdWalletName}`} */}
+              {account?.accountCreateType === AccountCreateType.MPC
+                ? 'MPC Wallet'
+                : `Normal Wallet: ${account?.hdWalletName}`}
             </WalletName>
           </div>
 
@@ -702,7 +709,7 @@ const Home = () => {
                   });
                 }}
               >
-                Manage Wallet
+                Manage Wallet a
                 <IconComponent
                   name="chevron-right_8"
                   cls="icon chevron-right"

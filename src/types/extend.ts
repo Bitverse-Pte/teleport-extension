@@ -5,6 +5,7 @@ import { CoinType, Ecosystem, Provider } from 'types/network';
 export enum AccountCreateType {
   MNEMONIC = 'mnemonic',
   PRIVATE_KEY = 'privateKey',
+  MPC = 'mpc',
   KEYSTORE = 'keystore',
 }
 

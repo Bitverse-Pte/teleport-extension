@@ -177,7 +177,7 @@ const AccountSelect: React.FC<AccountSelectProps> = (
       >
         <div className="header content-wrap-padding">
           <CustomTab
-            tab1="ID Wallet"
+            tab1="MPC Wallet1"
             tab2="Normal Wallet"
             currentTab={accountCreateType}
             handleTabClick={handleTabClick}

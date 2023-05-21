@@ -28,6 +28,7 @@ const { sensors } = skynet;
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
+import { renderAccountCreateType } from 'ui/helpers/utils/account.util';
 
 export interface WalletHeaderProps {
   title: string;
@@ -53,6 +54,7 @@ const WalletManage: React.FC = () => {
   const location = useLocation();
   const wallet = useWallet();
   const [hdWalletAccounts, setHdWalletAccount] = useState<any>([]);
+  const [mpcWalletAccounts, setMPCWalletAccount] = useState<any>([]);
   const [simpleWalletAccounts, setSimpleWalletAccount] = useState<
     HdAccountStruct[]
   >([]);
@@ -71,6 +73,7 @@ const WalletManage: React.FC = () => {
   const queryWallets = async () => {
     const accounts: HdAccountStruct[] = await wallet.getWalletList();
     const hdWallets: HdAccountStruct[] = [],
+      mpcWallets: HdAccountStruct[] = [],
       simpleWallets: HdAccountStruct[] = [];
     if (accounts?.length > 0) {
       accounts.forEach((a: HdAccountStruct) => {
@@ -80,16 +83,19 @@ const WalletManage: React.FC = () => {
           a.accounts[0]?.accountCreateType === AccountCreateType.PRIVATE_KEY
         ) {
           simpleWallets.push(a);
+        } else if (a.accounts[0]?.accountCreateType === AccountCreateType.MPC) {
+          mpcWallets.push(a);
         }
       });
       setHdWalletAccount(hdWallets);
       setSimpleWalletAccount(simpleWallets);
+      setMPCWalletAccount(mpcWallets);
     }
 
     const current: BaseAccount = await wallet.getCurrentAccount();
     if (current) {
       setCurrentAccount(current);
-      if (current.accountCreateType === AccountCreateType.MNEMONIC) {
+      if (current.accountCreateType === AccountCreateType.MPC) {
         setAccountType(Tabs.FIRST);
       } else {
         setAccountType(Tabs.SECOND);
@@ -232,6 +238,118 @@ const WalletManage: React.FC = () => {
     setIsEdit(!isEdit);
   };
 
+  const makeList = (list, accountCreateType) => {
+    return list.map((w: HdAccountStruct, i: number) => {
+      return (
+        <div
+          className={`item flexR ${
+            currentAccount?.hdWalletId === w?.hdWalletId ? '_active' : ''
+          }`}
+          style={isEdit ? { paddingRight: '24px' } : {}}
+          key={w.hdWalletId}
+          onClick={(e) => {
+            if (isEdit) return;
+            handleWalletClick(w);
+          }}
+        >
+          <div
+            className="circle flexR"
+            style={{
+              background: WALLET_THEME_COLOR[i % 5],
+              color: '#171727',
+            }}
+          >
+            {w?.hdWalletName?.substr(0, 1)}
+            <div
+              className="circle-wrap flexR"
+              style={{
+                display: accountType === Tabs.SECOND ? 'flex' : 'none',
+              }}
+            >
+              <img
+                src={ecosystemToIconSVG(w?.accounts[0]?.ecosystem)}
+                className="circle-ecosystem-icon"
+              />
+            </div>
+          </div>
+          <div className="right flexR">
+            <WalletName cls="name-account-name" width={200}>
+              {w?.hdWalletName} ({renderAccountCreateType(accountCreateType)})
+            </WalletName>
+            <div
+              className="normal-container flexR cursor"
+              onClick={(e) => {
+                e.stopPropagation();
+                history.push({
+                  pathname: '/mnemonic-check',
+                  state: {
+                    hdWalletId: w.hdWalletId,
+                    accountType,
+                  },
+                });
+              }}
+              style={{
+                display: isEdit ? 'none' : 'flex',
+              }}
+            >
+              <IconComponent
+                name="key"
+                cls={clsx('key-default-icon')}
+                style={
+                  isDarkMode
+                    ? {
+                        fill: '#ffffff',
+                      }
+                    : {}
+                }
+              />
+              {/* <img
+              src={keyDefaultIcon}
+              className="home-no-assets key-default-icon"
+            />
+            <img
+              src={isDarkMode ? keyActiveIconDark : keyActiveIcon}
+              className="home-no-assets key-active-icon"
+            /> */}
+            </div>
+
+            <div
+              className="icons-container flexR"
+              style={{
+                display: isEdit ? 'flex' : 'none',
+              }}
+            >
+              <IconComponent
+                name="edit_16"
+                cls="base-text-color"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentWalletName(w.hdWalletName);
+                  setCurrentHdWalletId(w.hdWalletId);
+                  setRenamePopupVisible(true);
+                  sensors.track('teleport_wallet_manage_rename', {
+                    page: location.pathname,
+                  });
+                }}
+                style={{
+                  display: isEdit ? 'block' : 'none',
+                }}
+              />
+              <IconComponent
+                name="trash_16"
+                cls="base-text-color"
+                onClick={(e) => handleDeleteBtnClick(e, w.hdWalletId)}
+                style={{
+                  display: isEdit ? 'block' : 'none',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      );
+    });
+  };
+
   return (
     <div className={clsx('wallet-manage flexCol', { dark: isDarkMode })}>
       <UnlockModal
@@ -248,7 +366,7 @@ const WalletManage: React.FC = () => {
           handleDoneClick={() => setIsEdit(!isEdit)}
         />
       ) : (
-        <Header title="Manage Wallets" />
+        <Header title="Manage Wallets c" />
       )}
       <div
         className="wallet-manage-button-container flexR content-wrap-padding"
@@ -333,7 +451,7 @@ const WalletManage: React.FC = () => {
       </div>
       <div className="tab-container flexR content-wrap-padding">
         <CustomTab
-          tab1="ID Wallet"
+          tab1="MPC Wallet 3"
           currentTab={accountType}
           tab2="Normal Wallet"
           showToolTips
@@ -347,122 +465,19 @@ const WalletManage: React.FC = () => {
       <div className="content flexCol">
         <div className="account-container flexR">
           {(accountType === Tabs.FIRST
-            ? hdWalletAccounts
-            : simpleWalletAccounts
+            ? mpcWalletAccounts
+            : hdWalletAccounts.concat(simpleWalletAccounts)
           ).length > 0 ? (
             <div className="list flexCol">
-              {(accountType === Tabs.FIRST
-                ? hdWalletAccounts
-                : simpleWalletAccounts
-              ).map((w: HdAccountStruct, i: number) => (
-                <div
-                  className={`item flexR ${
-                    currentAccount?.hdWalletId === w?.hdWalletId
-                      ? '_active'
-                      : ''
-                  }`}
-                  style={isEdit ? { paddingRight: '24px' } : {}}
-                  key={w.hdWalletId}
-                  onClick={(e) => {
-                    if (isEdit) return;
-                    handleWalletClick(w);
-                  }}
-                >
-                  <div
-                    className="circle flexR"
-                    style={{
-                      background: WALLET_THEME_COLOR[i % 5],
-                      color: '#171727',
-                    }}
-                  >
-                    {w?.hdWalletName?.substr(0, 1)}
-                    <div
-                      className="circle-wrap flexR"
-                      style={{
-                        display: accountType === Tabs.SECOND ? 'flex' : 'none',
-                      }}
-                    >
-                      <img
-                        src={ecosystemToIconSVG(w?.accounts[0]?.ecosystem)}
-                        className="circle-ecosystem-icon"
-                      />
-                    </div>
-                  </div>
-                  <div className="right flexR">
-                    <WalletName cls="name-account-name" width={100}>
-                      {w?.hdWalletName}
-                    </WalletName>
-                    <div
-                      className="normal-container flexR cursor"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        history.push({
-                          pathname: '/mnemonic-check',
-                          state: {
-                            hdWalletId: w.hdWalletId,
-                            accountType,
-                          },
-                        });
-                      }}
-                      style={{
-                        display: isEdit ? 'none' : 'flex',
-                      }}
-                    >
-                      <IconComponent
-                        name="key"
-                        cls={clsx('key-default-icon')}
-                        style={
-                          isDarkMode
-                            ? {
-                                fill: '#ffffff',
-                              }
-                            : {}
-                        }
-                      />
-                      {/* <img
-                        src={keyDefaultIcon}
-                        className="home-no-assets key-default-icon"
-                      />
-                      <img
-                        src={isDarkMode ? keyActiveIconDark : keyActiveIcon}
-                        className="home-no-assets key-active-icon"
-                      /> */}
-                    </div>
-
-                    <div
-                      className="icons-container flexR"
-                      style={{
-                        display: isEdit ? 'flex' : 'none',
-                      }}
-                    >
-                      <IconComponent
-                        name="edit_16"
-                        cls="base-text-color"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentWalletName(w.hdWalletName);
-                          setCurrentHdWalletId(w.hdWalletId);
-                          setRenamePopupVisible(true);
-                          sensors.track('teleport_wallet_manage_rename', {
-                            page: location.pathname,
-                          });
-                        }}
-                        style={{
-                          display: isEdit ? 'block' : 'none',
-                        }}
-                      />
-                      <IconComponent
-                        name="trash_16"
-                        cls="base-text-color"
-                        onClick={(e) => handleDeleteBtnClick(e, w.hdWalletId)}
-                        style={{
-                          display: isEdit ? 'block' : 'none',
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
+              {accountType === Tabs.FIRST
+                ? makeList(mpcWalletAccounts, AccountCreateType.MPC)
+                : null}
+              {accountType === Tabs.SECOND
+                ? makeList(hdWalletAccounts, AccountCreateType.MNEMONIC)
+                : null}
+              {accountType === Tabs.SECOND
+                ? makeList(simpleWalletAccounts, AccountCreateType.PRIVATE_KEY)
+                : null}
             </div>
           ) : (
             <div className="no-data flexCol">

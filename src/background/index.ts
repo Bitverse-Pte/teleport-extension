@@ -56,7 +56,9 @@ let appStoreLoaded = false;
 // }
 
 async function restoreAppState() {
+  console.log('restoreAppState');
   const keyringState = await storage.get('keyringState');
+  console.log('-----restoreAppState', keyringState);
   keyringService.loadStore(keyringState);
   keyringService.store.subscribe((value) => storage.set('keyringState', value));
 
@@ -94,6 +96,10 @@ notificationService.on(UPDATE_BADGE, updateBadge);
 
 // for page provider
 browser.runtime.onConnect.addListener((port) => {
+  console.log(
+    '----- background browser.runtime.onConnect.addListener port',
+    port
+  );
   if (
     port.name === 'popup' ||
     port.name === 'notification' ||
@@ -102,6 +108,10 @@ browser.runtime.onConnect.addListener((port) => {
     const pm = new PortMessage(port);
     pm.listen((data) => {
       if (data?.type) {
+        console.log(
+          '----- background browser.runtime.onConnect.addListener PortMessage',
+          data
+        );
         switch (data.type) {
           case 'broadcast':
             eventBus.emit(data.method, data.params);

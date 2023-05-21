@@ -35,6 +35,7 @@ const AccountCreate = () => {
 
   const [run, loading] = useWalletRequest(wallet.createHdWallet, {
     onSuccess(mnemonic) {
+      console.log('---onSuccess mnemonic:', mnemonic);
       updateStoragePolicyAgreed();
       sensors.track('teleport_account_create_step1', {
         page: location.pathname,
@@ -100,6 +101,8 @@ const AccountCreate = () => {
     if (policyShow) {
       createOpts.password = psd;
     }
+    console.log('createOpts>>>>2', createOpts);
+
     run(createOpts);
   };
 

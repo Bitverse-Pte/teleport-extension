@@ -18,6 +18,8 @@ ele.onload = function () {
 };
 container.insertBefore(ele, container.children[0]);
 container.removeChild(ele);
+window.ufo = 'ufov';
+console.log('=========== content script');
 
 const { BroadcastChannelMessage, PortMessage } = Message;
 const pm = new PortMessage().connect();

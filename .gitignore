@@ -7,3 +7,5 @@ yarn-error
 .env
 .vscode/
 yarn-error.log
+mpc_wallet_core_wasm
+mpc_wallet_core_wasm_demo
