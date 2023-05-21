@@ -45,7 +45,24 @@
     }
   ],
   "content_security_policy": {},
-  "permissions": ["storage", "activeTab", "notifications", "tabs", "identity"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "notifications",
+    "tabs",
+    "identity",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
   "web_accessible_resources": [
     {
       "resources": ["pageProvider.js"],
