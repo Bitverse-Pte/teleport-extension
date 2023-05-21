@@ -10,14 +10,14 @@ import init, {
   ecdsa_build_sign_first_request,
   ecdsa_sign_first_handle,
 } from './mpc_wallet_core_wasm/pkg';
-import httpClient from 'bitverse-http-client';
+// import httpClient from 'bitverse-http-client';
+import httpClient from '../../bitverse-http-client';
 // import * as Comlink from 'comlink';
 
 // const webWorker = new Worker(new URL('./worker.ts', import.meta.url));
 // const work = Comlink.wrap(webWorker);
 
 export const baseURLMainNet = 'http://api2.bitverse-dev-1.bitverse.zone';
-debugger;
 // const testHttpRequest = async () => {
 //   // 接口1：需要签名的接口
 //   const apiUrl1 = '/bitverse/bitdapp/v1/public/quest/activity/get';
