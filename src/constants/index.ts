@@ -228,6 +228,8 @@ export const EVENTS = {
 export enum ACCOUNT_CREATE_TYPE {
   CREATE = 0,
   IMPORT,
+  MPCCREATE,
+  RECOVERY,
 }
 
 export enum ACCOUNT_IMPORT_TYPE {
