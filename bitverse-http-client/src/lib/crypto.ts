@@ -1,10 +1,10 @@
 import CryptoJS from 'crypto-js';
 
 export function resolveSignature(
-  _accessKeyId,
-  _accessKeySecret,
-  base64Content,
-  serverTime
+  _accessKeyId: string,
+  _accessKeySecret: string,
+  base64Content: string,
+  serverTime: number
 ) {
   if (_accessKeySecret === '' || _accessKeyId === '') {
     return '';

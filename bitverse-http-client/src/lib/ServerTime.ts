@@ -1,9 +1,12 @@
 import { baseURLMainNet } from './config';
 
 class ServerTime {
+  private _systime: number;
+  private _difftime: number;
+
   constructor() {
-    this._systime = null;
-    this._difftime = null;
+    this._systime = 0;
+    this._difftime = 0;
   }
 
   async init() {
