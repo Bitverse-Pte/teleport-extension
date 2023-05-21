@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useContext } from 'react';
+import React, { useMemo, useState, useContext, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import { Checkbox, Input } from 'antd';
@@ -22,7 +22,6 @@ import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 import * as bip39 from 'bip39';
 import { cloneDeep } from 'lodash';
-import { localHasPwd } from 'utils/pwd';
 
 const { sensors } = skynet;
 const { TextArea } = Input;
@@ -98,7 +97,14 @@ const AccountRecover = () => {
     number[]
   >([]);
 
-  const createPwd = !localHasPwd()
+  const [isBooted, setIsBooted] = useState(-1);
+
+  useEffect(() => {
+    wallet.isBooted().then((res) => {
+      setIsBooted(Number(res));
+    });
+  }, []);
+
   /* const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
     PresetNetworkId | string
   >(); */
@@ -177,8 +183,9 @@ const AccountRecover = () => {
 
   const disabled = useMemo(
     () => {
-      const str =
-        (policyShow &&
+      const str = 
+        isBooted === -1 ||
+        ((policyShow || !isBooted) &&
           (!agreed ||
             (importType === Tabs.FIRST &&
               (seedWords.length < 9 || errorMnemonicIndexList.length > 0)) ||
@@ -187,7 +194,7 @@ const AccountRecover = () => {
             !confirmPsd ||
             !name.trim() ||
             !passwordCheckPassed)) ||
-        (!policyShow &&
+        ((!policyShow || isBooted) &&
           ((importType === Tabs.FIRST &&
             (seedWords.length < 9 || errorMnemonicIndexList.length > 0)) ||
             (importType === Tabs.SECOND && !privateKey) ||
@@ -205,8 +212,9 @@ const AccountRecover = () => {
           psd,
           confirmPsd,
           passwordCheckPassed,
+          isBooted
         ]
-      : [importType, name, seedWords, errorMnemonicIndexList, privateKey]
+      : [importType, name, seedWords, errorMnemonicIndexList, privateKey, isBooted]
   );
 
   const submit = () => {
@@ -572,7 +580,7 @@ const AccountRecover = () => {
 
         <div
           className="password-container"
-          style={{ display: policyShow && createPwd ? 'block' : 'none' }}
+          style={{ display: policyShow && !isBooted ? 'block' : 'none' }}
         >
           <p className="account-recover-title">Password</p>
           <p className="account-create-notice">
@@ -614,7 +622,7 @@ const AccountRecover = () => {
         </div>
         <div
           className="password-container"
-          style={{ display: policyShow && !createPwd ? 'block' : 'none' }}
+          style={{ display: policyShow && isBooted ? 'block' : 'none' }}
         >
           <p className="account-recover-title">Input password</p>
           <CustomPasswordInput
