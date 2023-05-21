@@ -36,6 +36,8 @@ const Receive = lazy(() => import('ui/views/Receive'));
 const GasFee = lazy(() => import('ui/views/GasFee'));
 const Policy = lazy(() => import('ui/views/Policy'));
 
+const MPCCreatePwd = lazy(() => import('ui/views/MPCCreatePwd'));
+
 const Main = () => {
   return (
     <Fragment>
@@ -171,6 +173,9 @@ const Main = () => {
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/gas-fee">
           <GasFee />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/mpc-create-pwd">
+          <MPCCreatePwd/>
         </LazyPrivateRoute>
       </Switch>
     </Fragment>

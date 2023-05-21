@@ -22,6 +22,7 @@ import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 import * as bip39 from 'bip39';
 import { cloneDeep } from 'lodash';
+import { localHasPwd } from 'utils/pwd';
 
 const { sensors } = skynet;
 const { TextArea } = Input;
@@ -97,6 +98,7 @@ const AccountRecover = () => {
     number[]
   >([]);
 
+  const createPwd = !localHasPwd()
   /* const [privateKeyMasterChain, setPrivateKeyMasterChain] = useState<
     PresetNetworkId | string
   >(); */
@@ -570,7 +572,7 @@ const AccountRecover = () => {
 
         <div
           className="password-container"
-          style={{ display: policyShow ? 'block' : 'none' }}
+          style={{ display: policyShow && createPwd ? 'block' : 'none' }}
         >
           <p className="account-recover-title">Password</p>
           <p className="account-create-notice">
@@ -608,6 +610,19 @@ const AccountRecover = () => {
               }
             }}
             placeholder="Enter password again"
+          />
+        </div>
+        <div
+          className="password-container"
+          style={{ display: policyShow && !createPwd ? 'block' : 'none' }}
+        >
+          <p className="account-recover-title">Input password</p>
+          <CustomPasswordInput
+            cls="custom-password-input"
+            onChange={(e) => {
+              setPsd(e.target.value);
+            }}
+            placeholder="Enter your password"
           />
         </div>
         <div

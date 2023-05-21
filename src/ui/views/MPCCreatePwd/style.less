@@ -1,0 +1,84 @@
+@import '../../style/mixin';
+
+.mpc-create-pwd {
+  width: 100%;
+  height: 100%;
+}
+
+.mpc-create-pwd.dark {
+  background: @darkBg;
+  color: #ffffff;
+
+  .mpc-password-container {
+    padding: 0 24px;
+    flex: 1;
+    .create-title {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .create-notice {
+      font-size: 12px;
+      line-height: 18px;
+      color: #798cad;
+      margin-bottom: 12px;
+    }
+    svg {
+      fill: #ffffff;
+    }
+    input,
+    .custom-input {
+      background: #202030 !important;
+      border-color: #202030 !important;
+      color: #ffffff;
+      &.hover:hover{
+        border: 1px solid #56FAA5 !important;
+      }
+    }
+  
+    input::placeholder {
+      color: #5e6c8a !important;
+    }
+  
+    input::-webkit-input-placeholder {
+      color: #5e6c8a !important;
+    }
+  
+    .custom-password-input {
+      margin-bottom: 12px;
+      &:hover {
+        border-radius: 8px;
+        input.ant-input {
+          background: #202030 !important;
+        }
+      }
+  
+      input.ant-input {
+        &:focus {
+          background: #202030 !important;
+        }
+      }
+    }
+  }
+  .policy {
+    margin-top: 12px;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 17px;
+  
+    .policy-title {
+      margin-left: 8px;
+    }
+  
+    .policy-link {
+      color: @themeColor;
+  
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  .button {
+    margin-bottom: 40px;
+  }
+}
