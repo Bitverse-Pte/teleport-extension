@@ -1,23 +1,31 @@
 import { v4 as uuidv4 } from 'uuid';
 import init, {
-  // initThreadPool,
-  // test,
-  // ecdsa_keygen_first_handle,
-  // ecdsa_keygen_second_handle,
-  // test_key_gen_first_msg,
+  initThreadPool,
+  test,
+  ecdsa_keygen_first_handle,
+  ecdsa_keygen_second_handle,
+  test_key_gen_first_msg,
   ecdsa_chaincode_first_handle,
   ecdsa_chaincode_second_handle_and_return_master_key,
   ecdsa_build_sign_first_request,
   ecdsa_sign_first_handle,
 } from './mpc_wallet_core_wasm/pkg';
-// import httpClient from 'bitverse-http-client';
-import httpClient from '../../bitverse-http-client';
+
+import httpClient from 'bitverse-http-client';
 // import * as Comlink from 'comlink';
 
 // const webWorker = new Worker(new URL('./worker.ts', import.meta.url));
 // const work = Comlink.wrap(webWorker);
 
 export const baseURLMainNet = 'http://api2.bitverse-dev-1.bitverse.zone';
+console.log('ufoufo hello23:', hello);
+// void (async function () {
+// await init();
+//await initThreadPool(navigator.hardwareConcurrency);
+// await initThreadPool(1);
+// self.postMessage({ ready: true });
+// })();
+// new // hello();
 // const testHttpRequest = async () => {
 //   // 接口1：需要签名的接口
 //   const apiUrl1 = '/bitverse/bitdapp/v1/public/quest/activity/get';
@@ -111,7 +119,7 @@ function createInstance(baseURLMainNet) {
   };
 }
 
-const instance = createInstance(baseURLMainNet);
+// const instance = createInstance(baseURLMainNet);
 
 // export async function keygenMPC() {
 //   // keygen first
