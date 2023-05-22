@@ -81,7 +81,7 @@ function createInstance(baseURLMainNet) {
             'device-id': '634d410360b2b599152e1125',
             platform: 'android',
             userToken:
-              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhcHBJZCI6ImJpdHZlcnNlX2FwcCIsInVzZXJJZCI6MjA4ODU3MDAwMDAxMDAxNiwicGxhdGZvcm0iOjEsImlzc3VlZF9hdCI6MTY4NDMxMzY2MjE4OCwiZ2VuX3RzIjoxNjg0NDAwMDYyMTg4LCJleHBpcmVzX2F0IjoxNjg0NTcyODYyMTg4LCJpYXQiOjE2ODQzMTM2NjIsImV4cCI6MTY4Njk5MjA2Mn0.MEUCIFmaeyG3kUYuTl2Yv88Jqo9i6T9hT0rntXwuBBpGB20_AiEAqWPGbpxpzwSrdjw74s_Hgl0DWHBoBnercyoNYdpyyos',
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhcHBJZCI6ImJpdHZlcnNlX2FwcCIsInVzZXJJZCI6MjA4ODU3MDAwMDAxMDAxNiwicGxhdGZvcm0iOjEsImlzc3VlZF9hdCI6MTY4NDY3MDE1MTQ2NCwiZ2VuX3RzIjoxNjg0NzU2NTUxNDY0LCJleHBpcmVzX2F0IjoxNjg3MjYyMTUxNDY0LCJpYXQiOjE2ODQ2NzAxNTEsImV4cCI6MTY4NzM0ODU1MX0.MEYCIQC_J6TrT9Gd8YMjSt5s4cAbE8E_cxcDj99XrjtlokNT5QIhAIQHM8vyq10E11fsbfvb_aRJ3_5gf2Ci9NFH4gePq26v',
           },
         }
       );
@@ -99,7 +99,7 @@ function createInstance(baseURLMainNet) {
           'device-id': '634d410360b2b599152e1125',
           platform: 'android',
           userToken:
-            'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhcHBJZCI6ImJpdHZlcnNlX2FwcCIsInVzZXJJZCI6MjA4ODU3MDAwMDAxMDAxNiwicGxhdGZvcm0iOjEsImlzc3VlZF9hdCI6MTY4NDMxMzY2MjE4OCwiZ2VuX3RzIjoxNjg0NDAwMDYyMTg4LCJleHBpcmVzX2F0IjoxNjg0NTcyODYyMTg4LCJpYXQiOjE2ODQzMTM2NjIsImV4cCI6MTY4Njk5MjA2Mn0.MEUCIFmaeyG3kUYuTl2Yv88Jqo9i6T9hT0rntXwuBBpGB20_AiEAqWPGbpxpzwSrdjw74s_Hgl0DWHBoBnercyoNYdpyyos',
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhcHBJZCI6ImJpdHZlcnNlX2FwcCIsInVzZXJJZCI6MjA4ODU3MDAwMDAxMDAxNiwicGxhdGZvcm0iOjEsImlzc3VlZF9hdCI6MTY4NDY3MDE1MTQ2NCwiZ2VuX3RzIjoxNjg0NzU2NTUxNDY0LCJleHBpcmVzX2F0IjoxNjg3MjYyMTUxNDY0LCJpYXQiOjE2ODQ2NzAxNTEsImV4cCI6MTY4NzM0ODU1MX0.MEYCIQC_J6TrT9Gd8YMjSt5s4cAbE8E_cxcDj99XrjtlokNT5QIhAIQHM8vyq10E11fsbfvb_aRJ3_5gf2Ci9NFH4gePq26v',
         },
         redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url

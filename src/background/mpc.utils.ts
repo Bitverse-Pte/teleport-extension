@@ -18,7 +18,7 @@ import httpClient from 'bitverse-http-client';
 // const work = Comlink.wrap(webWorker);
 
 export const baseURLMainNet = 'http://api2.bitverse-dev-1.bitverse.zone';
-console.log('ufoufo hello23:', hello);
+// console.log('ufoufo hello23:', hello);
 // void (async function () {
 // await init();
 //await initThreadPool(navigator.hardwareConcurrency);
