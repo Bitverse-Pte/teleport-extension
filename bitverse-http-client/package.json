@@ -3,14 +3,14 @@
   "version": "1.0.1",
   "type": "module",
   "files": [
-    "dist"
+    "lib"
   ],
-  "main": "./dist/httpClient.umd.js",
-  "module": "./dist/httpClient.es.js",
+  "main": "./lib/httpClient.umd.js",
+  "module": "./lib/httpClient.es.js",
   "exports": {
     ".": {
-      "import": "./dist/httpClient.es.js",
-      "require": "./dist/httpClient.umd.js"
+      "import": "./lib/httpClient.es.js",
+      "require": "./lib/httpClient.umd.js"
     }
   },
   "scripts": {
