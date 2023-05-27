@@ -29,6 +29,8 @@ const CosmosActivityDetail = lazy(
   () => import('ui/views/Transaction/CosmosTransactionDetail')
 );
 
+const MpcRecoveryWallet = lazy(() => import('ui/views/MpcRecoveryWallet'));
+
 const Send = lazy(() => import('ui/views/Send'));
 const SendCos = lazy(() => import('ui/views/SendCos'));
 const ConfirmSendCos = lazy(() => import('ui/views/SendCosConfirm'));
@@ -171,6 +173,9 @@ const Main = () => {
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/gas-fee">
           <GasFee />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/mpc-recovery-wallet">
+          <MpcRecoveryWallet />
         </LazyPrivateRoute>
       </Switch>
     </Fragment>
