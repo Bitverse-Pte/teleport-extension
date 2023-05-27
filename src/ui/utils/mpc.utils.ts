@@ -65,26 +65,17 @@ console.log('ufoufo hello234:');
 // ecdsa_build_sign_first_request(1);
 // ecdsa_sign_first_handle(1, 2, 3, 4, 5, 6, 7, 8);
 
-function createInstance(baseURLMainNet) {
+function createInstance() {
   return {
     post: async (url, args) => {
-      const result = await httpClient.post(
-        url,
-        args,
-        // 不传默认是生产环境地址
-        {
-          baseURL: baseURLMainNet,
-          timeout: 1000 * 30,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'device-id': '634d410360b2b599152e1125',
-            platform: 'android',
-            userToken:
-              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhcHBJZCI6ImJpdHZlcnNlX2FwcCIsInVzZXJJZCI6MjA4ODU3MDAwMDAxMDAxNiwicGxhdGZvcm0iOjEsImlzc3VlZF9hdCI6MTY4NDc2MTYxMDAwNywiZ2VuX3RzIjoxNjg0ODQ4MDEwMDA3LCJleHBpcmVzX2F0IjoxNjg3MzUzNjEwMDA3LCJpYXQiOjE2ODQ3NjE2MTAsImV4cCI6MTY4NzQ0MDAxMH0.MEYCIQDG-8t6EXSaOpluHfa8ZHRaOc9NpQ2HoxUAPdF0zM37PAIhAKVf13njhHDb73-FCvABSgasKJvZX6IIcdsmToy687d-',
-          },
-        }
-      );
+      const result = await httpClient.post(url, args, {
+        timeout: 1000 * 30,
+        headers: {
+          'Content-Type': 'application/json',
+          userToken:
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhcHBJZCI6ImJpdHZlcnNlX2FwcCIsInVzZXJJZCI6MjA4ODU3MDAwMDAxMDAxNiwicGxhdGZvcm0iOjEsImlzc3VlZF9hdCI6MTY4NDc2MTYxMDAwNywiZ2VuX3RzIjoxNjg0ODQ4MDEwMDA3LCJleHBpcmVzX2F0IjoxNjg3MzUzNjEwMDA3LCJpYXQiOjE2ODQ3NjE2MTAsImV4cCI6MTY4NzQ0MDAxMH0.MEYCIQDG-8t6EXSaOpluHfa8ZHRaOc9NpQ2HoxUAPdF0zM37PAIhAKVf13njhHDb73-FCvABSgasKJvZX6IIcdsmToy687d-',
+        },
+      });
       return result;
     },
     post1: async (url, args) => {
@@ -95,9 +86,6 @@ function createInstance(baseURLMainNet) {
         credentials: 'same-origin', // include, *same-origin, omit
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'device-id': '634d410360b2b599152e1125',
-          platform: 'android',
           userToken:
             'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhcHBJZCI6ImJpdHZlcnNlX2FwcCIsInVzZXJJZCI6MjA4ODU3MDAwMDAxMDAxNiwicGxhdGZvcm0iOjEsImlzc3VlZF9hdCI6MTY4NDc2MTYxMDAwNywiZ2VuX3RzIjoxNjg0ODQ4MDEwMDA3LCJleHBpcmVzX2F0IjoxNjg3MzUzNjEwMDA3LCJpYXQiOjE2ODQ3NjE2MTAsImV4cCI6MTY4NzQ0MDAxMH0.MEYCIQDG-8t6EXSaOpluHfa8ZHRaOc9NpQ2HoxUAPdF0zM37PAIhAKVf13njhHDb73-FCvABSgasKJvZX6IIcdsmToy687d-',
         },
@@ -110,7 +98,7 @@ function createInstance(baseURLMainNet) {
   };
 }
 
-const instance = createInstance(baseURLMainNet);
+const instance = createInstance();
 
 export async function keygenMPC() {
   console.log('------frank keygenMPC');
