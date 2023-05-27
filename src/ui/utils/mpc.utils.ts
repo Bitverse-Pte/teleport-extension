@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 // import hello from './ufo_demo/hello';
-import httpClient from 'bitverse-http-client';
+import httpClient from '../../../bitverse-http-client';
 import * as Comlink from 'comlink';
 
 console.log('---import.meta.url:', import.meta.url);
@@ -188,15 +188,16 @@ export async function keygenMPC() {
   const cc_party_one_second_message = cc_party_one_second_message_result.result;
 
   //// swap Masterkey
-  const chainCodeSecondHandleResult = await work.ecdsa_chaincode_second_handle_and_return_master_key(
-    id,
-    keyGenSecondHandleResult.party_two_paillier,
-    JSON.parse(kg_second_message),
-    JSON.parse(cc_party_one_first_message),
-    chainCodeFirstHandleResult.cc_ec_key_pair2,
-    keyGenFirstHandleResult.kg_ec_key_pair_party2,
-    JSON.parse(cc_party_one_second_message)
-  );
+  const chainCodeSecondHandleResult =
+    await work.ecdsa_chaincode_second_handle_and_return_master_key(
+      id,
+      keyGenSecondHandleResult.party_two_paillier,
+      JSON.parse(kg_second_message),
+      JSON.parse(cc_party_one_first_message),
+      chainCodeFirstHandleResult.cc_ec_key_pair2,
+      keyGenFirstHandleResult.kg_ec_key_pair_party2,
+      JSON.parse(cc_party_one_second_message)
+    );
 
   console.log('客户端私钥分片=========>', chainCodeSecondHandleResult);
 
