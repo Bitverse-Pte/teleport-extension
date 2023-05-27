@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import webExtension, { readJsonFile } from "vite-plugin-web-extension";
 import path from "node:path";
+import wasm from "vite-plugin-wasm";
 
 function generateManifest() {
   const manifest = readJsonFile("src/manifest.json");
@@ -17,6 +18,7 @@ function generateManifest() {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    wasm(),
     react(),
     webExtension({
       manifest: generateManifest,

@@ -3342,6 +3342,11 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+vite-plugin-wasm@^3.2.2:
+  version "3.2.2"
+  resolved "https://npm.ffe390afd658c19dcbf707e0597b846d.de/vite-plugin-wasm/-/vite-plugin-wasm-3.2.2.tgz#7a66fef27733a0dea9b2b14f942a6389a2523f7c"
+  integrity sha512-cdbBUNR850AEoMd5nvLmnyeq63CSfoP1ctD/L2vLk/5+wsgAPlAVAzUK5nGKWO/jtehNlrSSHLteN+gFQw7VOA==
+
 vite-plugin-web-extension@^3.0.1:
   version "3.0.9"
   resolved "https://mirrors.cloud.tencent.com/npm/vite-plugin-web-extension/-/vite-plugin-web-extension-3.0.9.tgz#12f63df57285039f97565e2dc0e5a41845e31145"
