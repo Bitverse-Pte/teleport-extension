@@ -1,18 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
-import init, {
-  initThreadPool,
-  test,
-  ecdsa_keygen_first_handle,
-  ecdsa_keygen_second_handle,
-  test_key_gen_first_msg,
-  ecdsa_chaincode_first_handle,
-  ecdsa_chaincode_second_handle_and_return_master_key,
-  ecdsa_build_sign_first_request,
-  ecdsa_sign_first_handle,
-} from './mpc_wallet_core_wasm/pkg';
-
-import httpClient from '../../bitverse-http-client';
+// import init, {
+//   // initThreadPool,
+//   // test,
+//   // ecdsa_keygen_first_handle,
+//   // ecdsa_keygen_second_handle,
+//   // test_key_gen_first_msg,
+//   ecdsa_chaincode_first_handle,
+//   ecdsa_chaincode_second_handle_and_return_master_key,
+//   ecdsa_build_sign_first_request,
+//   ecdsa_sign_first_handle,
+// } from './mpc_wallet_core_wasm/pkg';
+import httpClient from 'bitverse-http-client';
 // import * as Comlink from 'comlink';
+
+// init();
 
 // const webWorker = new Worker(new URL('./worker.ts', import.meta.url));
 // const work = Comlink.wrap(webWorker);
