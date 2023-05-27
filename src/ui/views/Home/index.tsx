@@ -330,7 +330,7 @@ const Home = () => {
 
     try {
       // 如有需要,可以通过传递第三个参数控制baseURL
-      const result = await httpClient.post(apiUrl1, {
+      const result = await httpClient.post(baseURLMainNet + apiUrl1, {
         activityId: '123456',
       });
       console.log('[response ok]:', result);

@@ -11,7 +11,7 @@ import init, {
   ecdsa_sign_first_handle,
 } from './mpc_wallet_core_wasm/pkg';
 
-import httpClient from 'bitverse-http-client';
+import httpClient from '../../bitverse-http-client';
 // import * as Comlink from 'comlink';
 
 // const webWorker = new Worker(new URL('./worker.ts', import.meta.url));
