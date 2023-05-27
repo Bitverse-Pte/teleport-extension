@@ -1,0 +1,1 @@
+/Users/sh06010ml2/Documents/workspaces/bitverse/teleport/teleport-extension/src/background/hello-wasm/target/wasm32-unknown-unknown/release/hello_wasm.wasm: /Users/sh06010ml2/Documents/workspaces/bitverse/teleport/teleport-extension/src/background/hello-wasm/src/lib.rs

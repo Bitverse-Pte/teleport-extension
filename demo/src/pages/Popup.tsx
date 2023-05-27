@@ -1,18 +1,24 @@
 import { useEffect } from 'react';
-import "./Popup.css";
+import './Popup.css';
+// import { keygenMPC } from '../mpc.utils';
 
-export default function() {
+export default function () {
   useEffect(() => {
-    console.log("Hello from the popup!");
+    console.log('Hello from the popup!');
   }, []);
 
+  const handler = async (e) => {
+    console.log('click');
+    // const rtn = await keygenMPC('yyyyyy');
+    // console.log('------', rtn);
+  };
   return (
     <div>
       <img src="/icon-with-shadow.svg" />
-      <h1>vite-plugin-web-extension</h1>
+      <h1 onClick={handler}>vite-plugin-web-extension</h1>
       <p>
         Template: <code>react-ts</code>
       </p>
     </div>
-  )
+  );
 }
