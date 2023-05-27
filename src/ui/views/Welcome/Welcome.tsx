@@ -10,6 +10,7 @@ import { CustomButton } from 'ui/components/Widgets';
 import skynet from 'utils/skynet';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { openIndexPage } from 'background/webapi/tab';
 const { sensors } = skynet;
 
 const Welcome = () => {
@@ -26,6 +27,13 @@ const Welcome = () => {
     history.push({
       pathname: type === ACCOUNT_CREATE_TYPE.CREATE ? '/create' : '/recover',
     });
+  };
+
+  const handleBtnBackUp = () => {
+    openIndexPage('/mpcwalletbackup');
+    // history.push({
+    //   pathname: '/MPCWalletBackUp',
+    // });
   };
   return (
     <div className={clsx('welcome-container', { dark: isDarkMode })}>
@@ -54,6 +62,15 @@ const Welcome = () => {
           onClick={() => handleBtnClick(ACCOUNT_CREATE_TYPE.IMPORT)}
         >
           Import Wallet
+        </CustomButton>
+        <CustomButton
+          size="large"
+          block
+          type="default"
+          cls="custom-button-default import-wallet-btn"
+          onClick={() => handleBtnBackUp()}
+        >
+          钱包备份
         </CustomButton>
       </div>
     </div>

@@ -21,6 +21,7 @@ const SingleToken = lazy(() => import('ui/views/SingleToken'));
 const TokenAdd = lazy(() => import('ui/views/TokenAdd'));
 const AboutSoftware = lazy(() => import('ui/views/AboutSoftware'));
 const MnemonicCheck = lazy(() => import('ui/views/MnemonicCheck'));
+const MPCWalletBackUp = lazy(() => import('ui/views/MPCWalletBackUp'));
 const ActivityDetail = lazy(
   () => import('ui/views/Transaction/TransactionDetail')
 );
@@ -37,6 +38,8 @@ const ConfirmSendCos = lazy(() => import('ui/views/SendCosConfirm'));
 const Receive = lazy(() => import('ui/views/Receive'));
 const GasFee = lazy(() => import('ui/views/GasFee'));
 const Policy = lazy(() => import('ui/views/Policy'));
+
+const MPCCreatePwd = lazy(() => import('ui/views/MPCCreatePwd'));
 
 const Main = () => {
   return (
@@ -105,6 +108,10 @@ const Main = () => {
 
         <LazyPrivateRoute exact path="/policy">
           <Policy />
+        </LazyPrivateRoute>
+
+        <LazyPrivateRoute exact path="/mpcwalletbackup">
+          <MPCWalletBackUp />
         </LazyPrivateRoute>
 
         {/* Remove these two routes when we feel good about them  */}
@@ -176,6 +183,9 @@ const Main = () => {
         </LazyPrivateRoute>
         <LazyPrivateRoute exact path="/mpc-recovery-wallet">
           <MpcRecoveryWallet />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/mpc-create-pwd">
+          <MPCCreatePwd />
         </LazyPrivateRoute>
       </Switch>
     </Fragment>

@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "operation": "set",
+          "header": "User-Agent",
+          "value": "bitverse_app/1.0.0/android"
+        }
+      ]
+    },
+    "condition": {
+      "urlFilter": "api.bitverse.zone"
+    }
+  }
+]

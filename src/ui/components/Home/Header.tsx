@@ -10,6 +10,8 @@ import { ReactComponent as SettingLogo } from 'assets/settingIcon.svg';
 import { useSelector } from 'react-redux';
 import { getProvider } from 'ui/selectors/selectors';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
+import { useWallet, useWalletRequest } from 'ui/utils';
+import { keygenMPC } from 'ui/utils/mpc.utils';
 
 export function HomeHeader({
   menuOnClick,
@@ -20,6 +22,15 @@ export function HomeHeader({
 }) {
   const { isDarkMode } = useDarkmode();
   const currentProvider = useSelector(getProvider);
+  const wallet = useWallet();
+  const expandClick = (e) => {
+    chrome.tabs.create({ url: location.href });
+  };
+  const keygenMPCClick = async (e) => {
+    const rtn = await keygenMPC();
+    // const rtn = await wallet.keygenMPC();
+    console.log(rtn, '-------keygenMPC rtn');
+  };
   return (
     <div
       className={clsx('flex headerOfMenu justify-between items-center', {
@@ -51,6 +62,12 @@ export function HomeHeader({
         className="expand-menu-btn cursor"
         onClick={menuOnClick}
       /> */}
+      <button className="expand-menu-btn cursor" onClick={expandClick}>
+        expand
+      </button>
+      <button className="expand-menu-btn cursor" onClick={keygenMPCClick}>
+        keygenMPC
+      </button>
       <button className="expand-menu-btn cursor" onClick={menuOnClick}>
         <SettingLogo />
       </button>

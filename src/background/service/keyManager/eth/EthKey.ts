@@ -69,6 +69,8 @@ export class EthKey extends Base.KeyBase<Tx.Transaction> {
     return keyPair;
   }
 
+  // TODO generateMPCWalletFromXX
+
   public async generateSignature(
     stdTx: any,
     privateKey: string | Buffer

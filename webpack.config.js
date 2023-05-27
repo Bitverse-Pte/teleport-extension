@@ -24,6 +24,11 @@ const config = (env) => {
         // Fall back to default merging
         return { ...a, ...b };
       },
+      experiments: {
+        //syncWebAssembly: true,
+        asyncWebAssembly: true,
+        //topLevelAwait: true,
+      },
     })(moduleConfigs[env.module], envConfigs[env.config]);
   } else {
     console.error('you must set config and module');

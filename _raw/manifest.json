@@ -1,5 +1,10 @@
 {
   "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjf6OVp0fzHU525LaZu+X7SRg4MeyBep4TgfY1Txq5HyGxp8XTiVavcOrQ08qTxR9jcVSKuzg84yhE85epdPmpljwhEJA87rn4knw9Uk45u9kaSj67Fbag9gKk+k84BRt9H/sk5O77ei5Zd43TcFEfnKP5aO97rhfERcaUi2dOpTJTR+iFgnkeSqgNcNPWJ9nMoHx00k6fggbL92uujf0GE7jJTTE+n92wgIQ7DYyanK8KrNRnu8DGHaeV36MoZm0jt8y6Bz85OR9YbHbrJngQtPhaeUICPV1N5K6WMYAxxSpNE3oUo6rl8UnOx6mHLKZh5D75w5xfMyDu/CQjgHM5QIDAQAB",
+  "oauth2": {
+    "client_id": "839387024468-8a7p9h6n85l9hge3mjnhm5kqp9p6he2r.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/userinfo.email"]
+  },
   "name": "__MSG_appName__",
   "short_name": "__MSG_appName__",
   "version": "0.5.5",
@@ -40,7 +45,24 @@
     }
   ],
   "content_security_policy": {},
-  "permissions": ["storage", "activeTab", "notifications", "tabs"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "notifications",
+    "tabs",
+    "identity",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
   "web_accessible_resources": [
     {
       "resources": ["pageProvider.js"],

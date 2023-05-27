@@ -25,38 +25,41 @@ import DataSyncService from './service/dataSyncService';
 import { UPDATE_BADGE } from './service/notification';
 import { cosmosTxHistoryStorage } from './service/transactions/cosmos/cosmos';
 const { PortMessage } = Message;
+import httpClient from '../../bitverse-http-client';
 
 let appStoreLoaded = false;
 
-/*Sentry.init({
-  dsn:
-    'https://e871ee64a51b4e8c91ea5fa50b67be6b@o460488.ingest.sentry.io/5831390',
-  integrations: [new Integrations.BrowserTracing()],
-  release: process.env.release,
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0
-});*/
+const testHttp = async () => {
+  // setWalletManagePopupVisible(true);
+  // 接口1：需要签名的接口
+  const baseURLMainNet = 'https://api.bitverse.zone';
+  const apiUrl1 = `${baseURLMainNet}/bitverse/bitdapp/v1/public/quest/activity/get`;
 
-// function initAppMeta() {
-//   const head = document.querySelector('head');
-//   const icon = document.createElement('link');
-//   icon.href = '/images/logo.png';
-//   icon.rel = 'icon';
-//   head?.appendChild(icon);
-//   const name = document.createElement('meta');
-//   name.name = 'name';
-//   name.content = 'BitverseWallet';
-//   head?.appendChild(name);
-//   const description = document.createElement('meta');
-//   description.name = 'description';
-//   description.content = i18n.t('appDescription');
-//   head?.appendChild(description);
-// }
+  try {
+    // 如有需要,可以通过传递第三个参数控制headers
+    const result = await httpClient.post(
+      apiUrl1,
+      {
+        activityId: '123456',
+      },
+      {
+        'x-test-key': 'test',
+      }
+    );
+    console.log('[response ok]:', result);
+  } catch (error) {
+    console.log('[response error]: ', error);
+  }
+};
+
+setTimeout(() => {
+  testHttp();
+}, 5 * 1000);
 
 async function restoreAppState() {
+  console.log('restoreAppState');
   const keyringState = await storage.get('keyringState');
+  console.log('-----restoreAppState', keyringState);
   keyringService.loadStore(keyringState);
   keyringService.store.subscribe((value) => storage.set('keyringState', value));
 
@@ -94,6 +97,10 @@ notificationService.on(UPDATE_BADGE, updateBadge);
 
 // for page provider
 browser.runtime.onConnect.addListener((port) => {
+  console.log(
+    '----- background browser.runtime.onConnect.addListener port',
+    port
+  );
   if (
     port.name === 'popup' ||
     port.name === 'notification' ||
@@ -102,6 +109,10 @@ browser.runtime.onConnect.addListener((port) => {
     const pm = new PortMessage(port);
     pm.listen((data) => {
       if (data?.type) {
+        console.log(
+          '----- background browser.runtime.onConnect.addListener PortMessage',
+          data
+        );
         switch (data.type) {
           case 'broadcast':
             eventBus.emit(data.method, data.params);

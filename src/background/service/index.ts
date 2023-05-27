@@ -47,8 +47,9 @@ const gasFeeController = new GasFeeController({
     networkController,
     NETWORK_EVENTS.NETWORK_DID_CHANGE
   ),
-  getCurrentNetworkEIP1559Compatibility:
-    networkController.getEIP1559Compatibility.bind(networkController),
+  getCurrentNetworkEIP1559Compatibility: networkController.getEIP1559Compatibility.bind(
+    networkController
+  ),
   getCurrentAccountEIP1559Compatibility: () => true,
   legacyAPIEndpoint: `${gasApiBaseUrl}/networks/<chain_id>/gasPrices`,
   EIP1559APIEndpoint: `${gasApiBaseUrl}/networks/<chain_id>/suggestedGasFees`,
@@ -65,14 +66,17 @@ const txController = new TransactionController({
   initState: {},
   // TODO: this.permissionsController.getAccounts
   getPermittedAccounts: () => undefined,
-  getProviderConfig:
-    networkController.getProviderConfig.bind(networkController),
-  getCurrentNetworkEIP1559Compatibility:
-    networkController.getEIP1559Compatibility.bind(networkController),
+  getProviderConfig: networkController.getProviderConfig.bind(
+    networkController
+  ),
+  getCurrentNetworkEIP1559Compatibility: networkController.getEIP1559Compatibility.bind(
+    networkController
+  ),
   getCurrentAccountEIP1559Compatibility: () => true,
   networkStore: networkController.networkStore,
-  getCurrentChainId:
-    networkController.getCurrentChainId.bind(networkController),
+  getCurrentChainId: networkController.getCurrentChainId.bind(
+    networkController
+  ),
   // preferencesStore: this.preferencesController.store,
   txHistoryLimit: 40,
   signTransaction: keyringController.signTransaction.bind(keyringController),
@@ -81,8 +85,9 @@ const txController = new TransactionController({
   getEth: networkController.getCurrentEth.bind(networkController),
   trackMetaMetricsEvent: () => undefined,
   getParticipateInMetrics: () => false,
-  getEIP1559GasFeeEstimates:
-    gasFeeController.fetchGasFeeEstimates.bind(gasFeeController),
+  getEIP1559GasFeeEstimates: gasFeeController.fetchGasFeeEstimates.bind(
+    gasFeeController
+  ),
 });
 
 const latestBlockDataHub = new LatestBlockDataHubService({
@@ -124,8 +129,10 @@ async function newUnapprovedTransaction(txParams, req) {
   return await txController.newUnapprovedTransaction(txParams, req);
 }
 async function getPendingNonce(address) {
-  const { nonceDetails, releaseLock } =
-    await txController.nonceTracker.getNonceLock(address);
+  const {
+    nonceDetails,
+    releaseLock,
+  } = await txController.nonceTracker.getNonceLock(address);
   const pendingNonce = nonceDetails.params.highestSuggested;
 
   releaseLock();

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from 'antd';
@@ -32,9 +32,11 @@ const AccountCreate = () => {
   const wallet = useWallet();
   const { isDarkMode } = useDarkmode();
   const ClickToCloseMessage = useStyledMessage();
+  const [isBooted, setIsBooted] = useState(-1);
 
   const [run, loading] = useWalletRequest(wallet.createHdWallet, {
     onSuccess(mnemonic) {
+      console.log('---onSuccess mnemonic:', mnemonic);
       updateStoragePolicyAgreed();
       sensors.track('teleport_account_create_step1', {
         page: location.pathname,
@@ -65,16 +67,17 @@ const AccountCreate = () => {
   const disabled = useMemo(
     () => {
       const str =
-        (policyShow &&
+        isBooted === -1 ||
+        ((policyShow || !isBooted) &&
           (!name.trim() ||
             !agreed ||
             !psd ||
             !confirmPsd ||
             !passwordCheckPassed)) ||
-        (!policyShow && !name.trim());
+        ((!policyShow || isBooted) && !name.trim());
       return Boolean(str);
     },
-    policyShow ? [agreed, name, psd, confirmPsd, passwordCheckPassed] : [name]
+    policyShow ? [agreed, name, psd, confirmPsd, passwordCheckPassed, isBooted] : [name, isBooted]
   );
 
   const submit = () => {
@@ -100,8 +103,17 @@ const AccountCreate = () => {
     if (policyShow) {
       createOpts.password = psd;
     }
+    console.log('createOpts>>>>2', createOpts);
+
     run(createOpts);
   };
+
+
+  useEffect(() => {
+    wallet.isBooted().then((res) => {
+      setIsBooted(Number(res));
+    });
+  }, []);
 
   return (
     <div className={clsx('account-create flexCol', { dark: isDarkMode })}>
@@ -127,7 +139,7 @@ const AccountCreate = () => {
 
         <div
           className="password-container"
-          style={{ display: policyShow ? 'block' : 'none' }}
+          style={{ display: policyShow && !isBooted ? 'block' : 'none' }}
         >
           <p className="account-create-title">Password</p>
           <p className="account-create-notice">

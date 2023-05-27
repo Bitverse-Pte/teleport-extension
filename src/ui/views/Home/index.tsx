@@ -48,25 +48,23 @@ import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
+import httpClient from '../../../../bitverse-http-client';
+
 const Home = () => {
   const { isDarkMode } = useDarkmode();
   const history = useHistory();
   const wallet = useWallet();
   const [account, setAccount] = useState<BaseAccount>();
-  const [
-    account2ConnectedSite,
-    setAccount2ConnectedSite,
-  ] = useState<BaseAccount>();
+  const [account2ConnectedSite, setAccount2ConnectedSite] =
+    useState<BaseAccount>();
   const [accountPopupVisible, setPopupVisible] = useState(false);
-  const [walletManagePopupVisible, setWalletManagePopupVisible] = useState(
-    false
-  );
+  const [walletManagePopupVisible, setWalletManagePopupVisible] =
+    useState(false);
   const [createAccountLoading, setCreateAccountLoading] = useState(false);
   const [tokenListLoading, setTokenListLoading] = useState(false);
   const [settingPopupVisible, setSettingPopupVisible] = useState(false);
-  const [connectedSitePopupVisible, setConnectedSitePopupVisible] = useState(
-    false
-  );
+  const [connectedSitePopupVisible, setConnectedSitePopupVisible] =
+    useState(false);
   const [tabType, setTabType] = useState(Tabs.FIRST);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filterCondition, setFilterCondition] = useState('');
@@ -324,6 +322,23 @@ const Home = () => {
     setWalletManagePopupVisible(true);
   };
 
+  const testHttp = async () => {
+    // setWalletManagePopupVisible(true);
+    // 接口1：需要签名的接口
+    const apiUrl1 = '/bitverse/bitdapp/v1/public/quest/activity/get';
+    const baseURLMainNet = 'https://api.bitverse.zone';
+
+    try {
+      // 如有需要,可以通过传递第三个参数控制baseURL
+      const result = await httpClient.post(apiUrl1, {
+        activityId: '123456',
+      });
+      console.log('[response ok]:', result);
+    } catch (error) {
+      console.log('[response error]: ', error);
+    }
+  };
+
   return (
     <div
       className={clsx('home flexCol', {
@@ -433,6 +448,7 @@ const Home = () => {
                 nativeToken?.price || 0
               )}
             </div>
+            <button onClick={testHttp}>test http3</button>
             <div className="home-preview-button-container flexR">
               <TipButton
                 title="Send"

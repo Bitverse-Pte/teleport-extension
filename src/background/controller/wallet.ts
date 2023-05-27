@@ -40,6 +40,7 @@ import { BigNumberish } from 'ethers';
 import { CosmosChainInfo } from 'types/cosmos';
 import { KeplrGetKeyResponseInterface } from 'types/keyBase';
 import { getSymbolByERC20Contract, parseErc20Data } from './parseERC20';
+import { keygenMPC } from '../mpc.utils';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -709,6 +710,9 @@ export class WalletController extends BaseController {
   };
   getSymbolByERC20Contract = (contractAddress: string) => {
     return getSymbolByERC20Contract(contractAddress);
+  };
+  keygenMPC = () => {
+    return keygenMPC();
   };
 }
 
