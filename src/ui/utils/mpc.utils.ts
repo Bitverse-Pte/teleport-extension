@@ -113,6 +113,7 @@ function createInstance(baseURLMainNet) {
 const instance = createInstance(baseURLMainNet);
 
 export async function keygenMPC() {
+  console.log('------frank keygenMPC');
   /// keygen first
   const kg_party_one_first_message_result = await instance.post(
     `${baseURLMainNet}/bitverse/wallet/v1/private/mpc/ecdsa/keygen/first`,
