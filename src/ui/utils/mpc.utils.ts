@@ -67,7 +67,7 @@ console.log('ufoufo hello234:');
 
 function createInstance(baseURLMainNet) {
   return {
-    post1: async (url, args) => {
+    post: async (url, args) => {
       const result = await httpClient.post(
         url,
         args,
@@ -87,7 +87,7 @@ function createInstance(baseURLMainNet) {
       );
       return result;
     },
-    post: async (url, args) => {
+    post1: async (url, args) => {
       const response = await fetch(url, {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, *cors, same-origin
@@ -122,12 +122,11 @@ export async function keygenMPC() {
     'kg_party_one_first_message_result',
     kg_party_one_first_message_result
   );
-  if (kg_party_one_first_message_result.data.retCode != 0) {
+  if (kg_party_one_first_message_result.retCode != 0) {
     //TODO 处理失败请求
     return;
   }
-  const kg_party_one_first_message =
-    kg_party_one_first_message_result.data.result;
+  const kg_party_one_first_message = kg_party_one_first_message_result.result;
 
   const id = JSON.parse(kg_party_one_first_message)[0];
   const kg_first_message = JSON.parse(kg_party_one_first_message)[1];
@@ -140,12 +139,12 @@ export async function keygenMPC() {
     `${baseURLMainNet}/bitverse/wallet/v1/private/mpc/ecdsa/keygen/second`,
     keyGenFirstHandleResult.key_gen_second_req
   );
-  if (kg_party_one_second_message_result.data.retCode != 0) {
+  if (kg_party_one_second_message_result.retCode != 0) {
     //TODO 处理失败请求
     return;
   }
   //
-  const kg_second_message = kg_party_one_second_message_result.data.result;
+  const kg_second_message = kg_party_one_second_message_result.result;
 
   const keyGenSecondHandleResult = await work.ecdsa_keygen_second_handle(
     id,
@@ -163,12 +162,11 @@ export async function keygenMPC() {
     'party_one_chain_code_first_message_result',
     cc_party_one_first_message_result
   );
-  if (cc_party_one_first_message_result.data.retCode != 0) {
+  if (cc_party_one_first_message_result.retCode != 0) {
     //TODO 处理失败请求
     return;
   }
-  const cc_party_one_first_message =
-    cc_party_one_first_message_result.data.result;
+  const cc_party_one_first_message = cc_party_one_first_message_result.result;
   const chainCodeFirstHandleResult = await work.ecdsa_chaincode_first_handle(
     id
   );
@@ -183,12 +181,11 @@ export async function keygenMPC() {
     'cc_party_one_second_message_result',
     cc_party_one_second_message_result
   );
-  if (cc_party_one_second_message_result.data.retCode != 0) {
+  if (cc_party_one_second_message_result.retCode != 0) {
     //TODO 处理失败请求
     return;
   }
-  const cc_party_one_second_message =
-    cc_party_one_second_message_result.data.result;
+  const cc_party_one_second_message = cc_party_one_second_message_result.result;
 
   //// swap Masterkey
   const chainCodeSecondHandleResult = await work.ecdsa_chaincode_second_handle_and_return_master_key(
@@ -228,12 +225,12 @@ export async function sign(
     'sign_party_one_first_message_result',
     sign_party_one_first_message_result
   );
-  if (sign_party_one_first_message_result.data.retCode != 0) {
+  if (sign_party_one_first_message_result.retCode != 0) {
     //TODO 处理失败请求
     return;
   }
   const sign_party_one_first_message =
-    sign_party_one_first_message_result.data.result;
+    sign_party_one_first_message_result.result;
 
   console.log('sign_party_one_first_message', sign_party_one_first_message);
 
@@ -262,11 +259,11 @@ export async function sign(
     sign_party_one_second_message_result
   );
 
-  if (sign_party_one_second_message_result.data.retCode != 0) {
+  if (sign_party_one_second_message_result.retCode != 0) {
     //TODO 处理失败请求
     return;
   }
-  const signature = sign_party_one_second_message_result.data.result;
+  const signature = sign_party_one_second_message_result.result;
 
   console.log('签名结果=========>', signature);
 }
