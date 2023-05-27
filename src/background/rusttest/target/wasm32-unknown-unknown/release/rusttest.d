@@ -1,0 +1,1 @@
+/Users/sh06010ml2/Documents/workspaces/bitverse/teleport/teleport-extension/src/background/rusttest/target/wasm32-unknown-unknown/release/rusttest.wasm: /Users/sh06010ml2/Documents/workspaces/bitverse/teleport/teleport-extension/src/background/rusttest/src/lib.rs

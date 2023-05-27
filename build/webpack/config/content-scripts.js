@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const webpack = require('webpack');
 const TSConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const ESLintWebpackPlugin = require('eslint-webpack-plugin');
+// const ESLintWebpackPlugin = require('eslint-webpack-plugin');
 const AssetReplacePlugin = require('../../plugins/AssetReplacePlugin');
 const { version } = require('../../../_raw/manifest.json');
 const paths = require('../../paths');
@@ -30,9 +30,9 @@ const contentScriptConfig = {
     ],
   },
   plugins: [
-    new ESLintWebpackPlugin({
-      extensions: ['ts', 'tsx', 'js', 'jsx'],
-    }),
+    // new ESLintWebpackPlugin({
+    //   extensions: ['ts', 'tsx', 'js', 'jsx'],
+    // }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser',
@@ -42,9 +42,7 @@ const contentScriptConfig = {
       '#PAGEPROVIDER#': 'pageProvider',
     }),
     new webpack.DefinePlugin({
-      'process.env.version': JSON.stringify(
-        `version: ${version}`
-      ),
+      'process.env.version': JSON.stringify(`version: ${version}`),
     }),
   ],
   resolve: {

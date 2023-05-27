@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const webpack = require('webpack');
 const TSConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const ESLintWebpackPlugin = require('eslint-webpack-plugin');
+// const ESLintWebpackPlugin = require('eslint-webpack-plugin');
 const { version } = require('../../../_raw/manifest.json');
 const paths = require('../../paths');
 
@@ -39,18 +39,16 @@ const backgroundConfig = {
     ],
   },
   plugins: [
-    new ESLintWebpackPlugin({
-      extensions: ['ts', 'tsx', 'js', 'jsx'],
-    }),
+    // new ESLintWebpackPlugin({
+    //   extensions: ['ts', 'tsx', 'js', 'jsx'],
+    // }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser',
       dayjs: 'dayjs',
     }),
     new webpack.DefinePlugin({
-      'process.env.version': JSON.stringify(
-        `version: ${version}`
-      ),
+      'process.env.version': JSON.stringify(`version: ${version}`),
       window: 'globalThis',
     }),
   ],

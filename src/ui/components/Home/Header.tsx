@@ -11,7 +11,17 @@ import { useSelector } from 'react-redux';
 import { getProvider } from 'ui/selectors/selectors';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useWallet, useWalletRequest } from 'ui/utils';
+import init, { greet, initSync } from '../../../background/rusttest/pkg';
 import { keygenMPC } from 'ui/utils/mpc.utils';
+
+// void (async function () {
+//   console.log('Worker is initializing...');
+//   await init();
+//   //await initThreadPool(navigator.hardwareConcurrency);
+//   // await initThreadPool(1);
+//   // self.postMessage({ ready: true });
+//   greet('ufoufoufo');
+// })();
 
 export function HomeHeader({
   menuOnClick,
@@ -27,7 +37,10 @@ export function HomeHeader({
     chrome.tabs.create({ url: location.href });
   };
   const keygenMPCClick = async (e) => {
-    const rtn = await keygenMPC();
+    // initSync();
+    // const rtn = greet('ufo ufo ufo');
+    const rtn = await keygenMPC('aaaaaaaaa');
+    // const rtn = await keygenMPC();
     // const rtn = await wallet.keygenMPC();
     console.log(rtn, '-------keygenMPC rtn');
   };

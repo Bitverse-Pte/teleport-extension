@@ -3,7 +3,7 @@ require('dotenv').config();
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TSConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const ESLintWebpackPlugin = require('eslint-webpack-plugin');
+// const ESLintWebpackPlugin = require('eslint-webpack-plugin');
 const tsImportPluginFactory = require('ts-import-plugin');
 const { version } = require('../../../_raw/manifest.json');
 const paths = require('../../paths');
@@ -221,9 +221,9 @@ const config = {
     : []
   ).concat(
     ...[
-      new ESLintWebpackPlugin({
-        extensions: ['ts', 'tsx', 'js', 'jsx'],
-      }),
+      // new ESLintWebpackPlugin({
+      //   extensions: ['ts', 'tsx', 'js', 'jsx'],
+      // }),
       new HtmlWebpackPlugin({
         inject: true,
         template: paths.popupHtml,
