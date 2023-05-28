@@ -28,9 +28,9 @@ const config = (env) => {
         //syncWebAssembly: true,
         // asyncWebAssembly: true,
         //topLevelAwait: true,
-        // asyncWebAssembly: true,
+        asyncWebAssembly: true,
         // syncWebAssembly: true,
-        //   topLevelAwait: true,
+        topLevelAwait: true,
       },
     })(moduleConfigs[env.module], envConfigs[env.config]);
   } else {
