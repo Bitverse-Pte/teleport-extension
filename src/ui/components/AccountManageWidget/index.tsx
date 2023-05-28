@@ -102,15 +102,16 @@ const AccountManageWidget = (props: IAccountManageWidgetProps, ref) => {
               (da: IDisplayAccountManage) => da.hdPathIndex === a.hdPathIndex
             )
           ) {
-            displayAccounts
-              .find(
-                (da: IDisplayAccountManage) => da.hdPathIndex === a.hdPathIndex
-              )
-              ?.ecosystems?.push({
-                accounts: [a],
-                ecosystem: a.ecosystem,
-                ecosystemName: ecosystemMapping[a.ecosystem].ecosystemName,
-              });
+            // COSMOS 隐藏
+            // displayAccounts
+            //   .find(
+            //     (da: IDisplayAccountManage) => da.hdPathIndex === a.hdPathIndex
+            //   )
+            //   ?.ecosystems?.push({
+            //     accounts: [a],
+            //     ecosystem: a.ecosystem,
+            //     ecosystemName: ecosystemMapping[a.ecosystem].ecosystemName,
+            //   });
           } else {
             displayAccounts.push({
               hdPathIndex: a.hdPathIndex,

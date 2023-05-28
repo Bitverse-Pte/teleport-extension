@@ -29,6 +29,7 @@ import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 import { renderAccountCreateType } from 'ui/helpers/utils/account.util';
+import { openIndexPage } from 'background/webapi/tab';
 
 export interface WalletHeaderProps {
   title: string;
@@ -278,21 +279,27 @@ const WalletManage: React.FC = () => {
             </WalletName>
             <div
               className="normal-container flexR cursor"
-              onClick={(e) => {
-                e.stopPropagation();
-                history.push({
-                  pathname: '/mnemonic-check',
-                  state: {
-                    hdWalletId: w.hdWalletId,
-                    accountType,
-                  },
-                });
-              }}
               style={{
                 display: isEdit ? 'none' : 'flex',
               }}
             >
               <IconComponent
+                name="copy"
+                cls="backup-icon"
+                onClick={(e) => openIndexPage('/mpcwalletbackup')}
+              />
+
+              <IconComponent
+                onClick={(e) => {
+                  e.stopPropagation();
+                  history.push({
+                    pathname: '/mnemonic-check',
+                    state: {
+                      hdWalletId: w.hdWalletId,
+                      accountType,
+                    },
+                  });
+                }}
                 name="key"
                 cls={clsx('key-default-icon')}
                 style={
@@ -397,6 +404,29 @@ const WalletManage: React.FC = () => {
             style={{ color: '#fff' }}
           >
             Edit
+          </span>
+        </div>
+        <div
+          className="wallet-manage-button-item cursor flexCol _edit"
+          onClick={() => openIndexPage('/mpc-recovery-wallet')}
+        >
+          <div
+            className="wallet-manage-button-wrap flexR"
+            style={{ background: '#F7A600' }}
+          >
+            <IconComponent
+              name="rocket"
+              cls="wallet-manage-img"
+              style={{
+                fill: isDarkMode ? '#ffffff' : '#000000',
+              }}
+            />
+          </div>
+          <span
+            className="wallet-manage-button-item-title"
+            style={{ color: '#fff' }}
+          >
+            Recovery
           </span>
         </div>
         <div
