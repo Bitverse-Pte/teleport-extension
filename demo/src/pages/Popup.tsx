@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { sendNumber } from '../message';
 // import './Popup.css';
 // import { keygenMPC } from '../mpc.utils';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -15,7 +16,7 @@ import { useEffect } from 'react';
 //   ecdsa_sign_first_handle,
 // } from '../mpc_wallet_core_wasm/pkg';
 
-import { keygenMPC } from '../mpc.utils';
+// import { keygenMPC, test } from '../mpc.utils';
 
 export default function () {
   useEffect(() => {
@@ -26,9 +27,10 @@ export default function () {
     console.log('click1');
     // console.log('------', rtn);
     // var a = test('333');
-
-    var a = keygenMPC('99999999');
-    console.log(a);
+    sendNumber(42); // 42 is logged in the background
+    // var a = keygenMPC('99999999');
+    // var a = test('99999999');
+    // console.log(a);
   };
   return (
     <div>

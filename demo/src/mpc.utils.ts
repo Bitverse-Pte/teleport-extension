@@ -1,9 +1,9 @@
-// import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 // // import hello from './ufo_demo/hello';
 import httpClient from 'bitverse-http-client';
-import * as Comlink from 'comlink';
-import Worker from './worker.ts?worker';
+// import * as Comlink from 'comlink';
+// import Worker from './worker.ts?worker';
 // import InlineWorker from './worker.js?worker&inline';
 
 // console.log('---import.meta.url:', import.meta.url);
@@ -12,23 +12,23 @@ import Worker from './worker.ts?worker';
 //   new URL('../workers/worker.ts', import.meta.url)
 // );
 // const webWorker = new Worker(new URL('./worker.ts', import.meta.url));
-const webWorker = new Worker();
+// const webWorker = new Worker();
 // const work = Comlink.wrap(webWorker);
 
-// export async function keygenMPC(arg) {
-//   console.log(webWorker);
-//   const aaa = await work
-//     .test_wasm(arg)
-//     .then((v) => {
-//       console.log('------keygen1', v);
-//     })
-//     .catch((e) => {
-//       console.log('-------keygen2', e);
-//     });
-//   console.log('------aaa', aaa);
-//   return aaa;
-//   return 'aaa';
-// }
+export async function test(arg) {
+  console.log(webWorker);
+  const aaa = await work
+    .test_wasm(arg)
+    .then((v) => {
+      console.log('------keygen1', v);
+    })
+    .catch((e) => {
+      console.log('-------keygen2', e);
+    });
+  console.log('------aaa', aaa);
+  return aaa;
+  return 'aaa';
+}
 
 export const baseURLMainNet = 'http://api2.bitverse-dev-1.bitverse.zone';
 // console.log('ufoufo hello234:');

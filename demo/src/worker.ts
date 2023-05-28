@@ -46,28 +46,27 @@ const obj = {
   },
 };
 
-Comlink.expose({ test_wasm });
+// Comlink.expose({ test_wasm });
 
-// Comlink.expose({
-//   test,
-//   inc: obj.inc,
-//   ecdsa_keygen_first_handle,
-//   ecdsa_keygen_second_handle,
-//   test_key_gen_first_msg,
-//   ecdsa_chaincode_first_handle,
-//   ecdsa_chaincode_second_handle_and_return_master_key,
-//   ecdsa_build_sign_first_request,
-//   ecdsa_sign_first_handle,
-//   // party_two_key_gen_first_message_handle,
-//   // party_two_key_gen_second_message_handle,
-//   // party_two_chain_code_first_message_handle,
-//   // party_two_chain_code_second_message_handle,
-//   // party_two_compute_chain_code_handle,
-//   // party_two_set_master_key_handle,
-//   // party_two_sign_first_message_handle,
-//   // party_two_sign_second_message_handle,
-//   // test_protoc_1,
-//   // bit_any_pre_sign,
-//   // bit_any_pre_test,
-//   // e_invoke
-// });
+Comlink.expose({
+  test_wasm,
+  ecdsa_keygen_first_handle,
+  ecdsa_keygen_second_handle,
+  test_key_gen_first_msg,
+  ecdsa_chaincode_first_handle,
+  ecdsa_chaincode_second_handle_and_return_master_key,
+  ecdsa_build_sign_first_request,
+  ecdsa_sign_first_handle,
+  // party_two_key_gen_first_message_handle,
+  // party_two_key_gen_second_message_handle,
+  // party_two_chain_code_first_message_handle,
+  // party_two_chain_code_second_message_handle,
+  // party_two_compute_chain_code_handle,
+  // party_two_set_master_key_handle,
+  // party_two_sign_first_message_handle,
+  // party_two_sign_second_message_handle,
+  // test_protoc_1,
+  // bit_any_pre_sign,
+  // bit_any_pre_test,
+  // e_invoke
+});
