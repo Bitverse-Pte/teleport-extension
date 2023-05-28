@@ -1,15 +1,10 @@
 // import { v4 as uuidv4 } from 'uuid';
 
 // // import hello from './ufo_demo/hello';
-<<<<<<< HEAD
-// // import httpClient from 'bitverse-http-client';
-// import * as Comlink from 'comlink';
-=======
 import httpClient from 'bitverse-http-client';
 import * as Comlink from 'comlink';
 import Worker from './worker.ts?worker';
 // import InlineWorker from './worker.js?worker&inline';
->>>>>>> 0ea22b3 (demo is working)
 
 // console.log('---import.meta.url:', import.meta.url);
 // console.log(
@@ -18,7 +13,7 @@ import Worker from './worker.ts?worker';
 // );
 // const webWorker = new Worker(new URL('./worker.ts', import.meta.url));
 const webWorker = new Worker();
-const work = Comlink.wrap(webWorker);
+// const work = Comlink.wrap(webWorker);
 
 // export async function keygenMPC(arg) {
 //   console.log(webWorker);
