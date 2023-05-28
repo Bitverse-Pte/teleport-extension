@@ -621,6 +621,16 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
+bitverse-http-client@1.0.3:
+  version "1.0.3"
+  resolved "https://npm.ffe390afd658c19dcbf707e0597b846d.de/bitverse-http-client/-/bitverse-http-client-1.0.3.tgz#3fb888808d6c034370a9212b7912f353386cd1ed"
+  integrity sha512-NMT50m17lwQu+LtQMwSokLQB6QBRzYJOc2spqubiWgFxXrmXWdJwdmZPPNGPDZ82aCaZ16RDsqIFvMclvGKQIg==
+  dependencies:
+    crypto-js "^4.1.1"
+    js-base64 "^3.7.5"
+    react "^18.2.0"
+    react-dom "^18.2.0"
+
 bluebird@~3.7:
   version "3.7.2"
   resolved "https://mirrors.cloud.tencent.com/npm/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
@@ -851,6 +861,11 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
+comlink@^4.4.1:
+  version "4.4.1"
+  resolved "https://npm.ffe390afd658c19dcbf707e0597b846d.de/comlink/-/comlink-4.4.1.tgz#e568b8e86410b809e8600eb2cf40c189371ef981"
+  integrity sha512-+1dlx0aY5Jo1vHy/tSsIGpSkN4tS9rZSW8FIhG0JH/crs9wwweswIo/POr451r7bZww3hFbPAKnTpimzL/mm4Q==
+
 commander@2.9.0:
   version "2.9.0"
   resolved "https://mirrors.cloud.tencent.com/npm/commander/-/commander-2.9.0.tgz#9c99094176e12240cb22d6c5146098400fe0f7d4"
@@ -935,6 +950,11 @@ crypt@0.0.2:
   version "0.0.2"
   resolved "https://mirrors.cloud.tencent.com/npm/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
   integrity sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=
+
+crypto-js@^4.1.1:
+  version "4.1.1"
+  resolved "https://npm.ffe390afd658c19dcbf707e0597b846d.de/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 crypto-random-string@^4.0.0:
   version "4.0.0"
@@ -1935,6 +1955,11 @@ jose@4.13.1:
   version "4.13.1"
   resolved "https://mirrors.cloud.tencent.com/npm/jose/-/jose-4.13.1.tgz#449111bb5ab171db85c03f1bd2cb1647ca06db1c"
   integrity sha512-MSJQC5vXco5Br38mzaQKiq9mwt7lwj2eXpgpRyQYNHYt2lq1PjkWa7DLXX0WVcQLE9HhMh3jPiufS7fhJf+CLQ==
+
+js-base64@^3.7.5:
+  version "3.7.5"
+  resolved "https://npm.ffe390afd658c19dcbf707e0597b846d.de/js-base64/-/js-base64-3.7.5.tgz#21e24cf6b886f76d6f5f165bfcd69cc55b9e3fca"
+  integrity sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==
 
 js-sdsl@^4.1.4:
   version "4.4.0"

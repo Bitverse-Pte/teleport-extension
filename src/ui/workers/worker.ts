@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 // import init, {
 //   initThreadPool,
 //   test,
@@ -19,9 +21,9 @@ const getRandomValues = crypto.getRandomValues;
 crypto.getRandomValues = function <T extends ArrayBufferView | null>(
   array: T
 ): T {
-  const buffer = new Uint8Array((array as unknown) as Uint8Array);
+  const buffer = new Uint8Array(array as Uint8Array);
   const value = getRandomValues.call(crypto, buffer);
-  ((array as unknown) as Uint8Array).set(value);
+  (array as Uint8Array).set(value);
   return array;
 };
 

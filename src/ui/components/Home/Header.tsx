@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { getProvider } from 'ui/selectors/selectors';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useWallet, useWalletRequest } from 'ui/utils';
-import init, { greet, initSync } from '../../../background/rusttest/pkg';
+// import init, { greet, initSync } from '../../../background/rusttest/pkg';
 import { keygenMPC } from 'ui/utils/mpc.utils';
 
 // void (async function () {
