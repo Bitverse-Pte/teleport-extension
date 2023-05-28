@@ -12,7 +12,6 @@ import { Tabs } from 'constants/wallet';
 import skynet from 'utils/skynet';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
-import { openIndexPage } from 'background/webapi/tab';
 const { sensors } = skynet;
 
 const Welcome = () => {
@@ -30,20 +29,10 @@ const Welcome = () => {
 
     switch (ACCOUNT_CREATE_TYPE[type]) {
       case 'MPCCREATE':
-        history.push({
-          pathname: '/email',
-          state: {
-            redirect: '/mpcwalletbackup',
-          },
-        });
+        history.push('/email-creat');
         break;
       case 'RECOVERY':
-        history.push({
-          pathname: '/email',
-          state: {
-            redirect: '/mpc-recovery-wallet',
-          },
-        });
+        history.push('/email-recovery');
         break;
       case 'CREATE':
         history.push('/create');
@@ -54,13 +43,6 @@ const Welcome = () => {
     }
   };
 
-  const handleBtnBackUp = () => {
-    openIndexPage('/mpcwalletbackup');
-    // history.push({
-    //   pathname: '/MPCWalletBackUp',
-    // });
-  };
-
   return (
     <div className={clsx('welcome-container', { dark: isDarkMode })}>
       <div className="logo-container">
@@ -68,16 +50,6 @@ const Welcome = () => {
         <TlpTextLogo className="logo-header-left-title" viewBox="0 0 102 13" />
         <p className="welcome-to">Welcome to Bitverse Wallet</p>
       </div>
-
-      <CustomButton
-        size="large"
-        block
-        type="default"
-        cls="custom-button-default import-wallet-btn"
-        onClick={() => handleBtnBackUp()}
-      >
-        钱包备份
-      </CustomButton>
 
       <CustomTab
         tab1="MPC Wallet"

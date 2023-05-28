@@ -1,35 +1,29 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useDarkmode } from 'ui/hooks/useDarkMode';
-import clsx from 'clsx';
-import { AccountHeader } from '../AccountRecover';
 import { CustomButton, CustomInput } from 'ui/components/Widgets';
 import { useWallet } from 'ui/utils';
-import { browser } from 'webextension-polyfill-ts';
-import skynet from 'utils/skynet';
-const { sensors } = skynet;
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 import './style.less';
+import { openIndexPage } from 'background/webapi/tab';
+import { browser } from 'webextension-polyfill-ts';
 
-const AccountEmail = () => {
+const AccountEmail = (props) => {
+  const { redirect } = props;
   const { t } = useTranslation();
-  const { state, pathname } = useLocation<{
-    redirect: string;
-  }>();
-  const { redirect } = state;
-
   const history = useHistory();
-  const { isDarkMode } = useDarkmode();
   const [emailAdd, setEmailAdd] = useState('');
   const [emailCode, setEmailCode] = useState('');
+  const [isCode, setIsCode] = useState(true);
   const wallet = useWallet();
   const mailReg =
     /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
   const ClickToCloseMessage = useStyledMessage();
 
-  const handlePwdRedirect = async () => {
+  const onSubmit = async () => {
+    browser.storage.local.set({ email: emailAdd });
     const isBooted = await wallet.isBooted();
+    // const isBooted = true;
     // true 代表没有密码,跳转密码页
     if (isBooted) {
       history.push({
@@ -40,16 +34,11 @@ const AccountEmail = () => {
       });
       return;
     }
-    history.push(`/${redirect}`);
-  };
-
-  const submit = () => {
-    console.log(emailAdd, emailCode);
-    browser.storage.local.set({ email: emailAdd });
-    handlePwdRedirect();
+    openIndexPage(`/${redirect}`);
   };
 
   const handleGetCode = () => {
+    setIsCode(true);
     console.log('getcode');
   };
 
@@ -60,8 +49,7 @@ const AccountEmail = () => {
   }, [emailAdd, emailCode]);
 
   return (
-    <div className={clsx('email-wrap flexCol', { dark: isDarkMode })}>
-      <AccountHeader title="Create MPC Wallet" />
+    <>
       <div className="content content-wrap-padding">
         <CustomInput
           placeholder="Email address"
@@ -75,12 +63,20 @@ const AccountEmail = () => {
                 content: 'invalid email',
                 key: 'invalid email',
               });
+              setIsCode(true);
               return;
+            } else {
+              setIsCode(false);
             }
           }}
         />
         <div className="verified-wrap">
-          <CustomButton type="primary" cls="code-btn" onClick={handleGetCode}>
+          <CustomButton
+            type="primary"
+            disabled={isCode}
+            cls="code-btn"
+            onClick={handleGetCode}
+          >
             GetCode
           </CustomButton>
           <CustomInput
@@ -92,19 +88,18 @@ const AccountEmail = () => {
           />
         </div>
       </div>
-
       <div className="button content-wrap-padding">
         <CustomButton
           type="primary"
           cls="theme email-btn"
           block
-          onClick={submit}
+          onClick={onSubmit}
           disabled={disabled}
         >
           Continue
         </CustomButton>
       </div>
-    </div>
+    </>
   );
 };
 

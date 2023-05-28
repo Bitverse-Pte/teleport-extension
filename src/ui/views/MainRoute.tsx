@@ -38,7 +38,8 @@ const ConfirmSendCos = lazy(() => import('ui/views/SendCosConfirm'));
 const Receive = lazy(() => import('ui/views/Receive'));
 const GasFee = lazy(() => import('ui/views/GasFee'));
 const Policy = lazy(() => import('ui/views/Policy'));
-const Email = lazy(() => import('ui/views/AccountEmail'));
+const CreateEmail = lazy(() => import('ui/views/AccountEmail/create'));
+const RecoveryEmail = lazy(() => import('ui/views/AccountEmail/recovery'));
 
 const MPCCreatePwd = lazy(() => import('ui/views/MPCCreatePwd'));
 
@@ -188,8 +189,11 @@ const Main = () => {
         <LazyPrivateRoute exact path="/mpc-create-pwd">
           <MPCCreatePwd />
         </LazyPrivateRoute>
-        <LazyPrivateRoute exact path="/email">
-          <Email />
+        <LazyPrivateRoute exact path="/email-creat">
+          <CreateEmail />
+        </LazyPrivateRoute>
+        <LazyPrivateRoute exact path="/email-recovery">
+          <RecoveryEmail />
         </LazyPrivateRoute>
       </Switch>
     </Fragment>

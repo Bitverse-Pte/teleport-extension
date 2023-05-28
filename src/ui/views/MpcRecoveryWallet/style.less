@@ -1,35 +1,63 @@
 .mpc-recovery-wallet{
+    max-width: 800px;
+    margin: 20px auto;
     background: #02182B;
     color: #fff;
-    padding: 16px;
-    box-sizing: border-box;
-    margin-bottom: 16px;
+    padding: 32px 16px 16px;
+    border-radius: 20px;
     .header{
-        padding: 22px 5px;
         color: #ADB1B8;
         font-size: 14px;
-        font-weight: 400;
+        margin-bottom: 8px;
         .email{
             color: #fff;
             font-weight: 500;
             font-size: 16px;
-            line-height: 24px;
+            margin-top: 4px;
         }
     }
     .item{
-        margin-bottom: 12px;
-        padding: 10px;
         background: #202030;
+        color: #fff;
+        font-size: 16px;
+        margin-bottom: 12px;
         border-radius: 12px;
+        padding: 0 16px;
+        overflow: hidden;
+        .wallet-name{
+            height: 52px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #313438;
+        }
         .cloud-disk-item{
             display: flex;
-            margin-top: 10px;
+            margin: 16px 0;
             align-items: center;
-            // button{
-            //     border: 1px solid blue;
-            //     padding: 0 3px;
-            //     margin-left: 20px;
-            // }
+            .disk-name{
+                flex:1
+            }
+            .icon-wrap{
+                margin-right: 10px;
+                &.iCloud{
+                    width: 26px;
+                    height: 18px;
+                    background: url('../../../assets/recovery/icloud.png') no-repeat;
+                    background-size: 100%;
+                }
+                &.DropBox{
+                    width: 24px;
+                    height: 24px;
+                    background: url('../../../assets/recovery/dropbox.png') no-repeat;
+                    background-size: 100%;
+                }
+                &.GoogleDrive{
+                    width: 26px;
+                    height: 20px;
+                    background: url('../../../assets/recovery/googledrive.png') no-repeat;
+                    background-size: 100%;
+                }
+            }
         }
     }
 }
