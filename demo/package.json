@@ -10,7 +10,9 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "vite-plugin-wasm": "^3.2.2"
+    "vite-plugin-wasm": "^3.2.2",
+    "bitverse-http-client": "1.0.3",
+    "comlink": "^4.4.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",
