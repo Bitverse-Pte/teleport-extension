@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 //   ecdsa_build_sign_first_request,
 //   ecdsa_sign_first_handle,
 // } from './mpc_wallet_core_wasm/pkg';
-import httpClient from '../../../bitverse-http-client';
+import httpClient from 'bitverse-http-client';
 // import * as Comlink from 'comlink';
 
 // init();

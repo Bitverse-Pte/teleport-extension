@@ -25,7 +25,7 @@ import DataSyncService from './service/dataSyncService';
 import { UPDATE_BADGE } from './service/notification';
 import { cosmosTxHistoryStorage } from './service/transactions/cosmos/cosmos';
 const { PortMessage } = Message;
-import httpClient from '../../bitverse-http-client';
+import httpClient from 'bitverse-http-client';
 
 let appStoreLoaded = false;
 

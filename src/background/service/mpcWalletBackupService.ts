@@ -2,7 +2,7 @@ import eventBus from 'eventBus';
 import { v4 as uuidv4 } from 'uuid';
 import { EVENTS } from 'constants/index';
 import { keyringService } from 'background/service';
-import httpClient from '../../../bitverse-http-client';
+import httpClient from 'bitverse-http-client';
 enum CloudType {
   googleDriver = 'googleDriver',
 }

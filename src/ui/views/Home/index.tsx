@@ -48,7 +48,7 @@ import clsx from 'clsx';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 
-import httpClient from '../../../../bitverse-http-client';
+import httpClient from 'bitverse-http-client';
 
 const Home = () => {
   const { isDarkMode } = useDarkmode();
