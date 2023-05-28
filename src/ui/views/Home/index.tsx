@@ -449,6 +449,22 @@ const Home = () => {
               )}
             </div>
             <button onClick={testHttp}>test http3</button>
+            <button
+              onClick={async () => {
+                const res = await wallet.getStorage('test');
+                console.log('[get storage]', res);
+              }}
+            >
+              读存储
+            </button>
+            <button
+              onClick={async () => {
+                const res = await wallet.setStorage('test', { a: 1, b: 2 });
+                console.log('[set storage]', res);
+              }}
+            >
+              写存储
+            </button>
             <div className="home-preview-button-container flexR">
               <TipButton
                 title="Send"
