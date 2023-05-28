@@ -35,18 +35,6 @@
   "background": {
     "service_worker": "bg-loader.js"
   },
-  "content_scripts": [
-    {
-      "all_frames": true,
-      "js": ["webextension-polyfill.js", "content-script.js"],
-      "matches": ["file://*/*", "http://*/*", "https://*/*"],
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["*://connect.trezor.io/*/popup.html"],
-      "js": ["vendor/trezor/trezor-content-script.js"]
-    }
-  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
   },
