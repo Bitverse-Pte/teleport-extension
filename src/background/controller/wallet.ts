@@ -40,7 +40,8 @@ import { BigNumberish } from 'ethers';
 import { CosmosChainInfo } from 'types/cosmos';
 import { KeplrGetKeyResponseInterface } from 'types/keyBase';
 import { getSymbolByERC20Contract, parseErc20Data } from './parseERC20';
-import { keygenMPC } from '../mpc.utils';
+// import { keygenMPC } from '../mpc.utils';
+import { storage } from 'background/webapi';
 
 export class WalletController extends BaseController {
   isBooted = () => keyringService.isBooted();
@@ -215,6 +216,10 @@ export class WalletController extends BaseController {
   };
 
   setPassword = (password?: string) => keyringService.setPassword(password);
+
+  setStorage = (prop: any, value: any) => storage.set(prop, value);
+
+  getStorage = (prop: any) => storage.get(prop);
 
   importHdWalletByMnemonic = async (
     opts: Required<CreateAccountOpts>
@@ -712,7 +717,9 @@ export class WalletController extends BaseController {
     return getSymbolByERC20Contract(contractAddress);
   };
   keygenMPC = () => {
-    return keygenMPC();
+    // 这里报错了，没有引用到方法，先注释了
+    console.log('keygenMPC...');
+    // return keygenMPC();
   };
 }
 
