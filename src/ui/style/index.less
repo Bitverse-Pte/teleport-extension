@@ -133,3 +133,63 @@ button:focus {
     }
   }
 // }
+
+.fw{
+  font-weight: 600;
+}
+.fs14{
+  font-size: 14px;
+}
+.fs24{
+  font-size: 24px;
+}
+.fs16{
+  font-size: 16px;
+}
+
+.opeinIndex-wrap{
+  max-width: 600px;
+  margin: 20px auto;
+  background: #02182B;
+  color: #fff;
+  padding: 32px 16px 16px;
+  border-radius: 20px;
+  .g-item-list{
+    background: #202030;
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    padding: 0 16px;
+    overflow: hidden;
+    .cloud-disk-item{
+      display: flex;
+      margin: 16px 0;
+      align-items: center;
+      .disk-name{
+          flex:1
+      }
+    }
+    .icon-wrap{
+      margin-right: 10px;
+      &.iCloud{
+          width: 26px;
+          height: 18px;
+          background: url('../../../assets/recovery/icloud.png') no-repeat;
+          background-size: 100%;
+      }
+      &.DropBox{
+          width: 24px;
+          height: 24px;
+          background: url('../../../assets/recovery/dropbox.png') no-repeat;
+          background-size: 100%;
+      }
+      &.GoogleDrive{
+          width: 26px;
+          height: 20px;
+          background: url('../../../assets/recovery/googledrive.png') no-repeat;
+          background-size: 100%;
+      }
+  }
+  }
+}

@@ -6,7 +6,6 @@ import walletLogo from 'assets/Logo.svg';
 import { ReactComponent as TlpTextLogo } from 'assets/teleportText.svg';
 import axios from 'axios';
 import { data } from './recover';
-import { Button, Tag } from 'antd';
 import JSEncrypt from 'jsencrypt';
 
 import './style.less';
@@ -145,14 +144,14 @@ const Welcome = () => {
     getWalletRecovery();
   }, []);
   return (
-    <div className="mpc-recovery-wallet">
+    <div className="opeinIndex-wrap mpc-recovery-wallet">
       <div className="header">
         <div>The cloud disk associated with</div>
         <div className="email">{getEmail}</div>
       </div>
       {wallets.map((item: any) => {
         return (
-          <div key={item.walletId} className="item">
+          <div key={item.walletId} className="item g-item-list">
             <div className="wallet-name">{item.walletName}</div>
             {item.cloudDisk.map((i) => {
               return (
@@ -164,13 +163,13 @@ const Welcome = () => {
                     )}`}
                   ></div>
                   <div className="disk-name">{typeMap[i.cloudDiskType]}</div>
-                  <Button
+                  <CustomButton
                     type="primary"
                     disabled={i.cloudDiskType !== 2}
                     onClick={() => handleBtnClick(i.mpcClientMasterKey)}
                   >
                     立即同步
-                  </Button>
+                  </CustomButton>
                 </div>
               );
             })}

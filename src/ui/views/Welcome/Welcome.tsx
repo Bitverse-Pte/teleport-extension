@@ -12,6 +12,7 @@ import { Tabs } from 'constants/wallet';
 import skynet from 'utils/skynet';
 import { useDarkmode } from 'ui/hooks/useDarkMode';
 import clsx from 'clsx';
+import { openIndexPage } from 'background/webapi/tab';
 const { sensors } = skynet;
 
 const Welcome = () => {
@@ -50,6 +51,15 @@ const Welcome = () => {
         <TlpTextLogo className="logo-header-left-title" viewBox="0 0 102 13" />
         <p className="welcome-to">Welcome to Bitverse Wallet</p>
       </div>
+      <CustomButton
+        size="large"
+        block
+        type="primary"
+        cls="create"
+        onClick={() => openIndexPage('/mpcwalletbackup')}
+      >
+        mpc wallet backup
+      </CustomButton>
 
       <CustomTab
         tab1="MPC Wallet"

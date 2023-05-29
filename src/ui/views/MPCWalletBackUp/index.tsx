@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { FC } from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { getGoogleAuthToken } from 'ui/utils/auth2';
+import { CustomButton } from 'ui/components/Widgets';
+import './style.less';
 
 interface MPCWalletBackUpProps {}
 
@@ -62,7 +64,46 @@ const MPCWalletBackUp: FC<MPCWalletBackUpProps> = () => {
   }
 
   return (
-    <div>
+    <div className="opeinIndex-wrap backup-wrap">
+      <div className="fs24">Recovery Kit</div>
+      <div className="hint">
+        If you switch devices, you can easily restore your wallet. No private
+        keys needed. Files will be backed up on your personal cloud drive, back
+        up your files on multiple cloud drives for extra security.
+      </div>
+      <div className="t2">Choose Recovery File</div>
+      <div className="g-item-list">
+        <div className="cloud-disk-item">
+          <div className="icon-wrap iCloud"></div>
+          <div className="disk-name">iCloud</div>
+          <CustomButton type="primary" onClick={() => handleUploadButtonClick}>
+            立即同步
+          </CustomButton>
+        </div>
+        <div className="cloud-disk-item">
+          <div className="icon-wrap iCloud"></div>
+          <div className="disk-name">Google Drive</div>
+          <CustomButton type="primary" onClick={() => handleUploadButtonClick}>
+            立即同步
+          </CustomButton>
+        </div>
+        <div className="cloud-disk-item">
+          <div className="icon-wrap DropBox"></div>
+          <div className="disk-name">Drop Box</div>
+          <CustomButton type="primary" onClick={() => handleUploadButtonClick}>
+            立即同步
+          </CustomButton>
+        </div>
+      </div>
+
+      <CustomButton
+        type="default"
+        cls="custom-button-default later-btn"
+        onClick={() => handleUploadButtonClick}
+      >
+        Recovery Later
+      </CustomButton>
+
       <button
         onClick={handleUploadButtonClick}
         style={{ border: '1px solid red' }}
