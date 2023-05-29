@@ -147,14 +147,14 @@ button:focus {
   font-size: 16px;
 }
 
-.opeinIndex-wrap{
-  min-height: 690px;
-  max-width: 600px;
-  margin: 20px auto;
-  background: #02182B;
-  color: #fff;
-  padding: 32px 16px 16px;
-  border-radius: 20px;
+.openIndex-wrap{
+  padding: 40px;
+  .wrap-container{
+    max-width: 600px;
+    margin: 0 auto;
+    color: #fff;
+    border-radius: 20px;
+  }
   .g-item-list{
     background: #202030;
     color: #fff;
@@ -192,5 +192,26 @@ button:focus {
           background-size: 100%;
       }
   }
+  }
+}
+
+.g-drawer-wrap{
+  .ant-drawer-content{
+    border-radius: 10px 10px 0 0;
+    background: #202030;
+  }
+  .ant-drawer-header{
+    background: #202030;
+    color: #fff;
+    border-bottom-color: #000;
+    .ant-drawer-title{
+      color: #fff;
+    }
+  }
+  .ant-btn{
+    display: block;
+    margin: 20px auto;
+    width: 200px;
+    height: 46px !important;
   }
 }

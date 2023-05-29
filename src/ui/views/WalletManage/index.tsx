@@ -10,7 +10,7 @@ import {
   HdAccountStruct,
 } from 'types/extend';
 import { Tabs, WALLET_THEME_COLOR } from 'constants/wallet';
-import { CustomTab, WalletName } from 'ui/components/Widgets';
+import { CustomButton, CustomTab, WalletName } from 'ui/components/Widgets';
 import { IconComponent } from 'ui/components/IconComponents';
 import noAssets from 'assets/noAssets.svg';
 import noAssetsDark from 'assets/noAssetDark.svg';
@@ -30,6 +30,7 @@ import clsx from 'clsx';
 import { useStyledMessage } from 'ui/hooks/style/useStyledMessage';
 import { renderAccountCreateType } from 'ui/helpers/utils/account.util';
 import { openIndexPage } from 'background/webapi/tab';
+import { Drawer } from 'antd';
 
 export interface WalletHeaderProps {
   title: string;
@@ -70,6 +71,7 @@ const WalletManage: React.FC = () => {
   const [unlockType, setUnlockType] = useState('edit');
   const { isDarkMode } = useDarkmode();
   const ClickToCloseMessage = useStyledMessage();
+  const [openCreateWallet, setOpenCreateWallet] = useState(false);
 
   const queryWallets = async () => {
     const accounts: HdAccountStruct[] = await wallet.getWalletList();
@@ -373,7 +375,7 @@ const WalletManage: React.FC = () => {
           handleDoneClick={() => setIsEdit(!isEdit)}
         />
       ) : (
-        <Header title="Manage Wallets c" />
+        <Header title="Manage Wallets" />
       )}
       <div
         className="wallet-manage-button-container flexR content-wrap-padding"
@@ -454,7 +456,7 @@ const WalletManage: React.FC = () => {
           </span>
         </div>
         <div
-          onClick={handleCreateBtnClick}
+          onClick={() => setOpenCreateWallet(true)}
           className="wallet-manage-button-item cursor flexCol _add"
         >
           <div
@@ -543,6 +545,36 @@ const WalletManage: React.FC = () => {
         }}
         onConfirm={onRenameConfirm}
       />
+
+      <Drawer
+        title="Select Wallet Type"
+        placement="bottom"
+        closable={false}
+        height={280}
+        className="g-drawer-wrap"
+        onClose={() => setOpenCreateWallet(false)}
+        visible={openCreateWallet}
+      >
+        <CustomButton
+          size="large"
+          block
+          type="primary"
+          onClick={() => {
+            history.push('/email-creat');
+          }}
+        >
+          Create MPC Wallet
+        </CustomButton>
+        <CustomButton
+          size="large"
+          block
+          type="default"
+          cls="custom-button-default"
+          onClick={handleCreateBtnClick}
+        >
+          Create Normal Wallet
+        </CustomButton>
+      </Drawer>
     </div>
   );
 };

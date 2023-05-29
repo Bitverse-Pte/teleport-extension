@@ -144,38 +144,40 @@ const Welcome = () => {
     getWalletRecovery();
   }, []);
   return (
-    <div className="opeinIndex-wrap mpc-recovery-wallet">
-      <div className="header">
-        <div>The cloud disk associated with</div>
-        <div className="email">{getEmail}</div>
+    <div className="openIndex-wrap">
+      <div className="wrap-container mpc-recovery-wallet">
+        <div className="header">
+          <div>The cloud disk associated with</div>
+          <div className="email">{getEmail}</div>
+        </div>
+        {wallets.map((item: any) => {
+          return (
+            <div key={item.walletId} className="item g-item-list">
+              <div className="wallet-name">{item.walletName}</div>
+              {item.cloudDisk.map((i) => {
+                return (
+                  <div className="cloud-disk-item" key={i.cloudDiskType}>
+                    <div
+                      className={`icon-wrap ${typeMap[i.cloudDiskType].replace(
+                        ' ',
+                        ''
+                      )}`}
+                    ></div>
+                    <div className="disk-name">{typeMap[i.cloudDiskType]}</div>
+                    <CustomButton
+                      type="primary"
+                      disabled={i.cloudDiskType !== 2}
+                      onClick={() => handleBtnClick(i.mpcClientMasterKey)}
+                    >
+                      立即同步
+                    </CustomButton>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
-      {wallets.map((item: any) => {
-        return (
-          <div key={item.walletId} className="item g-item-list">
-            <div className="wallet-name">{item.walletName}</div>
-            {item.cloudDisk.map((i) => {
-              return (
-                <div className="cloud-disk-item" key={i.cloudDiskType}>
-                  <div
-                    className={`icon-wrap ${typeMap[i.cloudDiskType].replace(
-                      ' ',
-                      ''
-                    )}`}
-                  ></div>
-                  <div className="disk-name">{typeMap[i.cloudDiskType]}</div>
-                  <CustomButton
-                    type="primary"
-                    disabled={i.cloudDiskType !== 2}
-                    onClick={() => handleBtnClick(i.mpcClientMasterKey)}
-                  >
-                    立即同步
-                  </CustomButton>
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
     </div>
   );
 };

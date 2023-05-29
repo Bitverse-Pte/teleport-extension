@@ -67,23 +67,24 @@ const MPCWalletBackUp: FC<MPCWalletBackUpProps> = () => {
   }
 
   return (
-    <div className="opeinIndex-wrap backup-wrap">
-      <div className="fs24">Recovery Kit</div>
-      <div className="hint">
-        If you switch devices, you can easily restore your wallet. No private
-        keys needed. Files will be backed up on your personal cloud drive, back
-        up your files on multiple cloud drives for extra security.
-      </div>
-      <div className="t2">Choose Recovery File</div>
-      <div className="g-item-list">
-        <div className="cloud-disk-item">
-          <div className="icon-wrap GoogleDrive"></div>
-          <div className="disk-name">Google Drive</div>
-          <CustomButton type="primary" onClick={handleUploadButtonClick}>
-            立即同步
-          </CustomButton>
+    <div className="openIndex-wrap">
+      <div className="wrap-container backup-wrap">
+        <div className="fs24">Recovery Kit</div>
+        <div className="hint">
+          If you switch devices, you can easily restore your wallet. No private
+          keys needed. Files will be backed up on your personal cloud drive,
+          back up your files on multiple cloud drives for extra security.
         </div>
-        {/* <div className="cloud-disk-item">
+        <div className="t2">Choose Recovery File</div>
+        <div className="g-item-list">
+          <div className="cloud-disk-item">
+            <div className="icon-wrap GoogleDrive"></div>
+            <div className="disk-name">Google Drive</div>
+            <CustomButton type="primary" onClick={handleUploadButtonClick}>
+              立即同步
+            </CustomButton>
+          </div>
+          {/* <div className="cloud-disk-item">
           <div className="icon-wrap iCloud"></div>
           <div className="disk-name">iCloud</div>
           <CustomButton type="primary" onClick={handleUploadButtonClick}>
@@ -97,17 +98,18 @@ const MPCWalletBackUp: FC<MPCWalletBackUpProps> = () => {
             立即同步
           </CustomButton>
         </div> */}
-      </div>
-
-      {/* <p>authToken: {authToken}</p> */}
-
-      {isModalOpen && (
-        <div className="loading-box">
-          <div className="loading-content">
-            <span className="loader"></span>
-          </div>
         </div>
-      )}
+
+        {/* <p>authToken: {authToken}</p> */}
+
+        {isModalOpen && (
+          <div className="loading-box">
+            <div className="loading-content">
+              <span className="loader"></span>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
