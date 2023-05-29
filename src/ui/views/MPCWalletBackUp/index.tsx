@@ -9,6 +9,8 @@ interface MPCWalletBackUpProps {}
 
 const MPCWalletBackUp: FC<MPCWalletBackUpProps> = () => {
   const [authToken, setAuthToken] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleGoogleAuth = async () => {
     const token = await getGoogleAuthToken();
     setAuthToken(token);
@@ -44,6 +46,7 @@ const MPCWalletBackUp: FC<MPCWalletBackUpProps> = () => {
 
   // 上传按钮点击事件处理函数
   function handleUploadButtonClick() {
+    setIsModalOpen(true);
     const content = `-----BEGIN PUBLIC KEY-----
     MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjf6OVp0fzHU525LaZu+X
     7SRg4MeyBep4TgfY1Txq5HyGxp8XTiVavcOrQ08qTxR9jcVSKuzg84yhE85epdPm
@@ -74,43 +77,37 @@ const MPCWalletBackUp: FC<MPCWalletBackUpProps> = () => {
       <div className="t2">Choose Recovery File</div>
       <div className="g-item-list">
         <div className="cloud-disk-item">
-          <div className="icon-wrap iCloud"></div>
-          <div className="disk-name">iCloud</div>
-          <CustomButton type="primary" onClick={() => handleUploadButtonClick}>
+          <div className="icon-wrap GoogleDrive"></div>
+          <div className="disk-name">Google Drive</div>
+          <CustomButton type="primary" onClick={handleUploadButtonClick}>
             立即同步
           </CustomButton>
         </div>
-        <div className="cloud-disk-item">
+        {/* <div className="cloud-disk-item">
           <div className="icon-wrap iCloud"></div>
-          <div className="disk-name">Google Drive</div>
-          <CustomButton type="primary" onClick={() => handleUploadButtonClick}>
+          <div className="disk-name">iCloud</div>
+          <CustomButton type="primary" onClick={handleUploadButtonClick}>
             立即同步
           </CustomButton>
         </div>
         <div className="cloud-disk-item">
           <div className="icon-wrap DropBox"></div>
           <div className="disk-name">Drop Box</div>
-          <CustomButton type="primary" onClick={() => handleUploadButtonClick}>
+          <CustomButton type="primary" onClick={handleUploadButtonClick}>
             立即同步
           </CustomButton>
-        </div>
+        </div> */}
       </div>
 
-      <CustomButton
-        type="default"
-        cls="custom-button-default later-btn"
-        onClick={() => handleUploadButtonClick}
-      >
-        Recovery Later
-      </CustomButton>
+      {/* <p>authToken: {authToken}</p> */}
 
-      <button
-        onClick={handleUploadButtonClick}
-        style={{ border: '1px solid red' }}
-      >
-        google auth
-      </button>
-      <p>authToken: {authToken}</p>
+      {isModalOpen && (
+        <div className="loading-box">
+          <div className="loading-content">
+            <span className="loader"></span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
